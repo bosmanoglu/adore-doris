@@ -1,0 +1,167 @@
+#!/bin/bash
+#  Modif Batu 2006/11/17 02:03pm
+# baseline.fast
+#%// BK 27-Oct-2000
+#%// $Revision: 3.5 $  $Date: 2003/04/14 06:35:15 $
+######################################################################
+#set -v on
+#set -x on
+PRG=`basename "$0"`
+VER="v1.1, FMR software"
+AUT="Bert Kampes, (c)2000"
+echo "$PRG $VER, $AUT"
+
+### Handle input
+if [ $# != 1 ]; then
+	echo " Usage: $0 project_inputfile"
+	exit 127
+fi
+
+######### Find Master Function ###############
+#Determine the average baselines for all possible masters
+find_master () 
+{
+if [ -e ${scripts}/${frame}_bl_avg.txt ]; then
+	mv ${scripts}/${frame}_bl_avg.txt ${scripts}/${frame}_bl_avg.txt.old
+fi
+
+for master in ${frame_stack}
+  do
+  	btemp_avg=0; bperp_avg=0; bparl_avg=0; cntr=0;
+  	exec < ${scripts}/${frame}_baselines.txt
+  	while read line
+  	do
+		acqu1=`echo ${line} | cut -f1 --delimiter=" "`
+		acqu2=`echo ${line} | cut -f2 --delimiter=" "`
+		btemp=`echo ${line} | cut -f3 --delimiter=" "`
+		bperp=`echo ${line} | cut -f4 --delimiter=" "`
+		bparl=`echo ${line} | cut -f5 --delimiter=" "`
+		if [ ${acqu1} == ${master} ] || [ ${acqu2} == ${master} ]; then
+			bperp_avg=$(echo "scale=2; ${bperp_avg}+ sqrt(${bperp}^2)" | bc)
+			btemp_avg=$(echo "scale=2; ${btemp_avg}+ sqrt(${btemp}^2)" | bc)
+			bparl_avg=$(echo "scale=2; ${bparl_avg}+ sqrt(${bparl}^2)" | bc)
+			let "cntr += 1"
+		else
+			continue
+		fi						
+		echo "${master} ${btemp_avg} ${bperp_avg} ${bparl_avg} ${cntr}"
+        done
+        bperp_avg=$(echo "scale=2; ${bperp_avg}/${cntr}" | bc)
+        btemp_avg=$(echo "scale=2; ${btemp_avg}/${cntr}" | bc)
+        bparl_avg=$(echo "scale=2; ${bparl_avg}/${cntr}" | bc)
+        	
+        echo "${master} ${btemp_avg} ${bperp_avg} ${bparl_avg}" >> ${scripts}/${frame}_bl_avg.txt
+        echo "> ${master} ${btemp_avg} ${bperp_avg} ${bparl_avg}"
+  done
+}
+
+######### END OF Find Master Function ########
+
+
+
+# PROJECT PARAMATERS: global & only these need to be modified
+frame=`grep "frame" $1 | cut -f2 -d "="`
+raid=`grep "raid" $1 | cut -f2 -d "="`
+username=`grep "username" $1 | cut -f2 -d "="`
+crop=`grep "crop" $1 | cut -f2 -d "="`
+
+# DIRECTORY STRUCTURE
+data=/${raid}/data/${username}/${frame}/data
+scripts=/${raid}/data/${username}/${frame}/scripts
+
+if [ ! -d ${scripts}/log ]; then
+    mkdir ${scripts}/log
+fi
+# 
+log=${scripts}/log
+#
+# TEMP DIR: if there's no one create it
+if [ ! -d ${scripts}/temp ]; then
+	mkdir ${scripts}/temp
+fi
+temp=${scripts}/temp
+#
+#orbits=/RAID3/data/orbits_freek
+        
+# DATE_REFERENCE: 
+# for getorb UTC seconds since [00:00:00 1970-01-01] to [00:00:00
+# 1985-01-01]
+#date_getorb_ref=`date --date '01-Jan-1985 0:00:00' +%sm`
+# FUNCTION: LSD: list only directory (requests (g)awk)
+lsd ()
+{
+    # local argument
+        ls -l ${1} | awk '/^d/ {print $NF}'
+}
+         
+# CREATE INPUT FILES: easier with input/output files
+if [ ! -e ${log}/${frame}_stack ]; then
+	lsd ${data} > ${log}/${frame}_stack
+fi
+      
+# LOG FILE
+echo "Start (initialization) time: " > ${log}/${crop}_log
+date > ${log}/${crop}_log
+frame_stack=`cat ${log}/${frame}_stack`
+
+#Clean Start
+if [ -e ${scripts}/${frame}_baselines.txt ]; then
+	echo "There is already a ${scripts}/${frame}_baselines.txt file."
+	echo "Would you like me to use it? [y/n]"
+	read answer
+
+	if [ $answer == "y" ]; then
+		echo "Find Master Running..."
+		find_master
+		exit 0
+	else
+		echo "Renaming file as ${scripts}/${frame}_baselines.txt.old"
+		mv ${scripts}/${frame}_baselines.txt ${scripts}/${frame}_baselines.txt.old
+	fi
+fi
+printf "Master Slave Btemp Bperp Bparl\n" > ${scripts}/${frame}_baselines.txt
+cd ${temp}
+for master in ${frame_stack}
+  do
+	for slave in ${frame_stack}
+	  do         
+	  if [ $master == $slave ]||[ -e ${slave}_${master}.prod ]; then
+	  	continue
+	  elif [ ! -e ${master}_${slave}.prod ]; then
+#	  	### Correct input.
+		masterres=${master}.res
+	  	MASTERFILE="${data}/${master}/${crop}/${master}.res"
+	  	if [ ! -e ${masterres} ]; then
+	  		ln -s ${MASTERFILE} ${master}.res
+	  	fi
+	  	slaveres=${slave}.res
+	  	SLAVEFILE="${data}/${slave}/${crop}/${slave}.res"
+	  	if [ ! -e ${slaveres} ]; then
+			ln -s ${SLAVEFILE} ${slave}.res
+	 	fi
+	  	### Create dummy input file(s).
+	  	DORISIN=${master}_${slave}.in
+	  	DORISOUT=${master}_${slave}.out
+	  	LOGFILE=${master}_${slave}.log
+	  	PRODFILE=${master}_${slave}.prod
+
+
+	  	###
+	  	cat ${scripts}/templates/input.baseline \
+	     	 |sed ''s/MASTERFILE/${masterres}/g'' | sed ''s/SLAVEFILE/${slaveres}/g'' |sed ''s/PRODUCTFILE/${PRODFILE}/g'' > ${DORISIN}
+
+  	  	### Run Doris, module XXX, use DUMPBASELINE card.
+	  	doris $DORISIN > $DORISOUT
+	  	rm ${master}_${slave}.in ${master}_${slave}.out
+	  fi
+	  	btemp=`cat ${master}_${slave}.prod | grep Btemp | cut -f3 -d: | cut -f1 -d/ | tr ' ' ' '`
+	  	bperp=`cat ${master}_${slave}.prod | grep Bperp | cut -f2 -d: | cut -f1 -d/ | tr ' ' ' '`
+	  	bpar=`cat ${master}_${slave}.prod | grep Bpar | cut -f2 -d: | cut -f1 -d/ | tr ' ' ' '`
+	  
+	  	line=$(printf "%s\t%s\t%s\t%s\t%s" $master $slave $btemp $bperp $bpar )
+	  	echo $line >> ${scripts}/${frame}_baselines.txt	  
+	done
+  done
+
+find_master
+exit 0

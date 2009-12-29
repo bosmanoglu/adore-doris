@@ -1,0 +1,24 @@
+c ***********************************************************
+c File created by: $PRG $VER
+c Author: $AUT
+c  This is an input file for Doris to perform baseline estimation
+c  from prompt.
+c ***********************************************************
+ c
+ comment  ___general options___
+ c
+SCREEN          ${SCREEN}
+MEMORY          ${MEMORY}
+OVERWRITE       ${OVERWRITE}
+BATCH           ${BATCH}
+LISTINPUT       ${LISTINPUT}
+DUMPBASELINE    ${DUMPBASELINE}
+PROCESS         coarseorb
+LOGFILE         ${LOGFILE}
+M_RESFILE       ${M_RESFILE}
+S_RESFILE       ${S_RESFILE}
+I_RESFILE       ${I_RESFILE}
+ c
+ c
+ c
+STOP
