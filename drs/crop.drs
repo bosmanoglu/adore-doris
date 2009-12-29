@@ -1,0 +1,50 @@
+ c                                       //
+ c         ___               ___         //
+ comment   ___GENERAL OPTIONS___         //
+ c                                       //
+SCREEN          info                     // level of output to standard out
+BEEP            off                      // level of beeping
+PREVIEW         off                       // SUNraster files with cpxfiddle
+MEMORY          500                      // MB
+OVERWRITE       ON                       // overwrite existing files
+BATCH           ON                       // non-interactive
+LISTINPUT       ON                       // copy this file to log
+DUMPBASELINE  15 10                    // eval baseline on grid
+HEIGHT		CenterHei		// Average Height for the crop
+c                                        //
+PROCESS         m_crop                   // convert data to internal format
+PROCESS		m_ovs			 // oversample cropped data
+PROCESS         m_porbits                // get precise orbits
+#                                        //
+#   the general io files                 //
+#   --------------------                 //
+LOGFILE         OutputFolder/log.out                  // 
+ c
+M_RESFILE       OutputFolder/SLCFolder.res                  // parameter file
+ c                                       //
+ c         ___         ___               //
+ c         ___    ___                    //
+ comment   ___CROP___                    //
+ c                                       //
+ M_CROP_ID       master                  // identifier
+ M_CROP_IN       ProjectFolder/data/SLCFolder/SLCDataFile         // slc data file
+ M_CROP_OUT      OutputFolder/SLCFolder.crop   // output filename
+ M_DBOW_GEO      CenterPhi CenterLam AzWidth RgWidth //
+ c                                       //
+ c         ___       ___                 //
+ comment   ___M_OVS  ___                 //
+ c                                       //
+ M_OVS_OUT	OutputFolder/SLCFolder.ovs
+ M_OVS_FACT_RNG Ovs_Rg
+ M_OVS_FACT_AZI Ovs_Az
+ c
+ c         ___       ___                 //
+ comment   ___PORBITS___                 //
+ c                                       //
+M_ORBDIR        SLCOrbit
+M_ORB_EXTRATIME 10                     // Time before first line
+M_ORB_INTERVAL  1                      // Time between data
+c M_ORB_DUMP      0.05                  // dump to ascii file
+c                                       //
+c                                       //
+STOP                                    // mandatory

@@ -1,0 +1,36 @@
+ c         ___               ___        //
+ comment   ___GENERAL OPTIONS___        //
+ c                                      //
+SCREEN          debug                    // level of output to standard out
+BEEP            off                     // level of beeping
+PREVIEW         off                     // SUNraster files with cpxfiddle
+MEMORY          800                   // MB
+OVERWRITE       ON                      // overwrite existing files
+BATCH           ON                      // non-interactive
+LISTINPUT       ON                      // copy this file to log
+ c
+ PROCESS 	 geocode		// georeference the results
+#                                       //
+#   the general io files                //
+#   --------------------                //
+LOGFILE         OutputFolder/log.out                 // 
+M_RESFILE       OutputFolder/MasterFolder.res            // parameter file
+S_RESFILE       OutputFolder/SLCFolder.res           // parameter file
+I_RESFILE       OutputFolder/MasterFolder_SLCFolder.res  // parameter file                      
+c
+c
+comment ___SLANT2H___
+c
+S2H_METHOD	ambiguity
+S2H_OUT_HEI	OutputFolder/geo_MasterFolder_SLCFolder.hei
+S2H_OUT_PHI	OutputFolder/s2h_MasterFolder_SLCFolder.phi
+S2H_OUT_LAM	OutputFolder/s2h_MasterFolder_SLCFolder.lam
+c
+c       ___       ___
+comment ___GEOCODE___
+c
+GEO_OUT_PHI	OutputFolder/geo_MasterFolder_SLCFolder.phi
+GEO_OUT_LAM	OutputFolder/geo_MasterFolder_SLCFolder.lam
+c
+STOP                                    // mandatory
+
