@@ -1,0 +1,94 @@
+ccccccccccccccccccccccccccccccccccc
+ccc   ADORE RUN-TIME Settings   ccc
+ccccccccccccccccccccccccccccccccccc
+AdoreFolder=/RAID3/data/batu/bin/adore
+ProjectFolder=/RAID3/data/batu/adore_boston
+ProjectName=All_i12s
+CropsFolder=ProjectFolder/process/ProjectName/crops
+i12sFolder=ProjectFolder/process/ProjectName/i12s
+PsiFolder=ProjectFolder/process/ProjectName/psi
+LogFile=ProjectFolder/ProjectName.log
+MasterFolder=25378 ccc 03993 ccc `ls -F ProjectFolder/data/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`		ccc	MasterFolder can be AUTO or a single orbit folder...
+SLCOrbit=`AdoreFolder/scripts/findorbits.sh OutputFolder/SLCFolder.res /RAID6/insar_lab/orbits`
+SLCFolder=`ls -F ProjectFolder/data/ | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null`
+SLCNoMaster=`ls -F ProjectFolder/data/ | grep -v MasterFolder | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null`
+SLCNoExclude=`ls -F ProjectFolder/data/ | grep -v -f excludeslc | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null`
+SLCInterf=`ls -F ProjectFolder/data/ | grep -v -f excludeslc | grep -v MasterFolder | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null`
+ccccccccccccccccccccccccccccccccccc
+ccc	Naming Convention	ccc
+ccccccccccccccccccccccccccccccccccc
+VolumeFile=VDF_DAT.001        ccc slc volume file
+LeaderFile=LEA_01.001         CCC slc leaderfile
+SLCDataFile=DAT_01.001         ccc slc data file
+DataFilePath=ProjectFolder/data/SLCFolder
+ccc For Envisat
+ccc DataFilePath=`ls ProjectFolder/data/SLCFolder/dat.*SLC | tr -d '\n'`
+ccc SLCDataFile=`basename DataFilePath | tr -d '\n'`         ccc slc data file
+ccccccccccccccccccccccccccccccccccc
+ccc	    Project Area	ccc
+ccccccccccccccccccccccccccccccccccc
+CenterPhi=42.3622
+CenterLam=-71.0635
+AzWidth=4200	ccc 8km over 2m + buffer 200
+RgWidth=1300	ccc 11km over 10m + buffer 200
+IfgArea=`AdoreFolder/scripts/setinterfarea.sh CropsFolder/MasterFolder/MasterFolder.res 100 100 | tr -d '\n'`
+ccccccccccccccccccccccccccccccccccc
+ccccccccccccccccccccccccccccccccccc
+ccc   Oversampling Parameters	ccc
+ccccccccccccccccccccccccccccccccccc
+Ovs_Az=2
+Ovs_Rg=2
+ccccccccccccccccccccccccccccccccccc
+ccc   Processes   		ccc
+ccccccccccccccccccccccccccccccccccc
+Process Start
+
+ccc Declare General Variables
+ASSIGN CropsFolder
+ASSIGN i12sFolder
+ASSIGN psiFolder
+ASSIGN MasterFolder
+
+ccc FOREACH SLCFolder {
+ccc	REASSIGN OutputFolder=CropsFolder/SLCFolder
+ccc	ASSIGN DataFilePath
+ccc	PERL 'use File::Path;mkpath("OutputFolder");'
+ccc	PREPROCESS ProjectFolder/adore/readfiles.drs OutputFolder/readfiles.drs     
+ccc	doris OutputFolder/readfiles.drs
+ccc	ASSIGN SLCOrbit
+ccc	PREPROCESS ProjectFolder/adore/crop.drs OutputFolder/crop.drs
+ccc	doris OutputFolder/crop.drs
+ccc }
+
+
+ccc REASSIGN SLCFolder=SLCNoMaster
+
+ccc FOREACH SLCFolder {
+ccc	REASSIGN OutputFolder=ProjectFolder/process/ProjectName/i12s_baseline/MasterFolder_SLCFolder
+ccc	PERL 'use File::Path;mkpath("OutputFolder");'
+ccc	ASSIGN DataFilePath
+ccc	ASSIGN SLCDataFile
+ccc	PREPROCESS ProjectFolder/adore/baseline.drs OutputFolder/baseline.drs
+ccc	doris OutputFolder/baseline.drs
+ccc }
+
+ccc AdoreFolder/scripts/findmaster.sh ProjectFolder/project.set
+
+ccc --- interferogram.drs --- ccc
+ASSIGN IfgArea
+REASSIGN SLCFolder=SLCInterf		ccc Remove Excluded SLCs and Master
+
+FOREACH SLCFolder {
+	REASSIGN OutputFolder=i12sFolder/MasterFolder_SLCFolder
+	PERL 'use File::Path;mkpath("OutputFolder");'
+	cp CropsFolder/MasterFolder/MasterFolder.res OutputFolder/MasterFolder.res
+	cp CropsFolder/SLCFolder/SLCFolder.res OutputFolder/SLCFolder.res
+	PREPROCESS ProjectFolder/adore/interferogram.drs  OutputFolder/interferogram.drs
+	doris OutputFolder/interferogram.drs
+}
+
+PERL 'use File::Path;mkpath("PsiFolder");'
+
+AdoreFolder/scripts/prepPSinput.sh i12sFolder PsiFolder/PSinput.lst
+
+Process End
