@@ -1,0 +1,51 @@
+\documentclass[letterpaper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[margin=2cm]{geometry}
+\renewcommand{\baselinestretch}{2} %For doublespacing.
+\usepackage[caption=true]{subfig}
+%\usepackage[dvips]{graphicx}
+%\graphicspath{{./eps}}
+%\DeclareGraphicsExtensions{.eps}
+\usepackage[cmex10]{amsmath}
+\usepackage{endfloat} %put all the figures at the end.
+\usepackage{multirow} %use multiple rows in tables.
+%\usepackage{ulem} %strike through
+\usepackage{microtype}%for not using ligatures
+\DisableLigatures{encoding = *, family = * }%for not using ligatures
+\usepackage{threeparttable} % for tables with tablenotes
+%\usepackage{changes}%to track changes.
+%\definechangesauthor[Tim Dixon]{TD}{orange}
+%\definechangesauthor[Shimon Wdowinski]{SW}{blue}
+%\definechangesauthor[Enrique Cabral]{EC}{red}
+%\definechangesauthor[Batuhan Osmanoglu]{BO}{green}
+
+%opening
+\title{ADORE - Automated DORis Environment}
+\author{Batuhan Osmanoglu}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Introduction}
+ADORE is an attempt to simply generating interferograms with DORIS. It is designed with simplicity and accessibility in mind. Main goals are to keep it simple, easy to modify, and easy to run on any LINUX system. 
+
+\section{ADORE Folder Structure}
+\subsection{drs}
+This folder includes the doris input files. Each input file uses "drs" extension. 
+\subsection{man}
+This folder holds the users manual.
+\subsection{scr}
+scr folder has the scripts and binaries that ADORE relies on. 
+\subsection{set}
+set folder holds the default settings for ADORE. 
+
+
+
+%\bibliographystyle{alpha}
+%\bibliography{Library}
+
+\end{document}
