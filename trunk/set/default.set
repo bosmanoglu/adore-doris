@@ -57,6 +57,11 @@ m_in_dat=`ls ${dataFolder}/${SLCFolder}/${dataFile} | tr -d '\n'`
 m_in_vol=`ls ${dataFolder}/${SLCFolder}/${volumeFile} | tr -d '\n'`
 m_in_lea=`ls ${dataFolder}/${SLCFolder}/${leaderFile} | tr -d '\n'`
 m_in_null=`ls ${dataFolder}/${SLCFolder}/${nullFile} | tr -d '\n'`
+# check if the values are set or not. If empty set to "dummy"
+if [ -z "${m_in_dat}" ]; then m_in_dat=dummy; fi
+if [ -z "${m_in_vol}" ]; then m_in_vol=dummy; fi
+if [ -z "${m_in_lea}" ]; then m_in_lea=dummy; fi
+if [ -z "${m_in_null}" ]; then m_in_null=dummy; fi
 ################### m_porbits
 m_orb_dir=${projectFolder}/orbits
 m_orb_interval=1
