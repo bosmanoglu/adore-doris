@@ -1,27 +1,30 @@
 #!/bin/bash
 ###############################################
-###############################################
-# setinterfarea.sh
-# Part of Adore Project
-# Batuhan Osmanoglu, Aug 2007 CSTARS, Miami
-#
-#
-# This function reads the master.res file and 
-# dumps first-last line, first last pixel.
-#
-# Calculation is simply done by:
-# LINELO = FirstLine + Line Margin
-# LINEHI = LastLine - Line Margin
-# ... and so on.
-#
-# Requires:
-#	- Master.res file location
-#	- Line Margin
-#	- Pixel Margin
-# Provides:
-#	- LINELO LINEHI PIXELLO PIXELHI
-#
-###############################################
+nargs=$#
+if [ ${nargs} -lt 3 ]
+then
+cat<<_EOF
+getI12sArea.sh
+Part of Adore Project
+Batuhan Osmanoglu, Aug 2007 CSTARS, Miami
+
+ This function reads the master.res file and 
+ dumps first-last line, first last pixel.
+
+ Calculation is simply done by:
+ LINELO = FirstLine + Line Margin
+ LINEHI = LastLine - Line Margin
+ ... and so on.
+
+ Requires:
+	- Master.res file location
+	- Line Margin
+	- Pixel Margin
+ Provides:
+	- LINELO LINEHI PIXELLO PIXELHI
+_EOF
+exit 1
+fi
 ###############################################
 
 MasterRes=$1
