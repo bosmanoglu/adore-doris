@@ -17,15 +17,16 @@ getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${mast
 [ -z "${runFolder}"		] && runFolder=${processFolder}/${runName}
 [ -z "${cropsFolder}"		] && cropsFolder=${runFolder}/crops
 [ -z "${i12sFolder}"		] && i12sFolder=${runFolder}/i12s
-[ -z "${baselinesFolder}"	] && baselinesFolder=${processFolder}/${runName}/baselines
+[ -z "${baselinesFolder}"	] && baselinesFolder=${runFolder}/baselines
 [ -z "${master}"		] && master=`eval ${getMaster}`
 [ -z "${slave}"			] && slave=`eval ${getSlave}`
-[ -z "${excludesFile}"		] && excludesFile=${processFolder}/${runName}/excludes
+[ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${orbitsFolder}"		] && orbitsFolder=${projectFolder}/orbits
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
 [ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
 [ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
 [ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
+[ -z "${unspecified}"		] && unspecified=" "	#readinput.hh unspecified filenames are set to this
 #######################################
 ###     Default Doris Settings      ###
 #######################################
@@ -43,7 +44,7 @@ getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${mast
 [ -z "${orb_interp}" 		] && orb_interp="polyfit 3"
 [ -z "${dumpBaseline}" 		] && dumpBaseline="15 10"
 [ -z "${height}" 		] && height=0.0
-#tiePoint
+[ -z "${tiePoint}"		] && tiepoint="0.0 0.0 0.0"
 [ -z "${m_rg_t_error}" 		] && m_rg_t_error="0.0"
 [ -z "${m_az_t_error}" 		] && m_az_t_error="0.0"
 [ -z "${s_rg_t_error}" 		] && s_rg_t_error="0.0"
@@ -62,13 +63,40 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 ################### m_porbits
 [ -z "${m_orb_dir}" 		] && m_orb_dir=${projectFolder}/orbits
 [ -z "${m_orb_interval}" 	] && m_orb_interval=1
-[ -z "${m_orb_extratime}" 	] && m_orb_extratime=3
-[ -z "${m_orb_dump}" 		] && m_orb_dump=1
+[ -z "${m_orb_extratime}" 	] && m_orb_extratime=4
+[ -z "${m_orb_dump}" 		] && m_orb_dump=-1
 ################### m_crop
 [ -z "${m_crop_in}" 		] && m_crop_in=${m_in_dat}
 [ -z "${m_crop_out}" 		] && m_crop_out=${cropsFolder}/${slcName}/${slcName}.res
-#m_dbow ] && =
-#m_dbow_geo ] && =
+[ -z "${m_dbow}"		] && m_dbow="0 0 0 0"
+[ -z "${m_dbow_geo}" 		] && m_dbow_geo="0 0 0 0"
+################### m_simamp
+[ -z "${sam_in_dem}" 		] && sam_in_dem="${projectFolder}/dem/${runName}.dem"
+[ -z "${sam_in_format}"		] && sam_in_format="I2"
+[ -z "${sam_in_size}" 		] && sam_in_size="6000 4800"
+[ -z "${sam_in_delta}" 		] && sam_in_delta="0.00833333333333333333 0.00833333333333333333"
+[ -z "${sam_in_ul}" 		] && sam_in_ul="89.995833333333333333 -19.995833333333333333"
+[ -z "${sam_in_nodata}"		] && sam_in_nodata="-9999"
+[ -z "${sam_out_file}" 		] && sam_out_file="${cropsFolder}/${master}/${master}.sam"
+[ -z "${sam_out_dem}" 		] && sam_out_dem="${cropsFolder}/${master}/${master}.dem"
+################### m_timing
+[ -z "${mte_method}" 		] && mte_method="magspace"
+[ -z "${mte_in_pos}" 		] && mte_in_pos=${unspecified}
+[ -z "${mte_nwin}" 		] && mte_nwin="16"
+[ -z "${mte_winsize}" 		] && mte_winsize="256 128"
+[ -z "${mte_acc}" 		] && mte_acc="32 32"
+[ -z "${mte_initoff}" 		] && mte_initoff="0 0"
+################### m_ovs
+[ -z "${m_ovs_out}" 		] && m_ovs_out="${cropsFolder}/${master}/${master}.ovs"
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+################### 
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+
 ################### s_readfiles
 [ -z "${s_in_method}" 		] && s_in_method=${m_in_method}
 [ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} | tr -d '\n'`
