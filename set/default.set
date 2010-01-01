@@ -1,74 +1,83 @@
 #######################################
-###  ADORE-BASH Run-Time Settings   ###
-#######################################
-projectFolder="."
-processFolder=${projectFolder}/process
-dataFolder=${projectFolder}/data
-projectName="project"
-cropsFolder=${processFolder}/${projectName}/crops
-i12sFolder=${processFolder}/${projectName}/i12s
-baselinesFolder=${processFolder}/${projectName}/baselines
-#masterFolder=
-excludesFile=${processFolder}/${projectName}/excludes
-orbitsFolder=${projectFolder}/orbits
-#slcFolder=
-#slcNoMaster=
-#slcNoExclude=
-#slcInterf=
-dataFile=DAT_01.001    # slc data filename can be a regexp (dat.*, *.slc)
-leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
-volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
-nullFile=NUL_01.001    # slc nul filename can be a regexp
-#######################################
 ###  ADORE-Bash One-Line Functions  ###
 #######################################
-getMasterFolder='ls -F ${dataFolder} |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null'
-getSlcFolder='ls -F ${dataFolder} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-getSlcNoMaster='ls -F ${dataFolder} | grep -v ${masterFolder} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-getSlcNoExclude='ls -F ${dataFolder} | grep -v -f ${excludesFile} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-getSlcInterf='ls -F ${dataFolder} | grep -v -f ${excludesFile} | grep -v ${masterFolder} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-
-
+getMaster='ls -F ${dataFolder}/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null'
+getSlave='ls -F ${dataFolder}/ | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null'
+getSlcNoMaster='ls -F ${dataFolder}/ | grep -v ${masterSlc} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
+getSlcNoExclude='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
+getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${masterSlc} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
+#######################################
+###  ADORE-BASH Run-Time Settings   ###
+#######################################
+[ -z "${projectFolder}"		] && projectFolder="."
+[ -z "${tmpFolder}"		] && tmpFolder=${projectFolder}/tmp
+[ -z "${processFolder}"		] && processFolder=${projectFolder}/process
+[ -z "${dataFolder}"		] && dataFolder=${projectFolder}/data
+[ -z "${runName}"		] && runName="default"
+[ -z "${runFolder}"		] && runFolder=${processFolder}/${runName}
+[ -z "${cropsFolder}"		] && cropsFolder=${runFolder}/crops
+[ -z "${i12sFolder}"		] && i12sFolder=${runFolder}/i12s
+[ -z "${baselinesFolder}"	] && baselinesFolder=${processFolder}/${runName}/baselines
+[ -z "${master}"		] && master=`eval ${getMaster}`
+[ -z "${slave}"			] && slave=`eval ${getSlave}`
+[ -z "${excludesFile}"		] && excludesFile=${processFolder}/${runName}/excludes
+[ -z "${orbitsFolder}"		] && orbitsFolder=${projectFolder}/orbits
+[ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
+[ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
+[ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
+[ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
 #######################################
 ###     Default Doris Settings      ###
 #######################################
-screen=info
-beep=off
-batch=on
-overwrite=on
-preview=off
-listInput=on
-memory=500
-logFile=${processFolder}/${projectName}/${projectName}.log
-m_resfile=master.res
-s_resfile=slave.res
-i_resfile=i12s.res
-orb_interp="polyfit 3"
-dumpBaseline="15 10"
-#height
+[ -z "${screen}"		] && screen=info
+[ -z "${beep}"			] && beep=off
+[ -z "${batch}" 		] && batch=on
+[ -z "${overwrite}" 		] && overwrite=on
+[ -z "${preview}" 		] && preview=off
+[ -z "${listInput}" 		] && listInput=on
+[ -z "${memory}" 		] && memory=500
+[ -z "${logFile}" 		] && logFile=${processFolder}/${runName}/${runName}.log
+[ -z "${m_resfile}" 		] && m_resfile=${dorisProcess}.res
+[ -z "${s_resfile}" 		] && s_resfile=${dorisProcess}.res
+[ -z "${i_resfile}" 		] && i_resfile=i12s.res
+[ -z "${orb_interp}" 		] && orb_interp="polyfit 3"
+[ -z "${dumpBaseline}" 		] && dumpBaseline="15 10"
+[ -z "${height}" 		] && height=0.0
 #tiePoint
-m_rg_t_error="0.0"
-m_az_t_error="0.0"
-s_rg_t_error="0.0"
-s_az_t_error="0.0"
-################### readfiles
-m_in_method=ERS
-m_in_dat=`ls ${dataFolder}/${SLCFolder}/${dataFile} | tr -d '\n'`
-m_in_vol=`ls ${dataFolder}/${SLCFolder}/${volumeFile} | tr -d '\n'`
-m_in_lea=`ls ${dataFolder}/${SLCFolder}/${leaderFile} | tr -d '\n'`
-m_in_null=`ls ${dataFolder}/${SLCFolder}/${nullFile} | tr -d '\n'`
+[ -z "${m_rg_t_error}" 		] && m_rg_t_error="0.0"
+[ -z "${m_az_t_error}" 		] && m_az_t_error="0.0"
+[ -z "${s_rg_t_error}" 		] && s_rg_t_error="0.0"
+[ -z "${s_az_t_error}" 		] && s_az_t_error="0.0"
+################### m_readfiles
+[ -z "${m_in_method}" 		] && m_in_method=ERS
+[ -z "${m_in_dat}" 		] && m_in_dat=`echo "ls ${dataFolder}/${master}/${dataFile} | tr -d '\n'"`
+[ -z "${m_in_vol}" 		] && m_in_vol=`ls "${dataFolder}/${master}/${volumeFile}" 2>/dev/null | tr -d '\n'`
+[ -z "${m_in_lea}" 		] && m_in_lea=`ls "${dataFolder}/${master}/${leaderFile}" 2>/dev/null | tr -d '\n'`
+[ -z "${m_in_null}" 		] && m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
 # check if the values are set or not. If empty set to "dummy"
-if [ -z "${m_in_dat}" ]; then m_in_dat=dummy; fi
-if [ -z "${m_in_vol}" ]; then m_in_vol=dummy; fi
-if [ -z "${m_in_lea}" ]; then m_in_lea=dummy; fi
-if [ -z "${m_in_null}" ]; then m_in_null=dummy; fi
+if [ -z ${m_in_dat}" 		]; then m_in_dat=dummy; fi
+if [ -z ${m_in_vol}" 		]; then m_in_vol=dummy; fi
+if [ -z ${m_in_lea}" 		]; then m_in_lea=dummy; fi
+if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 ################### m_porbits
-m_orb_dir=${projectFolder}/orbits
-m_orb_interval=1
-m_orb_extratime=3
-m_orb_dump=1
+[ -z "${m_orb_dir}" 		] && m_orb_dir=${projectFolder}/orbits
+[ -z "${m_orb_interval}" 	] && m_orb_interval=1
+[ -z "${m_orb_extratime}" 	] && m_orb_extratime=3
+[ -z "${m_orb_dump}" 		] && m_orb_dump=1
 ################### m_crop
-m_crop_in=${m_in_dat}
-m_crop_out=${cropsFolder}/${slcFolder}/${slcFolder}.res
-#m_dbow=
-#m_dbow_geo=
+[ -z "${m_crop_in}" 		] && m_crop_in=${m_in_dat}
+[ -z "${m_crop_out}" 		] && m_crop_out=${cropsFolder}/${slcName}/${slcName}.res
+#m_dbow ] && =
+#m_dbow_geo ] && =
+################### s_readfiles
+[ -z "${s_in_method}" 		] && s_in_method=${m_in_method}
+[ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} | tr -d '\n'`
+[ -z "${s_in_vol}" 		] && s_in_vol=`ls ${dataFolder}/${slave}/${volumeFile} 2>/dev/null | tr -d '\n'`
+[ -z "${s_in_lea}" 		] && s_in_lea=`ls ${dataFolder}/${slave}/${leaderFile} 2>/dev/null | tr -d '\n'`
+[ -z "${s_in_null}" 		] && s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
+# check if the values are set or not. If empty set to "dummy"
+[ -z "${s_in_dat}" 		]  && s_in_dat=dummy
+[ -z "${s_in_vol}" 		]  && s_in_vol=dummy
+[ -z "${s_in_lea}" 		]  && s_in_lea=dummy
+[ -z "${s_in_null}" 		] && s_in_null=dummy
+
