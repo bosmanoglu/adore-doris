@@ -67,7 +67,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${m_orb_dump}" 		] && m_orb_dump=-1
 ################### m_crop
 [ -z "${m_crop_in}" 		] && m_crop_in=${m_in_dat}
-[ -z "${m_crop_out}" 		] && m_crop_out=${cropsFolder}/${slcName}/${slcName}.res
+[ -z "${m_crop_out}" 		] && m_crop_out=${cropsFolder}/${master}/${master}.res
 [ -z "${m_dbow}"		] && m_dbow="0 0 0 0"
 [ -z "${m_dbow_geo}" 		] && m_dbow_geo="0 0 0 0"
 ################### m_simamp
@@ -88,15 +88,10 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${mte_initoff}" 		] && mte_initoff="0 0"
 ################### m_ovs
 [ -z "${m_ovs_out}" 		] && m_ovs_out="${cropsFolder}/${master}/${master}.ovs"
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-################### 
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-
+[ -z "${m_ovs_out_format}"	] && m_ovs_out_format="ci2"
+[ -z "${m_ovs_fact_rng}" 	] && m_ovs_fact_rng="1"
+[ -z "${m_ovs_fact_azi}" 	] && m_ovs_fact_azi="1"
+[ -z "${m_ovs_kernelsize}"	] && m_ovs_kernelsize="16"
 ################### s_readfiles
 [ -z "${s_in_method}" 		] && s_in_method=${m_in_method}
 [ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} | tr -d '\n'`
@@ -108,4 +103,112 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${s_in_vol}" 		]  && s_in_vol=dummy
 [ -z "${s_in_lea}" 		]  && s_in_lea=dummy
 [ -z "${s_in_null}" 		] && s_in_null=dummy
+################### s_porbits
+[ -z "${s_orb_dir}" 		] && s_orb_dir=${m_orb_dir}
+[ -z "${s_orb_interval}" 	] && s_orb_interval=${m_orb_interval}
+[ -z "${s_orb_extratime}" 	] && s_orb_extratime=${m_orb_extratime}
+[ -z "${s_orb_dump}" 		] && s_orb_dump=${m_orb_dump}
+################### s_crop
+[ -z "${s_crop_in}" 		] && s_crop_in=${s_in_dat}
+[ -z "${s_crop_out}" 		] && s_crop_out=${cropsFolder}/${slave}/${slave}.res
+[ -z "${s_dbow}"		] && s_dbow="0 0 0 0"
+[ -z "${s_dbow_geo}" 		] && s_dbow_geo="0 0 0 0"
+################### s_ovs
+[ -z "${s_ovs_out}" 		] && s_ovs_out="${cropsFolder}/${slave}/${slave}.ovs"
+[ -z "${s_ovs_out_format}"	] && s_ovs_out_format="${m_ovs_out_format}"
+[ -z "${s_ovs_fact_rng}" 	] && s_ovs_fact_rng="${m_ovs_fact_rng}"
+[ -z "${s_ovs_fact_azi}" 	] && s_ovs_fact_azi="${m_ovs_fact_azi}"
+[ -z "${s_ovs_kernelsize}"	] && s_ovs_kernelsize="${m_ovs_kernelsize}"
+################### coarseorb -- nocards
+################### coarsecorr
+[ -z "${cc_method}" 		] && cc_method="magfft"
+[ -z "${cc_in_pos}" 		] && cc_in_pos=${unspecified}
+[ -z "${cc_nwin}" 		] && cc_nwin="11"
+[ -z "${cc_winsize}" 		] && cc_winsize="64 64"
+[ -z "${cc_acc}" 		] && cc_acc="32 8"
+[ -z "${cc_initoff}" 		] && cc_initoff="0 0"
+################### m_filtazi
+[ -z "${af_blocksize}" 		] && af_blocksize="1024"
+[ -z "${af_overlap}" 		] && af_overlap="128"
+[ -z "${af_hamming}" 		] && af_hamming="0.75"
+[ -z "${af_out_master}" 	] && af_out_master="${i12sFolder}/${master}_${slave}/${master}.afilt"
+[ -z "${af_out_slave}" 		] && af_out_slave="${i12sFolder}/${master}_${slave}/${slave}.afilt"
+[ -z "${af_out_format}" 	] && af_out_format="cr4"
+################### s_filtazi -- nocards
+################### fine
+[ -z "${fc_method}" 		] && fc_method="magfft"
+[ -z "${fc_nwin}" 		] && fc_nwin="400"
+[ -z "${fc_in_pos}" 		] && fc_in_pos=${unspecified}
+[ -z "${fc_winsize}" 		] && fc_winsize="32 32"
+[ -z "${fc_acc}" 		] && fc_acc="4 4"
+[ -z "${fc_initoff}" 		] && fc_initoff="0 0"
+[ -z "${fc_osfactor}" 		] && fc_osfactor="16"
+[ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
+################### reltiming
+[ -z "${rte_threshold}" 	] && rte_threshold="0.4"
+[ -z "${rte_maxiter}" 		] && rte_maxiter="10000"
+[ -z "${rte_k_alpha}" 		] && rte_k_alpha="1.97"
+################### demassist
+[ -z "${dac_in_dem}" 		] && dac_in_dem=${unspecified}
+[ -z "${dac_in_format}" 	] && dac_in_format="i2"	
+[ -z "${dac_in_size}" 		] && dac_in_size="6000 4800"
+[ -z "${dac_in_delta}" 		] && dac_in_delta="0.00833333333333333333 0.00833333333333333333"
+[ -z "${dac_in_ul}" 		] && dac_in_ul="89.995833333333333333 -19.995833333333333333"
+[ -z "${dac_in_nodata}" 	] && dac_in_nodata="-9999"
+[ -z "${dac_out_dem}" 		] && dac_out_dem="${unspecified}" #"${i12sFolder}/${master}_${slave}/${master}_${slave}.dem"
+[ -z "${dac_out_demi}" 		] && dac_out_demi="${unspecified}" #"${i12sFolder}/${master}_${slave}/${master}_${slave}.demi"
+[ -z "${dac_out_dem_lp}" 	] && dac_out_dem_lp="${i12sFolder}/${master}_${slave}/${master}_${slave}.dem_lp"
+################### coregpm
+[ -z "${cpm_threshold}" 	] && cpm_threshold="0.4"
+[ -z "${cpm_degree}" 		] && cpm_degree="1"
+[ -z "${cpm_dump}" 		] && cpm_dump="off"
+[ -z "${cpm_plot}" 		] && cpm_plot="nobg"
+[ -z "${cpm_weight}" 		] && cpm_weight="bamler"
+[ -z "${cpm_maxiter}" 		] && cpm_maxiter="10"
+[ -z "${cpm_k_alpha}" 		] && cpm_k_alpha="1.97"
+################### resample
+[ -z "${rs_method}" 		] && rs_method="knab16"
+[ -z "${rs_out_file}" 		] && rs_out_file="${i12sFolder}/${master}_${slave}/${slave}.rsmp"
+[ -z "${rs_dbow}" 		] && rs_dbow="0 0 0 0"
+[ -z "${rs_dbow_geo}" 		] && rs_dbow_geo="0 0 0 0"
+[ -z "${rs_shiftazi}" 		] && rs_shiftazi="on"
+################### filtrange
+[ -z "${rf_method}" 		] && rf_method="adaptive"
+[ -z "${rf_fftlength}" 		] && rf_fftlength="64"
+[ -z "${rf_overlap}" 		] && rf_overlap="0"
+[ -z "${rf_hamming}" 		] && rf_hamming="0.75"
+[ -z "${rf_slope}" 		] && rf_slope="0"
+[ -z "${rf_nlmean}" 		] && rf_nlmean="15"
+[ -z "${rf_threshold}" 		] && rf_threshold="5"
+[ -z "${rf_oversample}" 	] && rf_oversample="2"
+[ -z "${rf_weightcorr}" 	] && rf_weightcorr="off"
+[ -z "${rf_out_master}" 	] && rf_out_master="${i12sFolder}/${master}_${slave}/${master}.rfilter"
+[ -z "${rf_out_slave}" 		] && rf_out_slave="${i12sFolder}/${master}_${slave}/${slave}.rfilter"
+[ -z "${rf_out_format}" 	] && rf_out_format="cr4"
+################### interfero
+[ -z "${int_out_cint}" 		] && int_out_cint="${i12sFolder}/${master}_${slave}/${master}_${slave}.cint"
+[ -z "${int_out_int}" 		] && int_out_int="${unspecified}"
+[ -z "${int_multilook}" 	] && int_multilook="5 1"
+################### comprefpha
+[ -z "${fe_method}" 		] && fe_method="porbits"
+[ -z "${fe_degree}" 		] && fe_degree="5"
+[ -z "${fe_npoints}" 		] && fe_npoints="501"
+[ -z "${fe_in_pos}" 		] && fe_in_pos="${unspecified}"
+# [ -z "${fe_out_file}" 		] && fe_out_file=""
+################### subtrrefpha
+[ -z "${srp_method}" 		] && srp_method="polynomial"
+[ -z "${srp_out_cint}" 		] && srp_out_cint="${i12sFolder}/${master}_${slave}/${master}_${slave}.srp"
+[ -z "${srp_multilook}" 	] && srp_multilook="1 1"
+[ -z "${srp_dumprefpha}" 	] && srp_dumprefpha="off"
+[ -z "${srp_οut_refpha}" 	] && srp_out_refpha="${unspecified}"
+[ -z "${srp_out_h2ph}" 		] && srp_out_h2ph="${i12sFolder}/${master}_${slave}/${master}_${slave}.h2ph"
+[ -z "${}" 		] && =""
+
+
+
+################### 
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
+[ -z "${}" 		] && =""
 
