@@ -1,25 +1,23 @@
 #!/bin/bash
 # This is another attempt to develop Automatic Doris Environment
 # It runs like this:
-# adore readfiles project.set
+# adore project.set dorisProcess
 # default values are loaded from default.set
 # each doris step can be run. They should have a corresponding *.drs file in the drs folder.
 
-dorisProcess=${1}
-settings=${2}
+settings=${1}
+dorisProcess=${2}
 
 . ${settings} #load project settings
 . "${ADOREFOLDER}/set/default.set" #load defaults.
-[ -n "${dataFile}" ] && echo ${dataFile}
 
-#echo < drs/${request}.drs
-#cat drs/${request}.drs | sed -e "s/\${i}/1/" | sed -e "s/\${word}/dog/"
-#exec<drs/${request}.drs
-#while read line
-#do
-cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
-	newline=`eval echo -E ${line}`
-	#newline=`eval echo -E $processFolder`
-	echo $newline
-done
+#check if a special function exists in /scr/ folder
+if [ -f "${ADOREFOLDER}/scr/${dorisProcess}" ]; then
+	${ADOREFOLDER}/scr/${dorisProcess} ${settings}
+else
+	cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+		newline=`eval echo -E ${line}`
+		echo $newline > ${outputFolder}/${dorisProcess}.drs
+	done
+fi
 exit 0
