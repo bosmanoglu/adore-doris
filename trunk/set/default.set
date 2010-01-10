@@ -1,4 +1,4 @@
-#######################################
+#######################################5~5~
 ###  ADORE-Bash One-Line Functions  ###
 #######################################
 getMaster='ls -F ${dataFolder}/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null'
@@ -81,7 +81,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${sam_out_dem}" 		] && sam_out_dem="${cropsFolder}/${master}/${master}.dem"
 ################### m_timing
 [ -z "${mte_method}" 		] && mte_method="magspace"
-[ -z "${mte_in_pos}" 		] && mte_in_pos=${unspecified}
+[ -z "${mte_in_pos}" 		] && mte_in_pos="${unspecified}"
 [ -z "${mte_nwin}" 		] && mte_nwin="16"
 [ -z "${mte_winsize}" 		] && mte_winsize="256 128"
 [ -z "${mte_acc}" 		] && mte_acc="32 32"
@@ -122,7 +122,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 ################### coarseorb -- nocards
 ################### coarsecorr
 [ -z "${cc_method}" 		] && cc_method="magfft"
-[ -z "${cc_in_pos}" 		] && cc_in_pos=${unspecified}
+[ -z "${cc_in_pos}" 		] && cc_in_pos="${unspecified}"
 [ -z "${cc_nwin}" 		] && cc_nwin="11"
 [ -z "${cc_winsize}" 		] && cc_winsize="64 64"
 [ -z "${cc_acc}" 		] && cc_acc="32 8"
@@ -138,7 +138,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 ################### fine
 [ -z "${fc_method}" 		] && fc_method="magfft"
 [ -z "${fc_nwin}" 		] && fc_nwin="400"
-[ -z "${fc_in_pos}" 		] && fc_in_pos=${unspecified}
+[ -z "${fc_in_pos}" 		] && fc_in_pos="${unspecified}"
 [ -z "${fc_winsize}" 		] && fc_winsize="32 32"
 [ -z "${fc_acc}" 		] && fc_acc="4 4"
 [ -z "${fc_initoff}" 		] && fc_initoff="0 0"
@@ -149,7 +149,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${rte_maxiter}" 		] && rte_maxiter="10000"
 [ -z "${rte_k_alpha}" 		] && rte_k_alpha="1.97"
 ################### demassist
-[ -z "${dac_in_dem}" 		] && dac_in_dem=${unspecified}
+[ -z "${dac_in_dem}" 		] && dac_in_dem="${unspecified}"
 [ -z "${dac_in_format}" 	] && dac_in_format="i2"	
 [ -z "${dac_in_size}" 		] && dac_in_size="6000 4800"
 [ -z "${dac_in_delta}" 		] && dac_in_delta="0.00833333333333333333 0.00833333333333333333"
@@ -182,8 +182,8 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${rf_threshold}" 		] && rf_threshold="5"
 [ -z "${rf_oversample}" 	] && rf_oversample="2"
 [ -z "${rf_weightcorr}" 	] && rf_weightcorr="off"
-[ -z "${rf_out_master}" 	] && rf_out_master="${i12sFolder}/${master}_${slave}/${master}.rfilter"
-[ -z "${rf_out_slave}" 		] && rf_out_slave="${i12sFolder}/${master}_${slave}/${slave}.rfilter"
+[ -z "${rf_out_master}" 	] && rf_out_master="${i12sFolder}/${master}_${slave}/${master}.rfilt"
+[ -z "${rf_out_slave}" 		] && rf_out_slave="${i12sFolder}/${master}_${slave}/${slave}.rfilt"
 [ -z "${rf_out_format}" 	] && rf_out_format="cr4"
 ################### interfero
 [ -z "${int_out_cint}" 		] && int_out_cint="${i12sFolder}/${master}_${slave}/${master}_${slave}.cint"
@@ -194,7 +194,7 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${fe_degree}" 		] && fe_degree="5"
 [ -z "${fe_npoints}" 		] && fe_npoints="501"
 [ -z "${fe_in_pos}" 		] && fe_in_pos="${unspecified}"
-# [ -z "${fe_out_file}" 		] && fe_out_file=""
+# [ -z "${fe_out_file}" 	] && fe_out_file=""
 ################### subtrrefpha
 [ -z "${srp_method}" 		] && srp_method="polynomial"
 [ -z "${srp_out_cint}" 		] && srp_out_cint="${i12sFolder}/${master}_${slave}/${master}_${slave}.srp"
@@ -202,13 +202,67 @@ if [ -z ${m_in_null}" 		]; then m_in_null=dummy; fi
 [ -z "${srp_dumprefpha}" 	] && srp_dumprefpha="off"
 [ -z "${srp_οut_refpha}" 	] && srp_out_refpha="${unspecified}"
 [ -z "${srp_out_h2ph}" 		] && srp_out_h2ph="${i12sFolder}/${master}_${slave}/${master}_${slave}.h2ph"
-[ -z "${}" 		] && =""
-
-
-
+################### comprefdem
+[ -z "${crd_in_dem}" 		] && crd_in_dem="${unspecified}"
+[ -z "${crd_in_format}" 	] && crd_in_format="i2"
+[ -z "${crd_in_format}" 	] && crd_in_format="i2"	
+[ -z "${crd_in_size}" 		] && crd_in_size="6000 4800"
+[ -z "${crd_in_delta}" 		] && crd_in_delta="0.00833333333333333333 0.00833333333333333333"
+[ -z "${crd_in_ul}" 		] && crd_in_ul="89.995833333333333333 -19.995833333333333333"
+[ -z "${crd_in_nodata}" 	] && crd_in_nodata="-9999"
+[ -z "${crd_include_fe}" 	] && crd_include_fe="off"
+[ -z "${crd_out_dem}" 		] && crd_out_dem=""${unspecified}"" #"${i12sFolder}/${master}_${slave}/${master}_${slave}.dem"
+[ -z "${crd_out_demi}" 		] && crd_out_demi=""${unspecified}"" #"${i12sFolder}/${master}_${slave}/${master}_${slave}.demi"
+[ -z "${crd_out_file}" 		] && crd_out_file="${i12sFolder}/${master}_${slave}/${master}_${slave}.refdem"
+[ -z "${crd_out_dem_lp}" 	] && crd_out_dem_lp="${i12sFolder}/${master}_${slave}/${master}_${slave}.demlp"
+[ -z "${crd_out_h2ph}" 		] && crd_out_h2ph="${i12sFolder}/${master}_${slave}/${master}_${slave}.crdh2ph"
+################### subtrrefdem
+[ -z "${srd_out_cint}" 		] && srd_out_cint="${i12sFolder}/${master}_${slave}/${master}_${slave}.srd"
+[ -z "${srd_offset}" 		] && srd_offset="0 0"
+################### coherence
+[ -z "${coh_method}" 		] && coh_method="include_refdem"
+[ -z "${coh_out_ccoh}" 		] && coh_out_ccoh="${unspecified}" #"${i12sFolder}/${master}_${slave}/${master}_${slave}.ccoh"
+[ -z "${coh_out_coh}" 		] && coh_out_coh="${i12sFolder}/${master}_${slave}/${master}_${slave}.coh"
+[ -z "${coh_multilook}"		] && coh_multilook=${int_multilook} #defaul "10 2"
+[ -z "${coh_winsize}" 		] && coh_winsize="10 2"
+################### filtphase
+[ -z "${pf_method}" 		] && pf_method="goldstein"
+[ -z "${pf_out_file}" 		] && pf_out_file="${i12sFolder}/${master}_${slave}/${master}_${slave}.filt"
+[ -z "${pf_in_file}" 		] && pf_in_file="${unspecified}"
+[ -z "${pf_alpha}" 		] && pf_alpha="0.2"
+[ -z "${pf_overlap}" 		] && pf_overlap="3"
+[ -z "${pf_blocksize}" 		] && pf_blocksize="32"
+[ -z "${pf_kernel}" 		] && pf_kernel="1 2 3 2 1"
+[ -z "${pf_in_kernel2d}" 	] && pf_in_kernel2d="${unspecified}"
+################### unwrap
+[ -z "${uw_method}" 		] && uw_method="snaphu"
+[ -z "${uw_out_file}" 		] && uw_out_file="${i12sFolder}/${master}_${slave}/${master}_${slave}.unw"
+[ -z "${uw_out_format}" 	] && uw_out_format="real4" # default "hgt"
+[ -z "${uw_snaphu_mode}" 	] && uw_snaphu_mode="defo" # default "topo"
+[ -z "${uw_snaphu_conf}" 	] && uw_snaphu_conf="${coh_out_coh}"
+[ -z "${uw_snaphu_log}" 	] && uw_snaphu_log="${i12sFolder}/${master}_${slave}/${master}_${slave}.unwlog"
+[ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
+[ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
+################### dinsar
+[ -z "${di_out_file}" 		] && di_out_file="${i12sFolder}/${master}_${slave}/${master}_${slave}.dinsar"
+[ -z "${di_in_topomaster}" 	] && di_in_topomaster="${m_resfile}"
+[ -z "${di_in_toposlave}" 	] && di_in_toposlave=""${unspecified}""
+[ -z "${di_in_topoint}" 	] && di_in_topoint="${unspecified}"
+[ -z "${di_out_scaled}" 	] && di_out_scaled="${unspecified}"
+################### slant2h
+[ -z "${s2h_method}" 		] && s2h_method="ambiguity"
+[ -z "${s2h_out_hei}" 		] && s2h_out_hei="${i12sFolder}/${master}_${slave}/${master}_${slave}.hei"
+[ -z "${s2h_out_phi}" 		] && s2h_out_phi="${i12sFolder}/${master}_${slave}/${master}_${slave}.s2hphi"
+[ -z "${s2h_out_lam}" 		] && s2h_out_lam="${i12sFolder}/${master}_${slave}/${master}_${slave}.s2hlam"
+[ -z "${s2h_npoints}" 		] && s2h_npoints="200"
+[ -z "${s2h_degree1d}" 		] && s2h_degree1d=2
+[ -z "${s2h_nheights}" 		] && s2h_nheights="$((${s2h_ndegree1d}+1))"
+[ -z "${s2h_degree2d}" 		] && s2h_degree2d="5"
+################### geocode
+[ -z "${geo_out_phi}" 		] && geo_out_phi="${i12sFolder}/${master}_${slave}/${master}_${slave}.phi"
+[ -z "${geo_out_lam}" 		] && geo_out_lam="${i12sFolder}/${master}_${slave}/${master}_${slave}.lam"
 ################### 
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-[ -z "${}" 		] && =""
-
+#[ -z "${}" 		] && =""
+#[ -z "${}" 		] && =""
+#[ -z "${}" 		] && =""
+#[ -z "${}" 		] && =""
