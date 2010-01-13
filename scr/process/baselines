@@ -1,0 +1,53 @@
+#!/bin/bash
+#backup variables
+singleStackMaster=${master}
+#end backup
+outputFolder=${baselinesFolder}
+mkdir -p ${outputFolder}
+logFile=${outputFolder}/baselines.log
+#
+for folder in ${dataFolder}/*
+do
+  if [ -d "${folder}" ]; then #check if it is a folder
+    master=${folder##*/}
+   if [ -e ${excludesFile} ]; then #if excludes file exist check to see if this folder is excluded.
+     inExclude=`grep ${master} ${excludesFile}`
+   fi
+   if [ -z "${inExclude}" ]; then #if not in excludesFile we will process this
+     echo "Processing ${master}"
+     #populate m_in_dat, vol,lea null
+     #TEST echo ls ${dataFolder}/${master}/${dataFile}     
+     m_in_dat=`ls ${dataFolder}/${master}/${dataFile} | tr -d '\n'`
+     m_in_vol=`ls ${dataFolder}/${master}/${volumeFile} 2>/dev/null | tr -d '\n'`
+     m_in_lea=`ls ${dataFolder}/${master}/${leaderFile} 2>/dev/null | tr -d '\n'`
+     m_in_null=`ls ${dataFolder}/${master}/${nullFile}  2>/dev/null | tr -d '\n'`
+     
+     m_resfile="${outputFolder}/${master}.res"
+
+     p m_readfiles     
+   fi
+  fi 
+done
+
+####Now the i12s
+#put variables back
+master=${singleStackMaster}
+
+for file in `ls ${outputFolder}/*.res`
+do
+  slave=${file%%.res}
+  slave=${slave##*/}
+   if [ -e ${excludesFile} ]; then #if excludes file exist check to see if this folder is excluded.
+     inExclude=`grep ${master} ${excludesFile}`
+   fi
+   if [ "${master}" == "${slave}" ]; then
+     continue
+   fi
+   if [ -z "${inExclude}" ]; then #if not in excludesFile we will process this
+     echo "Processing ${master}_${slave}"
+     i_resfile="${outputFolder}/${master}_${slave}.bsl"
+     s_resfile="${outputFolder}/${slave}.res"
+     m_resfile="${outputFolder}/${master}.res"
+     p coarseorb
+   fi
+done
