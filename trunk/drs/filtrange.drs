@@ -20,12 +20,19 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         filtrange               // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+RF_METHOD	${rf_method}		//
+RF_FFTLENGTH	${rf_fftlength}		//
+RF_OVERLAP	${rf_overlap}		//
+RF_HAMMING	${rf_hamming}		//
+RF_SLOPE	${rf_slope}		//
+RF_NLMEAN	${rf_nlmean}		//
+RF_THRESHOLD	${rf_threshold}		//
+RF_OVERSAMPLE	${rf_oversample}	//
+RF_WEIGHTCORR	${rf_weightcorr}	//
+RF_OUT_MASTER	${rf_out_master}	//
+RF_OUT_SLAVE	${rf_out_slave}		//
+RF_OUT_FORMAT	${rf_out_format}	//
 
 STOP

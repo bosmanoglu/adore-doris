@@ -1,0 +1,18 @@
+#!/bin/bash
+cat << _EOF
+Available doris processes:
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+_EOF
+
+#to-do: get the file list automatically from drs/ and scr/process folders
+#for file in `ls ${ADOREFOLDER}/drs/*.drs`
+#do
+#  file=`basename ${file}`
+#  echo ${file%%.drs}
+#done

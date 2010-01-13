@@ -20,12 +20,12 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         dinsar                  // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+DI_OUT_FILE	${di_out_file}		//	
+DI_IN_TOPOMASTER ${di_in_topomaster}	//
+DI_IN_TOPOSLAVE ${di_in_toposlave}	//
+DI_IN_TOPOINT	${di_in_topoint}	//
+DI_OUT_SCALED	${di_out_scaled}	//
 
 STOP

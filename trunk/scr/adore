@@ -1,23 +1,182 @@
 #!/bin/bash
-# This is another attempt to develop Automatic Doris Environment
-# It runs like this:
-# adore project.set dorisProcess
-# default values are loaded from default.set
+# ADORE
+# Automatic Doris Environment
+# 
+# USAGE:
+# 	adore adoreCommand
+#	adore -u user.set adoreCommand
+#	adore -u user.set -p dorisProcess
+#	adore -u user.set -p dorisProcess adoreCommand
+#	adore -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+#
+# DESCRIPTION:
+#	ADORE is an attempt to simplify processing of different interferometric stacks
+#  like, single-master-stack, or short-baselines.
+# default options are loaded from ${ADOREFOLDER}/set/default.set
 # each doris step can be run. They should have a corresponding *.drs file in the drs folder.
+# 
+# INPUT:
+#  adoreCommand: see the manual for available adoreCommands
+#  -u: user settings file. 
+#  -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+#  -d: define variable (has priority over user settings file.)
+#
+# if both adoreCommand and dorisProcess is used, first the dorisProcess
+# is run, and then the adoreCommand.
+#
+# OUTPUT:
+#  nothing for adoreCommands.
+#  dorisStep: SUCCESS for successful doris processing steps.
+#
 
-settings=${1}
-dorisProcess=${2}
+###### SOME FUNCTIONS
+pp()
+{
+#PREP, PRE-PROCESS
+  #this is the default processing
+  rm -f ${outputFolder}/${dorisProcess}.drs
+  dorisProcess=${1}
+  if [ -r "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+      newline=`eval echo -E ${line}`
+      echo $newline >> ${outputFolder}/${dorisProcess}.drs
+    done
+  else
+    echo "Unknown process ${dorisProcess}"
+  fi
+}
+p()
+{
+#PROCESS
+ dorisProcess=${1}
+  if [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
+          . ${ADOREFOLDER}/scr/process/${dorisProcess}
+  else
+    if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+ #     rm -f ${outputFolder}/${dorisProcess}.drs
+ #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+ #       newline=`eval echo -E ${line}`
+ #       echo $newline >> ${outputFolder}/${dorisProcess}.drs
+ #     done    
+      pp ${dorisProcess}
+      doris ${outputFolder}/${dorisProcess}.drs
+      [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+    else
+      echo "Unknown process: ${dorisProcess}."
+      lsprocess
+    fi
+  fi
+}
+s()
+{
+#SHOW
+  dorisProcess=${1}
+  if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+      newline=`eval echo -E ${line}`
+      echo $newline 
+    done
+  else
+    echo "Unknown process ${dorisProcess}"
+  fi
+}
+ctrl_c()
+{
+ if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
+   ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
+   #bind redraw-current-line   
+ else
+   echo " "
+   echo "Saving History..."
+   history -w ${adoreHistoryFile}
+   exit 0;
+ fi
+}
 
-. ${settings} #load project settings
-. "${ADOREFOLDER}/set/default.set" #load defaults.
 
-#check if a special function exists in /scr/ folder
-if [ -f "${ADOREFOLDER}/scr/${dorisProcess}" ]; then
-	${ADOREFOLDER}/scr/${dorisProcess} ${settings}
-else
-	cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
-		newline=`eval echo -E ${line}`
-		echo $newline > ${outputFolder}/${dorisProcess}.drs
-	done
+###### GET INPUT OPTIONS
+#start a loop for getopts. I want to read parameters of options -n -i  etc. 
+while getopts  "iu:p:d:" flag
+do
+  #echo "$flag" $OPTIND $OPTARG 
+  # above line outputs the parameter flag (-n, etc.), 
+  #index of the flag in the commandline and  the argument. If you just want
+  #a flag then you simply remove the column from getopts line 
+  #(i.e. to make n a flag "ni:a:...")  
+  eval ${flag}=${OPTARG}
+done
+# now $u=userSettings, $p=dorisProcess, $d=defineVariables
+#below I use a for loop to remove already parsed parameters 
+for ((k=1; k<$OPTIND; k++ ))
+do
+  shift
+done  
+# now I can assign values to the leftover parameters. 
+adoreCommand=$1
+dorisProcess=$p
+
+###### LOAD SETTINGS
+#echo "User Settings File: ${u}"
+#if [ -r "${u}" ]; then
+#  if [ -e "${u}" ]; then
+#    . ${u} 					#load user project settings
+#  else
+#    echo "Can not find user settings file: ${u}"
+#  fi
+#else
+#  echo "No defined user settings file."
+#fi
+#eval ${d}				#overwrite user settings with commandline
+#if [ -z "${ADOREFOLDER}" ]; then
+# ADOREFOLDER=`dirname ${0}`
+# ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
+#fi
+ADORESCR=`dirname "${0}"`
+. ${ADORESCR}/initialize
+#. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+
+
+if [ -n "${dorisProcess}" ]; then
+  p ${dorisProcess}
 fi
+#if adoreCommand was specified run adoreCommand.
+[ -n "${adoreCommand}" ] && ${ADOREFOLDER}/scr/${adoreCommand}.sh
+
+if [ "${i-notInteractive}" != "notInteractive" ]; then
+  set -o emacs
+  #bind '"M-[A":history-search-backward'
+  #bind '"M-[B":history-search-forward'
+  #ctrl-r is reverse search history... bind Control-r:redraw-current-line
+  #adoreHistoryFile=${ADOREFOLDER}/scr/.history
+  #INPUTRC=${ADOREFOLDER}/scr/.inputrc
+
+  #trap ctrl-c and call ctrl_c()
+  trap ctrl_c 2 # ctrl+c=sigint 2
+  
+  history -r ${adoreHistoryFile}
+  PATH=${PATH}:${ADOREFOLDER}/scr
+  while [ 1 ]; do
+    #PS1='ADORE: '
+    #echo -n "ADORE: "
+    read -p "ADORE: " -e command
+    history -s "${command}"  #add command to history
+    ctrl_c_counter=0	#reset counter
+    #echo TEST: ${command%% *} #get the first word.
+    case "${command%% *}" in 
+      exit)
+        history -w ${adoreHistoryFile} #save history
+        exit 0
+        ;;
+      initialize)
+        . ${ADORESCR}/initialize
+        ;;
+      undo)
+        . ${ADORESCR}/undo ${command#* }        
+        ;;      
+      *)
+        eval ${command}
+    esac
+  done
+fi
+
 exit 0

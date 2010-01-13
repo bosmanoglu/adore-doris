@@ -1,0 +1,13 @@
+#!/bin/bash
+
+pp ${dorisProcess}
+
+if [ -z ${fc_in_pos} ]; then
+  #if the input file is not defined remove the line
+  grep -v FC_IN_POS ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+fi
+
+doris ${outputFolder}/${dorisProcess}.drs
+[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+

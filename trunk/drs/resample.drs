@@ -20,12 +20,13 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         resample                  // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+RS_METHOD	${rs_method}		//
+RS_OUT_FILE	${rs_out_file}		//
+RS_OUT_FORMAT	${rs_out_format}	//
+RS_DBOW		${rs_dbow}		//
+RS_DBOW_GEO	${rs_dbow_geo}		//
+RS_SHIFTAZI	${rs_shiftazi}		//
 
 STOP

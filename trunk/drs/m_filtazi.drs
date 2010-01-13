@@ -20,12 +20,13 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         m_filtazi               // convert data to internal format
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+AF_BLOCKSIZE	${af_blocksize}		//
+AF_OVERLAP	${af_overlap}		//
+AF_HAMMING	${af_hamming}		//
+AF_OUT_MASTER	${af_out_master}	//
+AF_OUT_SLAVE	${af_out_slave}		//
+AF_OUT_FORMAT	${af_out_format}	//
 
 STOP

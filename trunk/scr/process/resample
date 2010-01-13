@@ -1,0 +1,20 @@
+#!/bin/bash
+
+pp ${dorisProcess}
+
+# remove undefined settings from .drs file so that doris handles it
+# automatically
+#check if dbow or dbowgeo is set
+if [ "${rs_dbow}" == "0 0 0 0" ]; then
+  grep -v RS_DBOW ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+fi
+
+if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
+  grep -v RS_DBOW_GEO ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+fi
+
+#run doris
+doris ${outputFolder}/${dorisProcess}.drs
+[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"

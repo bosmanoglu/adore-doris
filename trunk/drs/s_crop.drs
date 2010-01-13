@@ -28,14 +28,14 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 c                                       //
-PROCESS         s_readfiles             //
- c         ___         ___              //
- comment   ___READFILES___              //
+PROCESS         s_crop                  // convert data to internal format
+c					//
+ c         ___               ___        //
+ comment   ___ Process Param ___        //
  c                                      //
-S_IN_METHOD	${s_in_method}		//
-S_IN_VOL        ${s_in_vol}       	// slc volume file
-S_IN_LEA        ${s_in_lea}      	// slc leaderfile
-S_IN_DAT        ${s_in_dat}      	// slc data file
-S_IN_NULL       ${s_in_null}            //
-c
+S_CROP_IN	${s_crop_in}		//
+S_CROP_OUT	${s_crop_out}		//
+S_DBOW		${s_dbow}		//
+S_DBOW_GEO	${s_dbow_geo}		//
+ c
 STOP

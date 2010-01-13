@@ -20,12 +20,15 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         slant2h                 // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+S2H_METHOD	${s2h_method}		//
+S2H_OUT_HEI	${s2h_out_hei}		//
+S2H_OUT_PHI	${s2h_out_phi}		//
+S2H_OUT_LAM	${s2h_out_lam}		//
+S2H_NPOINTS	${s2h_npoints}		//
+S2H_DEGREE1D	${s2h_degree1d}		//
+S2H_NHEIGHTS	${s2h_nheights}		//
+S2H_DEGREE2D	${s2h_degree2d}		//
 
 STOP

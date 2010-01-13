@@ -20,12 +20,16 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         demassist               // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+DAC_IN_DEM	${dac_in_dem}		//
+DAC_IN_FORMAT	${dac_in_format}	//
+DAC_IN_SIZE	${dac_in_size}		//
+DAC_IN_DELTA	${dac_in_delta}		//
+DAC_IN_UL	${dac_in_ul}		//
+DAC_IN_NODATA	${dac_in_nodata}	//
+DAC_OUT_DEM	${dac_out_dem}		//
+DAC_OUT_DEMI	${dac_out_demi}		//
+DAC_OUT_DEM_LP	${dac_out_dem_lp}	//
 
 STOP

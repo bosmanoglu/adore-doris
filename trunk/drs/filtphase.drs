@@ -20,12 +20,15 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         filtphase               // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+PF_METHOD	${pf_method}		//
+PF_OUT_FILE	${pf_out_file}		//
+PF_IN_FILE	${pf_in_file}		//
+PF_ALPHA	${pf_alpha}		//
+PF_OVERLAP	${pf_overlap}		//
+PF_BLOCKSIZE	${pf_blocksize}		//
+PF_KERNEL	${pf_kernel}		//
+PF_IN_KERNEL2D	${pf_in_kernel2d}	//
 
 STOP
