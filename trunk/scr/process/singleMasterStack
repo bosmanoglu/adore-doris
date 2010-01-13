@@ -27,12 +27,12 @@ do
      
      m_resfile="${outputFolder}/${master}.res"
      alreadyProcessed=`${ADORESCR}/readRes.sh ${m_resfile} process_control readfiles`
-     [ ${alreadyProcessed} -eq 0 ] && p m_readfiles     
+     [ ! ${alreadyProcessed-0} ] && p m_readfiles     
      
      #check if orb_dir is defined
      if [ -d "${m_orb_dir}" ]; then
        alreadyProcessed=`${ADORESCR}/readRes.sh ${m_resfile} process_control precise_orbits`     
-       [ ${alreadyProcessed} -eq 0 ] &&  p m_porbits
+       [ ${alreadyProcessed-0} -eq 0 ] &&  p m_porbits
      fi
      
      #now do crop
@@ -40,12 +40,12 @@ do
      m_crop_out=${outputFolder}/${master}.crop
      
      alreadyProcessed=`${ADORESCR}/readRes.sh ${m_resfile} process_control crop`
-     [ ${alreadyProcessed} -eq 0 ] && p m_crop
+     [ ${alreadyProcessed-0} -eq 0 ] && p m_crop
      
      #now do oversample if required
      if [[ ${m_ovs_fact_rng} -gt 1 || ${m_ovs_fact_azi} -gt 1 ]]; then
        alreadyProcessed=`${ADORESCR}/readRes.sh ${m_resfile} process_control oversample`
-       [ ${alreadyProcessed} -eq 0 ] && p m_ovs
+       [ ${alreadyProcessed-0} -eq 0 ] && p m_ovs
      fi
      
    fi
@@ -81,7 +81,7 @@ do
      # coarseorb
      if [ -e ${i_resfile} ]; then
        alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control coarse_orbits`
-       [ ${alreadyProcessed} -eq 0 ] && p coarseorb
+       [ ${alreadyProcessed-0} -eq 0 ] && p coarseorb
      else
        p coarseorb
      fi
@@ -90,19 +90,19 @@ do
      cc_nwin=100
      cc_initoff="orbit"
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control coarse_correl`
-     [ "${alreadyProcessed}" -eq 0 ] && p coarsecorr
+     [ "${alreadyProcessed-0}" -eq 0 ] && p coarsecorr
 
      # fine
      fc_nwin=4000
      fc_initoff="coarsecorr"
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control fine_coreg`
-     [ ${alreadyProcessed} -eq 0 ] && p fine
+     [ ${alreadyProcessed-0} -eq 0 ] && p fine
      
      # coregpm
      cpm_degree="2"
      cpm_maxiter="${fc_nwin}"
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control comp_coreg`
-     [ ${alreadyProcessed} -eq 0 ] && p coregpm
+     [ ${alreadyProcessed-0} -eq 0 ] && p coregpm
 
      # resample
      alreadyProcessed=`${ADORESCR}/readRes.sh ${s_resfile} process_control resample`
@@ -110,15 +110,15 @@ do
      
      # interfero
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control interfero`
-     [ ${alreadyProcessed} -eq 0 ] && p interfero
+     [ ${alreadyProcessed-0} -eq 0 ] && p interfero
           
      # comprefpha
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control comp_refphase`
-     [ ${alreadyProcessed} -eq 0 ] && p comprefpha
+     [ ${alreadyProcessed-0} -eq 0 ] && p comprefpha
      
      # subtrrefpha
      alreadyProcessed=`${ADORESCR}/readRes.sh ${i_resfile} process_control subtr_refphase`
-     [ ${alreadyProcessed} -eq 0 ] && p subtrrefpha
+     [ ${alreadyProcessed-0} -eq 0 ] && p subtrrefpha
 
    fi
   fi
