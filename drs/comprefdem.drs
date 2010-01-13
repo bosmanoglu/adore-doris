@@ -1,35 +1,39 @@
- c         ___               ___        //
- comment   ___GENERAL OPTIONS___        //
- c                                      //
-SCREEN          debug                    // level of output to standard out
-BEEP            off                     // level of beeping
-PREVIEW         off                     // SUNraster files with cpxfiddle
-MEMORY          800                   // MB
-OVERWRITE       ON                      // overwrite existing files
-BATCH           ON                      // non-interactive
-LISTINPUT       ON                      // copy this file to log
- c
- PROCESS	 comprefdem		// Interpolate DEM
-#                                       //
-#   the general io files                //
-#   --------------------                //
-LOGFILE         OutputFolder/log.out                 // 
-M_RESFILE       OutputFolder/MasterFolder.res           // parameter file
-S_RESFILE       OutputFolder/SLCFolder.res            // parameter file
-I_RESFILE       OutputFolder/MasterFolder_SLCFolder.res  // parameter file                      
-c
-c
-comment     ___COMPREFDEM___
-c
- CRD_DENSE       0.2			//
- CRD_IN_DEM      DemFile		//
- CRD_IN_SIZE     SizeX SizeY		//
- CRD_IN_UL       ULLat ULLon		//
- CRD_IN_DELTA    DeltaX DeltaY 		//
-c CRD_OUT_DEMI    OutputFolder/interferogram.dem	//
-c CRD_OUT_FILE    OutputFolder/MasterFolder_SLCFolder_refdem.raw		//
- CRD_OUT_SIMINT  OutputFolder/MasterFolder_SLCFolder_simint.raw		//
- CRD_OUT_DEM_LP	OutputFolder/MasterFolder_SLCFolder_lpdem.raw		//
-c           ___               ___
+SCREEN		${screen}		//
+BEEP   		${beep}			//
+BATCH  		${batch}		//
+OVERWRITE	${overwrite}		//
+PREVIEW         ${preview}              // SUNraster files with cpxfiddle
+LISTINPUT       ${listInput}            // copy this file to log
+MEMORY          ${memory}               // MB
+
+LOGFILE		${logFile}		//
+M_RESFILE	${m_resfile}		//
+S_RESFILE	${s_resfile}		//
+I_RESFILE	${i_resfile}		//
+
+ORB_INTERP	${orb_interp}		//
+DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
+HEIGHT		${height}		// Average Height for the crop
+TIEPOINT	${tiePoint}		//
+M_RG_T_ERROR	${m_rg_t_error}		//
+M_AZ_T_ERROR	${m_az_t_error}		//
+S_RG_T_ERROR	${s_rg_t_error}		//
+S_AZ_T_ERROR	${s_az_t_error}		//
+
+ PROCESS	comprefdem		// Interpolate DEM
+
+ CRD_IN_DEM     ${crd_in_dem}		//
+ CRD_IN_FORMAT	${crd_in_format}	// 
+ CRD_IN_SIZE    ${crd_in_size}		//
+ CRD_IN_DELTA   ${crd_in_delta}		//
+ CRD_IN_UL      ${crd_in_ul}		//
+ CRD_IN_NODATA	${crd_in_nodata}	//
+ CRD_INCLUDE_FE ${crd_include_fe}	//
+ CRD_OUT_DEM	${crd_out_dem}		//
+ CRD_OUT_DEMI   ${crd_out_demi}		//
+ CRD_OUT_FILE   ${crd_out_file}		//
+ CRD_OUT_DEM_LP	${crd_out_dem_lp}	//
+ CRD_OUT_H2PH	${crd_out_h2ph}		//
+
 STOP                                    // mandatory
 

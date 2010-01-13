@@ -1,0 +1,33 @@
+#!/bin/bash
+dorisProcessReset()
+{
+## AUTHOR:   Mahmut Arikan
+## EMAIL:    M.Arikan@TUDelft.nl
+## VERSION:  v1.4
+## DATE:     20060612
+## UPDATE:   20090114
+##
+## TUDelft, DEOS Radar Group  - 2006
+##
+##
+## reset doris steps in the result files,
+## up to the processing step you want
+ 
+ lineno=$(awk '/_Start_'$1'/{print NR-1}' $2);  # get me the line number of the process line - 1
+ if [ "$lineno" != "" ]; then 
+   echo "  ${1} found at ${lineno} in ${2}"
+   sed -i -e '/^'$1'/,/End_process_control/s/1/0/g' -e ''${lineno}',$ d' $2
+   [ $? -eq 0 ] && echo "  Undo Successful."
+ else
+   echo "  ${1} not found in ${2}. This might not be important."
+ fi
+}
+
+if [ "${2-undefined}" != "undefined" ]; then
+  dorisProcessReset ${1} ${2}
+else
+  dorisProcessReset ${1} ${m_resfile}
+  dorisProcessReset ${1} ${s_resfile}
+  dorisProcessReset ${1} ${i_resfile}
+fi
+

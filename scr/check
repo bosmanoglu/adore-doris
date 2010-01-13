@@ -1,0 +1,8 @@
+#!/bin/bash
+
+startline=`grep -n Start_process_control ${1} | cut -f1 -d":"`
+endline=`grep -n End_process_control ${1} | cut -f1 -d":"`
+
+length=`echo ${endline} - ${startline} |bc`
+grep -A ${length} Start_process_control ${1}
+

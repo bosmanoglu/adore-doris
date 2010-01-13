@@ -20,12 +20,15 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         unwrap                  // 
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+UW_METHOD	${uw_method}		//
+UW_OUT_FILE	${uw_out_file}		//
+UW_OUT_FORMAT	${uw_out_format}	//
+UW_SNAPHU_MODE	${uw_snaphu_mode}	//
+UW_SNAPHU_COH	${uw_sanphu_coh}	//
+UW_SNAPHU_LOG	${uw_snaphu_log}	//
+UW_SNAPHU_INIT	${uw_snaphu_init}	//
+UW_SNAPHU_VERBOSE ${uw_snaphu_verbose}	//
 
 STOP

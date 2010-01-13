@@ -20,12 +20,13 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         coarsecorr              // convert data to internal format
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+CC_METHOD	${cc_method}		//
+CC_IN_POS	${cc_in_pos}		//
+CC_NWIN		${cc_nwin}		//
+CC_WINSIZE	${cc_winsize}		//
+CC_ACC		${cc_acc}		//
+CC_INITOFF	${cc_initoff}		//
 
 STOP

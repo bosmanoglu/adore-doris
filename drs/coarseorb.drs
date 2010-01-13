@@ -1,24 +1,25 @@
-c ***********************************************************
-c File created by: $PRG $VER
-c Author: $AUT
-c  This is an input file for Doris to perform baseline estimation
-c  from prompt.
-c ***********************************************************
- c
- comment  ___general options___
- c
-SCREEN          ${SCREEN}
-MEMORY          ${MEMORY}
-OVERWRITE       ${OVERWRITE}
-BATCH           ${BATCH}
-LISTINPUT       ${LISTINPUT}
-DUMPBASELINE    ${DUMPBASELINE}
+SCREEN		${screen}		//
+BEEP   		${beep}			//
+BATCH  		${batch}		//
+OVERWRITE	${overwrite}		//
+PREVIEW         ${preview}              // SUNraster files with cpxfiddle
+LISTINPUT       ${listInput}            // copy this file to log
+MEMORY          ${memory}               // MB
+
+LOGFILE		${logFile}		//
+M_RESFILE	${m_resfile}		//
+S_RESFILE	${s_resfile}		//
+I_RESFILE	${i_resfile}		//
+
+ORB_INTERP	${orb_interp}		//
+DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
+HEIGHT		${height}		// Average Height for the crop
+TIEPOINT	${tiePoint}		//
+M_RG_T_ERROR	${m_rg_t_error}		//
+M_AZ_T_ERROR	${m_az_t_error}		//
+S_RG_T_ERROR	${s_rg_t_error}		//
+S_AZ_T_ERROR	${s_az_t_error}		//
+
 PROCESS         coarseorb
-LOGFILE         ${LOGFILE}
-M_RESFILE       ${M_RESFILE}
-S_RESFILE       ${S_RESFILE}
-I_RESFILE       ${I_RESFILE}
- c
- c
- c
+
 STOP

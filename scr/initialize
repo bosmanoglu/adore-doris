@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "User Settings File: ${u}"
+if [ -r "${u}" ]; then
+  if [ -e "${u}" ]; then
+    . ${u} 					#load user project settings
+  else
+    echo "Can not find user settings file: ${u}"
+  fi
+else
+  echo "No defined user settings file."
+fi
+eval ${d}				#overwrite user settings with commandline
+if [ -z "${ADOREFOLDER}" ]; then
+ ADOREFOLDER=`dirname ${0}`
+ ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
+fi
+. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+
+

@@ -20,12 +20,15 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         m_simamp                // convert data to internal format
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+SAM_IN_DEM      ${sam_in_dem}		//
+SAM_IN_FORMAT	${sam_in_format}	//
+SAM_IN_SIZE	${sam_in_size}		//
+SAM_IN_DELTA	${sam_in_delta}		//
+SAM_IN_UL	${sam_in_ul}		//
+SAM_IN_NODATA	${sam_in_nodata}	//
+SAM_OUT_FILE	${sam_out_file}		//
+SAM_OUT_DEM	${sam_out_dem}		//
 
 STOP

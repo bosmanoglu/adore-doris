@@ -20,12 +20,11 @@ M_AZ_T_ERROR	${m_az_t_error}		//
 S_RG_T_ERROR	${s_rg_t_error}		//
 S_AZ_T_ERROR	${s_az_t_error}		//
 
-PROCESS         m_readfiles             //
+PROCESS         m_crop                  // convert data to internal format
 
-M_IN_METHOD	${m_in_method}		//
-M_IN_VOL        ${m_in_vol}       	// slc volume file
-M_IN_LEA        ${m_in_lea}      	// slc leaderfile
-M_IN_DAT        ${m_in_dat}      	// slc data file
-M_IN_NULL       ${m_in_null}            //
+M_CROP_IN	${m_crop_in}		//
+M_CROP_OUT	${m_crop_out}		//
+M_DBOW		${m_dbow}		//
+M_DBOW_GEO	${m_dbow_geo}		//
 
 STOP
