@@ -55,7 +55,6 @@ done
 ####Now the i12s
 #put variables back
 master=${singleStackMaster}
-outputFolder="${cropsFolder}/${master}"
 
 for folder in ${cropsFolder}/*
 do

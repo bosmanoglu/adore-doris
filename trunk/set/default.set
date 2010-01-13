@@ -157,8 +157,8 @@ if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 [ -z "${dac_in_delta}" 		] && dac_in_delta="0.00833333333333333333 0.00833333333333333333"
 [ -z "${dac_in_ul}" 		] && dac_in_ul="89.995833333333333333 -19.995833333333333333"
 [ -z "${dac_in_nodata}" 	] && dac_in_nodata="-9999"
-[ -z "${dac_out_dem}" 		] && dac_out_dem="${unspecified}" #"${outputFolder}/${master}_${slave}.dacdem"
-[ -z "${dac_out_demi}" 		] && dac_out_demi="${unspecified}" #"${outputFolder}/${master}_${slave}.dacdemi"
+[ -z "${dac_out_dem}" 		] && dac_out_dem="${outputFolder}/${master}_${slave}.dacdem"
+[ -z "${dac_out_demi}" 		] && dac_out_demi="${outputFolder}/${master}_${slave}.dacdemi"
 [ -z "${dac_out_dem_lp}" 	] && dac_out_dem_lp="${outputFolder}/{master}_${slave}.dacdem_lp"
 ################### coregpm
 [ -z "${cpm_threshold}" 	] && cpm_threshold="0.4"
@@ -224,7 +224,7 @@ if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 [ -z "${srd_offset}" 		] && srd_offset="0 0"
 ################### coherence
 [ -z "${coh_method}" 		] && coh_method="include_refdem"
-[ -z "${coh_out_ccoh}" 		] && coh_out_ccoh="${unspecified}" #"${outputFolder}/${master}_${slave}.ccoh"
+[ -z "${coh_out_ccoh}" 		] && coh_out_ccoh="${outputFolder}/${master}_${slave}.ccoh"
 [ -z "${coh_out_coh}" 		] && coh_out_coh="${outputFolder}/${master}_${slave}.coh"
 [ -z "${coh_multilook}"		] && coh_multilook=${int_multilook} #defaul "10 2"
 [ -z "${coh_winsize}" 		] && coh_winsize="10 2"

@@ -14,6 +14,266 @@ if [ -z "${ADOREFOLDER}" ]; then
  ADOREFOLDER=`dirname ${0}`
  ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
 fi
-. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+#. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+# Above line does not work because everything is already set. 
+#######################################
+###  ADORE-BASH Run-Time Settings   ###
+#######################################
+#[ -z "${projectFolder}"		] && projectFolder="."
+tmpFolder=${projectFolder}/tmp
+#[ -z "${outputFolder}"		] && outputFolder="."
+processFolder=${projectFolder}/process
+dataFolder=${projectFolder}/data
+#[ -z "${runName}"		] && runName="default"
+runFolder=${processFolder}/${runName}
+cropsFolder=${runFolder}/crops
+i12sFolder=${runFolder}/i12s
+baselinesFolder=${runFolder}/baselines
+adoreHistoryFile=${projectFolder}/.history
+#[ -z "${master}"		] && master=`eval ${getMaster}`
+#[ -z "${slave}"			] && slave=`eval ${getSlave}`
+excludesFile=${runFolder}/excludes
+orbitsFolder=${projectFolder}/orbits
+#[ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
+#[ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
+#[ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
+#[ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
+#[ -z "${unspecified}"		] && unspecified=" "	#readinput.hh unspecified filenames are set to this
+#######################################
+###     Default Doris Settings      ###
+#######################################
+#[ -z "${screen}"		] && screen=info
+#[ -z "${beep}"			] && beep=off
+#[ -z "${batch}" 		] && batch=on
+#[ -z "${overwrite}" 		] && overwrite=on
+#[ -z "${preview}" 		] && preview=off
+#[ -z "${listInput}" 		] && listInput=on
+#[ -z "${memory}" 		] && memory=500
+logFile=${outputFolder}/${runName}.log
+m_resfile=${outputFolder}/${master}.res
+s_resfile=${outputFolder}/${slave}.res
+i_resfile=${outputFolder}/${master}_${slave}.res
+#[ -z "${orb_interp}" 		] && orb_interp="polyfit"
+#[ -z "${dumpBaseline}" 		] && dumpBaseline="1 1" # default is "0 0" but fails at readinput.cc 1271
+#[ -z "${height}" 		] && height=0.0
+#[ -z "${tiePoint}"		] && tiePoint="0.0 0.0 0.0"
+#[ -z "${m_rg_t_error}" 		] && m_rg_t_error="0.0"
+#[ -z "${m_az_t_error}" 		] && m_az_t_error="0.0"
+#[ -z "${s_rg_t_error}" 		] && s_rg_t_error="0.0"
+#[ -z "${s_az_t_error}" 		] && s_az_t_error="0.0"
+################### m_readfiles
+#[ -z "${m_in_method}" 		] && m_in_method=ERS
+m_in_dat=`ls ${dataFolder}/${master}/${dataFile} | tr -d '\n'`
+m_in_vol=`ls "${dataFolder}/${master}/${volumeFile}" 2>/dev/null | tr -d '\n'`
+m_in_lea=`ls "${dataFolder}/${master}/${leaderFile}" 2>/dev/null | tr -d '\n'`
+m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
+# check if the values are set or not. If empty set to "dummy"
+if [ -z "${m_in_dat}" 		]; then m_in_dat="dummy"; fi
+if [ -z "${m_in_vol}" 		]; then m_in_vol="dummy"; fi
+if [ -z "${m_in_lea}" 		]; then m_in_lea="dummy"; fi
+if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
+################### m_porbits
+m_orb_dir=${projectFolder}/orbits
+#[ -z "${m_orb_interval}" 	] && m_orb_interval=1
+#[ -z "${m_orb_extratime}" 	] && m_orb_extratime=4
+#[ -z "${m_orb_dump}" 		] && m_orb_dump=-1
+################### m_crop
+m_crop_in=${m_in_dat}
+m_crop_out=${outputFolder}/${master}.crop
+#[ -z "${m_dbow}"		] && m_dbow="0 0 0 0"
+#[ -z "${m_dbow_geo}" 		] && m_dbow_geo="0 0 0 0"
+################### m_simamp
+sam_in_dem="${projectFolder}/dem/${runName}.dem"
+#[ -z "${sam_in_format}"		] && sam_in_format="I2"
+#[ -z "${sam_in_size}" 		] && sam_in_size="6000 4800"
+#[ -z "${sam_in_delta}" 		] && sam_in_delta="0.00833333333333333333 0.00833333333333333333"
+#[ -z "${sam_in_ul}" 		] && sam_in_ul="89.995833333333333333 -19.995833333333333333"
+#[ -z "${sam_in_nodata}"		] && sam_in_nodata="-9999"
+sam_out_file="${outputFolder}/${master}.sam"
+sam_out_dem="${outputFolder}/${master}.samdem"
+################### m_timing
+#[ -z "${mte_method}" 		] && mte_method="magspace"
+#[ -z "${mte_in_pos}" 		] && mte_in_pos="${unspecified}"
+#[ -z "${mte_nwin}" 		] && mte_nwin="16"
+#[ -z "${mte_winsize}" 		] && mte_winsize="256 128"
+#[ -z "${mte_acc}" 		] && mte_acc="32 32"
+#[ -z "${mte_initoff}" 		] && mte_initoff="0 0"
+################### m_ovs
+m_ovs_out="${outputFolder}/${master}.ovs"
+#[ -z "${m_ovs_out_format}"	] && m_ovs_out_format="ci2"
+#[ -z "${m_ovs_fact_rng}" 	] && m_ovs_fact_rng="1"
+#[ -z "${m_ovs_fact_azi}" 	] && m_ovs_fact_azi="1"
+#[ -z "${m_ovs_kernelsize}"	] && m_ovs_kernelsize="16"
+################### s_readfiles
+s_in_method=${m_in_method}
+s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} | tr -d '\n'`
+s_in_vol=`ls ${dataFolder}/${slave}/${volumeFile} 2>/dev/null | tr -d '\n'`
+s_in_lea=`ls ${dataFolder}/${slave}/${leaderFile} 2>/dev/null | tr -d '\n'`
+s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
+# check if the values are set or not. If empty set to "dummy"
+[ -z "${s_in_dat}" 		]  && s_in_dat=dummy
+[ -z "${s_in_vol}" 		]  && s_in_vol=dummy
+[ -z "${s_in_lea}" 		]  && s_in_lea=dummy
+[ -z "${s_in_null}" 		] && s_in_null=dummy
+################### s_porbits
+s_orb_dir=${m_orb_dir}
+s_orb_interval=${m_orb_interval}
+s_orb_extratime=${m_orb_extratime}
+s_orb_dump=${m_orb_dump}
+################### s_crop
+s_crop_in=${s_in_dat}
+s_crop_out="${outputFolder}/${slave}.crop"
+#[ -z "${s_dbow}"		] && s_dbow="0 0 0 0"
+#[ -z "${s_dbow_geo}" 		] && s_dbow_geo="0 0 0 0"
+################### s_ovs
+s_ovs_out="${outputFolder}/${slave}.ovs"
+s_ovs_out_format="${m_ovs_out_format}"
+s_ovs_fact_rng="${m_ovs_fact_rng}"
+s_ovs_fact_azi="${m_ovs_fact_azi}"
+s_ovs_kernelsize="${m_ovs_kernelsize}"
+################### coarseorb -- nocards
+################### coarsecorr
+#[ -z "${cc_method}" 		] && cc_method="magfft"
+#[ -z "${cc_in_pos}" 		] && cc_in_pos="${unspecified}"
+#[ -z "${cc_nwin}" 		] && cc_nwin="11"
+#[ -z "${cc_winsize}" 		] && cc_winsize="64 64"
+#[ -z "${cc_acc}" 		] && cc_acc="32 8"
+#[ -z "${cc_initoff}" 		] && cc_initoff="0 0"
+################### m_filtazi
+#[ -z "${af_blocksize}" 		] && af_blocksize="1024"
+#[ -z "${af_overlap}" 		] && af_overlap="128"
+#[ -z "${af_hamming}" 		] && af_hamming="0.75"
+af_out_master="${outputFolder}/${master}.af"
+af_out_slave="${outputFolder}/${slave}.af"
+#[ -z "${af_out_format}" 	] && af_out_format="cr4"
+################### s_filtazi -- nocards
+################### fine
+#[ -z "${fc_method}" 		] && fc_method="magfft"
+#[ -z "${fc_nwin}" 		] && fc_nwin="400"
+#[ -z "${fc_in_pos}" 		] && fc_in_pos="${unspecified}"
+#[ -z "${fc_winsize}" 		] && fc_winsize="32 32"
+#[ -z "${fc_acc}" 		] && fc_acc="4 4"
+#[ -z "${fc_initoff}" 		] && fc_initoff="0 0"
+#[ -z "${fc_osfactor}" 		] && fc_osfactor="16"
+#[ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
+################### reltiming
+#[ -z "${rte_threshold}" 	] && rte_threshold="0.4"
+#[ -z "${rte_maxiter}" 		] && rte_maxiter="10000"
+#[ -z "${rte_k_alpha}" 		] && rte_k_alpha="1.97"
+################### demassist
+dac_in_dem="${projectFolder}/dem/${runName}.dem"
+#[ -z "${dac_in_format}" 	] && dac_in_format="i2"	
+#[ -z "${dac_in_size}" 		] && dac_in_size="6000 4800"
+#[ -z "${dac_in_delta}" 		] && dac_in_delta="0.00833333333333333333 0.00833333333333333333"
+#[ -z "${dac_in_ul}" 		] && dac_in_ul="89.995833333333333333 -19.995833333333333333"
+#[ -z "${dac_in_nodata}" 	] && dac_in_nodata="-9999"
+dac_out_dem="${outputFolder}/${master}_${slave}.dacdem"
+dac_out_demi="${outputFolder}/${master}_${slave}.dacdemi"
+dac_out_dem_lp="${outputFolder}/{master}_${slave}.dacdem_lp"
+################### coregpm
+#[ -z "${cpm_threshold}" 	] && cpm_threshold="0.4"
+#[ -z "${cpm_degree}" 		] && cpm_degree="1"
+#[ -z "${cpm_dump}" 		] && cpm_dump="off"
+#[ -z "${cpm_plot}" 		] && cpm_plot="nobg"
+#[ -z "${cpm_weight}" 		] && cpm_weight="bamler"
+#[ -z "${cpm_maxiter}" 		] && cpm_maxiter="10"
+#[ -z "${cpm_k_alpha}" 		] && cpm_k_alpha="1.97"
+################### resample
+#[ -z "${rs_method}" 		] && rs_method="knab6p"
+rs_out_file="${outputFolder}/${slave}.rs"
+#[ -z "${rs_out_format}"		] && rs_out_format="cr4"
+#[ -z "${rs_dbow}" 		] && rs_dbow="0 0 0 0"
+#[ -z "${rs_dbow_geo}" 		] && rs_dbow_geo="0 0 0 0"
+#[ -z "${rs_shiftazi}" 		] && rs_shiftazi="on"
+################### filtrange
+#[ -z "${rf_method}" 		] && rf_method="adaptive"
+#[ -z "${rf_fftlength}" 		] && rf_fftlength="64"
+#[ -z "${rf_overlap}" 		] && rf_overlap="0"
+#[ -z "${rf_hamming}" 		] && rf_hamming="0.75"
+#[ -z "${rf_slope}" 		] && rf_slope="0"
+#[ -z "${rf_nlmean}" 		] && rf_nlmean="15"
+#[ -z "${rf_threshold}" 		] && rf_threshold="5"
+#[ -z "${rf_oversample}" 	] && rf_oversample="2"
+#[ -z "${rf_weightcorr}" 	] && rf_weightcorr="off"
+rf_out_master="${outputFolder}/${master}.rf"
+rf_out_slave="${outputFolder}/${slave}.rf"
+#rf_out_format="cr4"
+################### interfero
+int_out_cint="${outputFolder}/${master}_${slave}.cint"
+int_out_int="${outputFolder}/${master}_${slave}.int"
+#[ -z "${int_multilook}" 	] && int_multilook="5 1"
+################### comprefpha
+#[ -z "${fe_method}" 		] && fe_method="porbits"
+#[ -z "${fe_degree}" 		] && fe_degree="5"
+#[ -z "${fe_npoints}" 		] && fe_npoints="501"
+#[ -z "${fe_in_pos}" 		] && fe_in_pos="${unspecified}"
+# [ -z "${fe_out_file}" 	] && fe_out_file=""
+################### subtrrefpha
+#[ -z "${srp_method}" 		] && srp_method="polynomial"
+srp_out_cint="${outputFolder}/${master}_${slave}.srp"
+#[ -z "${srp_multilook}" 	] && srp_multilook="1 1"
+#[ -z "${srp_dumprefpha}" 	] && srp_dumprefpha="off"
+srp_out_refpha="${outputFolder}/${master}_${slave}.srprefpha"
+srp_out_h2ph="${outputFolder}/${master}_${slave}.srph2ph"
+################### comprefdem
+#[ -z "${crd_in_dem}" 		] && crd_in_dem="${unspecified}"
+#[ -z "${crd_in_format}" 	] && crd_in_format="i2"
+#[ -z "${crd_in_format}" 	] && crd_in_format="i2"	
+#[ -z "${crd_in_size}" 		] && crd_in_size="6000 4800"
+#[ -z "${crd_in_delta}" 		] && crd_in_delta="0.00833333333333333333 0.00833333333333333333"
+#[ -z "${crd_in_ul}" 		] && crd_in_ul="89.995833333333333333 -19.995833333333333333"
+#[ -z "${crd_in_nodata}" 	] && crd_in_nodata="-9999"
+#[ -z "${crd_include_fe}" 	] && crd_include_fe="off"
+crd_out_dem="${outputFolder}/${master}_${slave}.crddem"
+crd_out_demi="${outputFolder}/${master}_${slave}.crddemi"
+crd_out_file="${outputFolder}/${master}_${slave}.crd"
+crd_out_dem_lp="${outputFolder}/${master}_${slave}.crddemlp"
+crd_out_h2ph="${outputFolder}/${master}_${slave}.crdh2ph"
+################### subtrrefdem
+srd_out_cint="${outputFolder}/${master}_${slave}.srd"
+#[ -z "${srd_offset}" 		] && srd_offset="0 0"
+################### coherence
+#[ -z "${coh_method}" 		] && coh_method="include_refdem"
+coh_out_ccoh="${outputFolder}/${master}_${slave}.ccoh"
+coh_out_coh="${outputFolder}/${master}_${slave}.coh"
+coh_multilook=${int_multilook} #defaul "10 2"
+#[ -z "${coh_winsize}" 		] && coh_winsize="10 2"
+################### filtphase
+#[ -z "${pf_method}" 		] && pf_method="goldstein"
+pf_out_file="${outputFolder}/${master}_${slave}.pf"
+#[ -z "${pf_in_file}" 		] && pf_in_file="${unspecified}"
+#[ -z "${pf_alpha}" 		] && pf_alpha="0.2"
+#[ -z "${pf_overlap}" 		] && pf_overlap="3"
+#[ -z "${pf_blocksize}" 		] && pf_blocksize="32"
+#[ -z "${pf_kernel}" 		] && pf_kernel="1 2 3 2 1"
+#[ -z "${pf_in_kernel2d}" 	] && pf_in_kernel2d="${unspecified}"
+################### unwrap
+#[ -z "${uw_method}" 		] && uw_method="snaphu"
+uw_out_file="${outputFolder}/${master}_${slave}.uw"
+#[ -z "${uw_out_format}" 	] && uw_out_format="real4" # default "hgt"
+#[ -z "${uw_snaphu_mode}" 	] && uw_snaphu_mode="defo" # default "topo"
+#uw_snaphu_conf="${coh_out_coh}"
+uw_snaphu_log="${outputFolder}/${master}_${slave}.uwlog"
+#[ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
+#[ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
+################### dinsar
+di_out_file="${outputFolder}/${master}_${slave}.di"
+di_in_topomaster="${m_resfile}"
+#[ -z "${di_in_toposlave}" 	] && di_in_toposlave=""${unspecified}""
+#[ -z "${di_in_topoint}" 	] && di_in_topoint="${unspecified}"
+#[ -z "${di_out_scaled}" 	] && di_out_scaled="${unspecified}"
+################### slant2h
+#[ -z "${s2h_method}" 		] && s2h_method="ambiguity"
+s2h_out_hei="${outputFolder}/${master}_${slave}.s2hhei"
+s2h_out_phi="${outputFolder}/${master}_${slave}.s2hphi"
+s2h_out_lam="${outputFolder}/${master}_${slave}.s2hlam"
+#[ -z "${s2h_npoints}" 		] && s2h_npoints="200"
+#[ -z "${s2h_degree1d}" 		] && s2h_degree1d=2
+s2h_nheights="$((${s2h_ndegree1d}+1))"
+#[ -z "${s2h_degree2d}" 		] && s2h_degree2d="5"
+################### geocode
+geo_out_phi="${outputFolder}/${master}_${slave}.geophi"
+geo_out_lam="${outputFolder}/${master}_${slave}.geolam"
+
 
 
