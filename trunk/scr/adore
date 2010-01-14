@@ -72,7 +72,7 @@ s()
 #SHOW
   dorisProcess=${1}
   if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline 
     done
@@ -82,15 +82,16 @@ s()
 }
 ctrl_c()
 {
- if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
-   ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
+# if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
+   #ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
    #bind redraw-current-line   
- else
-   echo " "
-   echo "Saving History..."
-   history -w ${adoreHistoryFile}
-   exit 0;
- fi
+   continue
+# else
+#   echo " "
+#   echo "Saving History..."
+#   history -w ${adoreHistoryFile}
+#   exit 0;
+# fi
 }
 
 
@@ -158,9 +159,9 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   while [ 1 ]; do
     #PS1='ADORE: '
     #echo -n "ADORE: "
-    read -p "ADORE: " -e command
-    history -s "${command}"  #add command to history
-    ctrl_c_counter=0	#reset counter
+    #ctrl_c_counter_bck=${ctrl_c_counter}
+    read -r -p "ADORE: " -e command
+    [ -n "${command}" ] && history -s "${command}"  #add command to history if not empty
     #echo TEST: ${command%% *} #get the first word.
     case "${command%% *}" in 
       exit)
@@ -175,6 +176,8 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
         ;;      
       *)
         eval ${command}
+        #[[ "${ctrl_c_counter}" -eq "${ctrl_c_counter_bck}" ]] && ctrl_c_counter=0	#reset counter
+        ;;
     esac
   done
 fi

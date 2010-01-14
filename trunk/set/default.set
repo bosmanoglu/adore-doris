@@ -1,12 +1,4 @@
 #######################################
-###  ADORE-Bash One-Line Functions  ###
-#######################################
-getMaster='ls -F ${dataFolder}/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null'
-getSlave='ls -F ${dataFolder}/ | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null'
-getSlcNoMaster='ls -F ${dataFolder}/ | grep -v ${masterSlc} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-getSlcNoExclude='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${masterSlc} | grep "/" |tr -d "/"| tr -d [:blank:] | tr "\n" ";" 2>/dev/null'
-#######################################
 ###  ADORE-BASH Run-Time Settings   ###
 #######################################
 [ -z "${projectFolder}"		] && projectFolder="."
@@ -20,8 +12,8 @@ getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${mast
 [ -z "${i12sFolder}"		] && i12sFolder=${runFolder}/i12s
 [ -z "${baselinesFolder}"	] && baselinesFolder=${runFolder}/baselines
 [ -z "${adoreHistoryFile}"	] && adoreHistoryFile=${projectFolder}/.history
-[ -z "${master}"		] && master=`eval ${getMaster}`
-[ -z "${slave}"			] && slave=`eval ${getSlave}`
+[ -z "${master}"		] && master=`ls -F ${dataFolder}/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
+[ -z "${slave}"			] && slave=`ls -F ${dataFolder}/ | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${orbitsFolder}"		] && orbitsFolder=${projectFolder}/orbits
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
@@ -57,11 +49,6 @@ getSlcInterf='ls -F ${dataFolder}/ | grep -v -f ${excludesFile} | grep -v ${mast
 [ -z "${m_in_vol}" 		] && m_in_vol=`ls "${dataFolder}/${master}/${volumeFile}" 2>/dev/null | tr -d '\n'`
 [ -z "${m_in_lea}" 		] && m_in_lea=`ls "${dataFolder}/${master}/${leaderFile}" 2>/dev/null | tr -d '\n'`
 [ -z "${m_in_null}" 		] && m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
-# check if the values are set or not. If empty set to "dummy"
-if [ -z "${m_in_dat}" 		]; then m_in_dat="dummy"; fi
-if [ -z "${m_in_vol}" 		]; then m_in_vol="dummy"; fi
-if [ -z "${m_in_lea}" 		]; then m_in_lea="dummy"; fi
-if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 ################### m_porbits
 [ -z "${m_orb_dir}" 		] && m_orb_dir=${projectFolder}/orbits
 [ -z "${m_orb_interval}" 	] && m_orb_interval=1
@@ -100,11 +87,6 @@ if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 [ -z "${s_in_vol}" 		] && s_in_vol=`ls ${dataFolder}/${slave}/${volumeFile} 2>/dev/null | tr -d '\n'`
 [ -z "${s_in_lea}" 		] && s_in_lea=`ls ${dataFolder}/${slave}/${leaderFile} 2>/dev/null | tr -d '\n'`
 [ -z "${s_in_null}" 		] && s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
-# check if the values are set or not. If empty set to "dummy"
-[ -z "${s_in_dat}" 		]  && s_in_dat=dummy
-[ -z "${s_in_vol}" 		]  && s_in_vol=dummy
-[ -z "${s_in_lea}" 		]  && s_in_lea=dummy
-[ -z "${s_in_null}" 		] && s_in_null=dummy
 ################### s_porbits
 [ -z "${s_orb_dir}" 		] && s_orb_dir=${m_orb_dir}
 [ -z "${s_orb_interval}" 	] && s_orb_interval=${m_orb_interval}
@@ -259,13 +241,9 @@ if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 [ -z "${s2h_out_lam}" 		] && s2h_out_lam="${outputFolder}/${master}_${slave}.s2hlam"
 [ -z "${s2h_npoints}" 		] && s2h_npoints="200"
 [ -z "${s2h_degree1d}" 		] && s2h_degree1d=2
-[ -z "${s2h_nheights}" 		] && s2h_nheights="$((${s2h_ndegree1d}+1))"
+[ -z "${s2h_nheights}" 		] && s2h_nheights="$((${s2h_degree1d}+1))"
 [ -z "${s2h_degree2d}" 		] && s2h_degree2d="5"
 ################### geocode
 [ -z "${geo_out_phi}" 		] && geo_out_phi="${outputFolder}/${master}_${slave}.geophi"
 [ -z "${geo_out_lam}" 		] && geo_out_lam="${outputFolder}/${master}_${slave}.geolam"
 ################### 
-#[ -z "${}" 		] && =""
-#[ -z "${}" 		] && =""
-#[ -z "${}" 		] && =""
-#[ -z "${}" 		] && =""
