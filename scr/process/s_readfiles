@@ -1,0 +1,18 @@
+#!/bin/bash
+
+slcType=`echo ${slcType-undefined} | tr "[:upper:]" "[:lower:]"`
+#echo ${slcType}
+#check if slcType exists
+case "${slcType}" in
+  gamma)
+    echo "Reading Gamma SLC"
+    slaveDataFolder=`dirname "${s_in_dat}"`
+    gammaReadfiles.csh ${slaveDataFolder}/*.pslcpar ${slaveDataFolder}/System.par ${s_in_dat} 0 > ${outputFolder}/${slave}.res
+  ;;
+  *)
+    #if [ "${slcType-undefined}" == "undefined" ]; then
+    #standard processing
+    pp ${dorisProcess}
+    doris ${outputFolder}/${dorisProcess}.drs
+  ;;
+esac

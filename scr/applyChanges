@@ -58,7 +58,7 @@ if [ -z "${m_in_vol}" 		]; then m_in_vol="dummy"; fi
 if [ -z "${m_in_lea}" 		]; then m_in_lea="dummy"; fi
 if [ -z "${m_in_null}" 		]; then m_in_null="dummy"; fi
 ################### m_porbits
-m_orb_dir=${projectFolder}/orbits
+m_orbdir=${projectFolder}/orbits
 #[ -z "${m_orb_interval}" 	] && m_orb_interval=1
 #[ -z "${m_orb_extratime}" 	] && m_orb_extratime=4
 #[ -z "${m_orb_dump}" 		] && m_orb_dump=-1
@@ -101,7 +101,7 @@ s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
 [ -z "${s_in_lea}" 		]  && s_in_lea=dummy
 [ -z "${s_in_null}" 		] && s_in_null=dummy
 ################### s_porbits
-s_orb_dir=${m_orb_dir}
+s_orbdir=${m_orbdir}
 s_orb_interval=${m_orb_interval}
 s_orb_extratime=${m_orb_extratime}
 s_orb_dump=${m_orb_dump}
