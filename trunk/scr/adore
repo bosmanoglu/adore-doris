@@ -173,7 +173,11 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
         ;;
       undo)
         . ${ADORESCR}/undo ${command#* }        
-        ;;      
+        ;;
+      \?)
+        [ -e ${ADORESCR}/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${command#* }      
+        [ -e ${ADORESCR}/process/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${command#* }              
+        ;;
       *)
         eval ${command}
         #[[ "${ctrl_c_counter}" -eq "${ctrl_c_counter_bck}" ]] && ctrl_c_counter=0	#reset counter

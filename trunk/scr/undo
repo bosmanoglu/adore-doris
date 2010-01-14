@@ -1,4 +1,33 @@
 #!/bin/bash
+# USAGE:
+#	. undo processName [fileName]
+#	. undo processName
+#
+# DESCRIPTION:
+#  UNDO is an internal ADORE command. It removes the 
+#  given processName from the result files.   
+#
+# INPUT:
+#  processName: Doris step to be deleted from the resultfile.
+#  
+#  Optional:
+#    fileName: If omitted undo will try to remove the given doris
+#      step from master, slave and interferograms result files.    
+#
+# OUTPUT:
+#  Undo Successful: if doris step was found and removed.
+#  
+# Doris steps in result files.
+# readfiles       coarse_orbits  interfero       filtphase
+# precise_orbits  coarse_correl  comp_refphase   unwrap
+# crop            fine_coreg     subtr_refphase  slant2h
+# sim_amplitude   timing_error   comp_refdem     geocoding
+# master_timing   dem_assist     subtr_refdem    dinsar
+# filt_azi        comp_coregpm   coherence
+# filt_range      resample
+# oversample
+#
+
 dorisProcessReset()
 {
 ## AUTHOR:   Mahmut Arikan

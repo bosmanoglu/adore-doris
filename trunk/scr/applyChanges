@@ -1,4 +1,7 @@
 #!/bin/bash
+echo "This function is deprecated. Please use settings function"
+
+<<_COMMENTOUT
 #. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
 # Above line does not work because everything is already set. 
 #######################################
@@ -259,6 +262,6 @@ s2h_nheights="$((${s2h_ndegree1d}+1))"
 ################### geocode
 geo_out_phi="${outputFolder}/${master}_${slave}.geophi"
 geo_out_lam="${outputFolder}/${master}_${slave}.geolam"
-
+_COMMENTOUT
 
 

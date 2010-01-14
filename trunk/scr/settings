@@ -1,4 +1,38 @@
 #!/bin/bash
+# USAGE:
+#	. settings option [argument]
+#	. settings
+#	. settings apply '${setting}'
+#	. settings check
+#	. settings raw
+#	. settings save [fileName]
+#	. settings load fileName
+#
+# DESCRIPTION:
+#  SETTINGS is an internal ADORE command. 
+#  It aims at providing a smooth interface for modifying ADORE 
+#  settings.
+#
+# INPUT:
+#  . settings: will list the current settings as seen by ADORE.
+#
+#  . settings apply '${settings}': updates settings depending on
+#	${setting}. This is not done in a recursive way.
+#
+#  . settings check: looks for differences between ADORE's 
+#	expectations and current values. Handy for finding 
+#	errors due to recursive dependancies.
+#
+#  . settings raw: displays the unprocessed settings with USERS
+#	changes. This can be saved with the save function.
+#
+#  . settings save [fileName]: saves the settings (raw) to the file.
+#	if fileName is not specified './settings.set' is used.
+#
+#  . settings load fileName: loads the settings to the environment.
+#
+
+
 dumpRawSettings(){
     tempFile=${1}
     #######################################

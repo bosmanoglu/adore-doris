@@ -1,4 +1,18 @@
 #!/bin/bash
+# USAGE:
+#	. check resultFile
+#	check resultFile
+#
+# DESCRIPTION:
+#  CHECK is an internal/external ADORE command. It shows the  
+#  process control list from the given result file.
+#
+# INPUT:
+#  resultFile: Result File (*.res) to check.
+#  
+# OUTPUT:
+#  Shows the process control list of given result file.
+#
 
 startline=`grep -n Start_process_control ${1} | cut -f1 -d":"`
 endline=`grep -n End_process_control ${1} | cut -f1 -d":"`

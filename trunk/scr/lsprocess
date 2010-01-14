@@ -1,4 +1,19 @@
 #!/bin/bash
+#!/bin/bash
+# USAGE:
+#	. lsprocess
+#	lsprocess
+#
+# DESCRIPTION:
+#  lsprocess is an internal/external ADORE command. It shows the  
+#  list of doris steps to run. List is in column order (read down then right).
+#
+# INPUT:
+#  No input option.
+#  
+# OUTPUT:
+#  List of doris steps as recognized by adore.
+#
 cat << _EOF
 Available doris processes:
 
