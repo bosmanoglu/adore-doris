@@ -1,0 +1,187 @@
+#!/bin/bash
+dumpRawSettings(){
+    tempFile=${1}
+    #######################################
+    #show settings without shell expansions
+    #######################################
+    #first dump the default to a temp file. 
+    rm -rf ${tempFile}
+    cat "${ADOREFOLDER}/set/default.set" | while read -r line; do
+      #get right side of the line
+      echo ${line##*&&} >> ${tempFile}
+    done
+    ####read user.set and make required changes##
+    #############################################
+    cat "${u}" | while read -r line; do
+      #if it has a relative values replace default.      
+      rightSide=${line##*=}
+      evalRightSide=`eval echo ${rightSide} 2> /dev/null`
+
+      [ -z "${evalRightSide}" ] && continue; #if no value continue
+      [ -z "${line%%=*}" ] && continue; #if no value continue
+
+      #check if rightside is relative
+      #if [ "${rightSide}" != "${evalRightSide}" ]; then
+        #echo rightSide: ${rightSide}
+        #echo evalRightSide: ${evalRightSide}
+        #search .tempfile and replace line
+        #lineNumber=`grep -n ${line%%=*}| cut -f1 -d:`        
+ #       echo A: ${line%%=*} ${rightSide}
+ #       sed "s/\(^${line%%=*}=\)\(..*$\)/\1${rightSide}/" ${tempFile} > ${tempFile}2
+        sed "s@\(^${line%%=*}=\)\(..*$\)@\1${rightSide}@" ${tempFile} > ${tempFile}2
+        mv ${tempFile}2 ${tempFile}
+      #fi
+    done
+##    echo not implemented yet.
+    
+}
+
+case ${1} in
+  save)
+    #save settings to a file
+    rm -rf ${2-settings.set} #clear if file exists
+    tempFile=${2-settings.set}
+    ##BELOW EXACTLY SAME AS RAW
+      dumpRawSettings ${tempFile}
+      #check to see if current environment is set differently 
+      #######################################################
+      cat ${tempFile} | while read -r line; do          
+        leftSide=${line%%=*}; #get the left side of name=value pair.
+        leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
+        [ -z "${leftSide}" ] && continue; #if no value continue
+        [ -z "${leftSideEval}" ] && continue; #if no value continue
+        
+        rightSide=${line##*=}; # get the right side (value)
+        rightSideEval=`eval echo "${rightSide}" 2> /dev/null` 
+        [ -z "${rightSideEval}" ] && continue; #if no value continue      
+
+        if [ "${leftSideEval}" != "${rightSideEval}" ]; then
+          sed "s@\(^${line%%=*}=\)\(..*$\)@\1${leftSideEval}@" ${tempFile} > ${tempFile}2
+          mv ${tempFile}2 ${tempFile}        
+        fi    
+      done
+    ##ABOVE EXACTLY SAME AS RAW
+    echo "Settings saved to ${2-settings.set}"
+  ;;
+  load)
+    #load settings from file
+    if [ "${2-undefined}" == "undefined" ];then
+      loadFile=${u};
+    else
+      loadFile=${2};
+    fi
+    . ${loadFile}
+  ;;
+  raw)
+    #show settings without shell expansions
+    tempFile=".tempfile"
+    dumpRawSettings ${tempFile}
+    #check to see if current environment is set differently 
+    #######################################################
+    cat ${tempFile} | while read -r line; do          
+      leftSide=${line%%=*}; #get the left side of name=value pair.
+      leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
+      [ -z "${leftSide}" ] && continue; #if no value continue
+      [ -z "${leftSideEval}" ] && continue; #if no value continue
+      
+      rightSide=${line##*=}; # get the right side (value)
+      rightSideEval=`eval echo "${rightSide}" 2> /dev/null` 
+      [ -z "${rightSideEval}" ] && continue; #if no value continue      
+
+      if [ "${leftSideEval}" != "${rightSideEval}" ]; then
+	sed "s@\(^${line%%=*}=\)\(..*$\)@\1${leftSideEval}@" ${tempFile} > ${tempFile}2
+        mv ${tempFile}2 ${tempFile}        
+      fi    
+    done
+    cat ${tempFile}
+    rm -rf ${tempFile}  
+
+    #check if right side exists
+    #if [[ "${line}" == *\&\&* ]]; then           
+    #  #get right side of the line      
+    #  line=`eval echo "${line##*&&}"`
+    #  if [ -n "${line%%=*}" ]; then 
+    #    #echo ${line%%=*}=${line##*=}
+    #    line=${line%%=*};
+    #    echo ${line}=${!line}
+    #  fi
+    #fi
+  ;;
+  check)
+    #check for inconsistent changes. like ${master} is changed but ${m_resfiles} is still old.
+    tempFile=".tempfile"
+    dumpRawSettings ${tempFile}
+    #check to see if current environment is set differently 
+    #######################################################
+    cat ${tempFile} | while read -r line; do          
+      leftSide=${line%%=*}; #get the left side of name=value pair.
+      leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
+      [ -z "${leftSide}" ] && continue; #if no value continue
+      [ -z "${leftSideEval}" ] && continue; #if no value continue
+      
+      rightSide=${line##*=}; # get the right side (value)
+      rightSideEval=`eval echo "${rightSide}" 2> /dev/null` 
+      [ -z "${rightSideEval}" ] && continue; #if no value continue      
+
+      if [ "${leftSideEval}" != "${rightSideEval}" ]; then
+        echo " active  ${leftSide}=${leftSideEval}"        
+        echo " default ${leftSide}=${rightSide}"
+        echo " "
+#        echo B: ${line%%=*} ${leftSideEval}
+#	echo sed "s/\(^${line%%=*}=\)\(..*$\)/\1${leftSideEval}/" ${tempFile}
+	#sed "s/\(^${line%%=*}=\)\(..*$\)/\1${leftSideEval}/" ${tempFile} > ${tempFile}2
+	#sed "s@\(^${line%%=*}=\)\(..*$\)@\1${leftSideEval}@" ${tempFile} > ${tempFile}2
+        #mv ${tempFile}2 ${tempFile}        
+      fi    
+    done
+    #cat ${tempFile}
+    rm -rf ${tempFile}  
+
+  ;;  
+  apply)
+    if [ "${2-undefined}" != "undefined" ]; then
+      #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
+      dumpRawSettings .tempfile
+      rm -rf .tempfile3
+      cat .tempfile | while read -r line; do
+      leftSide=${line%%=*}; #get the left side of name=value pair. (get name)
+      #leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
+      #[ -z "${leftSideEval}" ] && continue; #if no value continue
+      rightSide=${line##*=}; # get the right side (value)
+      rightSideEval=`eval echo ${rightSide} 2> /dev/null` 
+      [ -z "${rightSideEval}" ] && continue; #if no value continue
+        if [[ "${rightSide}" == *${2}* ]]; then
+          echo -e " ${leftSide}\t = ${rightSideEval}"
+          echo "${leftSide}=${rightSideEval}" >> .tempfile3
+          #evalcmd=`echo "${leftSide}=${rightSideEval}"`
+          #eval ${leftSide}="${rightSideEval}"
+          #echo -e "${leftSide}\t = ${!leftSide}"
+          #echo ${m_resfile}
+          #export m_resfile
+        fi    
+      done
+      [ -r .tempfile3 ] && . .tempfile3
+      rm -rf .tempfile .tempfile3
+    else
+      echo " USAGE:"
+      echo "     . settings apply '\${variable}'"
+      echo " ex: . settings apply '\${master}'"
+    fi
+  ;;  
+  *)
+    #default: show settings
+    cat "${ADOREFOLDER}/set/default.set" | while read -r line; do
+      #check if right side exists
+      if [[ "${line}" == *\&\&* ]]; then           
+        #get right side of the line      
+        line=`eval echo "${line##*&&}"`
+        if [ -n "${line%%=*}" ]; then 
+          #echo ${line%%=*}=${line##*=}
+          line=${line%%=*};
+          #indirect referencing in the line below {!
+          echo " ${line}=${!line}"
+        fi
+      fi
+    done
+  ;;
+esac

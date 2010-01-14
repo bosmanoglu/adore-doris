@@ -1,13 +1,14 @@
 #!/bin/bash
-echo "User Settings File: ${u}"
-if [ -r "${u}" ]; then
-  if [ -e "${u}" ]; then
+if [ -e "${u}" ]; then
+  if [ -r "${u}" ]; then
+    u=`readlink -e ${u}`
+    echo "User Settings File: ${u}"
     . ${u} 					#load user project settings
   else
-    echo "Can not find user settings file: ${u}"
+    echo "Can not read user settings file: ${u}"
   fi
 else
-  echo "No defined user settings file."
+  echo "User settings file is not defined. Using defaults."
 fi
 eval ${d}				#overwrite user settings with commandline
 if [ -z "${ADOREFOLDER}" ]; then
@@ -15,3 +16,14 @@ if [ -z "${ADOREFOLDER}" ]; then
  ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
 fi
 . "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+
+# check if the values are set or not. If empty set to "dummy"
+[ -z "${m_in_dat}" 		] && m_in_dat="dummy"
+[ -z "${m_in_vol}" 		] && m_in_vol="dummy"
+[ -z "${m_in_lea}" 		] && m_in_lea="dummy"
+[ -z "${m_in_null}" 		] && m_in_null="dummy"
+# check if the values are set or not. If empty set to "dummy"
+[ -z "${s_in_dat}" 		] && s_in_dat="dummy"
+[ -z "${s_in_vol}" 		] && s_in_vol="dummy"
+[ -z "${s_in_lea}" 		] && s_in_lea="dummy"
+[ -z "${s_in_null}" 		] && s_in_null="dummy"
