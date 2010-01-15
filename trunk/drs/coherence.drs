@@ -25,7 +25,7 @@ PROCESS         coherence               //
 COH_METHOD	${coh_method}		//
 COH_OUT_CCOH	${coh_out_ccoh}		//
 COH_OUT_COH	${coh_out_coh}		//
-COH_MULTILOOK	${coh_out_multilook}	//
+COH_MULTILOOK	${coh_multilook}	//
 COH_WINSIZE	${coh_winsize}		//
 
 STOP

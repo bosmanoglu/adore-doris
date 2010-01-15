@@ -24,7 +24,7 @@ PROCESS         coregpm                 //
 
 CPM_THRESHOLD   ${cpm_threshold}        //
 CPM_DEGREE      ${cpm_degree}           //
-CPM_MAXITER     ${cpm_maxiter}		//
+CPM_DUMP        ${cpm_dump}		//
 CPM_PLOT        ${cpm_plot}             // plot w/o magnitude background
 CPM_WEIGHT	${cpm_weight}		//
 CPM_MAXITER	${cpm_maxiter}		//

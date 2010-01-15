@@ -15,7 +15,7 @@ if [ "${s_dbow}" == "0 0 0 0" ]; then
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
 
-if [ "${S_dbow_geo}" == "0 0 0 0" ]; then
+if [ "${s_dbow_geo}" == "0 0 0 0" ]; then
   grep -v S_DBOW_GEO ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
