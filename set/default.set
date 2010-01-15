@@ -144,7 +144,7 @@
 [ -z "${dac_out_dem_lp}" 	] && dac_out_dem_lp="${outputFolder}/{master}_${slave}.dacdem_lp"
 ################### coregpm
 [ -z "${cpm_threshold}" 	] && cpm_threshold="0.4"
-[ -z "${cpm_degree}" 		] && cpm_degree="1"
+[ -z "${cpm_degree}" 		] && cpm_degree="2"
 [ -z "${cpm_dump}" 		] && cpm_dump="off"
 [ -z "${cpm_plot}" 		] && cpm_plot="nobg"
 [ -z "${cpm_weight}" 		] && cpm_weight="bamler"
