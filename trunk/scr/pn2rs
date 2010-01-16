@@ -1,0 +1,45 @@
+#!/bin/bash
+# USAGE:
+#	pn2rs processName 
+#
+# DESCRIPTION:
+#  PN2RS is an external ADORE command.  
+#  It outputs the resultfile section name for the given processName.
+#
+# INPUT:
+#  processName: Doris step to lookup.
+#  
+# OUTPUT:
+#  Name of the section in doris result file.
+
+[ "$1" == "m_readfiles" ] && echo readfiles
+[ "$1" == "s_readfiles" ] && echo readfiles
+[ "$1" == "coarseorb"   ] && echo coarse_orbits
+[ "$1" == "demassist"   ] && echo dem_assist
+[ "$1" == "subtrrefpha"   ] && echo subtr_refphase
+[ "$1" == "dinsar"  ] && echo dinsar
+[ "$1" == "m_porbits"  ] && echo precise_orbits
+[ "$1" == "s_porbits"  ] && echo precise_orbits
+[ "$1" == "coarsecorr"  ] && echo coarse_correl
+[ "$1" == "coregpm"  ] && echo comp_coregpm
+[ "$1" == "comprefdem"  ] && echo comp_refdem
+[ "$1" == "slant2h"  ] && echo slant2h
+[ "$1" == "m_crop"  ] && echo crop
+[ "$1" == "s_crop"  ] && echo crop
+[ "$1" == "m_filtazi"  ] && echo filt_azi
+[ "$1" == "resample"  ] && echo resample
+[ "$1" == "subtrrefdem"  ] && echo subtr_refdem
+[ "$1" == "geocode"  ] && echo geocoding
+[ "$1" == "m_simamp"  ] && echo sim_amplitude
+[ "$1" == "s_filtazi"  ] && echo filt_azi
+[ "$1" == "filtrange"  ] && echo filt_range
+[ "$1" == "coherence"  ] && echo coherence
+[ "$1" == "m_timing"  ] && echo master_timing
+[ "$1" == "fine"  ] && echo fine_coreg
+[ "$1" == "interfero"  ] && echo interfero
+[ "$1" == "filtphase"  ] && echo filtphase
+[ "$1" == "m_ovs"  ] && echo oversample 
+[ "$1" == "s_ovs"  ] && echo oversample
+[ "$1" == "reltiming"  ] && echo timing_error
+[ "$1" == "comprefpha"  ] && echo comp_refphase
+[ "$1" == "unwrap"  ] && echo unwrap
