@@ -37,7 +37,7 @@ pp()
   rm -f ${outputFolder}/${dorisProcess}.drs
   dorisProcess=${1}
   if [ -r "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline >> ${outputFolder}/${dorisProcess}.drs
     done
@@ -94,7 +94,6 @@ ctrl_c()
 # fi
 }
 
-
 ###### GET INPUT OPTIONS
 #start a loop for getopts. I want to read parameters of options -n -i  etc. 
 while getopts  "iu:p:d:" flag
@@ -145,11 +144,17 @@ fi
 
 if [ "${i-notInteractive}" != "notInteractive" ]; then
   set -o emacs
+  set -o histexpand
+  #set bind-tty-special-chars off
+  #bind TAB:complete
+  #bind '"TAB":complete-variable'  
   #bind '"M-[A":history-search-backward'
   #bind '"M-[B":history-search-forward'
   #ctrl-r is reverse search history... bind Control-r:redraw-current-line
   #adoreHistoryFile=${ADOREFOLDER}/scr/.history
   #INPUTRC=${ADOREFOLDER}/scr/.inputrc
+  . /etc/bash_completion
+  . ${ADOREFOLDER}/scr/.inputrc
 
   #trap ctrl-c and call ctrl_c()
   trap ctrl_c 2 # ctrl+c=sigint 2

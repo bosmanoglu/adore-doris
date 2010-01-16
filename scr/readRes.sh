@@ -32,13 +32,34 @@ fi
 inputfile=${1}
 section=${2}
 parameter=${3}
+notify=${4:-off}
 startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
 endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
 
 length=`echo ${endline} - ${startline} |bc`
-result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
-#echo $result
-
+if [[ "${notify}" == "notify" ]]; then
+  #get number of hits
+  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
+  if [[ ${numHits} -gt 1 ]]; then
+    echo " "
+    echo "I found more than 1 match for your selection."    
+    echo "Please enter the selection you want me to use."
+    for (( c=1; c<=${numHits}; c++ ))
+    do
+      matchingLine=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
+      echo $c : ${matchingLine}      
+    done
+    read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
+    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    
+    if [ -z "${result}" ]; then
+      echo "Something went wrong."
+      echo "Exiting..."
+      return; 
+    fi
+  fi
+else
+  result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+fi
 result=${result##*:} 	#Get the part after the LAST column 
 
 #echo "$startline $endline $length $parameter_length"

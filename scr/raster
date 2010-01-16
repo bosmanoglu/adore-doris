@@ -1,0 +1,210 @@
+#!/bin/bash
+# ADORE
+# Automatic Doris Environment
+#
+# USAGE:
+#	. raster a|p|m dorisStep cpxfiddleOptions
+#
+# DESCRIPTION:
+#  RASTER is an internal ADORE command.  
+#  It creates sunraster images of the DORIS products using 
+#  cpxfiddle.   
+#
+# INPUT:
+#  a|p|m: 
+#	a: creates amplitude image.
+#  	p: creates phase image.
+#	m: creates amplitude/phase mixed image.
+#
+#  dorisStep: The step for the output. lsprocess can be used to 
+#     get a list of doris processes.
+#     The step can be in the master, slave or interferogram result file.
+#
+#  Optional:
+#	cpxfiddleOptions: This is passed to cpxfiddle. 
+#	    -w, -f, -q, -o, -e are fixed. They can not be specified.
+#	    available options: 
+#		-M: multilook factor. default is 1/1
+#		-s: scale. default is 1
+#		-l, -L
+#		-p, -P
+#		-S, -m, -c, -r, -B, -H, ...
+#
+# OUTPUT:
+#   Raster image in the following naming convention:
+#	a: A_filename.ras
+#	p: P_filename.ras
+#	m: M_filename.ras
+#   *'.' (dot) character in the filename will be converted to '_'(underscore).
+#
+
+#echo $@
+#echo $#
+unset generate; unset dorisStep; unset remainder; unset format
+###### GET INPUT OPTIONS
+if [ $# -gt 2 ]; then
+    generate=${1};shift
+    dorisStep=${1};shift
+    remainder=$@;
+elif [ $# -eq 2 ];then
+  generate=${1};shift
+  dorisStep=${1};shift
+  remainder='';
+else
+  echo "Please check usage by: ? raster"
+  return
+fi
+
+echo "I'll pass these options to cpxfiddle: ${remainder}"
+
+if [[ ${dorisStep} == m_* ]]; then
+  dorisStep=`pn2rs ${dorisStep}`
+  grepM=`grep ${dorisStep} ${m_resfile}`
+elif [[ ${dorisStep} == s_* ]]; then
+  dorisStep=`pn2rs ${dorisStep}`
+  grepS=`grep ${dorisStep} ${s_resfile}`
+else
+  #find which result file has info
+  # resample is a interfero step but outputs to s etc.
+  dorisStep=`pn2rs ${dorisStep}`
+  grepM=`grep ${dorisStep} ${m_resfile}`
+  grepS=`grep ${dorisStep} ${s_resfile}`
+  grepI=`grep ${dorisStep} ${i_resfile}`
+fi
+
+if [[ -n "${grepM}" ]]; then
+  resultFile=${m_resfile};
+elif [[ -n "${grepS}" ]]; then
+  resultFile=${s_resfile};
+elif [[ -n "${grepI}" ]]; then 
+  resultFile=${i_resfile};
+else
+  echo "File can not be related to the current resultfiles. Please check your Master and Slave settings are correct."
+  exit
+fi
+
+echo "Reading file information from: ${resultFile}"
+firstPixel=`readRes.sh ${resultFile} ${dorisStep} First_pixel`
+lastPixel=`readRes.sh ${resultFile} ${dorisStep} Last_pixel`
+width=$((${lastPixel}-${firstPixel}+1));
+#readRes.sh ${resultFile} ${dorisStep} Data_output_file notify
+##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
+inputfile=${resultFile}
+section=${dorisStep}
+parameter="Data_output_file"
+notify=notify
+startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
+endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
+
+length=`echo ${endline} - ${startline} |bc`
+if [[ "${notify}" == "notify" ]]; then
+  #get number of hits
+  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
+  if [[ ${numHits} -gt 1 ]]; then
+    echo " "
+    echo "I found more than 1 match for your selection."    
+    echo "Please enter the selection you want me to use."
+    for (( c=1; c<=${numHits}; c++ ))
+    do
+      matchingLine=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
+      echo $c : ${matchingLine}      
+    done
+    read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
+    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
+    if [ -z "${result}" ]; then
+      echo "Something went wrong."
+      echo "Exiting..."
+      return; 
+    else
+      #get the format
+      format=`grep -A ${length} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
+      format=${format##*:}    #Get the part after the LAST column
+    fi
+  else
+    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+    format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+  fi
+else
+  result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+  format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+fi
+result=${result##*:} 	#Get the part after the LAST column 
+
+#echo "$startline $endline $length $parameter_length"
+#echo "$parameter"
+#echo $result
+
+fileName=${result}
+########################## END OF READRES.
+#echo $fileName
+
+if [ -z ${fileName} ]; then
+  echo "No data file for the step ${dorisStep} in ${resFile}"
+  return;
+fi
+
+[ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
+[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
+[ "${format//[[:space:]]}" == "real4" ] && format="r4";
+[ "${format//[[:space:]]}" == "short" ] && format="i4";
+echo Image Width  ..${width}..
+echo Image Format ..${format}..
+outName=`basename ${fileName}| tr '.' '_'`
+#echo Outname  ..${outName}..
+if [[ "${generate}" == *a* ]]; then
+  if [[ ${#format} -eq 2 ]];then
+    cpxfiddle -w ${width} -f ${format} -e 0.5 -q normal -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+  else
+    cpxfiddle -w ${width} -f ${format} -e 0.5 -q mag  -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+  fi
+  echo "Name of rasterfile: A_${outName}.ras"
+fi
+if [[ "${generate}" == *p* ]]; then
+  if [[ ${#format} -eq 2 ]];then
+    cpxfiddle -w ${width} -f ${format} -q normal -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+  else
+    cpxfiddle -w ${width} -f ${format} -q phase  -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+  fi
+  echo "Name of rasterfile: P_${outName}.ras"    
+fi
+if [[ "${generate}" == *m* ]]; then
+  if [[ ${#format} -eq 2 ]];then
+    echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
+  else
+    cpxfiddle -w ${width} -f ${format} -e 0.5 -s 1.2 -o sunraster -c jet ${remainder} ${fileName} > M_${outName}.ras
+  fi
+  echo "Name of rasterfile: M_${outName}.ras"    
+  #cpxfiddle -w ${width} -f ${frmt} -e 0.5 -s 1.2 -q mixed -o sunraster -c cool -M${ratio} ${fname} > ${bname}_mixed.ras
+fi
+
+
+
+
+<<COMMENTEDOUT
+#get width and format
+old_IFS=$IFS
+IFS=$'\n'
+lines=($(cat ${resultFile})) # array
+IFS=$old_IFS
+breakCMD="";
+echo "Number of Lines: ${#lines}"
+
+for (( c=0; c<=${#lines}; c++ ))
+do
+  #first find the filename. After that. Exit at the first END.
+  line=${lines[1]}
+  echo ${line}
+   [[ "${line}" == *${fileName}* ]] && breakCMD='break'; 
+   if [[ breakCMD == 'break' ]]; then 
+     echo ${line}
+     #[[ "${line}" == *First_line*  ]] && firstLine=`echo ${line} | cut -f2 -d:`; echo $firstLine
+     #[[ "${line}" == *Last_line*   ]] && lastLine=`echo ${line} | cut -f2 -d:`; echo $lastLine
+     if [[ "${line}" == *Data_output_format*   ]]; then 
+       [ -z ${format} ] && format=`echo ${line} | cut -f2 -d:`
+     fi
+     [[ "${line}" == *First_pixel* ]] && firstPixel=`echo ${line} | cut -f2 -d: | tr -d " "`;
+     [[ "${line}" == *Last_pixel*  ]] && lastPixel=`echo ${line} | cut -f2 -d: | tr -d " "`;
+     [[ "${line}" == *End_* ]] && ${breakCMD}
+   fi
+done < ${resultFile}
+COMMENTEDOUT
