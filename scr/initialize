@@ -1,4 +1,18 @@
 #!/bin/bash
+# USAGE:
+#	. initialize
+#
+# DESCRIPTION:
+#  INITIALIZE is an internal ADORE command.  
+#  It is used to load and check user settings. Regular users will probably not
+#  need to use it. For saving and loading user settings see "? settings" 
+#
+# INPUT:
+#  No input parameters are required.
+#
+# OUTPUT:
+#  Output's user settings file path.
+#  
 if [ -e "${u}" ]; then
   if [ -r "${u}" ]; then
     u=`readlink -e ${u}`
@@ -12,8 +26,8 @@ else
 fi
 eval ${d}				#overwrite user settings with commandline
 if [ -z "${ADOREFOLDER}" ]; then
- ADOREFOLDER=`dirname ${0}`
- ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
+ [ -z ${ADORESCR} ] && ADORESCR=`dirname ${0}`
+ ADOREFOLDER=${ADORESCR//\/scr/} # Remove the scripts folder. 
 fi
 . "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
 
