@@ -30,6 +30,11 @@
 #
 
 ###### SOME FUNCTIONS
+generateRandomString(){
+  randomString=`fortune |head -n1| md5sum |md5sum`
+  randomString=${randomString:1:8}; #get first 8 char
+}
+
 pp()
 {
 #PREP, PRE-PROCESS
@@ -180,6 +185,7 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
         . ${ADORESCR}/undo ${command#* }        
         ;;
       \?)
+        #[ "${command#* }" == "?" ] && . "${ADORESCR}/?"
         [ -e ${ADORESCR}/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${command#* }      
         [ -e ${ADORESCR}/process/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${command#* }              
         ;;

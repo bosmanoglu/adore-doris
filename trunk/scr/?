@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# USAGE:
+#	? commandName
+#
+# DESCRIPTION:
+#  ? is a builtin ADORE command.  
+#  It displays the help for given adore command.   
+#
+# INPUT:
+#  commandName: ADORE command name to get help. A list of commands 
+#  can be found at the end of this help message.
+#  
+# OUTPUT:
+#  Help message for the specified command, or this message if no command is given.
+# 
+# 
+# ADORE Commands:
+# ?		: Help
+# check		: Check completed steps in result file.
+# initialize	: Initialize default settings.
+# lsprocess	: list DORIS processes
+# pn2rs		: convert Process Name to Result file Section title.
+# p		: Process DORIS step.
+# raster		: Create raster image from doris result.
+# settings	: Utility for listing, saving and loading ADORE variables.
+# undo		: Undo all processing after a given step.
+#
+# ADORE Batch Processes:
+# singleMasterStack	: Script to process multiple interferograms with a single master.
+
+
