@@ -7,6 +7,7 @@
 #######################################
 ###  ADORE-BASH Run-Time Settings   ###
 #######################################
+[ -z "${slcType}"         	] && slcType=""
 [ -z "${projectFolder}"		] && projectFolder="."
 [ -z "${tmpFolder}"		] && tmpFolder=${projectFolder}/tmp
 [ -z "${_rel_tmpFolder}"	] && _rel_tmpFolder='echo ${projectFolder}/tmp'
