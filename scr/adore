@@ -30,8 +30,17 @@
 #
 
 ###### SOME FUNCTIONS
+function ask()          # See "settings save" for example of use.
+{
+  echo -n "$@" '[y/n] ' ; read ans
+  case "$ans" in
+    y*|Y*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+                            
 generateRandomString(){
-  randomString=`fortune |head -n1| md5sum |md5sum`
+  randomString=`date +%N | md5sum |md5sum`
   randomString=${randomString:1:8}; #get first 8 char
 }
 
@@ -158,7 +167,7 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   #ctrl-r is reverse search history... bind Control-r:redraw-current-line
   #adoreHistoryFile=${ADOREFOLDER}/scr/.history
   #INPUTRC=${ADOREFOLDER}/scr/.inputrc
-  . /etc/bash_completion
+  [ -e "/etc/bash_completion" ] && . /etc/bash_completion
   . ${ADOREFOLDER}/scr/.inputrc
 
   #trap ctrl-c and call ctrl_c()

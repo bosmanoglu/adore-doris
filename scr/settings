@@ -4,6 +4,7 @@
 #	. settings
 #	. settings apply variableName
 #	. settings check
+#	. settings fix
 #	. settings raw
 #	. settings save [fileName]
 #	. settings load fileName
@@ -25,6 +26,9 @@
 #  . settings check: looks for differences between ADORE's 
 #	expectations and current values. Handy for finding 
 #	errors due to recursive dependancies.
+#
+#  . settings fix: after "check"ing you can accept suggested changes 
+#	using the variables. Check will display a reference line.
 #
 #  . settings raw: displays the unprocessed settings with USERS
 #	changes. This can be saved with the save function.
@@ -125,6 +129,16 @@ case ${1} in
     tempFile=${randomString}
 
     dumpDefaultSettings ${tempFile}
+    
+    if [ -e "${saveFileName}" ]; then
+      if ask "Shall I overwrite ${saveFileName}?"
+        then 
+          rm  ${saveFileName}
+      else
+        return
+      fi
+    fi
+    
     #check to see if current environment is set differently 
     #######################################################
     cat ${tempFile} | while read -r line; do          
@@ -133,17 +147,22 @@ case ${1} in
       [ -z "${leftSide}" ] && continue; #if no value continue
       [ -z "${leftSideEval}" ] && continue; #if no value continue
       
-      
       rightSide=${line##*=}; # get the right side (value) (default)
-      rightSideEval=`eval echo "${rightSide}" 2> /dev/null` #(evaluate default)
+      if [[ "${leftSide}" == *_rel* ]]; then
+        rightSideEval=`eval "${rightSide}" 2> /dev/null` #(evaluate default)
+      else
+        rightSideEval=`eval echo "${rightSide}" 2> /dev/null` #(evaluate default)
+      fi
       [ -z "${rightSideEval}" ] && continue; #if no value continue      
 
       if [ "${leftSideEval}" != "${rightSideEval}" ]; then
+        #echo ..${line%%=*}..=..${!leftSide}..
         echo ${line%%=*}=\"${!leftSide}\" >> ${saveFileName}
       fi    
     done
     
-    mv ${tempFile} ${saveFileName}	
+    #mv ${tempFile} ${saveFileName}	
+    rm ${tempFile}
     echo "Settings saved to ${saveFileName}"
   ;;
   load)
@@ -155,7 +174,7 @@ case ${1} in
     fi
     clearSettings;
     u=`readlink -e ${loadFile}`
-    unset ${loadFile}
+    unset loadFile
     . initialize
   ;;
   reset)
@@ -204,6 +223,7 @@ case ${1} in
   check)
     #check for inconsistent changes. like ${master} is changed but ${m_resfiles} is still old.
       #loop over _ref_variables. and check for mismatches
+      suggestionLine=". settings fix"
       for var in ${!_rel_*}
       do
         #echo ${var}=${!var} #display contents
@@ -217,9 +237,10 @@ case ${1} in
           echo " active    ${setting}=${!setting}"        
           echo " suggested ${setting}=${relativeValue}"
           echo " "
+          suggestionLine="${suggestionLine} ${setting}"
         fi
       done
-    
+      [ "${suggestionLine}" != ". settings fix" ] && echo ${suggestionLine}
 
 #    tempFile=".tempfile"
 #    dumpRawSettings ${tempFile}
@@ -298,6 +319,36 @@ case ${1} in
       echo " ex: . settings apply master"
     fi
   ;;  
+  fix)
+    if [ "${2:-undefined}" == "undefined" ]; then
+      echo "Applying all suggested changes."
+      for var in ${!_rel_*}
+      do
+        #echo ${var}=${!var} #display contents
+        #echo ${var}=${var##*_rel_} # display setting to be modified
+        setting=${var##*_rel_} # get setting name
+        relativeValue=`eval ${!var}`
+        #echo ${setting}=${!setting} #display current settings
+        #echo ${setting}=${relativeValue}
+        [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
+        if [ "${!setting}" != "${relativeValue}" ]; then
+          echo "${setting}=${relativeValue}"        
+          eval "echo ${setting}=${relativeValue}"
+        fi
+      done
+    else
+      for (( k=2 ; k<=$# ; k++ ))
+      do
+        #echo ${!k}
+        setting=${!k}
+        relativeName="_rel_${!k}"
+        #echo ${relativeName}
+        relativeValue=`eval ${!relativeName}`
+        echo "${setting}=${relativeValue}"
+        eval "${setting}=${relativeValue}" 
+      done
+    fi
+  ;;
   *)
     generateRandomString; 
     tempFile=${randomString}
