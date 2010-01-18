@@ -145,7 +145,7 @@ case ${1} in
       leftSide=${line%%=*}; #get the left side of name=value pair.
       leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
       [ -z "${leftSide}" ] && continue; #if no value continue
-      [ -z "${leftSideEval}" ] && continue; #if no value continue
+      #[ -z "${leftSideEval}" ] && continue; #if no value continue
       
       rightSide=${line##*=}; # get the right side (value) (default)
       if [[ "${leftSide}" == *_rel* ]]; then
@@ -153,7 +153,7 @@ case ${1} in
       else
         rightSideEval=`eval echo "${rightSide}" 2> /dev/null` #(evaluate default)
       fi
-      [ -z "${rightSideEval}" ] && continue; #if no value continue      
+      #[ -z "${rightSideEval}" ] && continue; #if no value continue      
 
       if [ "${leftSideEval}" != "${rightSideEval}" ]; then
         #echo ..${line%%=*}..=..${!leftSide}..
