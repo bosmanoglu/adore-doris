@@ -148,11 +148,12 @@ case ${1} in
       #[ -z "${leftSideEval}" ] && continue; #if no value continue
       
       rightSide=${line##*=}; # get the right side (value) (default)
-      if [[ "${leftSide}" == *_rel* ]]; then
-        rightSideEval=`eval "${rightSide}" 2> /dev/null` #(evaluate default)
-      else
+      #if [[ "${leftSide}" == *_rel* ]]; then
+      #  rightSideEval=`eval echo ${rightSide}` #(evaluate default)
+      #  echo ..${leftSideEval}..=..${rightSideEval}../..${rightSide}
+      #else
         rightSideEval=`eval echo "${rightSide}" 2> /dev/null` #(evaluate default)
-      fi
+      #fi
       #[ -z "${rightSideEval}" ] && continue; #if no value continue      
 
       if [ "${leftSideEval}" != "${rightSideEval}" ]; then

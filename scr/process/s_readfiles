@@ -6,8 +6,8 @@ slcType=`echo ${slcType-undefined} | tr "[:upper:]" "[:lower:]"`
 case "${slcType}" in
   gamma)
     echo "Reading Gamma SLC"
-    slaveDataFolder=`dirname "${s_in_dat}"`
-    gammaReadfiles.csh ${slaveDataFolder}/*.pslcpar ${slaveDataFolder}/System.par ${s_in_dat} 0 > ${outputFolder}/${slave}.res
+    masterDataFolder=`dirname "${m_in_dat}"`
+    gammaReadfiles.csh ${gammaParFile} ${gammaSysFile} ${m_in_dat} ${gammaByteSwap} > ${outputFolder}/${master}.res
   ;;
   *)
     #if [ "${slcType-undefined}" == "undefined" ]; then
