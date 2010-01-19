@@ -1,38 +1,38 @@
-SCREEN		${screen}		//
-BEEP   		${beep}			//
-BATCH  		${batch}		//
-OVERWRITE	${overwrite}		//
-PREVIEW         ${preview}              // SUNraster files with cpxfiddle
-LISTINPUT       ${listInput}            // copy this file to log
-MEMORY          ${memory}               // MB
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
 
-LOGFILE		${logFile}		//
-M_RESFILE	${m_resfile}		//
-S_RESFILE	${s_resfile}		//
-I_RESFILE	${i_resfile}		//
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
 
-ORB_INTERP	${orb_interp}		//
-DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
-HEIGHT		${height}		// Average Height for the crop
-TIEPOINT	${tiePoint}		//
-M_RG_T_ERROR	${m_rg_t_error}		//
-M_AZ_T_ERROR	${m_az_t_error}		//
-S_RG_T_ERROR	${s_rg_t_error}		//
-S_AZ_T_ERROR	${s_az_t_error}		//
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
 
-PROCESS         filtrange               // 
+process         filtrange               // 
 
-RF_METHOD	${rf_method}		//
-RF_FFTLENGTH	${rf_fftlength}		//
-RF_OVERLAP	${rf_overlap}		//
-RF_HAMMING	${rf_hamming}		//
-RF_SLOPE	${rf_slope}		//
-RF_NLMEAN	${rf_nlmean}		//
-RF_THRESHOLD	${rf_threshold}		//
-RF_OVERSAMPLE	${rf_oversample}	//
-RF_WEIGHTCORR	${rf_weightcorr}	//
-RF_OUT_MASTER	${rf_out_master}	//
-RF_OUT_SLAVE	${rf_out_slave}		//
-RF_OUT_FORMAT	${rf_out_format}	//
+rf_method	${rf_method}		//
+rf_fftlength	${rf_fftlength}		//
+rf_overlap	${rf_overlap}		//
+rf_hamming	${rf_hamming}		//
+rf_slope	${rf_slope}		//
+rf_nlmean	${rf_nlmean}		//
+rf_threshold	${rf_threshold}		//
+rf_oversample	${rf_oversample}	//
+rf_weightcorr	${rf_weightcorr}	//
+rf_out_master	${rf_out_master}	//
+rf_out_slave	${rf_out_slave}		//
+rf_out_format	${rf_out_format}	//
 
-STOP
+stop

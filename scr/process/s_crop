@@ -11,12 +11,12 @@ done
 # automatically
 #check if dbow or dbowgeo is set
 if [ "${s_dbow}" == "0 0 0 0" ]; then
-  grep -v S_DBOW ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  grep -i -v -w "s_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
 
 if [ "${s_dbow_geo}" == "0 0 0 0" ]; then
-  grep -v S_DBOW_GEO ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  grep -i -v -w "s_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
 

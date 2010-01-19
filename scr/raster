@@ -40,7 +40,8 @@
 
 #echo $@
 #echo $#
-unset generate; unset dorisStep; unset remainder; unset format
+#Clear Script Variables
+unset generate dorisStep remainder format grepM grepS grepI
 ###### GET INPUT OPTIONS
 if [ $# -gt 2 ]; then
     generate=${1};shift
@@ -54,6 +55,9 @@ else
   echo "Please check usage by: ? raster"
   return
 fi
+
+# make generate lowercase to accommadate user entries in caps from APM
+generate=`echo ${generate} | tr [:upper:] [:lower:]`
 
 echo "I'll pass these options to cpxfiddle: ${remainder}"
 

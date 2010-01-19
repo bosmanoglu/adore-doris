@@ -30,22 +30,19 @@
 [ -z "${slave}"			] && slave=`ls -F ${dataFolder}/ | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${_rel_excludesFile}"	] && _rel_excludesFile='echo ${runFolder}/excludes'
-[ -z "${orbitsFolder}"		] && orbitsFolder=${projectFolder}/orbits
-[ -z "${_rel_orbitsFolder}"	] && _rel_orbitsFolder='echo ${projectFolder}/orbits'
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
 [ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
 [ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
 [ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
 [ -z "${unspecified}"		] && unspecified=" "	#readinput.hh unspecified filenames are set to this
 ####### for Gamma Processing... m/s_readfiles
-[ -z "${slcType}"         	] && slcType=""
-[ -z "${gammaParFilePattern}"   ] && gammaParFilePattern="*.pslcpar"
-[ -z "${gammaSysFilePattern}"   ] && gammaSysFilePattern="System.par"
+[ -z "${slcType}"         	] && slcType=""	#set to gamma for gamma slc's.
+[ -z "${gammaParFile}"   	] && gammaParFile="*.pslcpar"
+[ -z "${gammaSysFile}"   	] && gammaSysFile="System.par"
 [ -z "${gammaByteSwap}"         ] && gammaByteSwap="0"
-[ -z "${gammaParFile}" 		] && gammaParFile=`ls ${dataFolder}/${master}/${gammaParFilePattern} 2>/dev/null | tr -d '\n'`
-[ -z "${_rel_gammaParFile}" 	] && _rel_gammaParFile='ls ${dataFolder}/${master}/${gammaParFilePattern} 2>/dev/null | tr -d "\n"'
-[ -z "${gammaSysFile}" 		] && gammaSysFile=`ls ${dataFolder}/${master}/${gammaSysFilePattern} 2>/dev/null | tr -d '\n'`
-[ -z "${_rel_gammaSysFile}" 	] && _rel_gammaSysFile='ls ${dataFolder}/${master}/${gammaSysFilePattern} 2>/dev/null | tr -d "\n"'
+####### for resample
+[ -z "${rs_az_buffer}"		] && rs_az_buffer="200"
+[ -z "${rs_rg_buffer}"		] && rs_rg_buffer="200"
 #######################################
 ###     Default Doris Settings      ###
 #######################################
@@ -54,10 +51,10 @@
 [ -z "${batch}" 		] && batch=on
 [ -z "${overwrite}" 		] && overwrite=on
 [ -z "${preview}" 		] && preview=off
-[ -z "${listInput}" 		] && listInput=on
+[ -z "${listinput}" 		] && listinput=on
 [ -z "${memory}" 		] && memory=500
-[ -z "${logFile}" 		] && logFile=${outputFolder}/${runName}.log
-[ -z "${_rel_logFile}" 		] && _rel_logFile='echo ${outputFolder}/${runName}.log'
+[ -z "${logfile}" 		] && logfile=${outputFolder}/${runName}.log
+[ -z "${_rel_logfile}" 		] && _rel_logfile='echo ${outputFolder}/${runName}.log'
 [ -z "${m_resfile}" 		] && m_resfile=${outputFolder}/${master}.res
 [ -z "${_rel_m_resfile}" 	] && _rel_m_resfile='echo ${outputFolder}/${master}.res'
 [ -z "${s_resfile}" 		] && s_resfile=${outputFolder}/${slave}.res
@@ -65,9 +62,9 @@
 [ -z "${i_resfile}" 		] && i_resfile=${outputFolder}/${master}_${slave}.res
 [ -z "${_rel_i_resfile}"	] && _rel_i_resfile='echo ${outputFolder}/${master}_${slave}.res'
 [ -z "${orb_interp}" 		] && orb_interp="polyfit"
-[ -z "${dumpBaseline}" 		] && dumpBaseline="1 1" # default is "0 0" but fails at readinput.cc 1271
+[ -z "${dumpbaseline}" 		] && dumpbaseline="1 1" # default is "0 0" but fails at readinput.cc 1271
 [ -z "${height}" 		] && height=0.0
-[ -z "${tiePoint}"		] && tiePoint="0.0 0.0 0.0"
+[ -z "${tiepoint}"		] && tiepoint="0.0 0.0 0.0"
 [ -z "${m_rg_t_error}" 		] && m_rg_t_error="0.0"
 [ -z "${m_az_t_error}" 		] && m_az_t_error="0.0"
 [ -z "${s_rg_t_error}" 		] && s_rg_t_error="0.0"
@@ -83,8 +80,7 @@
 [ -z "${m_in_null}" 		] && m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
 [ -z "${_rel_in_null}" 		] && _rel_in_null='ls ${dataFolder}/${master}/${nullFile} 2>/dev/null | tr -d "\n"'
 ################### m_porbits
-[ -z "${m_orb_dir}" 		] && m_orb_dir=${projectFolder}/orbits
-[ -z "${_rel_m_orb_dir}" 	] && _rel_m_orb_dir='echo ${projectFolder}/orbits'
+[ -z "${m_orbdir}" 		] && m_orbdir="${unspecified}"
 [ -z "${m_orb_interval}" 	] && m_orb_interval=1
 [ -z "${m_orb_extratime}" 	] && m_orb_extratime=4
 [ -z "${m_orb_dump}" 		] && m_orb_dump=-1
@@ -133,8 +129,8 @@
 [ -z "${s_in_null}" 		] && s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
 [ -z "${_rel_s_in_null}" 	] && _rel_s_in_null='ls ${dataFolder}/${slave}/${nullFile} 2>/dev/null | tr -d "\n"'
 ################### s_porbits
-[ -z "${s_orb_dir}" 		] && s_orb_dir=${m_orb_dir}
-[ -z "${_rel_s_orb_dir}" 	] && _rel_s_orb_dir='echo ${m_orb_dir}'
+[ -z "${s_orbdir}" 		] && s_orbdir=${m_orbdir}
+[ -z "${_rel_s_orbdir}" 	] && _rel_s_orbdir='echo ${m_orbdir}'
 [ -z "${s_orb_interval}" 	] && s_orb_interval=${m_orb_interval}
 [ -z "${_rel_s_orb_interval}" 	] && _rel_s_orb_interval='echo ${m_orb_interval}'
 [ -z "${s_orb_extratime}" 	] && s_orb_extratime=${m_orb_extratime}
@@ -147,7 +143,8 @@
 [ -z "${s_crop_out}" 		] && s_crop_out="${outputFolder}/${slave}.crop"
 [ -z "${_rel_s_crop_out}" 	] && _rel_s_crop_out='echo ${outputFolder}/${slave}.crop'
 [ -z "${s_dbow}"		] && s_dbow="0 0 0 0"
-[ -z "${s_dbow_geo}" 		] && s_dbow_geo="0 0 0 0"
+[ -z "${s_dbow_geo}" 		] && s_dbow_geo="${m_dbow_geo}"
+[ -z "${_rel_s_dbow_geo}"	] && _rel_s_dbow_geo='echo ${m_dbow_geo}'
 ################### s_ovs
 [ -z "${s_ovs_out}" 		] && s_ovs_out="${outputFolder}/${slave}.ovs"
 [ -z "${_rel_s_ovs_out}" 	] && _rel_s_ovs_out='echo ${outputFolder}/${slave}.ovs'

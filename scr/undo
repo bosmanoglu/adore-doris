@@ -17,15 +17,6 @@
 # OUTPUT:
 #  Undo Successful: if doris step was found and removed.
 #  
-# Doris steps in result files.
-# readfiles       coarse_orbits  interfero       filtphase
-# precise_orbits  coarse_correl  comp_refphase   unwrap
-# crop            fine_coreg     subtr_refphase  slant2h
-# sim_amplitude   timing_error   comp_refdem     geocoding
-# master_timing   dem_assist     subtr_refdem    dinsar
-# filt_azi        comp_coregpm   coherence
-# filt_range      resample
-# oversample
 #
 
 dorisProcessReset()
@@ -52,11 +43,18 @@ dorisProcessReset()
  fi
 }
 
+unset dorisStep
+dorisStep=`pn2rs ${1}`
+
 if [ "${2-undefined}" != "undefined" ]; then
-  dorisProcessReset ${1} ${2}
+  dorisProcessReset ${dorisStep} ${2}
+elif [[ "${1}" == m_* ]]; then
+  dorisProcessReset ${dorisStep} ${m_resfile};
+elif [[ "${1}" == s_* ]]; then
+  dorisProcessReset ${dorisStep} ${s_resfile}; 
 else
-  dorisProcessReset ${1} ${m_resfile}
-  dorisProcessReset ${1} ${s_resfile}
-  dorisProcessReset ${1} ${i_resfile}
+  dorisProcessReset ${dorisStep} ${m_resfile}
+  dorisProcessReset ${dorisStep} ${s_resfile}
+  dorisProcessReset ${dorisStep} ${i_resfile}
 fi
 
