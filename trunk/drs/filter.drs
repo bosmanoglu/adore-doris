@@ -1,21 +1,21 @@
-SCREEN          info                    // level of output to standard out
-BEEP            off                     // level of beeping
-PREVIEW         off                     // SUNraster files with cpxfiddle
-MEMORY          800                   // MB
-OVERWRITE       ON                      // overwrite existing files
-BATCH           ON                      // non-interactive
-LISTINPUT       ON                      // copy this file to log
- PROCESS	filtphase		//
+screen          info                    // level of output to standard out
+beep            off                     // level of beeping
+preview         off                     // sunraster files with cpxfiddle
+memory          800                   // mb
+overwrite       on                      // overwrite existing files
+batch           on                      // non-interactive
+listinput       on                      // copy this file to log
+ process	filtphase		//
 #                                       //
 #   the general io files                //
 #   --------------------                //
-LOGFILE         OutputFolder/log.out                 // 
-M_RESFILE       OutputFolder/MasterFolder.res           // parameter file
-S_RESFILE       OutputFolder/SLCFolder.res            // parameter file
-I_RESFILE       OutputFolder/MasterFolder_SLCFolder.res  // parameter file                      
+logfile         outputfolder/log.out                 // 
+m_resfile       outputfolder/masterfolder.res           // parameter file
+s_resfile       outputfolder/slcfolder.res            // parameter file
+i_resfile       outputfolder/masterfolder_slcfolder.res  // parameter file                      
 c
 c
-PF_METHOD	goldstein
-PF_OUT_FILE	OutputFolder/MasterFolder_SLCFolder.filt //
-STOP                                    // mandatory
+pf_method	goldstein
+pf_out_file	outputfolder/masterfolder_slcfolder.filt //
+stop                                    // mandatory
 

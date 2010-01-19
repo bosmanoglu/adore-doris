@@ -7,12 +7,28 @@ case "${slcType}" in
   gamma)
     echo "Reading Gamma SLC"
     masterDataFolder=`dirname "${m_in_dat}"`
-    gammaReadfiles.csh ${gammaParFile} ${gammaSysFile} ${m_in_dat} ${gammaByteSwap} > ${outputFolder}/${master}.res
+    #get parFile SysFile
+    parFile=`ls ${dataFolder}/${master}/${gammaParFile} 2>/dev/null | tr -d '\n'`
+    if [ ! -e "${parFile}" ]; then
+      echo " I can not find the parameter file ("${gammaParFile}") inside ${masterDataFolder}"
+      return -1;
+    fi
+
+    sysFile=`ls ${dataFolder}/${master}/${gammaSysFile} 2>/dev/null | tr -d '\n'`
+    if [ ! -e "${sysFile}" ]; then
+      echo " I can not find the parameter file ("${gammaSysFile}") inside ${masterDataFolder}"
+      return -1;
+    fi
+    
+    gammaReadfiles.csh ${parFile} ${sysFile} ${m_in_dat} ${gammaByteSwap} > ${outputFolder}/${master}.res
+    [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+    unset masterDataFolder parFile sysFile
   ;;
   *)
     #if [ "${slcType-undefined}" == "undefined" ]; then
     #standard processing
     pp ${dorisProcess}
     doris ${outputFolder}/${dorisProcess}.drs
+    [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
   ;;
 esac

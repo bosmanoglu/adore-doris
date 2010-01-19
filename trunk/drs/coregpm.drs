@@ -1,33 +1,33 @@
-SCREEN		${screen}		//
-BEEP   		${beep}			//
-BATCH  		${batch}		//
-OVERWRITE	${overwrite}		//
-PREVIEW         ${preview}              // SUNraster files with cpxfiddle
-LISTINPUT       ${listInput}            // copy this file to log
-MEMORY          ${memory}               // MB
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
 
-LOGFILE		${logFile}		//
-M_RESFILE	${m_resfile}		//
-S_RESFILE	${s_resfile}		//
-I_RESFILE	${i_resfile}		//
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
 
-ORB_INTERP	${orb_interp}		//
-DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
-HEIGHT		${height}		// Average Height for the crop
-TIEPOINT	${tiePoint}		//
-M_RG_T_ERROR	${m_rg_t_error}		//
-M_AZ_T_ERROR	${m_az_t_error}		//
-S_RG_T_ERROR	${s_rg_t_error}		//
-S_AZ_T_ERROR	${s_az_t_error}		//
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
 
-PROCESS         coregpm                 // 
+process         coregpm                 // 
 
-CPM_THRESHOLD   ${cpm_threshold}        //
-CPM_DEGREE      ${cpm_degree}           //
-CPM_DUMP        ${cpm_dump}		//
-CPM_PLOT        ${cpm_plot}             // plot w/o magnitude background
-CPM_WEIGHT	${cpm_weight}		//
-CPM_MAXITER	${cpm_maxiter}		//
-CPM_K_ALPHA	${cpm_k_alpha}		//
+cpm_threshold   ${cpm_threshold}        //
+cpm_degree      ${cpm_degree}           //
+cpm_dump        ${cpm_dump}		//
+cpm_plot        ${cpm_plot}             // plot w/o magnitude background
+cpm_weight	${cpm_weight}		//
+cpm_maxiter	${cpm_maxiter}		//
+cpm_k_alpha	${cpm_k_alpha}		//
 
-STOP
+stop

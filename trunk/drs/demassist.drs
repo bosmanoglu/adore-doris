@@ -1,35 +1,35 @@
-SCREEN		${screen}		//
-BEEP   		${beep}			//
-BATCH  		${batch}		//
-OVERWRITE	${overwrite}		//
-PREVIEW         ${preview}              // SUNraster files with cpxfiddle
-LISTINPUT       ${listInput}            // copy this file to log
-MEMORY          ${memory}               // MB
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
 
-LOGFILE		${logFile}		//
-M_RESFILE	${m_resfile}		//
-S_RESFILE	${s_resfile}		//
-I_RESFILE	${i_resfile}		//
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
 
-ORB_INTERP	${orb_interp}		//
-DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
-HEIGHT		${height}		// Average Height for the crop
-TIEPOINT	${tiePoint}		//
-M_RG_T_ERROR	${m_rg_t_error}		//
-M_AZ_T_ERROR	${m_az_t_error}		//
-S_RG_T_ERROR	${s_rg_t_error}		//
-S_AZ_T_ERROR	${s_az_t_error}		//
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
 
-PROCESS         demassist               // 
+process         demassist               // 
 
-DAC_IN_DEM	${dac_in_dem}		//
-DAC_IN_FORMAT	${dac_in_format}	//
-DAC_IN_SIZE	${dac_in_size}		//
-DAC_IN_DELTA	${dac_in_delta}		//
-DAC_IN_UL	${dac_in_ul}		//
-DAC_IN_NODATA	${dac_in_nodata}	//
-DAC_OUT_DEM	${dac_out_dem}		//
-DAC_OUT_DEMI	${dac_out_demi}		//
-DAC_OUT_DEM_LP	${dac_out_dem_lp}	//
+dac_in_dem	${dac_in_dem}		//
+dac_in_format	${dac_in_format}	//
+dac_in_size	${dac_in_size}		//
+dac_in_delta	${dac_in_delta}		//
+dac_in_ul	${dac_in_ul}		//
+dac_in_nodata	${dac_in_nodata}	//
+dac_out_dem	${dac_out_dem}		//
+dac_out_demi	${dac_out_demi}		//
+dac_out_dem_lp	${dac_out_dem_lp}	//
 
-STOP
+stop

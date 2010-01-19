@@ -1,31 +1,31 @@
-SCREEN		${screen}		//
-BEEP   		${beep}			//
-BATCH  		${batch}		//
-OVERWRITE	${overwrite}		//
-PREVIEW         ${preview}              // SUNraster files with cpxfiddle
-LISTINPUT       ${listInput}            // copy this file to log
-MEMORY          ${memory}               // MB
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
 
-LOGFILE		${logFile}		//
-M_RESFILE	${m_resfile}		//
-S_RESFILE	${s_resfile}		//
-I_RESFILE	${i_resfile}		//
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
 
-ORB_INTERP	${orb_interp}		//
-DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
-HEIGHT		${height}		// Average Height for the crop
-TIEPOINT	${tiePoint}		//
-M_RG_T_ERROR	${m_rg_t_error}		//
-M_AZ_T_ERROR	${m_az_t_error}		//
-S_RG_T_ERROR	${s_rg_t_error}		//
-S_AZ_T_ERROR	${s_az_t_error}		//
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
 
-PROCESS         dinsar                  // 
+process         dinsar                  // 
 
-DI_OUT_FILE	${di_out_file}		//	
-DI_IN_TOPOMASTER ${di_in_topomaster}	//
-DI_IN_TOPOSLAVE ${di_in_toposlave}	//
-DI_IN_TOPOINT	${di_in_topoint}	//
-DI_OUT_SCALED	${di_out_scaled}	//
+di_out_file	${di_out_file}		//	
+di_in_topomaster ${di_in_topomaster}	//
+di_in_toposlave ${di_in_toposlave}	//
+di_in_topoint	${di_in_topoint}	//
+di_out_scaled	${di_out_scaled}	//
 
-STOP
+stop

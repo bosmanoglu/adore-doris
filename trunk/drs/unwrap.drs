@@ -1,34 +1,34 @@
-SCREEN		${screen}		//
-BEEP   		${beep}			//
-BATCH  		${batch}		//
-OVERWRITE	${overwrite}		//
-PREVIEW         ${preview}              // SUNraster files with cpxfiddle
-LISTINPUT       ${listInput}            // copy this file to log
-MEMORY          ${memory}               // MB
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
 
-LOGFILE		${logFile}		//
-M_RESFILE	${m_resfile}		//
-S_RESFILE	${s_resfile}		//
-I_RESFILE	${i_resfile}		//
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
 
-ORB_INTERP	${orb_interp}		//
-DUMPBASELINE    ${dumpBaseline}         // eval baseline on grid
-HEIGHT		${height}		// Average Height for the crop
-TIEPOINT	${tiePoint}		//
-M_RG_T_ERROR	${m_rg_t_error}		//
-M_AZ_T_ERROR	${m_az_t_error}		//
-S_RG_T_ERROR	${s_rg_t_error}		//
-S_AZ_T_ERROR	${s_az_t_error}		//
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
 
-PROCESS         unwrap                  // 
+process         unwrap                  // 
 
-UW_METHOD	${uw_method}		//
-UW_OUT_FILE	${uw_out_file}		//
-UW_OUT_FORMAT	${uw_out_format}	//
-UW_SNAPHU_MODE	${uw_snaphu_mode}	//
-UW_SNAPHU_COH	${uw_sanphu_coh}	//
-UW_SNAPHU_LOG	${uw_snaphu_log}	//
-UW_SNAPHU_INIT	${uw_snaphu_init}	//
-UW_SNAPHU_VERBOSE ${uw_snaphu_verbose}	//
+uw_method	${uw_method}		//
+uw_out_file	${uw_out_file}		//
+uw_out_format	${uw_out_format}	//
+uw_snaphu_mode	${uw_snaphu_mode}	//
+uw_snaphu_coh	${uw_sanphu_coh}	//
+uw_snaphu_log	${uw_snaphu_log}	//
+uw_snaphu_init	${uw_snaphu_init}	//
+uw_snaphu_verbose ${uw_snaphu_verbose}	//
 
-STOP
+stop
