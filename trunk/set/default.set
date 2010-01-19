@@ -7,7 +7,6 @@
 #######################################
 ###  ADORE-BASH Run-Time Settings   ###
 #######################################
-[ -z "${slcType}"         	] && slcType=""
 [ -z "${projectFolder}"		] && projectFolder="."
 [ -z "${tmpFolder}"		] && tmpFolder=${projectFolder}/tmp
 [ -z "${_rel_tmpFolder}"	] && _rel_tmpFolder='echo ${projectFolder}/tmp'
@@ -38,6 +37,15 @@
 [ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
 [ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
 [ -z "${unspecified}"		] && unspecified=" "	#readinput.hh unspecified filenames are set to this
+####### for Gamma Processing... m/s_readfiles
+[ -z "${slcType}"         	] && slcType=""
+[ -z "${gammaParFilePattern}"   ] && gammaParFilePattern="*.pslcpar"
+[ -z "${gammaSysFilePattern}"   ] && gammaSysFilePattern="System.par"
+[ -z "${gammaByteSwap}"         ] && gammaByteSwap="0"
+[ -z "${gammaParFile}" 		] && gammaParFile=`ls ${dataFolder}/${master}/${gammaParFilePattern} 2>/dev/null | tr -d '\n'`
+[ -z "${_rel_gammaParFile}" 	] && _rel_gammaParFile='ls ${dataFolder}/${master}/${gammaParFilePattern} 2>/dev/null | tr -d "\n"'
+[ -z "${gammaSysFile}" 		] && gammaSysFile=`ls ${dataFolder}/${master}/${gammaSysFilePattern} 2>/dev/null | tr -d '\n'`
+[ -z "${_rel_gammaSysFile}" 	] && _rel_gammaSysFile='ls ${dataFolder}/${master}/${gammaSysFilePattern} 2>/dev/null | tr -d "\n"'
 #######################################
 ###     Default Doris Settings      ###
 #######################################
