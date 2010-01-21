@@ -338,8 +338,8 @@ case ${1} in
         #echo ${setting}=${relativeValue}
         [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
         if [ "${!setting}" != "${relativeValue}" ]; then
-          echo "${setting}=${relativeValue}"        
-          eval "echo ${setting}=${relativeValue}"
+          echo "${setting}=\"${relativeValue}\""        
+          eval "echo ${setting}=\"${relativeValue}\""
         fi
       done
     else
@@ -350,8 +350,8 @@ case ${1} in
         relativeName="_rel_${!k}"
         #echo ${relativeName}
         relativeValue=`eval ${!relativeName}`
-        echo "${setting}=${relativeValue}"
-        eval "${setting}=${relativeValue}" 
+        echo "${setting}=\"${relativeValue}\""
+        eval "${setting}=\"${relativeValue}\"" 
       done
     fi
   ;;

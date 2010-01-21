@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+#
+# Author: Mahmut Arikan
+#
+# TUDelft 2007
+#
+# Trick Doris to use radarcoded SRTM heights to gecode.
+#
+# Modified by Batuhan Osmanoglu for ADORE. 
+
+
+# Check input options. 
+if [ ! -e ${i_resfile} ]; then
+  echo "I can not find the interferogram result file: ${i_resfile}"
+  return -1;
+elif [ ! -e ${sam_in_dem} ]; then
+  echo "Seems like \${sam_in_dem} is not set correctly."
+  echo "I can not find the dem file: ${sam_in_dem}"
+  return -1;
+fi
+
+#check if slant2h is already done
+grep _Start_slant2h ${i_resfile} && echo "slant2h info already in result file: ${i_resfile}" && return -1;
+
+#clear temporary variables
+unset l0 LN p0 PN mlA mlR
+# get the required information from the result file
+l0=`grep First_line ${i_resfile} 	| awk 'END{print $4}'`
+LN=`grep Last_line ${i_resfile} 	| awk 'END{print $4}'`
+p0=`grep First_pixel ${i_resfile} 	| awk 'END{print $4}'`
+PN=`grep Last_pixel ${i_resfile} 	| awk 'END{print $4}'`
+mlA=`grep Multilookfactor_azimuth_direction ${i_resfile} | awk 'END{print $2}'`
+mlR=`grep Multilookfactor_range_direction   ${i_resfile} | awk 'END{print $2}'`
+
+# write to interferogram file
+cat << END >> ${i_resfile}
+*******************************************************************
+*_Start_slant2h:
+*******************************************************************
+Method:                         schwabisch
+Data_output_file:                       ${s2h_out_hei}
+Data_output_format:                     real4
+First_line (w.r.t. original_master):    ${l0}
+Last_line (w.r.t. original_master):     ${LN}
+First_pixel (w.r.t. original_master):   ${p0}
+Last_pixel (w.r.t. original_master):    ${PN}
+Multilookfactor_azimuth_direction:      ${mlA}
+Multilookfactor_range_direction:        ${mlR}
+Ellipsoid (name,a,b):                   WGS84 6.37814e+06 6.35675e+06
+*******************************************************************
+* End_slant2h:_NORMAL
+*******************************************************************
+END
+
+# create a link for the s2h output file.
+ln -s ${sam_in_dem} ${s2h_out_hei}
+#remove temporary variables
+unset l0 LN p0 PN mlA mlR
+

@@ -15,18 +15,19 @@
 #  Help message for the specified command, or this message if no command is given.
 # 
 # 
-# ADORE Commands:
+# ******ADORE Commands******
 # ?		: Help
 # check		: Check completed steps in result file.
 # initialize	: Initialize default settings.
 # lsprocess	: list DORIS processes
 # pn2rs		: convert Process Name to Result file Section title.
 # p		: Process DORIS step.
+# s		: Show the input file for the DORIS step.
 # raster		: Create raster image from doris result.
 # settings	: Utility for listing, saving and loading ADORE variables.
 # undo		: Undo all processing after a given step.
 #
-# ADORE Batch Processes:
+# ******ADORE Batch Processes******
 # singleMasterStack	: Script to process multiple interferograms with a single master.
-
+#
 

@@ -84,7 +84,7 @@ elif [[ -n "${grepI}" ]]; then
   resultFile=${i_resfile};
 else
   echo "File can not be related to the current resultfiles. Please check your Master and Slave settings are correct."
-  exit
+  return;
 fi
 
 echo "Reading file information from: ${resultFile}"

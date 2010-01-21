@@ -29,71 +29,6 @@
 #  dorisStep: SUCCESS for successful doris processing steps.
 #
 
-###### SOME FUNCTIONS
-function ask()          # See "settings save" for example of use.
-{
-  echo -n "$@" '[y/n] ' ; read ans
-  case "$ans" in
-    y*|Y*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-                            
-generateRandomString(){
-  randomString=`date +%N | md5sum |md5sum`
-  randomString=${randomString:1:8}; #get first 8 char
-}
-
-pp()
-{
-#PREP, PRE-PROCESS
-  #this is the default processing
-  rm -f ${outputFolder}/${dorisProcess}.drs
-  dorisProcess=${1}
-  if [ -r "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
-      newline=`eval echo -E ${line}`
-      echo $newline >> ${outputFolder}/${dorisProcess}.drs
-    done
-  else
-    echo "Unknown process ${dorisProcess}"
-  fi
-}
-p()
-{
-#PROCESS
- dorisProcess=${1}
-  if [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
-          . ${ADOREFOLDER}/scr/process/${dorisProcess}
-  else
-    if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
- #     rm -f ${outputFolder}/${dorisProcess}.drs
- #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
- #       newline=`eval echo -E ${line}`
- #       echo $newline >> ${outputFolder}/${dorisProcess}.drs
- #     done    
-      pp ${dorisProcess}
-      doris ${outputFolder}/${dorisProcess}.drs
-      [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
-    else
-      echo "Unknown process: ${dorisProcess}."
-      lsprocess
-    fi
-  fi
-}
-s()
-{
-#SHOW
-  dorisProcess=${1}
-  if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
-      newline=`eval echo -E ${line}`
-      echo $newline 
-    done
-  else
-    echo "Unknown process ${dorisProcess}"
-  fi
-}
 ctrl_c()
 {
 # if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
@@ -130,31 +65,20 @@ adoreCommand=$1
 dorisProcess=$p
 
 ###### LOAD SETTINGS
-#echo "User Settings File: ${u}"
-#if [ -r "${u}" ]; then
-#  if [ -e "${u}" ]; then
-#    . ${u} 					#load user project settings
-#  else
-#    echo "Can not find user settings file: ${u}"
-#  fi
-#else
-#  echo "No defined user settings file."
-#fi
-#eval ${d}				#overwrite user settings with commandline
-#if [ -z "${ADOREFOLDER}" ]; then
-# ADOREFOLDER=`dirname ${0}`
-# ADOREFOLDER=${ADOREFOLDER%scr} # Remove the scripts folder. 
-#fi
 ADORESCR=`dirname "${0}"`
-. ${ADORESCR}/initialize
-#. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+#load functions
+source ${ADORESCR}/fun/functions
+#initialize ADORE
+source ${ADORESCR}/fun/initialize
+#adjust path
+PATH=${PATH}:${ADORESCR}
 
 
 if [ -n "${dorisProcess}" ]; then
   p ${dorisProcess}
 fi
 #if adoreCommand was specified run adoreCommand.
-[ -n "${adoreCommand}" ] && ${ADOREFOLDER}/scr/${adoreCommand}.sh
+[ -n "${adoreCommand}" ] && eval "${adoreCommand}" #${ADOREFOLDER}/scr/${adoreCommand}.sh
 
 if [ "${i-notInteractive}" != "notInteractive" ]; then
   set -o emacs
@@ -167,14 +91,13 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   #ctrl-r is reverse search history... bind Control-r:redraw-current-line
   #adoreHistoryFile=${ADOREFOLDER}/scr/.history
   #INPUTRC=${ADOREFOLDER}/scr/.inputrc
-  [ -e "/etc/bash_completion" ] && . /etc/bash_completion
-  . ${ADOREFOLDER}/scr/.inputrc
+  [ -e "/etc/bash_completion" ] && source /etc/bash_completion
+  [ -e "${ADOREFOLDER}/scr/.inputrc" ] && source ${ADOREFOLDER}/scr/.inputrc
 
   #trap ctrl-c and call ctrl_c()
   trap ctrl_c 2 # ctrl+c=sigint 2
   
   history -r ${adoreHistoryFile}
-  PATH=${PATH}:${ADOREFOLDER}/scr
   while [ 1 ]; do
     #PS1='ADORE: '
     #echo -n "ADORE: "
@@ -187,20 +110,15 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
         history -w ${adoreHistoryFile} #save history
         exit 0
         ;;
-      initialize)
-        . ${ADORESCR}/initialize
-        ;;
-      undo)
-        . ${ADORESCR}/undo ${command#* }        
-        ;;
       \?)
-        #[ "${command#* }" == "?" ] && . "${ADORESCR}/?"
-        [ -e ${ADORESCR}/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${command#* }      
-        [ -e ${ADORESCR}/process/${command#* } ] && sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${command#* }              
+        if [ "${command#* }" == "?" ]; then
+          sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
+          continue;
+        fi
+        h ${command#* }      
         ;;
       *)
         eval ${command}
-        #[[ "${ctrl_c_counter}" -eq "${ctrl_c_counter_bck}" ]] && ctrl_c_counter=0	#reset counter
         ;;
     esac
   done
