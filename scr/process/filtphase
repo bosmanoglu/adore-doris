@@ -4,13 +4,13 @@ pp ${dorisProcess}
 
 if [ -z ${pf_in_file} ]; then
   #if the input file is not defined remove the line
-  grep -v PF_IN_FILE ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  grep -v -i -w "pf_in_file" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
 
 if [ -z ${pf_in_kernel2d} ]; then
   #if the input file is not defined remove the line
-  grep -v PF_IN_KERNEL2D ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  grep -v -i -w "pf_in_kernel2d" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
   mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
 fi
 

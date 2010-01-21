@@ -26,7 +26,7 @@ uw_method	${uw_method}		//
 uw_out_file	${uw_out_file}		//
 uw_out_format	${uw_out_format}	//
 uw_snaphu_mode	${uw_snaphu_mode}	//
-uw_snaphu_coh	${uw_sanphu_coh}	//
+uw_snaphu_coh	${uw_snaphu_coh}	//
 uw_snaphu_log	${uw_snaphu_log}	//
 uw_snaphu_init	${uw_snaphu_init}	//
 uw_snaphu_verbose ${uw_snaphu_verbose}	//
