@@ -17,7 +17,7 @@ if [ -e "${u}" ]; then
   if [ -r "${u}" ]; then
     u=`readlink -e ${u}`
     echo "User Settings File: ${u}"
-    . ${u} 					#load user project settings
+    source ${u} 					#load user project settings
   else
     echo "Can not read user settings file: ${u}"
   fi
@@ -29,7 +29,7 @@ if [ -z "${ADOREFOLDER}" ]; then
  [ -z ${ADORESCR} ] && ADORESCR=`dirname ${0}`
  ADOREFOLDER=${ADORESCR//\/scr/} # Remove the scripts folder. 
 fi
-. "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
+source "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
 
 # check if the values are set or not. If empty set to "dummy"
 [ -z "${m_in_dat}" 		] && m_in_dat="dummy"

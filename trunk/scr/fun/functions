@@ -1,0 +1,103 @@
+#!/bin/bash
+###### SOME FUNCTIONS
+function ask()          # See "settings save" for example of use.
+{
+  echo -n "$@" '[y/n] ' ; read ans
+  case "$ans" in
+    y*|Y*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+                            
+function generateRandomString(){
+  randomString=`date +%N | md5sum |md5sum`
+  randomString=${randomString:1:8}; #get first 8 char
+}
+
+function pp()
+{
+#PREP, PRE-PROCESS
+  #this is the default processing
+  rm -f ${outputFolder}/${dorisProcess}.drs
+  dorisProcess=${1}
+  if [ -r "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
+      newline=`eval echo -E ${line}`
+      echo $newline >> ${outputFolder}/${dorisProcess}.drs
+    done
+  else
+    echo "Unknown process ${dorisProcess}"
+  fi
+}
+
+function p()
+{
+#PROCESS
+ dorisProcess=${1}
+  if [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
+          . ${ADOREFOLDER}/scr/process/${dorisProcess}
+  else
+    if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+ #     rm -f ${outputFolder}/${dorisProcess}.drs
+ #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+ #       newline=`eval echo -E ${line}`
+ #       echo $newline >> ${outputFolder}/${dorisProcess}.drs
+ #     done    
+      pp ${dorisProcess}
+      doris ${outputFolder}/${dorisProcess}.drs
+      [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+    else
+      echo "Unknown process: ${dorisProcess}."
+      lsprocess
+    fi
+  fi
+}
+
+function s()
+{
+#SHOW
+  dorisProcess=${1}
+  if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
+      newline=`eval echo -E ${line}`
+      echo $newline 
+    done
+  else
+    echo "Unknown process ${dorisProcess}"
+  fi
+}
+
+function raster(){
+	. ${ADORESCR}/raster "$@"
+}
+
+function settings(){
+	. ${ADORESCR}/raster settings "$@"
+}
+
+function initialize(){
+	. ${ADORESCR}/initialize
+}
+
+function undo(){
+	. ${ADORESCR}/undo "$@"
+}
+
+function dem2slant2h(){
+	. ${ADORESCR}/dem2slant2h "${@}"
+}
+
+function h(){
+  if [-e "${ADORESCR}/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
+  elif [ -e "${ADORESCR}/process/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
+  elif [ -e "${ADORESCR}/fun/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
+  else
+    echo "Unknown ADORE command: ${1}"
+    echo 'You can get a list of ADORE commands with the command: ?'
+  fi
+}
+
+#Have a new line at the end

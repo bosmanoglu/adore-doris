@@ -33,3 +33,5 @@ fi
 if [ -e ${m_resfile} ]; then
 	getLastProcess ${m_resfile}
 fi
+[ -n "${lastProcess}" ] && echo ${lastProcess}; exit 0
+
