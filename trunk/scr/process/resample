@@ -1,26 +1,34 @@
 #!/bin/bash
 
-pp ${dorisProcess}
-
 unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
-# remove undefined settings from .drs file so that doris handles it
-# automatically
 #check if dbowgeo is set
 if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
-  grep -i -v -w "rs_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  #if not check for rs_dbow
   if [ "${rs_dbow}" == "0 0 0 0" ]; then
-  # get a smaller dbow from master. Otherwise the resampling may fail. 
+   # get a smaller dbow from master. Otherwise the resampling may fail. 
+   rs_dbow=`${ADORESCR}/setinterfarea.sh ${m_resfile} ${rs_az_buffer} ${rs_rg_buffer} | tr -d "\n"`
+
     #get last step
     #masterLastProcessingStep=`check ${m_resfile}| grep 1 | tail -n 1 | cut -d: -f1`
     #firstLine=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "First_line (w.r.t. original_image)"
     #lastLine=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "Last_line (w.r.t. original_image)"
     #firstPixel=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "First_pixel (w.r.t. original_image)"
     #lastPixel=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "Last_pixel (w.r.t. original_image)"
-    rs_dbow=`${ADORESCR}/setinterfarea.sh ${m_resfile} ${rs_az_buffer} ${rs_rg_buffer}`
   fi
 fi
 
+pp ${dorisProcess}
+
+# remove undefined settings from .drs file so that doris handles it
+# automatically
+
+if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
+  grep -i -v -w "rs_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+fi
+
+### This is actually not necessary. if dbow_geo exists this is omitted. If dbow_geo is all zeros then 
+### first part of the code sets rs_dbow anyway...
 if [ "${rs_dbow}" == "0 0 0 0" ]; then
 # get a smaller dbow from master. Otherwise the resampling may fail. 
   grep -i -v -w "rs_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new

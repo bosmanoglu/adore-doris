@@ -243,7 +243,10 @@ case ${1} in
           suggestionLine="${suggestionLine} ${setting}"
         fi
       done
-      [ "${suggestionLine}" != ". settings fix" ] && echo ${suggestionLine}
+      if [ "${suggestionLine}" != ". settings fix" ]; then
+	echo "May I suggest we run the command below? I might be wrong for some settings though..."
+        echo ${suggestionLine}
+      fi
 
 #    tempFile=".tempfile"
 #    dumpRawSettings ${tempFile}
