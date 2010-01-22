@@ -68,27 +68,27 @@ function s()
 }
 
 function raster(){
-	. ${ADORESCR}/raster "$@"
+	. ${ADORESCR}/fun/raster "$@"
 }
 
 function settings(){
-	. ${ADORESCR}/raster settings "$@"
+	. ${ADORESCR}/fun/settings "$@"
 }
 
 function initialize(){
-	. ${ADORESCR}/initialize
+	. ${ADORESCR}/fun/initialize
 }
 
 function undo(){
-	. ${ADORESCR}/undo "$@"
+	. ${ADORESCR}/fun/undo "$@"
 }
 
 function dem2slant2h(){
-	. ${ADORESCR}/dem2slant2h "${@}"
+	. ${ADORESCR}/fun/dem2slant2h "${@}"
 }
 
 function h(){
-  if [-e "${ADORESCR}/${1}" ]; then 
+  if [ -e "${ADORESCR}/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
   elif [ -e "${ADORESCR}/process/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#check if dinsar
+if [ -e ${di_in_topomaster} ]; then
+  echo "I guess you are trying differential interferometry."
+  echo "I'll run the actual DORIS slant2h step."
+  pp ${dorisProcess}
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+else
+  #if not dinsar check if dem exists
+  #if so then run dem2slant2h
+  if [ -e "${sam_in_dem}" ]; then
+    echo "I guess you are using external DEM for geocoding."
+    echo "I'll run the dem2slant2h (slant2hTrick)."
+    dem2slant2h
+    [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"   
+  else
+    echo "If you are doing DInSAR I need di_in_topomaster to exist."
+    echo "Current setting for di_in_topomaster: ${di_in_topomaster}"
+    echo " "
+    echo "If you wanted to use an external DEM for geocoding, I need"
+    echo " sam_in_dem to exist."
+    echo "Current setting for sam_in_dem: ${sam_in_dem}"
+  fi
+fi
