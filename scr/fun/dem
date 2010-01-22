@@ -1,0 +1,38 @@
+#!/bin/bash
+
+
+function make_dem(){
+  srtm=${1}
+  #if dem doesn't exist create it
+  ## get center coordinates
+  center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude | tr -d '\n'`
+  center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude | tr -d '\n'`
+  ## get crop size
+  last_step=`check ${s_resfile} | grep -w "1" | cut -f2 -d:`
+  first_line=`readRes.sh ${s_resfile} ${last_step} First_line | tr -d '\n'`
+  last_line=`readRes.sh ${s_resfile} ${last_step} Last_line  | tr -d '\n'`
+  first_pixel=`readRes.sh ${s_resfile} ${last_step} First_pixel | tr -d '\n'`
+  last_pixel=`readRes.sh ${s_resfile} ${last_step} Last_pixel | tr -d '\n'`
+  size_rg=`echo "${last_pixel} ${first_pixel}" | awk '{printf "%d", $1-$2+1};'`
+  size_az=`echo "${last_line} ${first_line}" | awk '{printf "%d", $1-$2+1};'`
+    
+  radar_band_width=`readRes.sh ${m_resfile} readfiles Total_range_band_width | tr -d '\n'`
+  inc_angle=`readRes.sh ${i_resfile} coarse_orbits inc_angle | tr -d '\n'`
+  # get range resolution
+  [ -z "${slc_rg_res}" ] && slc_rg_res=`echo "2.99e8 ${radar_band_width} ${inc_angle}" | awk '{PI=3.14159;printf "%d", $1/($2*1e6*cos($3/180*PI))};'`
+  [ -z "${slc_az_res}" ] && slc_rg_res=`echo "${slc_rg_res}" | awk '{printf "%d", $1/5};'`
+  ## find bounding box
+  size_rg_km=`echo "${size_rg} ${slc_rg_res}" | awk '{printf "%d", $1*$2/1000};'`
+  size_az_km=`echo "${size_az} ${slc_az_res}" | awk '{printf "%d", $1*$2/1000};'`
+  dem_area=`boundingBox.sh $center_lat $center_lon $size_rg_km $size_az_km | tr -d '\n'`  
+
+  ## call construct_dem.sh
+  mkdir -p ${projectFolder}/dem
+  cd ${projectFolder}/dem
+  construct_dem.sh ${runName} ${dem_area} ${srtm}
+  ## modify settings
+  settings_file="input.doris_${runName}"
+  sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
+  sam_in_format=`readDrs.sh ${settings_file} SAM_IN_FORMAT | tr -d '\n'`
+  
+}
