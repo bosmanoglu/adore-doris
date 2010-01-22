@@ -17,12 +17,12 @@ LIMITATIONS:
 If the value of the parameter has ":" character the returned field might be wrong.
 
 EXAMPLE:
-$> readRes.sh  /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles RADAR_FREQUENCY
-5331004416.000000
-$> readRes.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles First_pixel_azimuth_time
-31.238
-$> grep First_pixel_azimuth_time /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res 
-First_pixel_azimuth_time (UTC):                 16-JAN-2004 16:36:31.238
+  $> readRes.sh  /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles RADAR_FREQUENCY
+    5331004416.000000
+  $> readRes.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles First_pixel_azimuth_time
+    31.238
+  $> grep First_pixel_azimuth_time /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res 
+    First_pixel_azimuth_time (UTC):                 16-JAN-2004 16:36:31.238
 _EOF
 exit 1
 fi
@@ -61,6 +61,7 @@ else
   result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
 fi
 result=${result##*:} 	#Get the part after the LAST column 
+result=${result%%//*}   #delete everything after //
 
 #echo "$startline $endline $length $parameter_length"
 #echo "$parameter"

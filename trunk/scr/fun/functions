@@ -100,4 +100,137 @@ function h(){
   fi
 }
 
+####################################################
+################### DORIS FUNCTIONS ################
+####################################################
+function coarsecorr(){
+  p coarsecorr
+}
+ 
+function coarseorb(){
+  p coarseorb
+}
+ 
+function coherence(){
+  p coherence
+}
+ 
+function comprefdem(){
+  p comprefdem
+}
+ 
+function comprefpha(){
+  p comprefpha
+}
+ 
+function coregpm(){
+  p coregpm
+}
+ 
+function demassist(){
+  p demassist
+}
+ 
+function dinsar(){
+  p dinsar
+}
+ 
+function filter(){
+  p filter
+}
+ 
+function filtphase(){
+  p filtphase
+}
+ 
+function filtrange(){
+  p filtrange
+}
+ 
+function fine(){
+  p fine
+}
+ 
+function geocode(){
+  p geocode
+}
+ 
+function interfero(){
+  p interfero
+}
+ 
+function m_crop(){
+  p m_crop
+}
+ 
+function m_filtazi(){
+  p m_filtazi
+}
+ 
+function m_ovs(){
+  p m_ovs
+}
+ 
+function m_porbits(){
+  p m_porbits
+}
+ 
+function m_readfiles(){
+  p m_readfiles
+}
+ 
+function m_simamp(){
+  p m_simamp
+}
+ 
+function m_timing(){
+  p m_timing
+}
+ 
+function reltiming(){
+  p reltiming
+}
+ 
+function resample(){
+  p resample
+}
+ 
+function s_crop(){
+  p s_crop
+}
+ 
+function s_filtazi(){
+  p s_filtazi
+}
+ 
+function slant2h(){
+  p slant2h
+}
+ 
+function s_ovs(){
+  p s_ovs
+}
+ 
+function s_porbits(){
+  p s_porbits
+}
+ 
+function s_readfiles(){
+  p s_readfiles
+}
+ 
+function subtrrefdem(){
+  p subtrrefdem
+}
+ 
+function subtrrefpha(){
+  p subtrrefpha
+}
+ 
+function unwrap(){
+  p unwrap
+}
+ 
+
+
 #Have a new line at the end
