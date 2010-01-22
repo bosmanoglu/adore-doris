@@ -178,7 +178,7 @@ case ${1} in
     clearSettings;
     u=`readlink -e ${loadFile}`
     unset loadFile
-    . initialize
+    initialize
   ;;
   reset)
     echo "Loading default settings..."

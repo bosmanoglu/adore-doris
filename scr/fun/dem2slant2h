@@ -54,7 +54,9 @@ Ellipsoid (name,a,b):                   WGS84 6.37814e+06 6.35675e+06
 END
 
 # create a link for the s2h output file.
-ln -s ${sam_in_dem} ${s2h_out_hei}
+ln -s ${crd_out_dem_lp} ${s2h_out_hei}
 #remove temporary variables
 unset l0 LN p0 PN mlA mlR
 
+# set process flag to 1
+sed -i -e '/^slant2h/s/0/1/g' ${i_resfile}
