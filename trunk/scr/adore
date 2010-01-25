@@ -72,7 +72,10 @@ source ${ADORESCR}/fun/functions
 source ${ADORESCR}/fun/initialize
 #adjust path
 PATH=${PATH}:${ADORESCR}
-
+########################### CHECK INPUT - MAKE SUGGESTIONS#
+[ -z "${master}" ] && echo "It seems like dataFolder and/or projectFolder is not set correctly."
+[ ! -e "${m_in_dat}" ] && echo "It seems like dataFile and/or master is not set correctly. Please set the SLC file pattern."
+[ ! -e "${s_in_dat}" ] && echo "It seems like dataFile and/or slave is not set correctly. Please set the SLC file pattern."
 
 if [ -n "${dorisProcess}" ]; then
   p ${dorisProcess}
@@ -83,6 +86,7 @@ fi
 if [ "${i-notInteractive}" != "notInteractive" ]; then
   set -o emacs
   set -o histexpand
+  HISTCONTROL=ignoreboth
   #set bind-tty-special-chars off
   #bind TAB:complete
   #bind '"TAB":complete-variable'  

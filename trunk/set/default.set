@@ -26,8 +26,8 @@
 [ -z "${_rel_baselinesFolder}"	] && _rel_baselinesFolder='echo ${runFolder}/baselines'
 [ -z "${adoreHistoryFile}"	] && adoreHistoryFile=${projectFolder}/.history
 [ -z "${_rel_adoreHistoryFile}"	] && _rel_adoreHistoryFile='echo ${projectFolder}/.history'
-[ -z "${master}"		] && master=`ls -F ${dataFolder}/ |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
-[ -z "${slave}"			] && slave=`ls -F ${dataFolder}/ | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
+[ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
+[ -z "${slave}"			] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${_rel_excludesFile}"	] && _rel_excludesFile='echo ${runFolder}/excludes'
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
@@ -43,6 +43,9 @@
 ####### for resample
 [ -z "${rs_az_buffer}"		] && rs_az_buffer="200"
 [ -z "${rs_rg_buffer}"		] && rs_rg_buffer="200"
+####### for dem
+[ -z "${slc_rg_res}"		] && unset slc_rg_res #default is not set
+[ -z "${slc_az_res}"		] && unset slc_az_res #default is not set
 #######################################
 ###     Default Doris Settings      ###
 #######################################
@@ -71,7 +74,7 @@
 [ -z "${s_az_t_error}" 		] && s_az_t_error="0.0"
 ################### m_readfiles
 [ -z "${m_in_method}" 		] && m_in_method=ERS
-[ -z "${m_in_dat}" 		] && m_in_dat=`ls ${dataFolder}/${master}/${dataFile} | tr -d '\n'`
+[ -z "${m_in_dat}" 		] && m_in_dat=`ls ${dataFolder}/${master}/${dataFile} 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_m_in_dat}" 	] && _rel_m_in_dat='ls ${dataFolder}/${master}/${dataFile} 2>/dev/null | tr -d "\n"'
 [ -z "${m_in_vol}" 		] && m_in_vol=`ls "${dataFolder}/${master}/${volumeFile}" 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_m_in_vol}" 	] && _rel_m_in_vol='ls ${dataFolder}/${master}/${volumeFile} 2>/dev/null | tr -d "\n"'
@@ -125,7 +128,7 @@
 ################### s_readfiles
 [ -z "${s_in_method}" 		] && s_in_method=${m_in_method}
 [ -z "${_rel_s_in_method}" 	] && _rel_s_in_method='echo ${m_in_method}'
-[ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} | tr -d '\n'`
+[ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_s_in_dat}"		] && _rel_s_in_dat='ls ${dataFolder}/${slave}/${dataFile} 2>/dev/null | tr -d "\n"'
 [ -z "${s_in_vol}" 		] && s_in_vol=`ls ${dataFolder}/${slave}/${volumeFile} 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_s_in_vol}" 	] && _rel_s_in_vol='ls ${dataFolder}/${slave}/${volumeFile} 2>/dev/null | tr -d "\n"'

@@ -24,6 +24,7 @@ process         m_timing                // convert data to internal format
 
 mte_method	${mte_method}		//
 mte_in_pos	${mte_in_pos}		//
+mte_nwin	${mte_nwin}		//
 mte_winsize	${mte_winsize}		//
 mte_acc		${mte_acc}		//
 mte_initoff	${mte_initoff}		//

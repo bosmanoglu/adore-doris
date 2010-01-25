@@ -58,8 +58,14 @@ fi
 
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
-
-echo "I'll pass these options to cpxfiddle: ${remainder}"
+generateCheck=`echo ${generate} | tr -d [a,p,m]`
+if [ -z ${generateCheck} ]; then
+  echo "I'll pass these options to cpxfiddle: ${remainder}"
+else
+  echo "I can only create phase(p), amplitude(a) or mixed(m) images."
+  echo "You provided some extra options: ${generateCheck}"
+  return -1;
+fi
 
 if [[ ${dorisStep} == m_* ]]; then
   dorisStep=`pn2rs ${dorisStep}`
@@ -83,7 +89,7 @@ elif [[ -n "${grepS}" ]]; then
 elif [[ -n "${grepI}" ]]; then 
   resultFile=${i_resfile};
 else
-  echo "File can not be related to the current resultfiles. Please check your Master and Slave settings are correct."
+  echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
   return;
 fi
 
@@ -150,7 +156,7 @@ fi
 [ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
 [ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
 [ "${format//[[:space:]]}" == "real4" ] && format="r4";
-[ "${format//[[:space:]]}" == "short" ] && format="i4";
+[ "${format//[[:space:]]}" == "short" ] && format="i2";
 echo Image Width  ..${width}..
 echo Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
