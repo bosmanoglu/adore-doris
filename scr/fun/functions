@@ -1,5 +1,54 @@
 #!/bin/bash
+#Source other function files
+source ${ADORESCR}/fun/resfile.fun
+
 ###### SOME FUNCTIONS
+function call(){
+  functionCall=$@;
+  #parse left of equal
+  functionOutput=${functionCall%%=*} 
+  #parse right of equal
+  functionCall=${functionCall#*=}
+  functionName=${functionCall%% *}
+  #echo output..${functionOutput}..
+  #echo call..${functionCall}..
+  #echo name..${functionName}..
+  #echo "setting output array"
+  #echo "function output..${functionOutput}.."
+  
+  eval output_array=${functionOutput}
+  #call function
+  eval ${functionCall}
+  
+  arrayLen=${#output_array[@]}
+  #loop over variables.
+  #assign values to output variables 
+  for (( k=0; k<${arrayLen}; k++ ))
+  do
+    # get the output name from the outputs array
+    outputName=${functionName}_outputs[$k]
+    # get the name of the functions original output variable
+    outputName=${!outputName}
+    # assign requestest output variable to original output variable
+    eval ${output_array[$k]}=${!outputName}
+  done
+  unset k output_array arrayLen outputName functionCall functionOutput functionName
+}
+
+testFunction_outputs=(output1 output2 output3) 
+function testFunction(){
+  output1=${2} #set the first output parameter to second input.
+  output2=${1} # set the first input parameter to second output.
+  output3=${3}
+}
+#echo "variable1=4"
+#variable1=4
+#echo "Initiating function call..."
+#echo 'call (a b c)=testFunction ${variable1} ready breakfast ;'
+#call "(a b c)=testFunction ${variable1} ready breakfast ;"
+#echo "$a $b $c"
+#unset a b c
+
 function ask()          # See "settings save" for example of use.
 {
   echo -n "$@" '[y/n] ' ; read ans
@@ -85,6 +134,10 @@ function undo(){
 
 function dem2slant2h(){
 	. ${ADORESCR}/fun/dem2slant2h "${@}"
+}
+
+function dem(){
+	. ${ADORESCR}/fun/dem "${@}"
 }
 
 function h(){

@@ -37,7 +37,7 @@ result=`echo $result | tr -s " "`
 #echo $result
 result=`echo $result | cut -f2- --delimiter=" "`
 #echo $result
-result=${result%%\0}
+#I don't know why this was here... but removes last zero removed 20100124. #result=${result%%\0}
 #echo $result 
 result2=`echo $result | awk -F" // " '{print $1}' `
 #echo $result2
