@@ -58,6 +58,18 @@ function ask()          # See "settings save" for example of use.
     *) return 1 ;;
   esac
 }
+
+function getSystemEndianness()	# See saveas arcview for example
+{
+ local endianness=`echo -n I | od -to2 | head -n1 | cut -f2 -d" " | cut -c6`
+ if [ ${endianness} -eq 1 ]; then
+   echo -n "little"
+ elif [ ${endianness} -eq 0 ]; then
+   echo -n "big"
+ else
+   echo -n "unknown"
+ fi
+}
                             
 function generateRandomString(){
   randomString=`date +%N | md5sum |md5sum`
@@ -143,6 +155,10 @@ function dem(){
 
 function saveas(){
 	. ${ADORESCR}/fun/saveas "${@}"
+}
+
+function check(){
+	. ${ADORESCR}/fun/check "${@}"
 }
 
 function h(){

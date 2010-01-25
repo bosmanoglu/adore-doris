@@ -1,0 +1,52 @@
+#!/bin/bash
+# USAGE:
+#	check
+#	check resultFile
+#
+# DESCRIPTION:
+#  CHECK is an internal ADORE command. 
+#  It shows the process control list from the result files.
+#
+# INPUT:
+#  No required inputs.
+#   
+#   Optional:
+#     resultFile: If specified, only displays given files process control list.
+#  
+# OUTPUT:
+#  Shows the process control list of given result file.
+#
+
+function displayProcessControl(){
+  local startline=`grep -n Start_process_control ${1} | cut -f1 -d":"`
+  local endline=`grep -n End_process_control ${1} | cut -f1 -d":"`
+
+  local length=`echo ${endline} - ${startline} |bc`
+  grep -A ${length} Start_process_control ${1} | grep -v "_process_control" | grep -v "NOT_USED"
+}
+
+local file1 file2 file3
+if [ "${1:-undefined}" == "undefined" ]; then 
+  generateRandomString
+  file1=${randomString}.tmp
+  echo -e "MASTER: \t\t" > ${file1}
+  displayProcessControl ${m_resfile} >> ${file1}
+#  echo ";"
+  generateRandomString
+  file2=${randomString}.tmp
+  echo -e "SLAVE: \t\t" > ${file2}
+  displayProcessControl ${s_resfile} >> ${file2}
+#  echo ";"
+  generateRandomString
+  file3=${randomString}.tmp
+  echo -e "INTERFEROGRAM: \t\t" > ${file3}
+  displayProcessControl ${i_resfile} >> ${file3}
+  paste ${file3} ${file1} ${file2}
+  rm -rf ${file1} ${file2} ${file3}
+else
+  echo "${1}:"
+  displayProcessControl ${1}
+fi
+
+
+
