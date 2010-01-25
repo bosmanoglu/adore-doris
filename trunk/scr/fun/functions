@@ -30,7 +30,8 @@ function call(){
     # get the name of the functions original output variable
     outputName=${!outputName}
     # assign requestest output variable to original output variable
-    eval ${output_array[$k]}=${!outputName}
+    #echo "${output_array[$k]}=${!outputName}"
+    eval ${output_array[$k]}=\"${!outputName}\"
   done
   unset k output_array arrayLen outputName functionCall functionOutput functionName
 }
@@ -138,6 +139,10 @@ function dem2slant2h(){
 
 function dem(){
 	. ${ADORESCR}/fun/dem "${@}"
+}
+
+function saveas(){
+	. ${ADORESCR}/fun/saveas "${@}"
 }
 
 function h(){

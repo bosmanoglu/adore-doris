@@ -1,0 +1,107 @@
+#!/bin/bash
+
+# $0 dorisStep  
+function saveas_envi(){
+  local dorisStep=${1}
+  local geocodeStatus phi_filename lam_filename phi_l0p0 lam_l0p0 phi_lNpN lam_lNpN phi_step lam_step
+  local filename resfile format numpixels numlines hei_filename hei_resfile hei_format hei_numpixels hei_numlines
+  local bands 
+  geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
+  if [ ${geocodeStatus} -eq "1" ]; then
+    call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+    call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
+    # get the name of phi(lat) and lambda (lon) files
+    phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
+    lam_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_lamda`
+    #get the coordinates for 1st px
+    phi_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`
+    #get the coordinates for last px
+    phi_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${lam_filename} 2>/dev/null | tr -d "\n"`        
+    #get the step size
+    phi_step=`echo "${phi_lNpN} ${phi_l0p0} ${numpixels}" | awk '{printf "%.6f", ($1-$2)/$3};'`
+    lam_step=`echo "${lam_lNpN} ${lam_l0p0} ${numlines}"  | awk '{printf "%.6f", ($1-$2)/$3};'`
+    #change format to envi 
+    [ ${format} == "cr4" ] && format="4" && bands="2"
+    [ ${format} == "ci2" ] && format="2" && bands="2"
+    [ ${format} == "r4" ] && format="4"  && bands="1"
+    [ ${format} == "i2" ] && format="2"  && bands="1"
+cat > ${filename}.hdr <<_EndHere
+ENVI
+description = {DORIS ${dorisStep} output: ${filename}}
+samples = ${numpixels}
+lines   = ${numlines}
+bands   = ${bands}
+header offset = 0
+file type = ENVI Standard
+data type = ${format}
+interleave = bip
+sensor type = Unknown
+byte order = 0
+map info = {Geographic Lat/Lon, 1.5000, 1.5000, ${phi_l0p0}, ${lam_l0p0}, ${phi_step}, ${lam_step}, WGS-84, units=Degrees}
+default bands = {1}
+wavelength units = Unknown
+_EndHere
+#    band names = {}
+    echo "ENVI header file: ${filename}.hdr"
+    echo "SUCCESS: saveas_envi"
+  else
+    echo "Please first do the geocoding step to export to ENVI."
+  fi
+}
+
+function saveas_arcgis(){
+  dorisStep=${1}
+  local geocodeStatus phi_filename lam_filename phi_l0p0 lam_l0p0 phi_lNpN lam_lNpN phi_step lam_step
+  local filename resfile format numpixels numlines hei_filename hei_resfile hei_format hei_numpixels hei_numlines
+  local bands 
+
+  geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
+  if [ ${geocodeStatus} -eq "1" ]; then
+    call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+    call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
+    # get the name of phi(lat) and lambda (lon) files
+    phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
+    lam_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_lamda`
+    #get the coordinates for 1st px
+    phi_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`
+    #get the coordinates for last px
+    phi_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${lam_filename} 2>/dev/null | tr -d "\n"`        
+    #get the step size
+    phi_step=`echo "${phi_lNpN} ${phi_l0p0} ${numpixels}" | awk '{printf "%.6f", ($1-$2)/$3};'`
+    lam_step=`echo "${lam_lNpN} ${lam_l0p0} ${numlines}"  | awk '{printf "%.6f", ($1-$2)/$3};'`
+    #change format to envi 
+    [ ${format} == "cr4" ] && format="32" && bands="2"
+    [ ${format} == "ci2" ] && format="16" && bands="2"
+    [ ${format} == "r4" ] && format="32"  && bands="1"
+    [ ${format} == "i2" ] && format="16"  && bands="1"
+cat > ${filename}.hdr <<_EndHere
+
+<<_EndHere
+BYTEORDER	I
+LAYOUT		BIP
+NROWS		${numlines}
+NCOLS		${numpixels}
+NBANDS		${bands}
+NBITS		${format}
+NODATA		-9999
+ULXMAP		${lam_l0p0}
+ULYMAP		${phi_l0p0}
+XDIM		${lam_step}
+YDIM		%{phi_step}
+_EndHere
+#xllcorner     0
+#yllcorner     0
+
+fi
+}
+
+
+case ${1} in 
+  envi)
+    saveas_envi ${2}
+  ;;
+esac
