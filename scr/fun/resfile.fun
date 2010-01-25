@@ -1,14 +1,17 @@
 #!/bin/bash
 
-dorisProcess2OutputFile_outputs=(filename resfile format numpixels numlines);
+dorisProcess2OutputFile_outputs=(_filename _resfile _format _numpixels _numlines);
 function dorisProcess2OutputFile(){
 # Usage:
 #  dorisProcess2OutputFile dorisStep [searchparameter]
 # ex:
 #  call (filename resfile format numpixels numlines)=dorisProcess2OutputFile subttrefpha 
 #  call (filename resfile format numpixels numlines)=dorisProcess2OutputFile geocode Data_output_file_hei
-  dorisStep=${1}
-  parameter=${2:-Data_output_file} #search parameter
+  local dorisStep=${1}
+  local parameter=${2:-Data_output_file} #search parameter
+  local grepM grepS grepI resfile firstPixel lastPixel numpixels multilookfactorPixels
+  local firstLine lastLine numlines multilookfactorLines inputfile section notify grepStart grepEnd grepLength
+  local numHits matchingLine result format filename
   #find which resfile to read.
   if [[ ${dorisStep} == m_* ]]; then
     dorisStep=`pn2rs ${dorisStep}`
@@ -26,38 +29,41 @@ function dorisProcess2OutputFile(){
   fi
 
   if [[ -n "${grepM}" ]]; then
-    resultFile=${m_resfile};
+    resfile=${m_resfile};
   elif [[ -n "${grepS}" ]]; then
-    resultFile=${s_resfile};
+    resfile=${s_resfile};
   elif [[ -n "${grepI}" ]]; then 
-    resultFile=${i_resfile};
+    resfile=${i_resfile};
   else
     echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
     return;
   fi
 
-  echo "Reading file information from: ${resultFile}"
+  echo "Reading ${dorisStep} information from: ${resfile}"
   # get nr of lines
-  firstPixel=`readRes.sh ${resultFile} ${dorisStep} First_pixel`
-  lastPixel=`readRes.sh ${resultFile} ${dorisStep} Last_pixel`
-  numPixels=$((${lastPixel}-${firstPixel}+1));
+  firstPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_pixel`
+  lastPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_pixel`  
+  numpixels=$((${lastPixel}-${firstPixel}+1));
+  multilookfactorPixels=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_range_direction`
+  [ "${multilookfactorPixels}" -gt 1 ] && numpixels=`echo ${numpixels} ${multilookfactorPixels} | awk '{printf "%d", $1/$2};'`
   # get nr of lines
-  firstLine=`readRes.sh ${resultFile} ${dorisStep} First_line`
-  lastLine=`readRes.sh ${resultFile} ${dorisStep} Last_line`
-  numLines=$((${lastLine}-${firstLine}+1));
-  
-  #readRes.sh ${resultFile} ${dorisStep} Data_output_file notify
+  firstLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_line`
+  lastLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_line`
+  numlines=$((${lastLine}-${firstLine}+1)); 
+  multilookfactorLines=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_azimuth_direction`
+  [ "${multilookfactorLines}" -gt 1 ] && numlines=`echo ${numlines} ${multilookfactorLines} | awk '{printf "%d", $1/$2};'`
+  #readRes.sh ${resfile} ${dorisStep} Data_output_file notify
   ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
-  inputfile=${resultFile}
+  inputfile=${resfile}
   section=${dorisStep}
   notify=notify
   grepStart=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
   grepEnd=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
 
-  grepLength=`echo ${grepEnd} - ${grepStart} |bc`
+  grepLength=$((${grepEnd}-${grepStart}));
   if [[ "${notify}" == "notify" ]]; then
     #get number of hits
-    numHits=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
+    numHits=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|wc -l`    
     if [[ ${numHits} -gt 1 ]]; then
       echo " "
       echo "I found more than 1 match for your selection."    
@@ -72,7 +78,7 @@ function dorisProcess2OutputFile(){
       if [ -z "${result}" ]; then
         echo "Something went wrong."
         echo "Exiting..."
-        return -1; 
+        return; 
       else
         #get the format
         format=`grep -A ${grepLength} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
@@ -80,11 +86,11 @@ function dorisProcess2OutputFile(){
       fi
     else
       result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}`
-      format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+      format=`readRes.sh ${resfile} ${dorisStep} Data_output_format`
     fi
   else
     result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}`
-    format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+    format=`readRes.sh ${resfile} ${dorisStep} Data_output_format`
   fi
   result=${result##*:} 	#Get the part after the LAST column 
   result=${result%%//*}	# Remove the part after // (trailing comment)
@@ -92,6 +98,13 @@ function dorisProcess2OutputFile(){
   #echo "$parameter"
   #echo $result
 
-  fileName=${result}
+  filename=${result//[[:space:]]}
   ########################## END OF READRES.
+  [ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
+  [ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
+  [ "${format//[[:space:]]}" == "real4" ] && format="r4";
+  [ "${format//[[:space:]]}" == "short" ] && format="i2";
+  
+  _filename=${filename};_resfile=${resfile};_format=${format};_numpixels=${numpixels};_numlines=${numlines}
 }
+
