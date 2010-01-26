@@ -25,24 +25,38 @@ function displayProcessControl(){
   grep -A ${length} Start_process_control ${1} | grep -v "_process_control" | grep -v "NOT_USED"
 }
 
-local file1 file2 file3
+local file1 file2 file3 files
+files="";
 if [ "${1:-undefined}" == "undefined" ]; then 
   generateRandomString
   file1=${randomString}.tmp
-  echo -e "MASTER: \t\t" > ${file1}
-  displayProcessControl ${m_resfile} >> ${file1}
+  if [ -e ${m_resfile} ]; then
+    echo -e "MASTER: \t\t" > ${file1}
+    displayProcessControl ${m_resfile} >> ${file1}
+    files+="${file1} "
+  fi
 #  echo ";"
   generateRandomString
   file2=${randomString}.tmp
-  echo -e "SLAVE: \t\t" > ${file2}
-  displayProcessControl ${s_resfile} >> ${file2}
+  if [ -e ${s_resfile} ];then 
+    echo -e "SLAVE: \t\t" > ${file2}
+    displayProcessControl ${s_resfile} >> ${file2}
+    files+="${file2} "
+  fi
 #  echo ";"
   generateRandomString
   file3=${randomString}.tmp
-  echo -e "INTERFEROGRAM: \t\t" > ${file3}
-  displayProcessControl ${i_resfile} >> ${file3}
-  paste ${file3} ${file1} ${file2}
-  rm -rf ${file1} ${file2} ${file3}
+  if [ -e ${i_resfile} ]; then
+    echo -e "INTERFEROGRAM: \t\t" > ${file3}
+    displayProcessControl ${i_resfile} >> ${file3}
+    files+="${file3}"
+  fi
+  if [ -n "${files}" ]; then
+    eval "paste ${files}"
+    rm -rf ${files}
+  else
+    echo "No resultfiles can be found. Are you in the correct folder? Did you do any processing yet?"
+  fi
 else
   echo "${1}:"
   displayProcessControl ${1}

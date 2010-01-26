@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# USAGE:
+#	s dorisProcess
+#
+# DESCRIPTION:
+#  s is a builtin ADORE command.  
+#  It shows the input file for the given DORIS processing step.   
+#
+# INPUT:
+#  dorisProcess: Name of the DORIS processing step to run. List of available
+#  processes can be found at the end of this help message or using lsprocess
+#  whenever required.
+#  
+# OUTPUT:
+#  Dumps input file for the given step to the stdout. 
+# 
+# Available DORIS processes:
+#
+# m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+# m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+# m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+# m_simamp		  s_filtazi   filtrange	  coherence
+# m_timing		  fine	      interfero	  filtphase
+# m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+#
