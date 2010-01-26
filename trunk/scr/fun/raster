@@ -3,7 +3,7 @@
 # Automatic Doris Environment
 #
 # USAGE:
-#	. raster a|p|m dorisStep cpxfiddleOptions
+#	raster a|p|m dorisStep cpxfiddleOptions
 #
 # DESCRIPTION:
 #  RASTER is an internal ADORE command.  
@@ -22,13 +22,11 @@
 #
 #  Optional:
 #	cpxfiddleOptions: This is passed to cpxfiddle. 
-#	    -w, -f, -q, -o, -e are fixed. They can not be specified.
-#	    available options: 
-#		-M: multilook factor. default is 1/1
-#		-s: scale. default is 1
-#		-l, -L
-#		-p, -P
-#		-S, -m, -c, -r, -B, -H, ...
+#	    Some options can not be specified for certain outputs.
+#	    Default options are shown in paranthesis.
+#		for amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
+#		for phase images:     -w -f -q -o (sunraster) -c (jet)
+#		for mixed images:     -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
 #
 # OUTPUT:
 #   Raster image in the following naming convention:
@@ -41,7 +39,9 @@
 #echo $@
 #echo $#
 #Clear Script Variables
-unset generate dorisStep remainder format grepM grepS grepI
+local generate dorisStep remainder #format grepM grepS grepI
+local generateCheck #resultFile firstPixel lastPixel width
+local fileName resFile format width numlines
 ###### GET INPUT OPTIONS
 if [ $# -gt 2 ]; then
     generate=${1};shift
@@ -67,84 +67,86 @@ else
   return -1;
 fi
 
-if [[ ${dorisStep} == m_* ]]; then
-  dorisStep=`pn2rs ${dorisStep}`
-  grepM=`grep ${dorisStep} ${m_resfile}`
-elif [[ ${dorisStep} == s_* ]]; then
-  dorisStep=`pn2rs ${dorisStep}`
-  grepS=`grep ${dorisStep} ${s_resfile}`
-else
-  #find which result file has info
-  # resample is a interfero step but outputs to s etc.
-  dorisStep=`pn2rs ${dorisStep}`
-  grepM=`grep ${dorisStep} ${m_resfile}`
-  grepS=`grep ${dorisStep} ${s_resfile}`
-  grepI=`grep ${dorisStep} ${i_resfile}`
-fi
-
-if [[ -n "${grepM}" ]]; then
-  resultFile=${m_resfile};
-elif [[ -n "${grepS}" ]]; then
-  resultFile=${s_resfile};
-elif [[ -n "${grepI}" ]]; then 
-  resultFile=${i_resfile};
-else
-  echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
-  return;
-fi
-
-echo "Reading file information from: ${resultFile}"
-firstPixel=`readRes.sh ${resultFile} ${dorisStep} First_pixel`
-lastPixel=`readRes.sh ${resultFile} ${dorisStep} Last_pixel`
-width=$((${lastPixel}-${firstPixel}+1));
+#if [[ ${dorisStep} == m_* ]]; then
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepM=`grep ${dorisStep} ${m_resfile}`
+#elif [[ ${dorisStep} == s_* ]]; then
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepS=`grep ${dorisStep} ${s_resfile}`
+#else
+#  #find which result file has info
+#  # resample is a interfero step but outputs to s etc.
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepM=`grep ${dorisStep} ${m_resfile}`
+#  grepS=`grep ${dorisStep} ${s_resfile}`
+#  grepI=`grep ${dorisStep} ${i_resfile}`
+#fi
+#
+#if [[ -n "${grepM}" ]]; then
+#  resultFile=${m_resfile};
+#elif [[ -n "${grepS}" ]]; then
+#  resultFile=${s_resfile};
+#elif [[ -n "${grepI}" ]]; then 
+#  resultFile=${i_resfile};
+#else
+#  echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
+#  return;
+#fi
+#
+#echo "Reading file information from: ${resultFile}"
+#firstPixel=`readRes.sh ${resultFile} ${dorisStep} First_pixel`
+#lastPixel=`readRes.sh ${resultFile} ${dorisStep} Last_pixel`
+#width=$((${lastPixel}-${firstPixel}+1));
 #readRes.sh ${resultFile} ${dorisStep} Data_output_file notify
+
+call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
 ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
-inputfile=${resultFile}
-section=${dorisStep}
-parameter="Data_output_file"
-notify=notify
-startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
-endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
-
-length=`echo ${endline} - ${startline} |bc`
-if [[ "${notify}" == "notify" ]]; then
-  #get number of hits
-  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
-  if [[ ${numHits} -gt 1 ]]; then
-    echo " "
-    echo "I found more than 1 match for your selection."    
-    echo "Please enter the selection you want me to use."
-    for (( c=1; c<=${numHits}; c++ ))
-    do
-      matchingLine=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
-      echo $c : ${matchingLine}      
-    done
-    read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
-    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
-    if [ -z "${result}" ]; then
-      echo "Something went wrong."
-      echo "Exiting..."
-      return; 
-    else
-      #get the format
-      format=`grep -A ${length} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
-      format=${format##*:}    #Get the part after the LAST column
-    fi
-  else
-    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
-    format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
-  fi
-else
-  result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
-  format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
-fi
-result=${result##*:} 	#Get the part after the LAST column 
-
-#echo "$startline $endline $length $parameter_length"
-#echo "$parameter"
-#echo $result
-
-fileName=${result}
+#inputfile=${resultFile}
+#section=${dorisStep}
+#parameter="Data_output_file"
+#notify=notify
+#startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
+#endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
+#
+#length=`echo ${endline} - ${startline} |bc`
+#if [[ "${notify}" == "notify" ]]; then
+#  #get number of hits
+#  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
+#  if [[ ${numHits} -gt 1 ]]; then
+#    echo " "
+#    echo "I found more than 1 match for your selection."    
+#    echo "Please enter the selection you want me to use."
+#    for (( c=1; c<=${numHits}; c++ ))
+#    do
+#      matchingLine=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
+#      echo $c : ${matchingLine}      
+#    done
+#    read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
+#    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
+#    if [ -z "${result}" ]; then
+#      echo "Something went wrong."
+#      echo "Exiting..."
+#      return; 
+#    else
+#      #get the format
+#      format=`grep -A ${length} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
+#      format=${format##*:}    #Get the part after the LAST column
+#    fi
+#  else
+#    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+#    format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+#  fi
+#else
+#  result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+#  format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+#fi
+#result=${result##*:} 	#Get the part after the LAST column 
+#
+##echo "$startline $endline $length $parameter_length"
+##echo "$parameter"
+##echo $result
+#
+#fileName=${result}
 ########################## END OF READRES.
 #echo $fileName
 
@@ -153,10 +155,10 @@ if [ -z ${fileName} ]; then
   return;
 fi
 
-[ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
-[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
-[ "${format//[[:space:]]}" == "real4" ] && format="r4";
-[ "${format//[[:space:]]}" == "short" ] && format="i2";
+#[ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
+#[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
+#[ "${format//[[:space:]]}" == "real4" ] && format="r4";
+#[ "${format//[[:space:]]}" == "short" ] && format="i2";
 echo Image Width  ..${width}..
 echo Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
@@ -187,8 +189,8 @@ if [[ "${generate}" == *m* ]]; then
   #cpxfiddle -w ${width} -f ${frmt} -e 0.5 -s 1.2 -q mixed -o sunraster -c cool -M${ratio} ${fname} > ${bname}_mixed.ras
 fi
 
-
-
+#go back to adore
+return 0;
 
 <<COMMENTEDOUT
 #get width and format

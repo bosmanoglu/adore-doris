@@ -162,7 +162,10 @@ function check(){
 }
 
 function h(){
-  if [ -e "${ADORESCR}/${1}" ]; then 
+  [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
+  if [ "${1:-undefined}" == "undefined" ]; then
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
+  elif [ -e "${ADORESCR}/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
   elif [ -e "${ADORESCR}/process/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
