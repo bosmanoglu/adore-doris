@@ -1,7 +1,6 @@
 #!/bin/bash
 #!/bin/bash
 # USAGE:
-#	. lsprocess
 #	lsprocess
 #
 # DESCRIPTION:

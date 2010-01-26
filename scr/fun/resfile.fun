@@ -45,13 +45,17 @@ function dorisProcess2OutputFile(){
   lastPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_pixel`  
   numpixels=$((${lastPixel}-${firstPixel}+1));
   multilookfactorPixels=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_range_direction`
-  [ "${multilookfactorPixels}" -gt 1 ] && numpixels=`echo ${numpixels} ${multilookfactorPixels} | awk '{printf "%d", $1/$2};'`
+  if [ -n "${multilookfactorPixels}" ]; then
+    [ "${multilookfactorPixels}" -gt 1 ] && numpixels=`echo ${numpixels} ${multilookfactorPixels} | awk '{printf "%d", $1/$2};'`
+  fi
   # get nr of lines
   firstLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_line`
   lastLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_line`
   numlines=$((${lastLine}-${firstLine}+1)); 
   multilookfactorLines=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_azimuth_direction`
-  [ "${multilookfactorLines}" -gt 1 ] && numlines=`echo ${numlines} ${multilookfactorLines} | awk '{printf "%d", $1/$2};'`
+  if [ -n "${multilookfactorLines}" ]; then
+    [ "${multilookfactorLines}" -gt 1 ] && numlines=`echo ${numlines} ${multilookfactorLines} | awk '{printf "%d", $1/$2};'`
+  fi
   #readRes.sh ${resfile} ${dorisStep} Data_output_file notify
   ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
   inputfile=${resfile}
