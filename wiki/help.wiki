@@ -286,3 +286,29 @@ INPUT:
 OUTPUT:
  Undo Successful: if doris step was found and removed.
 }}}
+=dem=
+{{{
+ADORE: ? dem
+USAGE:
+	dem operation parameters
+	dem make [SRTM1/SRTM3] [extraBufferPercentage] [name]
+	dem load [path/to/demfile.dem]
+	dem check 
+
+DESCRIPTION:
+ DEM is an internal ADORE command.  
+ It can generate and load DEM settings to the environment.   
+
+INPUT:
+ dem: 
+	defaults to "dem check"
+ dem make SRTM1/SRTM3 extraBufferPercentage name
+	Calculates the master scene coverage and issues a call to construct_dem.sh 
+	Area if padded (enlarged) in all directions with the extraBufferPercentage.
+	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
+ dem check:
+	Checks the environment DEM settings and suggests fixes to problems.
+ 
+OUTPUT:
+  Generates a folder with the dem. Leaves the hgt files in the current folder. 
+}}}
