@@ -2,6 +2,7 @@
 #
 # USAGE:
 #	s dorisProcess
+#	s variableName
 #
 # DESCRIPTION:
 #  s is a builtin ADORE command.  
@@ -9,8 +10,13 @@
 #
 # INPUT:
 #  dorisProcess: Name of the DORIS processing step to run. List of available
-#  processes can be found at the end of this help message or using lsprocess
-#  whenever required.
+#      processes can be found at the end of this help message or using lsprocess
+#      whenever required.
+#
+#  variableName: Name of the DORIS setting (ADORE variable) to display. This
+#      can be a partial name. For example if given m_ as variable name ADORE will
+#      display all variables and their values starting with m_
+#  
 #  
 # OUTPUT:
 #  Dumps input file for the given step to the stdout. 
