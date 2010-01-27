@@ -38,7 +38,8 @@ function saveas_envi(){
     #get the coordinates for last line on 1st col.(pixel)
     # phi is latitude so divide by numlines
     phi_lNp0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p1 -P1 ${phi_filename} 2>/dev/null | tr -d "\n"`        
-    phi_step=`echo "${phi_lNp0} ${phi_l0p0} ${numlines}"  | awk '{printf "%e", ($1-$2)/$3};'`
+	# Below line has a problem without -1 multiplier in Envi. 
+    phi_step=`echo "${phi_lNp0} ${phi_l0p0} ${numlines}"  | awk '{printf "%e", -1*($1-$2)/$3};'` 
     #calculate rotation
     lam_lNp0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`
     rotation=`echo "${phi_lNp0} ${phi_l0p0} ${lam_lNp0} ${lam_l0p0}" | awk '{PI=3.1415;printf "%.8f", 90+(atan2($1-$2, $3-$4)*180/PI)};'`

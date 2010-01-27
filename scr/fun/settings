@@ -299,7 +299,7 @@ case ${1} in
             if [ "${!setting}" != "${relativeValue}" ]; then
               echo ${setting}=${relativeValue}
               #eval ${setting}=\"${relativeValue}\"
-              eval "echo ${setting}=\"${relativeValue}\""
+              eval "${setting}=\"${relativeValue}\""
             fi
           fi
         done

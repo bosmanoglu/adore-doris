@@ -1,6 +1,7 @@
 #!/bin/bash
 #Source other function files
 source ${ADORESCR}/fun/resfile.fun
+source ${ADORESCR}/fun/plotting.fun
 
 ###### SOME FUNCTIONS
 function call(){
@@ -118,6 +119,7 @@ function p()
 function s()
 {
 #SHOW
+  local newline line dorisProcess var variableNames
   dorisProcess=${1}
   if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
@@ -125,7 +127,16 @@ function s()
       echo $newline 
     done
   else
-    echo "Unknown process ${dorisProcess}"
+    variableNames='eval echo \${!${dorisProcess}*}'
+    variableNames=`eval ${variableNames}`
+    if [ -n "${variableNames}" ]; then
+      for var in ${variableNames}
+      do
+	echo "${var}=${!var}"
+      done
+    else
+      echo "Unknown process or variable: ${dorisProcess}"
+    fi
   fi
 }
 
@@ -159,6 +170,10 @@ function saveas(){
 
 function check(){
 	. ${ADORESCR}/fun/check "${@}"
+}
+
+function exclude(){
+	. ${ADORESCR}/fun/exclude "${@}"
 }
 
 function h(){
@@ -308,6 +323,12 @@ function unwrap(){
   p unwrap
 }
  
+function baselines(){
+  p baselines
+}
 
+function singleMasterStack(){
+  p singleMasterStack
+}
 
 #Have a new line at the end
