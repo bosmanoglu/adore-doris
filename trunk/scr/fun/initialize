@@ -31,6 +31,9 @@ if [ -z "${ADOREFOLDER}" ]; then
 fi
 source "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
 
+#Check settings and make suggestions
+checkInitialSettings
+
 # check if the values are set or not. If empty set to "dummy"
 [ -z "${m_in_dat}" 		] && m_in_dat="dummy"
 [ -z "${m_in_vol}" 		] && m_in_vol="dummy"

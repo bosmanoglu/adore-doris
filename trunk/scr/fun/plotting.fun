@@ -11,8 +11,8 @@ function gnuplot_baseline(){
 #  done
 
 #get x-range y-range
-local xRange=`minmax -C process/test1/baselines/baselines | awk '{printf "%d:%d", $1-100, $2+100};'`
-local yRange=`minmax -C process/test1/baselines/baselines | awk '{printf "%d:%d", $3-100, $4+100};'`
+local xRange=`minmax -C ${1} | awk '{printf "%d:%d", $1-100, $2+100};'`
+local yRange=`minmax -C ${1} | awk '{printf "%d:%d", $3-100, $4+100};'`
 local fonts="arial,20"
 #DOWNLOADED FROM http://ilab.cs.byu.edu/cs360/ by Prof. Daniel Zappala
 gnuplot <<_ENDOFSCRIPT

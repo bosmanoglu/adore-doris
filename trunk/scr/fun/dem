@@ -18,8 +18,11 @@
 #	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
 #
 #  dem load path/to/demfile.dem
-# 	Load's the specified dem file. The DEM must be created with "dem make" or
-#	construct_dem.sh (from TU-DELFT).
+# 	Load's the specified dem file. 
+#	Currently supported DEM formats:
+#	  -output of "dem make"
+#	  -construct_dem.sh (from TU-DELFT).
+#	  -ArcGIS .flt files (with .flt and .hdr files should be in the same folder and have the same name.)
 #
 #  dem check:
 #	Checks the environment DEM settings and suggests fixes to problems.
@@ -30,7 +33,9 @@
 #   dem check: Checks and displays possible problems fixes on stdout.
 #
 
-function makeDEM(){
+function makeSrtmDem(){
+  local srtm buffer name center_lat center_lon size_rg size_az radar_band_width inc_angle
+  local size_rg_km size_az_km dem_area settings_file
   srtm=${1:-SRTM3}  
   buffer=${2:-20}
   name=${3:-dem}
@@ -76,10 +81,11 @@ function makeDEM(){
   updateDEMsettings ${settings_file}
 }
 
-function updateDEMsettings(){
+function updateSrtmDemsettings(){
  #reads dem settings from settings file and modifies ADORE environment
   settings_file=${1}
   [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
+  echo "Loading settings for sam_, dac_, and crd_"
   sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
   sam_in_format=`readDrs.sh ${settings_file} SAM_IN_FORMAT | tr -d '\n'`
   sam_in_size=`readDrs.sh ${settings_file} SAM_IN_SIZE | tr -d '\n'`
@@ -87,37 +93,84 @@ function updateDEMsettings(){
   sam_in_ul=`readDrs.sh ${settings_file} SAM_IN_UL | tr -d '\n'`
   sam_in_nodata=`readDrs.sh ${settings_file} SAM_IN_NODATA | tr -d '\n'`
   
-  dac_in_dem=`readDrs.sh ${settings_file} DAC_IN_DEM | tr -d '\n'`
-  dac_in_format=`readDrs.sh ${settings_file} DAC_IN_FORMAT | tr -d '\n'`
-  dac_in_size=`readDrs.sh ${settings_file} DAC_IN_SIZE | tr -d '\n'`
-  dac_in_delta=`readDrs.sh ${settings_file} DAC_IN_DELTA | tr -d '\n'`
-  dac_in_ul=`readDrs.sh ${settings_file} DAC_IN_UL | tr -d '\n'`
-  dac_in_nodata=`readDrs.sh ${settings_file} DAC_IN_NODATA | tr -d '\n'`
+  dac_in_dem=${sam_in_dem}
+  dac_in_format=${sam_in_format}
+  dac_in_size=${sam_in_size}
+  dac_in_delta=${sam_in_delta}
+  dac_in_ul=${sam_in_ul}
+  dac_in_nodata=${sam_in_nodata}
   
-  crd_in_dem=`readDrs.sh ${settings_file} CRD_IN_DEM | tr -d '\n'`
-  crd_in_format=`readDrs.sh ${settings_file} CRD_IN_FORMAT | tr -d '\n'`
-  crd_in_size=`readDrs.sh ${settings_file} CRD_IN_SIZE | tr -d '\n'`
-  crd_in_delta=`readDrs.sh ${settings_file} CRD_IN_DELTA | tr -d '\n'`
-  crd_in_ul=`readDrs.sh ${settings_file} CRD_IN_UL | tr -d '\n'`
-  crd_in_nodata=`readDrs.sh ${settings_file} CRD_IN_NODATA | tr -d '\n'`   
+  crd_in_dem=${sam_in_dem}
+  crd_in_format=${sam_in_format}
+  crd_in_size=${sam_in_size}
+  crd_in_delta=${sam_in_delta}
+  crd_in_ul=${sam_in_ul}
+  crd_in_nodata=${sam_in_nodata}
 }
 
-function checkDEM(){
+function updateArcGisDemSettings(){
+ #reads dem settings from .hdr file and modifies ADORE environment
+  local settings_file demFile nrows ncols ulx uly
+  settings_file=${1}
+  demFile=${2}
+  
+  [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
+  echo "Loading settings for sam_, dac_, and crd_"
+  sam_in_dem=${demFile}
+  sam_in_format='r4'
+  #set -x
+  nrows=`grep -i -w "nrows" ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
+  ncols=`grep -i -w "ncols" ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
+  cellsize=`grep -i -w "cellsize" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'` #change comma to dots if any
+  ulx=`grep -i -w "xllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'` # get upper left x. Is ArcGIS ll = doris ul ???
+  uly=`grep -i -w "yllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'`  
+  sam_in_size="${nrows} ${ncols}"
+  sam_in_delta="${cellsize} ${cellsize}"
+  sam_in_ul="${uly} ${ulx}"
+  sam_in_nodata=`grep -i -w "NODATA_value" ${settings_file} | awk '{gsub(",",".");printf "%d", $2};'| tr -d '\n'`
+  #set +x
+  dac_in_dem=${sam_in_dem}
+  dac_in_format=${sam_in_format}
+  dac_in_size=${sam_in_size}
+  dac_in_delta=${sam_in_delta}
+  dac_in_ul=${sam_in_ul}
+  dac_in_nodata=${sam_in_nodata}
+  
+  crd_in_dem=${sam_in_dem}
+  crd_in_format=${sam_in_format}
+  crd_in_size=${sam_in_size}
+  crd_in_delta=${sam_in_delta}
+  crd_in_ul=${sam_in_ul}
+  crd_in_nodata=${sam_in_nodata}
+}
+
+function checkDem(){
   #check if dem exists and in sync with environment
   everythingOK=0; #0 Yes, others no
   [ ! -e "${sam_in_dem}" ] && everythingOK=1;
-  [ ! -e "${dac_in_dem}" ] && everythingOK=1;
-  [ ! -e "${crd_in_dem}" ] && everythingOK=1;
+  [ ! -e "${dac_in_dem}" ] && everythingOK=2;
+  [ ! -e "${crd_in_dem}" ] && everythingOK=3;
   if [ ${everythingOK} ]; then
     case ${everythingOK} in
     1)
       echo "Error: 1"
-      echo "One or more of your dem input files are not defined."
-      echo "Please check your settings and/or make new DEM."
+      echo "sam_in_dem does not exist: ${sam_in_dem}"
+      echo "If you did not get errors 2 and 3 run \"settings check\" and fix."    
+    ;;
+    2)
+      echo "Error: 2"
+      echo "dac_in_dem does not exist: ${dac_in_dem}"
+      echo "If you did not get errors 1 and 3 run \"settings check\" and fix."    
+    ;;
+    3)
+      echo "Error: 3"
+      echo "crd_in_dem does not exist: ${crd_in_dem}"
+      echo "If you did not get errors 1 and 2 run \"settings check\" and fix."    
     ;;
     *)
       echo "Error: -"
       echo "There are some problems with your DEM settings."
+      echo "But I don't know how to help you... Sorry..."
     ;;
     esac
   else
@@ -125,47 +178,68 @@ function checkDEM(){
   fi
 }
 
-case ${1} in
-  make)
-    srtm=${2:-SRTM3}
-    buffer=${3:-20}
-    #check if dem exists. 
-    #if not make new.
-    if [ ! -e "${sam_in_dem}" ]; then
-      makeDEM ${srtm} ${buffer}
-    else
-      echo "It seems like you already have a DEM set for sam_in_dem: ${sam_in_dem}"
-    fi
-  ;;  
-  load)
-    if [ ${2:-undefined} == "undefined" ]; then
-      echo "No DEM specified. Using sam_in_dem"
-      demFile=${sam_in_dem};
-    else
-      demFile=${2};
-    fi
-    #read input settings 	
-    if [ -e "${demFile}" ]; then
-      echo "You are using this DEM: ${sam_in_dem}"
-      #get input settings file.
-      demPath=`dirname ${sam_in_dem}`
-      demBasename=`basename ${sam_in_dem}`
-      demBasename=${demBasename%%.dem*}	#chop the last .dem
-      demBasename=${demBasename##*final_} #chop the initial final
-      settings_file="input.doris_${demBasename}"
-      echo "I expect to find settings file at: ${demPath}/${settings_file}"
-      if [ -e ${demPath}/${settings_file} ]; then
-        updateDEMsettings ${demPath}/${settings_file}
+function main(){
+  local srtm buffer demFile demPath demBasename settings_file
+  case ${1} in
+    make)
+      srtm=${2:-SRTM3}
+      buffer=${3:-20}
+      #check if dem exists. 
+      #if not make new.
+      if [ ! -e "${sam_in_dem}" ]; then
+        makeSrtmDem ${srtm} ${buffer}
       else
-        echo "I can not find the settings file. Can you check?"
+        echo "It seems like you already have a DEM set for sam_in_dem: ${sam_in_dem}"
       fi
-    else
-      echo "The DEM file does not exist: ${sam_in_dem}"  
-    fi
-  ;;
-  *)
-    #check to see if dem exists and it is loaded.
-    checkDEM
-  ;;
-esac
+    ;;  
+    load)
+      if [ ${2:-undefined} == "undefined" ]; then
+        echo "No DEM specified. Using sam_in_dem"
+        demFile=${sam_in_dem};
+      else
+        demFile=${2};
+      fi
+      #read input settings 	
+      if [ -e "${demFile}" ]; then
+        if [[ "${demFile}" == *.dem* ]]; then
+          echo "You are using this SRTM DEM: ${sam_in_dem}"
+          #get input settings file.
+          demPath=`dirname ${demFile}`
+          demBasename=`basename ${demFile}`
+          demBasename=${demBasename%%.dem*}	#chop the last .dem
+          demBasename=${demBasename##*final_} #chop the initial final
+          settings_file="input.doris_${demBasename}"        
+          echo "I expect to find settings file at: ${demPath}/${settings_file}"
+          if [ -e "${demPath}/${settings_file}" ]; then
+            updateSrtmDemsettings ${demPath}/${settings_file}
+          else 
+            echo "I can not find the settings file. Can you check?"
+          fi
+        elif [[ "${demFile}" == *.flt* ]]; then
+          echo "You are using an ArcGIS binary file as DEM: ${demFile}"        
+          #get header file.
+          demPath=`dirname ${demFile}`
+          demBasename=`basename ${demFile}`
+          demBasename=${demBasename%%.flt*}     #chop the last .flt
+          settings_file="${demBasename}.hdr"
+          echo "I expect to find the header file at: ${demPath}/${settings_file}"
+          if [ -e "${demPath}/${settings_file}" ]; then
+            updateArcGisDemSettings ${demPath}/${settings_file} ${demFile}
+          else
+            echo "I can not find the header file. Can you check?"
+          fi
+        fi
+      else
+        echo "The DEM file does not exist: ${sam_in_dem}"  
+      fi
+    ;;
+    *)
+      #check to see if dem exists and it is loaded.
+      checkDem
+    ;;
+  esac
    
+}
+
+#run main function
+main "${@}"
