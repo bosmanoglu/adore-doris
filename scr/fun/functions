@@ -140,6 +140,16 @@ function s()
   fi
 }
 
+function checkInitialSettings(){
+########################### CHECK INPUT - MAKE SUGGESTIONS#
+[ "${projectFolder}" == "." ] && echo "projectFolder is set to \".\". Use with caution. In general your data should be located at projectFolder/data"
+[ -z "${master}" ] && echo "It seems like dataFolder and/or projectFolder is not set correctly."
+[ ! -e "${m_in_dat}" ] && echo "It seems like dataFile and/or master is not set correctly. Please set the SLC file pattern(dataFile)."
+[ ! -e "${s_in_dat}" ] && echo "It seems like slave is not set correctly. Please set the SLC file pattern."
+[ "${runName}" == "default" ] && echo "runName is set to \"default\"" && echo "Any batch processing results (baselines, singleMasterStack) will be under ${processFolder}/default"
+[ ! -d "${dataFolder}" ] && echo "dataFolder does not exist. Please set dataFolder. Current Setting: ${dataFolder}"
+}
+
 function raster(){
 	. ${ADORESCR}/fun/raster "$@"
 }
