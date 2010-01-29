@@ -110,7 +110,7 @@ function updateSrtmDemsettings(){
 
 function updateArcGisDemSettings(){
  #reads dem settings from .hdr file and modifies ADORE environment
-  local settings_file demFile nrows ncols ulx uly
+  local settings_file demFile nrows ncols lx lly uly
   settings_file=${1}
   demFile=${2}
   
@@ -122,11 +122,12 @@ function updateArcGisDemSettings(){
   nrows=`grep -i -w "nrows" ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
   ncols=`grep -i -w "ncols" ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
   cellsize=`grep -i -w "cellsize" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'` #change comma to dots if any
-  ulx=`grep -i -w "xllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'` # get upper left x. Is ArcGIS ll = doris ul ???
-  uly=`grep -i -w "yllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'`  
+  lx=`grep -i -w "xllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'` # get left x. 
+  lly=`grep -i -w "yllcorner" ${settings_file} | awk '{gsub(",",".");printf "%.8f", $2};'| tr -d '\n'`  # get lower left y
+  uly=`echo ${lly} ${nrows} ${cellsize} | awk '{printf "%.8f", $1+$2*$3};' |tr -d '\n'` #calculate upper left y
   sam_in_size="${nrows} ${ncols}"
   sam_in_delta="${cellsize} ${cellsize}"
-  sam_in_ul="${uly} ${ulx}"
+  sam_in_ul="${uly} ${lx}"
   sam_in_nodata=`grep -i -w "NODATA_value" ${settings_file} | awk '{gsub(",",".");printf "%d", $2};'| tr -d '\n'`
   #set +x
   dac_in_dem=${sam_in_dem}
