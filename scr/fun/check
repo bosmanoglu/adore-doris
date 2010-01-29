@@ -28,6 +28,15 @@ function displayProcessControl(){
 local file1 file2 file3 files
 files="";
 if [ "${1:-undefined}" == "undefined" ]; then 
+  #interferogram
+  generateRandomString
+  file3=${randomString}.tmp
+  if [ -e ${i_resfile} ]; then
+    echo -e "INTERFEROGRAM: \t\t" > ${file3}
+    displayProcessControl ${i_resfile} >> ${file3}
+    files+="${file3} "
+  fi
+  #master
   generateRandomString
   file1=${randomString}.tmp
   if [ -e ${m_resfile} ]; then
@@ -35,7 +44,7 @@ if [ "${1:-undefined}" == "undefined" ]; then
     displayProcessControl ${m_resfile} >> ${file1}
     files+="${file1} "
   fi
-#  echo ";"
+  #slave
   generateRandomString
   file2=${randomString}.tmp
   if [ -e ${s_resfile} ];then 
@@ -44,13 +53,6 @@ if [ "${1:-undefined}" == "undefined" ]; then
     files+="${file2} "
   fi
 #  echo ";"
-  generateRandomString
-  file3=${randomString}.tmp
-  if [ -e ${i_resfile} ]; then
-    echo -e "INTERFEROGRAM: \t\t" > ${file3}
-    displayProcessControl ${i_resfile} >> ${file3}
-    files+="${file3}"
-  fi
   if [ -n "${files}" ]; then
     eval "paste ${files}"
     rm -rf ${files}
