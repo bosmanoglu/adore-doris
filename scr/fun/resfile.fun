@@ -15,26 +15,32 @@ function dorisProcess2OutputFile(){
   #find which resfile to read.
   if [[ ${dorisStep} == m_* ]]; then
     dorisStep=`pn2rs ${dorisStep}`
-    grepM=`grep ${dorisStep} ${m_resfile}`
+    grepM=`readRes.sh ${m_resfile} process_control ${dorisStep}`
   elif [[ ${dorisStep} == s_* ]]; then
     dorisStep=`pn2rs ${dorisStep}`
-    grepS=`grep ${dorisStep} ${s_resfile}`
+    grepS=`readRes.sh ${s_resfile} process_control ${dorisStep}`
   else
     #find which result file has info
     # resample is a interfero step but outputs to s etc.
     dorisStep=`pn2rs ${dorisStep}`
-    grepM=`grep ${dorisStep} ${m_resfile}`
-    grepS=`grep ${dorisStep} ${s_resfile}`
-    grepI=`grep ${dorisStep} ${i_resfile}`
+    grepM=`readRes.sh ${m_resfile} process_control ${dorisStep}`
+    grepS=`readRes.sh ${s_resfile} process_control ${dorisStep}`
+    grepI=`readRes.sh ${i_resfile} process_control ${dorisStep}`
   fi
 
   if [[ -n "${grepM}" ]]; then
-    resfile=${m_resfile};
-  elif [[ -n "${grepS}" ]]; then
-    resfile=${s_resfile};
-  elif [[ -n "${grepI}" ]]; then 
-    resfile=${i_resfile};
-  else
+    grepM=${grepM//[[:blank:]]/};
+    [ "${grepM##*:}" -eq 1 ] && resfile=${m_resfile};
+  fi
+  if [[ -n "${grepS}" ]]; then
+    grepS=${grepS//[[:blank:]]/};
+    [ "${grepS##*:}" -eq 1 ] && resfile=${s_resfile};
+  fi
+  if [[ -n "${grepI}" ]]; then
+    grepI=${grepI//[[:blank:]]/}; 
+    [ "${grepI##*:}" -eq 1 ] && resfile=${i_resfile};
+  fi
+  if [ "${resfile:-undefined}" == "undefined" ]; then
     echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
     return;
   fi
