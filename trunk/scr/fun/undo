@@ -13,6 +13,7 @@
 #  Optional:
 #    fileName: If omitted undo will try to remove the given doris
 #      step from master, slave and interferograms result files.    
+#      If specified undo will only remove steps from the given file.
 #
 # OUTPUT:
 #  Undo Successful: if doris step was found and removed.

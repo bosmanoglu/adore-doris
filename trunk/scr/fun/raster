@@ -4,6 +4,7 @@
 #
 # USAGE:
 #	raster a|p|m dorisStep cpxfiddleOptions
+#	raster a|p|m dorisStep:filename cpxfiddleOptions
 #
 # DESCRIPTION:
 #  RASTER is an internal ADORE command.  
@@ -15,17 +16,23 @@
 #  using the convert command (imagemagick). 
 #
 # INPUT:
-#  a|p|m: 
+#  a|p|m 
 #	a: creates amplitude image.
 #  	p: creates phase image.
 #	m: creates amplitude/phase mixed image.
 #
-#  dorisStep: The step for the output. lsprocess can be used to 
-#     get a list of doris processes.
-#     The step can be in the master, slave or interferogram result file.
+#  dorisStep
+#       The step for the output. lsprocess can be used to 
+#       get a list of doris processes.
+#       The step can be in the master, slave or interferogram result file.
+# 
+#  dorisStep:filename 
+#	Can be used to specify a filename that is not in the resultfile.
+#	This is useful for generating rasters for *.demlp, *.notmasked files.
 #
 #  Optional:
-#	cpxfiddleOptions: This is passed to cpxfiddle. 
+#	cpxfiddleOptions
+#           These options are passed to cpxfiddle. 
 #	    Some options can not be specified for certain outputs.
 #	    Default options are shown in paranthesis.
 #		for amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
@@ -33,13 +40,19 @@
 #		for mixed images:     -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
 #
 # OUTPUT:
+#   Default raster format is set to "sunraster". If you prefer a different kind of output
+#   RASTER can convert the image using imagemagick "convert" tool. The format for the output
+#   is defined in the "raster_format" variable.
+#
 #   Raster image in the following naming convention:
 #	a: A_filename.ras
 #	p: P_filename.ras
 #	m: M_filename.ras
 #   *'.' (dot) character in the filename will be converted to '_'(underscore).
 #
-
+# VARIABLES:
+#   raster_format
+#
 
 function convert_raster(){
   local filename
@@ -48,7 +61,8 @@ function convert_raster(){
     if [[ "${raster_format}" != "ras" ]]; then
       echo "Converting ${1}.ras to format: ${raster_format}..."
       convert ${1}.ras ${1}.${raster_format}
-      [ $? -ne 0 ] && echo "There was a problem with imagemagick (convert) when I ran: convert ${1}.ras ${1}.${raster_format}"
+      [ $? -ne 0 ] && { echo "There was a problem with imagemagick (convert) when I ran: convert ${1}.ras ${1}.${raster_format}"; return 1; }
+      rm ${1}.ras
     fi
   fi
 }
@@ -58,7 +72,7 @@ function convert_raster(){
 #Clear Script Variables
 local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
-local fileName resFile format width numlines
+local fileName resFile format width numlines inputFileName
 ###### GET INPUT OPTIONS
 if [ $# -gt 2 ]; then
     generate=${1};shift
@@ -73,6 +87,7 @@ else
   return
 fi
 
+
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
@@ -83,6 +98,15 @@ else
   echo "You provided some extra options: ${generateCheck}"
   return -1;
 fi
+
+#check if filename is specified with dorisStep
+if [[ "${dorisStep}" == *:* ]]; then
+  inputFileName=${dorisStep#*:}
+  dorisStep=${dorisStep%:*}
+  [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
+fi
+
+
 
 #if [[ ${dorisStep} == m_* ]]; then
 #  dorisStep=`pn2rs ${dorisStep}`
@@ -171,6 +195,8 @@ if [ -z ${fileName} ]; then
   echo "No data file for the step ${dorisStep} in ${resFile}"
   return;
 fi
+#if specified change fileName to inputFileName
+[ "${inputFileName:-undefined}" != "undefined" ] && fileName=${inputFileName};
 
 #[ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
 #[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
@@ -179,6 +205,7 @@ fi
 echo Image Width  ..${width}..
 echo Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
+[ $? -ne 0 ] && { echo "I have problems finding filename: ${fileName}"; return 1; }
 #echo Outname  ..${outName}..
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then

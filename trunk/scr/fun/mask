@@ -43,7 +43,8 @@ elif [ "$format" == "cr4" ]; then
   echo "Complex masking operation adds a constant phase value of PI/4 to the whole image. Should not effect results/modeling etc."
   gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx
   [ ! -e ${mask_file}.cpx ] && echo "Complex mask file could not be created.: ${mask_file}.cpx" && echo "I was trying to run: gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx" && return
-  cpxmult ${doris_output}.notmasked ${mask_file}.cpx ${doris_output} add=1
+  #cpxmult ${doris_output}.notmasked ${mask_file}.cpx ${doris_output} add=1
+  gmtmath -bis2 -bos2 ${mask_file}.cpx ${doris_output}.notmasked MUL = ${doris_output}
 else
   echo "Output format of the file you requested is ${format}. I can only mask real4 (r4) or complex_real4 (cr4) files."
   return
