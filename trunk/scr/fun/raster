@@ -9,6 +9,10 @@
 #  RASTER is an internal ADORE command.  
 #  It creates sunraster images of the DORIS products using 
 #  cpxfiddle.   
+# 
+#  ADORE variable raster_format controls the output type. For all images
+#  a sunraster image is created and converted to the requested format 
+#  using the convert command (imagemagick). 
 #
 # INPUT:
 #  a|p|m: 
@@ -35,6 +39,19 @@
 #	m: M_filename.ras
 #   *'.' (dot) character in the filename will be converted to '_'(underscore).
 #
+
+
+function convert_raster(){
+  local filename
+  filename=${1}  
+  if [[ "${raster_format:-undefined}" != "undefined" ]]; then
+    if [[ "${raster_format}" != "ras" ]]; then
+      echo "Converting ${1}.ras to format: ${raster_format}..."
+      convert ${1}.ras ${1}.${raster_format}
+      [ $? -ne 0 ] && echo "There was a problem with imagemagick (convert) when I ran: convert ${1}.ras ${1}.${raster_format}"
+    fi
+  fi
+}
 
 #echo $@
 #echo $#
@@ -166,26 +183,31 @@ outName=`basename ${fileName}| tr '.' '_'`
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then
     cpxfiddle -w ${width} -f ${format} -e 0.5 -q normal -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+    convert_raster A_${outName}
   else
     cpxfiddle -w ${width} -f ${format} -e 0.5 -q mag  -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+    convert_raster A_${outName}
   fi
-  echo "Name of rasterfile: A_${outName}.ras"
+  echo "Name of rasterfile: A_${outName}.${raster_format}"
 fi
 if [[ "${generate}" == *p* ]]; then
   if [[ ${#format} -eq 2 ]];then
     cpxfiddle -w ${width} -f ${format} -q normal -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+    convert_raster P_${outName}
   else
     cpxfiddle -w ${width} -f ${format} -q phase  -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+    convert_raster P_${outName}
   fi
-  echo "Name of rasterfile: P_${outName}.ras"    
+  echo "Name of rasterfile: P_${outName}.${raster_format}"    
 fi
 if [[ "${generate}" == *m* ]]; then
   if [[ ${#format} -eq 2 ]];then
     echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
   else
     cpxfiddle -w ${width} -f ${format} -e 0.5 -s 1.2 -o sunraster -c jet ${remainder} ${fileName} > M_${outName}.ras
+    convert_raster M_${outName}
   fi
-  echo "Name of rasterfile: M_${outName}.ras"    
+  echo "Name of rasterfile: M_${outName}.${raster_format}"    
   #cpxfiddle -w ${width} -f ${frmt} -e 0.5 -s 1.2 -q mixed -o sunraster -c cool -M${ratio} ${fname} > ${bname}_mixed.ras
 fi
 

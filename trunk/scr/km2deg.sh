@@ -24,14 +24,17 @@ lon_center=${2}
 dist=${3}
 
 ### Calculate distance in degrees
-Ndeg=`echo "scale=4; ${dist} / 111" | bc -l`
+#Ndeg=`echo "scale=4; ${dist} / 111" | bc -l`
+Ndeg=`echo "${dist}"| awk '{printf "%0.6f", $1/111};'`
 
 if [ ${args} -eq 4 ]  
 then
 	dist2=${4}
-	Edeg=`echo "scale=4; 360 * ${dist2} / (2*3.1415*6356.750*c(${lat_center}))" | bc -l`
+	#Edeg=`echo "scale=4; 360 * ${dist2} / (2*3.1415*6356.750*c(${lat_center}))" | bc -l`
+	Edeg=`echo "${dist2} ${lat_center}" | awk '{PI=3.14159;printf "%0.6f", 360*$1/(2*PI*6356.750*cos($2/180*PI))};'`
 else
-	Edeg=`echo "scale=4; 360 * ${dist} / (2*3.1415*6356.750*c(${lat_center}))" | bc -l`	
+	#Edeg=`echo "scale=4; 360 * ${dist} / (2*3.1415*6356.750*c(${lat_center}))" | bc -l`	
+	Edeg=`echo "${dist} ${lat_center}" | awk '{PI=3.14159;printf "%0.6f", 360*$1/(2*PI*6356.750*cos($2/180*PI))};'`
 fi
 
 

@@ -30,15 +30,15 @@ function dorisProcess2OutputFile(){
 
   if [[ -n "${grepM}" ]]; then
     grepM=${grepM//[[:blank:]]/};
-    [ "${grepM##*:}" -eq 1 ] && resfile=${m_resfile};
+    [ -n "${grepM}" ] && [ "${grepM##*:}" -eq 1 ] && resfile=${m_resfile};
   fi
   if [[ -n "${grepS}" ]]; then
     grepS=${grepS//[[:blank:]]/};
-    [ "${grepS##*:}" -eq 1 ] && resfile=${s_resfile};
+    [ -n "${grepS}" ] && [ "${grepS##*:}" -eq 1 ] && resfile=${s_resfile};
   fi
   if [[ -n "${grepI}" ]]; then
     grepI=${grepI//[[:blank:]]/}; 
-    [ "${grepI##*:}" -eq 1 ] && resfile=${i_resfile};
+    [ -n "${grepI}" ] && [ "${grepI##*:}" -eq 1 ] && resfile=${i_resfile};
   fi
   if [ "${resfile:-undefined}" == "undefined" ]; then
     echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."

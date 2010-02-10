@@ -1,6 +1,6 @@
 #!/bin/bash
 # USAGE:
-#	saveas exportFormat processName
+#	saveas exportFormat [optionalParameters] processName
 #
 # DESCRIPTION:
 #  SAVEAS is an internal ADORE command. 
@@ -11,6 +11,12 @@
 #  exportFormat: envi or arcgis. 
 #  processName: Doris step to be exported.
 #  
+#  Optional:
+#    saveas arcgis [a|p|m] processName
+#	arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed).
+#       If not specified p(phase) is assumed. This can be used to export amplitude data as well if 
+#	you do not want to rescale the amplitude values. 
+#
 # OUTPUT:
 #  Generates an HDR file with the same name as the output file of the requested doris step (processName).
 #
@@ -126,11 +132,131 @@ _EndHere
 }
 
 
+function saveas_arcgis_gdal(){
+  local generate dorisStep geocodeStatus filename resfile format numpixels numlines hei_filename hei_resfile hei_format hei_numpixels hei_numlines
+  local generateCheck phi_filename lam_filename slc_rg_res_km slc_az_res_km center_lat center_lon slc_res_deg region 
+  local inc_angle radar_band_width
+ 
+  if [ ${2:-undefined} == "undefined" ]; then
+    generate="a"; echo "You only specified one parameter. I'm assuming you wanted (p)phase output."
+    dorisStep=${1}
+  else
+    generate=${1}
+    dorisStep=${2}
+  fi
+
+  geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
+  if [ ${geocodeStatus} -eq "1" ]; then
+    call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+    echo "..width..${numpixels}.."
+    echo "..format..${format}.."
+    call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
+    # get the name of phi(lat) and lambda (lon) files
+    phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
+    lam_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_lamda`
+
+    #generate file (amplitude, phase) to export
+    generate=`echo ${generate} | tr [:upper:] [:lower:]`
+    if [ "${#generate}" -gt "1" ]; then
+      echo "I can only convert one product (a-amplitude, p-phase or m-mixed) at a time."
+      return;
+    fi
+    generateCheck=`echo ${generate} | tr -d [a,p,m]`
+    if [ -z ${generateCheck} ]; then
+      echo -n "You requested me to generate: "
+      [ ${generate} == 'a' ] && echo "amplitude"
+      [ ${generate} == 'p' ] && echo "phase"
+      [ ${generate} == 'm' ] && echo "mixed"
+    else
+      echo "I can only create phase(p), amplitude(a) or mixed(m) images."
+      echo "You provided some extra options: ${generateCheck}"
+      return -1;
+    fi
+    if [ -z ${filename} ]; then
+      echo "No data file for the step ${dorisStep} in ${resfile}"
+      return;
+    fi
+    outName=`basename ${filename}| tr '.' '_'`
+    if [[ "${generate}" == *a* ]]; then
+      if [[ ${#format} -eq 2 ]];then
+        cpxfiddle -w ${numpixels} -f ${format} -e 0.5 -q normal -o float ${filename} > ${outName}.temporary || { echo "Error running command: $_"; return 1; }
+      else
+        cpxfiddle -w ${numpixels} -f ${format} -e 0.5 -q mag  -o float   ${filename} > ${outName}.temporary || { echo "Error running command: $_"; return 1; }
+      fi
+    elif [[ "${generate}" == *p* ]]; then
+      if [[ ${#format} -eq 2 ]];then
+        cpxfiddle -w ${numpixels} -f ${format} -q normal -o float ${filename} > ${outName}.temporary || { echo "Error running command: $_"; return 1; }
+      else 
+        cpxfiddle -w ${numpixels} -f ${format} -q phase  -o float ${filename} > ${outName}.temporary || { echo "Error running command: $_"; return 1; }
+      fi
+    elif [[ "${generate}" == *m* ]]; then
+      if [[ ${#format} -eq 2 ]];then
+        echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
+      else
+        cpxfiddle -w ${numpixels} -f ${format} -e 0.5 -s 1.2 -o float ${filename} > ${outName}.temporary || { echo "Error running command: $_"; return 1; }
+      fi
+    fi
+
+    #generate a 3 column data file combining phi lam hei
+    gmtconvert ${lam_filename} ${phi_filename} ${outName}.temporary -bis1 -A -bos3 > ${outName}.dat
+    #get pixel size in degrees
+	#################DUPLICATED CODE FROM scr/fun/dem. Make lines below a function
+        radar_band_width=`readRes.sh ${m_resfile} readfiles Total_range_band_width | tr -d '\n'`
+        echo "Radar Band Width=${radar_band_width}"
+        if [ -e ${i_resfile} ]; then
+          inc_angle=`readRes.sh ${i_resfile} coarse_orbits inc_angle | tr -d '\n'`
+        fi
+        [ -z "${inc_angle}" ] && echo -e "Can not read incidence angle from ${i_resfile}. \n Using default:23.2" && inc_angle=23.2
+        # get range resolution
+        [ -z "${slc_rg_res}" ] && slc_rg_res=`echo "2.99e8 ${radar_band_width} ${inc_angle}" | awk '{PI=3.14159;printf "%d", $1/($2*1e6*cos($3/180*PI))};'`
+        [ -z "${slc_az_res}" ] && slc_az_res=`echo "${slc_rg_res}" | awk '{printf "%d", $1/5};'`
+        echo "SLC resolution [Azimuth x Range]: ${slc_az_res} x ${slc_rg_res}"
+	#################END DUPLICATE
+    dorisStep=`pn2rs ${2}`  #readRes.sh does not call pn2rs automatically...
+    rg_multilooking=`${ADORESCR}/readRes.sh ${i_resfile} ${dorisStep} "Multilookfactor_range_direction"`    
+    az_multilooking=`${ADORESCR}/readRes.sh ${i_resfile} ${dorisStep} "Multilookfactor_azimuth_direction"`    
+    slc_rg_res_km=`echo "${slc_rg_res} ${rg_multilooking}" | awk '{printf "%f", $1*$2/1000};'`
+    slc_az_res_km=`echo "${slc_az_res} ${az_multilooking}" | awk '{printf "%f", $1*$2/1000};'`	
+    ## get center coordinates
+    center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude | tr -d '\n'`
+    center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude | tr -d '\n'`
+    slc_res_deg=`${ADORESCR}/km2deg.sh ${center_lat} ${center_lon} ${slc_az_res_km} ${slc_rg_res_km}`
+    [ $? -ne 0 ] && echo "Error running command: ${ADORESCR}/km2deg.sh ${center_lat} ${center_lon} ${slc_az_res_km} ${slc_rg_res_km}" && return 1
+    slc_res_deg=${slc_res_deg/ /\/}
+    #need to get the region for gmt 
+    region=`minmax -I${slc_res_deg} -bis3 ${outName}.dat` 
+    [ $? -ne 0 ] && echo "Error running command: minmax -I${slc_res_deg} -bis3 ${outName}.dat" && return 1
+    #generate grd file
+    xyz2grd ${outName}.dat -bis3 -G${outName}.grd ${region} -I${slc_res_deg} -N32767 -V || { echo "Error running command: $_"; return 1; }
+    #change grid to the older format (gdal complienat)
+    grdreformat ${outName}.grd ${outName}_grdreformat.grd=sf -V || { echo "Error running command: $_"; return 1; }
+    #translate the grd to HFA(img) format using gdal
+    gdal_translate -a_nodata 32767 -co "STATISTICS=YES" -of HFA ${outName}_grdreformat.grd ${outName}.img 
+    if [ $? -ne 0 ]; then
+      echo "gdal_translate failed. I was trying to run: gdal_translate -a_nodata 32767 -co "STATISTICS=YES" -of HFA ${outName}_grdreformat.grd ${outName}.img";
+      echo "I might have left behind temporary files: ${outName}.temporary ${outName}_grdreformat.grd ${outName}.grd ${outName}.dat"
+      return
+    else
+      #cleanup
+      rm -rf ${outName}.temporary ${outName}_grdreformat.grd ${outName}.grd ${outName}.dat
+      echo "ArcGIS filename: ${outName}.img"
+      echo "SUCCESS: saveas_arcgis"
+    fi
+  else
+    echo "Please first do the geocoding step to export to ArcGIS."
+  fi
+}
+
+
+
+
+
+
 case ${1} in 
   envi)
     saveas_envi ${2}    
   ;;
   arcgis)
-    saveas_arcgis ${2}
+    saveas_arcgis_gdal ${2} ${3}
   ;;
 esac
