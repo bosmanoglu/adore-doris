@@ -30,10 +30,11 @@ mask_file=${unwrap_file}.mask
 
 # generate float mask
 bkconvert ${mask_file} ${mask_file}.float 1 4 &> /dev/null
-[ ! -e ${mask_file}.float ] && echo "Complex Mask file could not be created.: ${mask_file}.float" && echo "I was trying to run: bkconvert ${mask_file} ${mask_file}.float 1 4" && return
+[ ! -e ${mask_file}.float ] && echo "Float mask file could not be created.: ${mask_file}.float" && echo "I was trying to run: bkconvert ${mask_file} ${mask_file}.float 1 4" && return
 
 # get the name of the output file for doris step.
 call "(doris_output resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
+echo "Backing-up ${doris_output} to ${doris_output}.notmasked"
 mv ${doris_output} ${doris_output}.notmasked
 if [ "${format}" == "r4" ]; then
   gmtmath -bis1 -bos1 ${mask_file}.float ${doris_output}.notmasked MUL = ${doris_output} &> /dev/null
@@ -41,7 +42,7 @@ elif [ "$format" == "cr4" ]; then
   #generate complex mask
   echo "Complex masking operation adds a constant phase value of PI/4 to the whole image. Should not effect results/modeling etc."
   gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx
-  [ ! -e ${mask_file}.cpx ] && echo "Complex Mask file could not be created.: ${mask_file}.cpx" && echo "I was trying to run: gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx" && return
+  [ ! -e ${mask_file}.cpx ] && echo "Complex mask file could not be created.: ${mask_file}.cpx" && echo "I was trying to run: gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx" && return
   cpxmult ${doris_output}.notmasked ${mask_file}.cpx ${doris_output} add=1
 else
   echo "Output format of the file you requested is ${format}. I can only mask real4 (r4) or complex_real4 (cr4) files."
