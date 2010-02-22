@@ -39,13 +39,41 @@ This folder includes the doris input files. Each input file uses "drs" extension
 \subsection{man}
 This folder holds the users manual.
 \subsection{scr}
-scr folder has the scripts and binaries that ADORE relies on. 
+scr folder has the scripts and binaries that ADORE relies on. These scripts can be used outside ADORE.
+\subsubsection*{scr/fun}
+fun folder has the internal ADORE functions. These files and functions will not run outside ADORE (would need modification).
 \subsection{set}
 set folder holds the default settings for ADORE. 
 
+\section{Features}
+ADORE has the following features:
+\begin{itemize}
+ \item Automatic-generation of default settings for basic SAR interferometry
+ \item SETTINGS tool to check, save and load project settings.
+ \item RASTER tool to generate raster images of DORIS results in the requested format (default ras).
+ \item DEM tool to check, load, and generate dem of the area covered by the image.
+ \item CHECK tool to show the status of the processing. 
+ \item ? tool to access help in the interactive mode.
+ \item S tool to check the values of input variables and steps. 
+ \item SAVEAS tool to export DORIS results into ArcGIS, ENVI (work-in-progress) and soon other formats.
+ \item MASK tool to mask areas unwrapped with SNAPHU.
+ \item UNDO tool to remove processing steps from the result from a certain processing step. 
+\end{itemize}
+
+\section{Dependencies}
+ADORE has the following dependencies:
+\begin{itemize}
+ \item TU-DELFT DORIS. (Required)
+ \item Image-Magick. (Optional, RASTER uses convert tool to convert images.)
+ \item GDAL (>1.6, optional, SAVEAS uses GDAL to export to ArcGIS) 
+\end{itemize}
+
+
+
 \section{Scripts}
 \subsection{adore}
-The main adore script. It interprets the command line and initiates other scripts.
+The main adore script. It interprets the command line and initiates other scripts. It can also be used in interactive mode. In the interactive mode, it sets up an environment to easily process interferograms with DORIS. 
+
 \subsection{boundingBox.sh}
  USAGE: ./boundingBox.sh lat lon dist [dist2]
  
@@ -116,14 +144,12 @@ LIMITATIONS:
 If the value of the parameter has ":" character the returned field might be wrong.
 
 EXAMPLE:
-	$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs M_IN_DAT
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs M_IN_DAT
 	/data/batu/adore_MexicoCity2/data/09828/dat.040116_ENVISAT1_163630.001_SLC
-	$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs LOGFILE
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs LOGFILE
 	/data/batu/adore_MexicoCity2/process/20by20/crops/09828/log.out
-	$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/crop.drs DUMPBASELINE
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/crop.drs DUMPBASELINE
 	15 10
-
-
 \subsection{getInterfArea.sh}
  This function reads the master.res file and 
  dumps first-last line, first last pixel.

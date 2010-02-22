@@ -3,6 +3,7 @@
 #	settings option [argument]
 #	settings
 #	settings apply variableName
+#	settings apply variableName1=variableValue1 [variableName2 variableName3=...]
 #	settings check
 #	settings fix
 #	settings raw
@@ -22,6 +23,8 @@
 #  settings apply variableName: updates settings that depend on
 #	variableName. This is not done in a recursive way. Use check
 #	for possible mismatches.
+#  	  Settings apply can also assign values usign the variableName=value
+#       syntax. 
 #
 #  settings check: looks for differences between ADORE's 
 #	expectations and current values. Handy for finding 
@@ -120,8 +123,7 @@ dumpRawSettings(){
     
 }
 
-case ${1} in
-  save)
+function settings_save(){
     #save settings to a file
     #rm -rf ${2:-settings.set} #clear if file exists
     saveFileName=${2:-settings.set}
@@ -167,8 +169,9 @@ case ${1} in
     #mv ${tempFile} ${saveFileName}	
     rm ${tempFile}
     echo "Settings saved to ${saveFileName}"
-  ;;
-  load)
+}
+
+function settings_load(){
     #load settings from file
     if [ "${2-undefined}" == "undefined" ];then
       loadFile=${u};
@@ -179,16 +182,9 @@ case ${1} in
     u=`readlink -e ${loadFile}`
     unset loadFile
     initialize
-  ;;
-  reset)
-    echo "Loading default settings..."
-    reset2DefaultSettings
-  ;;
-  clear)
-    echo "Removing all settings..."
-    clearSettings
-  ;;
-  raw)
+}
+
+function settings_raw(){
     #show settings without shell expansions
     tempFile=".tempfile"
     dumpRawSettings ${tempFile}
@@ -222,8 +218,9 @@ case ${1} in
     #    echo ${line}=${!line}
     #  fi
     #fi
-  ;;
-  check)
+}
+
+function settings_check(){
     #check for inconsistent changes. like ${master} is changed but ${m_resfiles} is still old.
       #loop over _ref_variables. and check for mismatches
       suggestionLine="settings fix"
@@ -239,6 +236,7 @@ case ${1} in
         if [ "${!setting}" != "${relativeValue}" ]; then
           echo " active    ${setting}=${!setting}"        
           echo " suggested ${setting}=${relativeValue}"
+          echo " reason    _rel_${setting}=\"${!var}\""          
           echo " "
           suggestionLine="${suggestionLine} ${setting}"
         fi
@@ -278,13 +276,23 @@ case ${1} in
 #    done
 #    #cat ${tempFile}
 #    rm -rf ${tempFile}  
+}
 
-  ;;  
-  apply)
+function settings_apply(){
     if [ "${2-undefined}" != "undefined" ]; then
-      #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
+      #loop over input. 
       for (( k=2 ; k<=$# ; k++ ))
       do
+        #check if this parameter is an assignment statement
+        inputPar="${!k}";
+        if [[ "${inputPar}" == *=* ]]; then
+          #make the assignment
+	  eval "${inputPar}"
+	  inputVar=${inputPar%%=*};
+	else
+	  inputVar=${inputPar};  
+	fi
+        #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
         #loop over _ref_variables. and check for changes.
         for var in ${!_rel_*}
         do
@@ -292,7 +300,7 @@ case ${1} in
           #echo ${var}=${var##*_rel_} # display setting to be modified
           setting=${var##*_rel_} # get setting name
           relativeValue=`eval ${!var}`
-          if [[ "${!var}" == *${!k}* ]]; then
+          if [[ "${!var}" == *${inputVar}* ]]; then
             #echo ${setting}=${!setting} #display current settings
             #echo ${setting}=${relativeValue}
             [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
@@ -330,8 +338,9 @@ case ${1} in
       echo "     . settings apply variableName"
       echo " ex: . settings apply master"
     fi
-  ;;  
-  fix)
+}
+
+function settings_fix(){
     if [ "${2:-undefined}" == "undefined" ]; then
       echo "Applying all suggested changes."
       for var in ${!_rel_*}
@@ -360,8 +369,9 @@ case ${1} in
         eval "${setting}=\"${relativeValue}\"" 
       done
     fi
-  ;;
-  *)
+}
+
+function settings_list(){
     #generateRandomString; 
     #tempFile=${randomString}
 
@@ -399,5 +409,36 @@ case ${1} in
         fi
       fi
     done 
+}
+
+case ${1} in
+  save)
+    settings_save "$@"
+  ;;
+  load)
+    settings_load "$@"
+  ;;
+  reset)
+    echo "Loading default settings..."
+    reset2DefaultSettings
+  ;;
+  clear)
+    echo "Removing all settings..."
+    clearSettings
+  ;;
+  raw)
+    settings_raw
+  ;;
+  check)
+    settings_check
+  ;;  
+  apply)
+    settings_apply "$@"
+  ;;  
+  fix)
+    settings_fix "$@"
+  ;;
+  *)
+    settings_list
   ;;
 esac

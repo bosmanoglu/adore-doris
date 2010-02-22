@@ -190,6 +190,10 @@ function mask(){
 	. ${ADORESCR}/fun/mask "${@}"
 }
 
+function scenes(){
+	. ${ADORESCR}/fun/scenes "${@}"
+}
+
 function h(){
   [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
   if [ "${1:-undefined}" == "undefined" ]; then
