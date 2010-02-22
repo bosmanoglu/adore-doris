@@ -30,11 +30,13 @@
 [ -z "${slave}"			] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${_rel_excludesFile}"	] && _rel_excludesFile='echo ${runFolder}/excludes'
+[ -z "${scenes_exclude}" 	] && scenes_exclude=() 	#Empty array... 
+[ -z "${scenes_include}" 	] && scenes_include=( `ls -d ${dataFolder}/* 2>/dev/null | awk -F/ '{print $NF}'` )  #List of folders in dataFolder.
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
 [ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
 [ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)
 [ -z "${nullFile}"		] && nullFile=NUL_01.001    # slc nul filename can be a regexp
-[ -z "${unspecified}"		] && unspecified=" "	#readinput.hh unspecified filenames are set to this
+[ -z "${unspecified}"		] && unspecified=""	#readinput.hh unspecified filenames are set to this
 ####### for Gamma Processing... m/s_readfiles
 [ -z "${slcType}"         	] && slcType=""	#set to gamma for gamma slc's.
 [ -z "${gammaParFile}"   	] && gammaParFile="*.pslcpar"

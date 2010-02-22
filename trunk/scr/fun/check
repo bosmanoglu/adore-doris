@@ -25,44 +25,403 @@ function displayProcessControl(){
   grep -A ${length} Start_process_control ${1} | grep -v "_process_control" | grep -v "NOT_USED"
 }
 
-local file1 file2 file3 files
-files="";
-if [ "${1:-undefined}" == "undefined" ]; then 
-  #interferogram
-  generateRandomString
-  file3=${randomString}.tmp
-  if [ -e ${i_resfile} ]; then
-    echo -e "INTERFEROGRAM: \t\t" > ${file3}
-    displayProcessControl ${i_resfile} >> ${file3}
-    files+="${file3} "
-  fi
-  #master
-  generateRandomString
-  file1=${randomString}.tmp
-  if [ -e ${m_resfile} ]; then
-    echo -e "MASTER: \t\t" > ${file1}
-    displayProcessControl ${m_resfile} >> ${file1}
-    files+="${file1} "
-  fi
-  #slave
-  generateRandomString
-  file2=${randomString}.tmp
-  if [ -e ${s_resfile} ];then 
-    echo -e "SLAVE: \t\t" > ${file2}
-    displayProcessControl ${s_resfile} >> ${file2}
-    files+="${file2} "
-  fi
-#  echo ";"
-  if [ -n "${files}" ]; then
-    eval "paste ${files}"
-    rm -rf ${files}
+function listProcessFlagsFromResultFiles(){
+  local file1 file2 file3 files
+  files="";
+  if [ "${1:-undefined}" == "undefined" ]; then 
+    #interferogram
+    generateRandomString
+    file3=${randomString}.tmp
+    if [ -e ${i_resfile} ]; then
+      echo -e "INTERFEROGRAM: \t\t" > ${file3}
+      displayProcessControl ${i_resfile} >> ${file3}
+      files+="${file3} "
+    fi
+    #master
+    generateRandomString
+    file1=${randomString}.tmp
+    if [ -e ${m_resfile} ]; then
+      echo -e "MASTER: \t\t" > ${file1}
+      displayProcessControl ${m_resfile} >> ${file1}
+      files+="${file1} "
+    fi
+    #slave
+    generateRandomString
+    file2=${randomString}.tmp
+    if [ -e ${s_resfile} ];then 
+      echo -e "SLAVE: \t\t" > ${file2}
+      displayProcessControl ${s_resfile} >> ${file2}
+      files+="${file2} "
+    fi
+  #  echo ";"
+    if [ -n "${files}" ]; then
+      eval "paste ${files}"
+      rm -rf ${files}
+    else
+      echo "No resultfiles can be found. Are you in the correct folder? Did you do any processing yet?"
+    fi
   else
-    echo "No resultfiles can be found. Are you in the correct folder? Did you do any processing yet?"
+    echo "${1}:"
+    displayProcessControl ${1}
   fi
+}
+
+function checkProcessFlag(){
+# Given a doris process name this function returns 
+# 1: already processed.
+# 0: ready to process
+# >1: for not ready to process.
+# 2: missing file 
+# 3: input error
+
+local alreadyProcessed prevProcStatus processName resFile
+case "${1}" in 
+  "m_readfiles")
+    processName=`pn2rs ${1}`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && return 0;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "m_porbits")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs m_readfiles`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ -d "${m_orb_dir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -d "${m_orb_dir}" ] && echo "Error 3: Input error... m_orb_dir" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "m_crop")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs m_readfiles`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "m_simamp")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs m_crop`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ -e "${sam_in_dem}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -e "${sam_in_dem}" ] && echo "Error 3: Input error... sam_in_dem" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "m_timing")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs m_simamp`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3    
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "m_ovs")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs m_crop`
+    resFile=${m_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ "${m_ovs_fact_azi}" -gt 1 ] && [ "${m_ovs_fact_rng}" -gt 1 ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ "${m_ovs_fact_azi}" -lt 2 ] && echo "Error 3: Input error... m_ovs_fact_azi < 2" && return 3
+    [ "${m_ovs_fact_rng}" -lt 2 ] && echo "Error 3: Input error... m_ovs_fact_azi < 2" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "s_readfiles")
+    processName=`pn2rs ${1}`
+    resFile=${s_resfile}
+    [ ! -e ${resFile} ] && return 0;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "s_porbits")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs s_readfiles`
+    resFile=${s_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ -d "${s_orb_dir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -d "${s_orb_dir}" ] && echo "Error 3: Input error... s_orb_dir" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "s_crop")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs s_readfiles`
+    resFile=${s_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "s_ovs")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs s_crop`
+    resFile=${s_resfile}
+    [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ "${s_ovs_fact_azi}" -gt 1 ] && [ "${s_ovs_fact_rng}" -gt 1 ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ "${s_ovs_fact_azi}" -lt 2 ] && echo "Error 3: Input error... s_ovs_fact_azi < 2" && return 3
+    [ "${s_ovs_fact_rng}" -lt 2 ] && echo "Error 3: Input error... s_ovs_fact_azi < 2" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "coarseorb")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && return 0;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "coarsecorr")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "m_filtazi")
+    processName=`pn2rs ${1}`
+    resFile=${m_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "s_filtazi")
+    processName=`pn2rs ${1}`
+    resFile=${s_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "fine")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "reltiming")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "demassist")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ -e "${dac_in_dem}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -e "${dac_in_dem}" ] && echo "Error 3: Input error... dac_in_dem" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "coregpm")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs fine`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "resample")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs coregpm`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "filtrange")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs resample`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "interfero")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs resample`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "comprefpha")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "subtrrefpha")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs comprefpha`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "comprefdem")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "subtrrefdem")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs comprefdem`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "coherence")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "filtphase")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "unwrap")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "dinsar")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs interfero`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    [ -e "${di_in_toposlave}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -e "${di_in_toposlave}" ] && echo "Error 3: Input error... di_in_toposlave" && return 3
+    return ${alreadyProcessed}
+  ;;
+  "slant2h")
+    processName=`pn2rs ${1}`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+  "geocode")
+    processName=`pn2rs ${1}`
+    prevProcessName=`pn2rs slant2h`
+    resFile=${i_resfile}
+    [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
+    [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
+    [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
+    prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
+    [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
+    alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
+    return ${alreadyProcessed}
+  ;;
+esac
+}
+
+#MAIN FUNCTION
+if [ "${1}" == "-p" ]; then
+ shift 
+ checkProcessFlag "${1}"
 else
-  echo "${1}:"
-  displayProcessControl ${1}
-fi
-
-
+ listProcessFlagsFromResultFiles "$@"
+fi 
 
