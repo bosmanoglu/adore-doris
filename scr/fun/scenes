@@ -1,0 +1,70 @@
+#!/bin/bash
+# USAGE:
+#	scenes 
+#	scenes exclude orbitFolder1 orbitFolder2 ...
+#	scenes include orbitFolder1 orbitFolder2 ...
+#
+# DESCRIPTION:
+#  SCENES is an internal ADORE command. 
+#  It has three usages: 
+#
+#  scenes: 
+#   	With no input parameters all available scenes are shown.
+#
+#  scenes exclude:
+# 	With no inputs this command lists currently excluded scenes.
+#
+#  scenes exclude orbitFolder1 orbitFolder2 ...:
+#       listed orbit folders (folders inside data folder) are excluded from
+#       batch processing.
+#
+# scenes include:
+#  	With no inputs this command lists currently included scenes. 
+#
+# scenes include orbitFolder1 orbitFolder2 ...:
+#  	given orbit folders will be removed from the exclude list. 
+#
+#
+
+function all_scenes(){
+  ls ${dataFolder} | grep -v ${excludesFile} 
+}
+
+function exclude(){
+  if [ "${1:-undefined}" == "undefined" ];then
+    if [ -e "${excludesFile}" ]; then
+      cat ${excludesFile} | sort | column ;
+    else 
+      echo "Excludes file does not exist. All orbits will be processed."
+      echo "Excludes file was expected at: ${excludesFile}"
+    fi
+  else
+    local orbit
+    for orbit in "$@"
+    do
+      if [ -d "${dataFolder}/${orbit}" ]; then
+        echo "Excluding ${orbit}"
+        echo "${orbit}" >> ${excludesFile}
+      else
+        echo "Can not find ${orbit} in data folder: ${dataFolder}"
+        return;
+      fi
+    done
+  fi
+}
+
+function include(){
+  if [ "${1:-undefined}" == "undefined" ]; then
+    if [ -e "${excludesFile}" ];then
+      cat ${
+}
+
+case "${1}" in 
+"")
+ all_scenes
+ ;;
+"exclude")
+ shift
+ exclude "$@"
+ ;;
+esac

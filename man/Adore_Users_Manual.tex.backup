@@ -43,9 +43,28 @@ scr folder has the scripts and binaries that ADORE relies on.
 \subsection{set}
 set folder holds the default settings for ADORE. 
 
+\section{Features}
+ADORE has the following features:
+\begin{itemize}
+ \item Automatic-generation of default settings for basic SAR interferometry
+ \item SETTINGS tool to check, save and load project settings.
+ \item RASTER tool to generate raster images of DORIS results in the requested format (default ras).
+\end{itemize}
+
+\section{Dependencies}
+ADORE has the following dependencies:
+\begin{itemize}
+ \item TU-DELFT DORIS. (Required)
+ \item Image-Magick. (Optional, RASTER uses convert tool to convert images.)
+ \item GDAL (>1.6, optional, SAVEAS uses GDAL to export to ArcGIS) 
+\end{itemize}
+
+
+
 \section{Scripts}
 \subsection{adore}
-The main adore script. It interprets the command line and initiates other scripts.
+The main adore script. It interprets the command line and initiates other scripts. It can also be used in interactive mode. In the interactive mode, it sets up an environment to easily process interferograms with DORIS. 
+
 \subsection{boundingBox.sh}
  USAGE: ./boundingBox.sh lat lon dist [dist2]
  
@@ -80,6 +99,64 @@ The main adore script. It interprets the command line and initiates other script
 .1351 .1815
  ./km2deg.sh 19.5803 -98.8733 15 15
 .1351 .1815
+\subsection{readRes.sh}> ./readRes.sh 
+USAGE: readRes.sh resultFile dorisStep parameter
+
+INPUT:
+  resultFile: is the DORIS result file (*.res)
+  dorisStep: is the processing step to look for the parameter.
+  parameter: field to be read in the result file. 
+
+OUTPUT: 
+  parameter value from the result file. 
+
+LIMITATIONS:
+If the value of the parameter has ":" character the returned field might be wrong.
+
+EXAMPLE:
+\$> readRes.sh  /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles RADAR_FREQUENCY
+5331004416.000000
+\$> readRes.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res readfiles First_pixel_azimuth_time
+31.238
+\$> grep First_pixel_azimuth_time /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/09828.res 
+First_pixel_azimuth_time (UTC):                 16-JAN-2004 16:36:31.238
+
+\subsection{readDrs.sh}
+USAGE: readDrs.sh drsFile parameter
+
+INPUT:
+  drsFile: is the DORIS input file (*.drs)
+  parameter: field to be read in the file. 
+
+OUTPUT: 
+  parameter value
+
+LIMITATIONS:
+If the value of the parameter has ":" character the returned field might be wrong.
+
+EXAMPLE:
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs M_IN_DAT
+	/data/batu/adore_MexicoCity2/data/09828/dat.040116_ENVISAT1_163630.001_SLC
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/readfiles.drs LOGFILE
+	/data/batu/adore_MexicoCity2/process/20by20/crops/09828/log.out
+	\$> ./readDrs.sh /RAID1/batu/adore_MexicoCity2/process/20by20/crops/09828/crop.drs DUMPBASELINE
+	15 10
+\subsection{getInterfArea.sh}
+ This function reads the master.res file and 
+ dumps first-last line, first last pixel.
+
+ Calculation is simply done by:
+ LINELO = FirstLine + Line Margin
+ LINEHI = LastLine - Line Margin
+ ... and so on.
+
+ Requires:
+	- Master.res file location
+	- Line Margin
+	- Pixel Margin
+ Provides:
+	- LINELO LINEHI PIXELLO PIXELHI
+
 
 %\bibliographystyle{alpha}
 %\bibliography{Library}
