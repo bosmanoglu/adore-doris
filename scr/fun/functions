@@ -96,10 +96,15 @@ function pp()
 function p()
 {
 #PROCESS
- dorisProcess=${1}
-  if [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
+  local dorisProcess=${1}
+  #if file is given with full path run that file.
+  if [ -f "${dorisProcess}" ]; then
+  	. ${dorisProcess};
+  #else check the scr/process to see if it is a process
+  elif [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
           . ${ADOREFOLDER}/scr/process/${dorisProcess}
   else
+  #else do default processing. Prepare drs file and run doris. 
     if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
  #     rm -f ${outputFolder}/${dorisProcess}.drs
  #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do

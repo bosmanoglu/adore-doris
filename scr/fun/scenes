@@ -27,36 +27,56 @@
 #
 
 function all_scenes(){
-  ls ${dataFolder} | grep -v ${excludesFile} 
+  ls -d ${dataFolder}/* 2>/dev/null | awk -F/ '{print $NF}'
 }
 
-function exclude(){
+function scenes_exclude(){
   if [ "${1:-undefined}" == "undefined" ];then
-    if [ -e "${excludesFile}" ]; then
-      cat ${excludesFile} | sort | column ;
+    if [ ${#scenes_exclude[@]} -gt 0 ]; then
+    #if [ -n "${scenes_exclude}" ]; then
+      #echo ${scenes_exclude}
+      echo ${scenes_exclude[@]}
     else 
-      echo "Excludes file does not exist. All orbits will be processed."
-      echo "Excludes file was expected at: ${excludesFile}"
+      echo "Currently, no scenes are excluded."
     fi
   else
-    local orbit
-    for orbit in "$@"
+    local scene
+    for scene in "$@"
     do
-      if [ -d "${dataFolder}/${orbit}" ]; then
-        echo "Excluding ${orbit}"
-        echo "${orbit}" >> ${excludesFile}
+      if [ -d "${dataFolder}/${scene}" ]; then
+        echo "Excluding ${scene}"
+        #echo "${orbit}" >> ${excludesFile}
+#        scenes_exclude=`echo ${scenes_exclude} ${scene} | tr " " "\n"|sort|tr "\n" " "`;
+#        scenes_include="${scenes_include//${scene}/}"; # Remove the given string from includes, add it to the excludes.
+ 	scenes_exclude=( ${scenes_exclude[@]} ${scene} );
+ 	scenes_include=( ${scenes_include[@]//${scene}/} );
       else
-        echo "Can not find ${orbit} in data folder: ${dataFolder}"
+        echo "Can not find ${scene} in data folder: ${dataFolder}"
         return;
       fi
     done
   fi
 }
 
-function include(){
+function scenes_include(){
   if [ "${1:-undefined}" == "undefined" ]; then
-    if [ -e "${excludesFile}" ];then
-      cat ${
+    if [ ${#scenes_include[@]} -gt 0 ]; then
+    #if [ -n "${scenes_include}" ]; then
+#      echo ${scenes_include}
+      echo ${scenes_include[@]}
+    else
+      echo "Currently, there are no scenes included. Check if you have your dataFolder set correctly."  
+    fi
+  else    
+    local scene
+    for scene in "$@"  
+    do
+#      scenes_exclude="${scenes_exclude[@]//${scene}/}"; # Remove the given string from excludes, add it to the includes.
+#      scenes_include=`echo ${scenes_include[@]} ${scene} |tr " " "\n"|sort|tr "\n" " "`;
+     scenes_exclude=( ${scenes_exclude[@]//${scene}/} );
+     scenes_include=( ${scenes_include[@]} ${scene} );
+    done
+  fi
 }
 
 case "${1}" in 
@@ -65,6 +85,10 @@ case "${1}" in
  ;;
 "exclude")
  shift
- exclude "$@"
+ scenes_exclude "$@"
+ ;;
+"include")
+ shift
+ scenes_include "$@"
  ;;
 esac

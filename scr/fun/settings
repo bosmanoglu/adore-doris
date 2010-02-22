@@ -123,6 +123,25 @@ dumpRawSettings(){
     
 }
 
+function settingsOK(){
+    #check for inconsistent changes. like ${master} is changed but ${m_resfiles} is still old.
+      #loop over _ref_variables. and check for mismatches
+      for var in ${!_rel_*}
+      do
+        #echo ${var}=${!var} #display contents
+        #echo ${var}=${var##*_rel_} # display setting to be modified
+        setting=${var##*_rel_} # get setting name
+        relativeValue=`eval ${!var}`
+        #echo ${setting}=${!setting} #display current settings
+        #echo ${setting}=${relativeValue}
+        [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
+        if [ "${!setting}" != "${relativeValue}" ]; then
+          return 1;
+        fi
+      done
+      return 0;
+}
+
 function settings_save(){
     #save settings to a file
     #rm -rf ${2:-settings.set} #clear if file exists
@@ -135,7 +154,7 @@ function settings_save(){
     dumpDefaultSettings ${tempFile}
     
     if [ -e "${saveFileName}" ]; then
-      if ask "Shall I overwrite ${saveFileName}?"
+      if ask "Shall I delete the old ${saveFileName}?"
         then 
           rm  ${saveFileName}
       else
@@ -147,6 +166,9 @@ function settings_save(){
     #######################################################
     cat ${tempFile} | while read -r line; do          
       leftSide=${line%%=*}; #get the left side of name=value pair.
+      leftSide="${leftSide}[@]"; #try to get the complete array if available.
+      				 #if variable is not an array this should default to 
+      				 #the variable value. 
       leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
       [ -z "${leftSide}" ] && continue; #if no value continue
       #[ -z "${leftSideEval}" ] && continue; #if no value continue
@@ -161,11 +183,21 @@ function settings_save(){
       #[ -z "${rightSideEval}" ] && continue; #if no value continue      
 
       if [ "${leftSideEval}" != "${rightSideEval}" ]; then
-        #echo ..${line%%=*}..=..${!leftSide}..
-        echo ${line%%=*}=\"${!leftSide}\" >> ${saveFileName}
+#        echo ..${line%%=*}..=..${!leftSide}..
+
+#        echo ${line%%=*}=\"${!leftSide}\" >> ${saveFileName}
+        #Since rev.52 we need to be able to save arrays as settings
+        #check if first character is a bracket
+        local testStr=( "${!leftSide}" );
+        #There apparently is a difference between @ and *, see http://www.linuxjournal.com/content/bash-arrays
+        if [ "${#testStr[*]}" -gt "1" ]; then
+          #we are saving an array no quotes. use brackets.
+          echo "${line%%=*}=( ${leftSideEval} )" >> ${saveFileName}
+	else
+          echo ${line%%=*}=\"${!leftSide}\" >> ${saveFileName}
+	fi           
       fi    
     done
-    
     #mv ${tempFile} ${saveFileName}	
     rm ${tempFile}
     echo "Settings saved to ${saveFileName}"
@@ -279,69 +311,65 @@ function settings_check(){
 }
 
 function settings_apply(){
-    if [ "${2-undefined}" != "undefined" ]; then
-      #loop over input. 
-      for (( k=2 ; k<=$# ; k++ ))
-      do
-        #check if this parameter is an assignment statement
-        inputPar="${!k}";
-        if [[ "${inputPar}" == *=* ]]; then
-          #make the assignment
-	  eval "${inputPar}"
-	  inputVar=${inputPar%%=*};
-	else
-	  inputVar=${inputPar};  
-	fi
-        #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
-        #loop over _ref_variables. and check for changes.
-        for var in ${!_rel_*}
-        do
-          #echo ${var}=${!var} #display contents
-          #echo ${var}=${var##*_rel_} # display setting to be modified
-          setting=${var##*_rel_} # get setting name
-          relativeValue=`eval ${!var}`
-          if [[ "${!var}" == *${inputVar}* ]]; then
-            #echo ${setting}=${!setting} #display current settings
-            #echo ${setting}=${relativeValue}
-            [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
-            if [ "${!setting}" != "${relativeValue}" ]; then
-              echo ${setting}=${relativeValue}
-              #eval ${setting}=\"${relativeValue}\"
-              eval "${setting}=\"${relativeValue}\""
-            fi
+  local recursive=1; #off=1, on=0
+  if [ "${2}" == "-r" ]; then
+    recursive=0;
+    shift;
+  fi
+  #Get the remaining 
+  if [ "${2-undefined}" != "undefined" ]; then
+    #loop over input. 
+    for (( k=2 ; k<=$# ; k++ )); do
+      #check if this parameter is an assignment statement
+      inputPar="${!k}";
+      if [[ "${inputPar}" == *=* ]]; then
+        #make the assignment
+        eval "${inputPar}"
+        inputVar=${inputPar%%=*};
+      else
+        inputVar=${inputPar};  
+      fi
+      #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
+      #loop over _ref_variables. and check for changes.
+      for var in ${!_rel_*}; do
+        #echo ${var}=${!var} #display contents
+        #echo ${var}=${var##*_rel_} # display setting to be modified
+        setting=${var##*_rel_} # get setting name
+        relativeValue=`eval ${!var}`
+        if [[ "${!var}" == *${inputVar}* ]]; then
+          #echo ${setting}=${!setting} #display current settings
+          #echo ${setting}=${relativeValue}
+          [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
+          if [ "${!setting}" != "${relativeValue}" ]; then
+            echo ${setting}=${relativeValue}
+            #eval ${setting}=\"${relativeValue}\"
+            eval "${setting}=\"${relativeValue}\""
           fi
-        done
-      done 
-  #      dumpRawSettings .tempfile
-  #      rm -rf .tempfile3
-  #      cat .tempfile | while read -r line; do
-  #      leftSide=${line%%=*}; #get the left side of name=value pair. (get name)
-  #      #leftSideEval=${!leftSide}; #indirect reference of the name. See active value.
-  #      #[ -z "${leftSideEval}" ] && continue; #if no value continue
-  #      rightSide=${line##*=}; # get the right side (value)
-  #      rightSideEval=`eval echo ${rightSide} 2> /dev/null` 
-  #      [ -z "${rightSideEval}" ] && continue; #if no value continue
-  #        if [[ "${rightSide}" == *${2}* ]]; then
-  #          echo -e " ${leftSide}\t = ${rightSideEval}"
-  #          echo "${leftSide}=${rightSideEval}" >> .tempfile3
-  #          #evalcmd=`echo "${leftSide}=${rightSideEval}"`
-  #          #eval ${leftSide}="${rightSideEval}"
-  #          #echo -e "${leftSide}\t = ${!leftSide}"
-  #          #echo ${m_resfile}
-  #          #export m_resfile
-  #        fi    
-  #      done
-  #      [ -r .tempfile3 ] && . .tempfile3
-  #      rm -rf .tempfile .tempfile3
-    else
-      echo " USAGE:"
-      echo "     . settings apply variableName"
-      echo " ex: . settings apply master"
+        fi
+      done #for relative definitions
+    done #for input
+
+    [ "${recursive}" -eq "1" ] && return; #if recursive is not requested return. 
+    local loopCounter=0
+    while [ ${loopCounter} -lt 10 ]; do
+      settings fix 
+      [ settingsOK ] && break; #if no change is detected no need to continue.
+      let loopCounter=loopCounter+1;
+    done #while recursive 
+    if [ ${loopCounter} -eq 10 ]; then
+      echo "Maximum loopcount (10) reached, there might be a problem with the settings."
+      echo "This might happen when the value of a variable changes at each loop."
     fi
+  else
+    echo " USAGE:"
+    echo "     . settings apply variableName"
+    echo " ex: . settings apply master"
+  fi
 }
 
 function settings_fix(){
     if [ "${2:-undefined}" == "undefined" ]; then
+      echo ""
       echo "Applying all suggested changes."
       for var in ${!_rel_*}
       do
@@ -354,7 +382,7 @@ function settings_fix(){
         [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
         if [ "${!setting}" != "${relativeValue}" ]; then
           echo "${setting}=\"${relativeValue}\""        
-          eval "echo ${setting}=\"${relativeValue}\""
+          eval "${setting}=\"${relativeValue}\""
         fi
       done
     else
