@@ -31,7 +31,7 @@
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
 [ -z "${_rel_excludesFile}"	] && _rel_excludesFile='echo ${runFolder}/excludes'
 [ -z "${scenes_exclude}" 	] && scenes_exclude=() 	#Empty array... 
-[ -z "${scenes_include}" 	] && scenes_include=( `ls -d ${dataFolder}/* 2>/dev/null | awk -F/ '{print $NF}'` )  #List of folders in dataFolder.
+[ -z "${scenes_include}" 	] && scenes_include=( `ls -F ${dataFolder}/  2>/dev/null | grep "/" | tr -d "/"` )  #List of folders in dataFolder.
 [ -z "${dataFile}" 		] && dataFile="DAT_01.001"    # slc data filename can be a regexp (dat.*, *.slc)
 [ -z "${leaderFile}"		] && leaderFile=LEA_01.001  # slc leaderfilename can be a regexp
 [ -z "${volumeFile}"		] && volumeFile=VDF_DAT.001 # slc volume filename can use regexp (vdf*)

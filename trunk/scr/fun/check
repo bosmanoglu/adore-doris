@@ -91,8 +91,8 @@ case "${1}" in
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3
     alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
-    [ -d "${m_orb_dir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
-    [ ! -d "${m_orb_dir}" ] && echo "Error 3: Input error... m_orb_dir" && return 3
+    [ -d "${m_orbdir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -d "${m_orbdir}" ] && echo "Error 3: Input error... m_orbdir" && return 3
     return ${alreadyProcessed}
   ;;
   "m_crop")
@@ -155,8 +155,8 @@ case "${1}" in
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
     alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
-    [ -d "${s_orb_dir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
-    [ ! -d "${s_orb_dir}" ] && echo "Error 3: Input error... s_orb_dir" && return 3
+    [ -d "${s_orbdir}" ]  && [ "${alreadyProcessed}" -eq 0 ] && return 0
+    [ ! -d "${s_orbdir}" ] && echo "Error 3: Input error... s_orbdir" && return 3
     return ${alreadyProcessed}
   ;;
   "s_crop")

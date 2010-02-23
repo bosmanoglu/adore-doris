@@ -27,7 +27,7 @@
 #
 
 function all_scenes(){
-  ls -d ${dataFolder}/* 2>/dev/null | awk -F/ '{print $NF}'
+  ls -F ${dataFolder}/ 2>/dev/null| grep "/"| tr -d "/"
 }
 
 function scenes_exclude(){
