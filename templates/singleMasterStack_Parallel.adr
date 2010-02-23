@@ -1,14 +1,22 @@
 #!/bin/bash
 
-function checkAndProcess(){
-  if check -p ${1} 
-  then  
-    bold "Working in $PWD"
-    bold "p ${1}"
-    p ${1}
-  else    
-    return 1;
-  fi
+function parallelProcess(){
+# $1:outputFolder
+# $2:adore command
+# expects settings to be at outputFolder/settings.set
+cat >${1}/batch.sh<<_EOFFILE
+#! /bin/csh
+ #PBS -N parallelJob
+ #PBS -l nodes=1
+ #PBS -q batch
+ #PBS -V
+ #PBS -l walltime=5:00:00
+ cd ${1}
+ ${ADORESCR}/adore -u "${1}/settings.set" "${2}"
+_EOFFILE
+
+#submit the job to the que
+qsub ${1}/batch.sh
 }
 
 # we will be changing directories
@@ -27,13 +35,18 @@ do
      cd "${outputFolder}"    
      settings save
 
-     #see function checkAndProcess above...
-     checkAndProcess s_readfiles    
-     checkAndProcess s_porbits
-     checkAndProcess s_crop
-     checkAndProcess s_ovs
+     parallelProcess "${outputFolder}" "s_readfiles;s_porbits;s_crop;s_ovs"
      
-     sleep 2 #pause two seconds to allow user interrupts
+done
+
+while [ 1 ];
+do
+  #wait until last submitted job creates the ovs file. 
+  if [ -e "${outputFolder}/${slave}.ovs" ]; then
+    break;
+  else
+    sleep 10
+  fi
 done
 
 ####Now the i12s
@@ -53,20 +66,10 @@ do
      cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
      cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
 
-     checkAndProcess coarseorb
-     checkAndProcess coarsecorr
-     checkAndProcess fine
-     checkAndProcess coregpm
-     checkAndProcess resample
-     checkAndProcess interfero
-     checkAndProcess comprefpha
-     checkAndProcess subtrrefpha
-
-     sleep 2 #pause two seconds to allow user interrupts
+     parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha"
 done
 
 
 #go back to where we started
 cd ${CALLDIR}
 
-return 0
