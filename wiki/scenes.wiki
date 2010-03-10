@@ -1,5 +1,5 @@
 #summary Include and exclude scenes from processing.
-#labels Phase-Support,scenes
+#labels Phase-Support,Help
 
 =USAGE:=
 	scenes 
