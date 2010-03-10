@@ -1,0 +1,43 @@
+#summary CHECK
+#labels Phase-Support,Help
+
+=USAGE:=
+	check
+	check resultFile
+
+=DESCRIPTION:=
+ CHECK is an internal ADORE command. 
+
+ It shows the process control list from the result files.
+
+=INPUT:=
+ No required inputs.
+  
+  Optional:
+    resultFile: If specified, only displays given files process control list.
+ 
+=OUTPUT:=
+ Shows the process control list of given result file.
+
+=Example:=
+{{{
+ADORE: check
+INTERFEROGRAM: 			MASTER: 			SLAVE: 		
+coarse_orbits:		1	readfiles:		1	readfiles:		1
+coarse_correl:		1	precise_orbits:		1	precise_orbits:		1
+fine_coreg:		1	crop:			1	crop:			1
+timing_error:		0	sim_amplitude:		0	sim_amplitude:		0
+dem_assist:		0	master_timing:		0	master_timing:		0
+comp_coregpm:		1	oversample:		1	oversample:		1
+interfero:		1	resample:		0	resample:		1
+coherence:		0	filt_azi:		0	filt_azi:		0
+comp_refphase:		1	filt_range:		0	filt_range:		0
+subtr_refphase:		1		
+comp_refdem:		0		
+subtr_refdem:		0		
+filtphase:		0		
+unwrap:			0		
+slant2h:		0		
+geocoding:		0		
+dinsar:			0
+}}}
