@@ -1,0 +1,63 @@
+#!/bin/bash
+
+
+function writePsiInputFile(){
+
+#set output file name.
+local outputFile=${1:-psi_input.txt}
+local srpd=${2:-srp}
+
+if [ -f ${outputFile} ] && [ ${overwrite} == "on" ]; then
+  rm -rf ${outputFile}
+elif [ -f ${outputFile} ] && [ ${overwrite} == "off" ]; then
+  if ask "Shall I delete the old ${outputFile}?"
+    then
+      rm -rf ${outputFile}
+  else
+      return
+  fi
+fi
+
+local scene
+for scene in ${scenes_include[*]}
+do
+   if [ "${master}" == "${scene}" ]; then
+     #date_master=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}.res readfiles "First_pixel_azimuth_time (UTC):" | awk '{printf($1)}'`
+     #Bperp=0
+     #Btemp=0
+     ## We do not have this file skip... slcrsmp=${cropsFolder}/${master}/${master}.
+     #interf=dummy
+     #h2ph=dummy
+     #atmo=dummy
+     #doppler_master=0
+     #also set l0, lN, p0, pN
+     #master_dummy=echo "${master} ${date_master} ${slcrsmp} ${interf} ${h2ph} ${atmo} ${Bperp} ${Btemp} ${doppler_master} ${l0} ${lN} ${p0} ${pN}" >> ${outputFile}
+     echo "Skipping master-master pair..."
+     continue
+   else
+     date_master=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}.res readfiles "First_pixel_azimuth_time (UTC):" | awk '{printf($1)}'`
+     date_slave=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res readfiles "First_pixel_azimuth_time (UTC):" | awk '{printf($1)}'`
+     doppler_master=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}.res readfiles "DC_const"`
+     doppler_slave=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res readfiles "DC_const"`
+     #doppler_diff_abs=`echo ${doppler_master} ${doppler_slave} | awk 'function abs(x){return x<0 ? -x : x};{printf("%0.2f", abs($1-$2) )}'`
+     doppler_diff_orig=`echo ${doppler_master} ${doppler_slave} | awk '{printf("%0.2f", $1-$2 )}'`
+     Bperp=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}_${scene}.res coarse_orbits "Bperp"`
+     Btemp=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}_${scene}.res coarse_orbits "Btemp"`
+     slcrsmp=${i12sFolder}/${master}_${scene}/${scene}.rs
+     interf=${i12sFolder}/${master}_${scene}/${master}_${scene}.${srpd}
+     h2ph=${i12sFolder}/${master}_${scene}/${master}_${scene}.${srpd}h2ph
+     atmo=${i12sFolder}/${master}_${scene} # dummy
+     l0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "First_line (w.r.t. original_master)"`
+     lN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "Last_line (w.r.t. original_master)"`
+     p0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "First_pixel (w.r.t. original_master)"`
+     pN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "Last_pixel (w.r.t. original_master)"`
+     echo ${scene} ${date_slave} ${slcrsmp} ${interf} ${h2ph} ${atmo} ${Bperp} ${Btemp} ${doppler_diff_orig} ${l0} ${lN} ${p0} ${pN} >> ${outputFile}
+     bold " ${master}_${scene}: OK"
+   fi
+done
+} #end function writePsiInputFile
+########## Main Function
+# We run scripts with p so shift once. 
+shift 
+writePsiInputFile "${@}"
+
