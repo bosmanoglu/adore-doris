@@ -1,11 +1,10 @@
 #summary How to install ADORE on Ubuntu.
 #labels Phase-Deploy
 
-= Introduction =
-
-ADORE consists of bash shell scripts and has a simple setup. There are some prerequisite 
-
 = Installation =
+
+ADORE consists of bash shell scripts and has a simple setup.  
+
 ADORE-DORIS installation consists of three steps. 
   * Dependencies: Installation of dependencies.
   * SVN-Checkout: Checking out latest ADORE-DORIS from the svn. See instructions at: http://code.google.com/p/adore-doris/source/checkout
