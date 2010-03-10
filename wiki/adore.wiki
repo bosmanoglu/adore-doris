@@ -1,4 +1,4 @@
-#summary ADORE
+#summary command help: ADORE
 #labels Phase-Support
 
 = USAGE: =
