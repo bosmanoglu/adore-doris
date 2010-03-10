@@ -1,5 +1,5 @@
 #summary ADORE has a built-in help feature. This page displays of some of the help features.
-#labels Phase-Support
+#labels Phase-Support,Deprecated
 
 = Introduction =
 
