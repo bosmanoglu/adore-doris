@@ -1,4 +1,5 @@
 #summary singleMasterStack.adr
+#labels Phase-Support,Help
 
 =USAGE:=
 {{{      p singleMasterStack.adr }}}
