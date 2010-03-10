@@ -62,6 +62,7 @@ for ((k=1; k<$OPTIND; k++ ))
 do
   shift
 done  
+unset flag OPTARG OPTIND
 # now I can assign values to the leftover parameters. 
 adoreCommand=$1
 dorisProcess=$p

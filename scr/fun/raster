@@ -23,7 +23,7 @@
 #
 #  dorisStep
 #       The step for the output. lsprocess can be used to 
-#       get a list of doris processes.
+#       get a list of doris processes. 
 #       The step can be in the master, slave or interferogram result file.
 # 
 #  dorisStep:filename 
@@ -33,16 +33,21 @@
 #  Optional:
 #	cpxfiddleOptions
 #           These options are passed to cpxfiddle. 
-#	    Some options can not be specified for certain outputs.
-#	    Default options are shown in paranthesis.
-#		for amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
-#		for phase images:     -w -f -q -o (sunraster) -c (jet)
-#		for mixed images:     -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
+#	    User options supersede default options (see below).
+#	    Default values for w,f are read from result file. 
+# 	    Default value for q is defined by output type (amplitude, phase, mixed).
+#	    Other default options are shown in paranthesis. 
+#		for complex amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
+#		for real amplitude images:    -w -f -q -o (sunraster) -c (gray)
+#		for phase images:             -w -f -q -o (sunraster) -c (jet)
+#		for mixed images:             -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
 #
 # OUTPUT:
-#   Default raster format is set to "sunraster". If you prefer a different kind of output
-#   RASTER can convert the image using imagemagick "convert" tool. The format for the output
-#   is defined in the "raster_format" variable.
+#   Default raster format is set to "sunraster". 
+#   raster_format:
+#     If you prefer a different kind of output  RASTER can convert 
+#     the image using imagemagick "convert" tool. The format for the output
+#     is defined in the "raster_format" variable.
 #
 #   Raster image in the following naming convention:
 #	a: A_filename.ras
@@ -73,7 +78,9 @@ function convert_raster(){
 local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
+local w f e q o c inArg parE parQ parO parC parS flag OPTIND OPTARG
 ###### GET INPUT OPTIONS
+inArg=( ${@} ); #save input arguements for getopts.
 if [ $# -gt 2 ]; then
     generate=${1};shift
     dorisStep=${1};shift
@@ -87,12 +94,30 @@ else
   return
 fi
 
-
+if [ ! -z "${remainder}" ]; then
+  #get options changing the default
+  while getopts "w:f:e:q:o:c:s:" flag "${@}"
+  do
+    #echo "flag=${flag} optin=${OPTIND} optarg=${OPTARG}"
+    # assign value to variables w f e q o c s
+    if [ "${flag}" == "?" ]; then
+      continue;
+    else
+      eval ${flag}=${OPTARG}
+      paramInd=$(( ${OPTIND}-1 ));
+      unset inArg[${paramInd}]
+      unset inArg[${OPTIND}]
+    fi
+  done
+  remainder=${inArg[@]:2};
+fi
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
 if [ -z ${generateCheck} ]; then
-  echo "I'll pass these options to cpxfiddle: ${remainder}"
+  if [ "${remainder:-undef}" != "undef" ]; then
+    echo "I'll pass these options to cpxfiddle: ..${remainder}.."
+  fi
 else
   echo "I can only create phase(p), amplitude(a) or mixed(m) images."
   echo "You provided some extra options: ${generateCheck}"
@@ -101,7 +126,7 @@ fi
 
 #check if filename is specified with dorisStep
 if [[ "${dorisStep}" == *:* ]]; then
-  inputFileName=${dorisStep#*:}
+  inputFileName=`eval echo ${dorisStep#*:}`
   dorisStep=${dorisStep%:*}
   [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
 fi
@@ -141,6 +166,16 @@ fi
 #readRes.sh ${resultFile} ${dorisStep} Data_output_file notify
 
 call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
+# if not empty and different from read value. 
+if [ ! -z ${w} ] && [ "${w}" != "${width}" ]; then
+  echo "Overwriting width(${width}) with user specified value: ${w}"
+  width=${width};
+fi  
+if [ ! -z ${f} ] && [ "${f}" != "${format}" ]; then
+  echo "Overwriting format(${format}) with user specified value: ${f}"
+  format=${f};
+fi  
+
 ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
 #inputfile=${resultFile}
 #section=${dorisStep}
@@ -209,20 +244,34 @@ outName=`basename ${fileName}| tr '.' '_'`
 #echo Outname  ..${outName}..
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then
-    cpxfiddle -w ${width} -f ${format} -e 0.5 -q normal -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+    #No log scaling if not complex. 
+    [ -z "${q}" ] && parQ="normal"    || parQ=${q}
+    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    [ -z "${c}" ] && parC="gray"      || parC=${c}
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
     convert_raster A_${outName}
   else
-    cpxfiddle -w ${width} -f ${format} -e 0.5 -q mag  -o sunraster -c gray ${remainder} ${fileName} > A_${outName}.ras
+    [ -z "${q}" ] && parQ="mag"       || parQ=${q}
+    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    [ -z "${c}" ] && parC="gray"      || parC=${c}
+    [ -z "${e}" ] && parE="0.5"       || parE=${e}
+    cpxfiddle -w ${width} -f ${format} -e ${e} -q ${parQ}  -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
     convert_raster A_${outName}
   fi
   echo "Name of rasterfile: A_${outName}.${raster_format}"
 fi
 if [[ "${generate}" == *p* ]]; then
   if [[ ${#format} -eq 2 ]];then
-    cpxfiddle -w ${width} -f ${format} -q normal -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+    [ -z "${q}" ] && parQ="normal"    || parQ=${q}
+    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    [ -z "${c}" ] && parC="jet"       || parC=${c}
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > P_${outName}.ras
     convert_raster P_${outName}
   else
-    cpxfiddle -w ${width} -f ${format} -q phase  -o sunraster -c jet ${remainder} ${fileName} > P_${outName}.ras
+    [ -z "${q}" ] && parQ="phase"     || parQ=${q}
+    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    [ -z "${c}" ] && parC="jet"       || parC=${c}  
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > P_${outName}.ras
     convert_raster P_${outName}
   fi
   echo "Name of rasterfile: P_${outName}.${raster_format}"    
@@ -231,7 +280,12 @@ if [[ "${generate}" == *m* ]]; then
   if [[ ${#format} -eq 2 ]];then
     echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
   else
-    cpxfiddle -w ${width} -f ${format} -e 0.5 -s 1.2 -o sunraster -c jet ${remainder} ${fileName} > M_${outName}.ras
+    [ -z "${q}" ] && parQ="mixed"     || parQ=${q}
+    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    [ -z "${c}" ] && parC="gray"      || parC=${c}
+    [ -z "${e}" ] && parE="0.5"       || parE=${e}
+    [ -z "${s}" ] && parS="1.2"       || parS=${s}
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -e ${parE} -s ${parS} -o ${parO} -c ${parC} ${remainder} ${fileName} > M_${outName}.ras
     convert_raster M_${outName}
   fi
   echo "Name of rasterfile: M_${outName}.${raster_format}"    

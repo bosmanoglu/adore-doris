@@ -214,6 +214,8 @@ function h(){
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
   elif [ -e "${ADORESCR}/fun/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
+  elif [ -e "${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${1}
   else
     echo "Unknown ADORE command: ${1}"
     echo 'You can get a list of ADORE commands with the command: ?'
