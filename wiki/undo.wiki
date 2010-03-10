@@ -1,0 +1,33 @@
+#summary UNDO DORIS step.
+#labels Phase-Support,Help
+
+=USAGE:=
+{{{
+	undo processName [fileName]
+	undo processName
+	undo only processName
+}}}
+=DESCRIPTION:=
+ UNDO is an internal ADORE command. 
+
+ It removes the given processName from the result files.   
+
+=INPUT:=
+ only: if specified undo removes only a single step and keep 
+   the information for the following steps. Use with caution.
+
+ processName: Doris step to be deleted from the resultfile.
+ 
+ ==Optional:==
+   fileName: If omitted undo will try to remove the given DORIS step from master, slave and interferograms result files.    
+     If specified undo will only remove steps from the given file.
+
+=OUTPUT:=
+ Undo Successful: if doris step was found and removed.
+
+=Example:=
+{{{
+ADORE: undo only s_crop
+  crop found at 154 in 050507.res
+  Undo Successful.
+}}}
