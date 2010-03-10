@@ -26,14 +26,14 @@
    will list the current settings as seen by ADORE.
 
  `settings apply [-r] variableName`: 
-  updates settings that depend on variableName. By default this is not done in a recursive way. Use [check] for possible mismatches. Recursive checks can be specified using -r option.
+  updates settings that depend on variableName. By default this is not done in a recursive way. Use `settings check` for possible mismatches. Recursive checks can be specified using -r option.
   Settings apply can also assign values usign the variableName=value syntax. 
 
  `settings check`: 
    looks for differences between ADORE's expectations and current values. Handy for finding errors due to recursive dependancies.
 
  `settings fix`:
-   after "settings check"ing you can accept suggested changes using the variables. Settings check will display a reference line.
+   after `settings check`ing you can accept suggested changes using the variables. `settings check` will display a reference line.
 
  `settings raw`:
    displays the unprocessed settings with USERS	changes. This can be saved with the save function.
