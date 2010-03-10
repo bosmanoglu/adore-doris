@@ -1,5 +1,5 @@
-#summary command help: ADORE
-#labels Phase-Support
+#summary ADORE
+#labels Phase-Support,Help
 
 = USAGE: =
 {{{
