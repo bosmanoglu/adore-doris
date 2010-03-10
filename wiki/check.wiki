@@ -40,4 +40,17 @@ unwrap:			0
 slant2h:		0		
 geocoding:		0		
 dinsar:			0
+
+ADORE: check 050507.res
+050507.res:
+readfiles:		1
+precise_orbits:		1
+crop:			1
+sim_amplitude:		0
+master_timing:		0
+oversample:		1
+resample:		1
+filt_azi:		0
+filt_range:		0
+
 }}}
