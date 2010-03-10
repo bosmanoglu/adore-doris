@@ -18,16 +18,17 @@
 # ******ADORE Commands******
 # ?		: Help
 # check		: Check completed steps in result file.
+# dem 		: Create, load and check dem
+# dem2slant2h	: Create DORIS slant2h output from comprefdem.
 # initialize	: Initialize default settings.
 # lsprocess	: list DORIS processes
-# pn2rs		: convert Process Name to Result file Section title.
+# mask		: Mask DORIS file using snaphu output. 
 # p		: Process DORIS step.
-# s		: Show the input file for the DORIS step.
+# pn2rs		: convert Process Name to Result file Section title.
 # raster		: Create raster image from doris result.
+# s		: Show the input file for the DORIS step.
+# saveas 	: Export DORIS results to a different format.
+# scenes 	: Include and exclude scenes from processing. 
 # settings	: Utility for listing, saving and loading ADORE variables.
 # undo		: Undo all processing after a given step.
-#
-# ******ADORE Batch Processes******
-# singleMasterStack	: Script to process multiple interferograms with a single master.
-#
 

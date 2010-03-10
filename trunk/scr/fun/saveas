@@ -138,7 +138,7 @@ function saveas_arcgis_gdal(){
   local inc_angle radar_band_width
  
   if [ ${2:-undefined} == "undefined" ]; then
-    generate="a"; echo "You only specified one parameter. I'm assuming you wanted (p)phase output."
+    generate="p"; echo "You only specified one parameter. I'm assuming you wanted (p)phase output."
     dorisStep=${1}
   else
     generate=${1}

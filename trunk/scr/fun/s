@@ -6,7 +6,8 @@
 #
 # DESCRIPTION:
 #  s is a builtin ADORE command.  
-#  It shows the input file for the given DORIS processing step.   
+#  It can show the input file for the given DORIS processing step. It can 
+#  also be used to display ADORE variables.
 #
 # INPUT:
 #  dorisProcess: Name of the DORIS processing step to run. List of available
