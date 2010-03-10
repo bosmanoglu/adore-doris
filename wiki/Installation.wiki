@@ -1,11 +1,22 @@
 #summary How to install ADORE on Ubuntu.
+#labels Phase-Deploy
 
 = Introduction =
 
 ADORE consists of bash shell scripts and has a simple setup. There are some prerequisite 
 
+= Installation =
+ADORE-DORIS installation consists of three steps. 
+  * Dependencies: Installation of dependencies.
+  * SVN-Checkout: Checking out latest ADORE-DORIS from the svn. See instructions at: http://code.google.com/p/adore-doris/source/checkout
+  * Setup: Setting your path to point to ADORE-DORIS executables (scr) directory.
+
+
+== Dependencies ==
+
+*Bold* text indicates packages are required for ADORE-DORIS to have some functionality. Optional packages are indicated by _italics_ and they expand the capabilities of ADORE-DORIS. Missing optional packages might cause error messages if a dependent command is issued (for example, if you do not have GDAL and use SAVEAS). 
+
 Code blocks such as {{{ code-block }}} show the command line to install required packages on Ubuntu systems. 
-= Details =
 
  ADORE requires the following packages to be installed on your system:
   * *TU-DELFT DORIS* http://enterprise.lr.tudelft.nl/doris/
@@ -13,7 +24,17 @@ TU-DELFT DORIS is used for all interferometric processing.
   * *GMT* http://gmt.soest.hawaii.edu/ {{{sudo apt-get install gmt}}}
 GMT is required for TU-DELFT DORIS and ADORE-DORIS uses it in MASK and SAVEAS commands.
   * _GNUPLOT_ {{{sudo apt-get install gnuplot}}}
-  * _Image-Magick_ {{{ sudo apt-get install imagemagick }}}
-Image-Magick is optional, it allows RASTER command to convert images from sun-raster format to supported formats (png, jpg, etc.). 
+    * GNUPLOT is used after the BASELINES command to create a post-script (PS) image of the temporal and perpendicular baselines.
+  * _Image-Magick_ {{{sudo apt-get install imagemagick }}}
+    * Image-Magick is optional, it allows RASTER command to convert images from sun-raster format to supported formats (png, jpg, etc.). 
   * _GDAL_ {{{sudo apt-get install gdal-bin}}}
-GDAL is optional, it allows ADORE-DORIS outputs to be exported to ArcGIS via SAVEAS command.
+    * GDAL is optional, it allows ADORE-DORIS outputs to be exported to ArcGIS via SAVEAS command.
+
+
+== Setup ==
+ADORE-DORIS scripts folder needs to be in your environment PATH. You can do this in ubuntu systems by adding the following lines to the end of your ~/.bashrc file. 
+
+{{{ 
+export ADORESCR=/path/to/adore-doris/scr
+export PATH=${PATH}:${ADORESCR}
+}}}
