@@ -1,0 +1,23 @@
+#summary Export DORIS results to a different format.
+#labels Phase-Support,Help
+
+=USAGE:=
+{{{
+	saveas exportFormat [optionalParameters] processName
+}}}
+
+=DESCRIPTION:=
+ SAVEAS is an internal ADORE command. <br>
+ It prepares DORIS results so that they can be opened by other programs. <br>
+ Currently ENVI and ArcGIS are supported. 
+
+=INPUT:=
+ exportFormat: envi or arcgis. 
+ processName: Doris step to be exported.
+ 
+ ==Optional:==
+   saveas arcgis [a|p|m] processName
+	arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed). If not specified p(phase) is assumed. This can be used to export amplitude data as well if you do not want to rescale the amplitude values. 
+
+=OUTPUT:=
+ Generates an HDR file with the same name as the output file of the requested doris step (processName).
