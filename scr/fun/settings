@@ -3,7 +3,7 @@
 #	settings option [argument]
 #	settings
 #	settings apply variableName
-#	settings apply variableName1=variableValue1 [variableName2 variableName3=...]
+#	settings apply [-r] variableName1=variableValue1 [variableName2 variableName3=...]
 #	settings check
 #	settings fix
 #	settings raw
@@ -20,11 +20,11 @@
 # INPUT:
 #  settings: will list the current settings as seen by ADORE.
 #
-#  settings apply variableName: updates settings that depend on
-#	variableName. This is not done in a recursive way. Use check
-#	for possible mismatches.
-#  	  Settings apply can also assign values usign the variableName=value
-#       syntax. 
+#  settings apply [-r] variableName: updates settings that depend on
+#	variableName. By default this is not done in a recursive way. Use 
+#       'settings check' for possible mismatches. Recursive checks can be 
+# 	specified using -r option. Settings apply can also assign values 
+#       using the variableName=value syntax. 
 #
 #  settings check: looks for differences between ADORE's 
 #	expectations and current values. Handy for finding 
