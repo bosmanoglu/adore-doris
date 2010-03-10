@@ -2,12 +2,15 @@
 # USAGE:
 #	undo processName [fileName]
 #	undo processName
+# 	undo only processName
 #
 # DESCRIPTION:
 #  UNDO is an internal ADORE command. It removes the 
 #  given processName from the result files.   
 #
 # INPUT:
+#  only: if specified undo removes only a single step and keep 
+#    the information for the following steps. Use with caution.
 #  processName: Doris step to be deleted from the resultfile.
 #  
 #  Optional:
@@ -16,9 +19,12 @@
 #      If specified undo will only remove steps from the given file.
 #
 # OUTPUT:
-#  Undo Successful: if doris step was found and removed.
+#  Undo Successful: if DORIS step was found and removed.
 #  
-#
+
+# Updates:
+# Modifed 2010-03-10 Added ONLY option to remove a single process.
+# 
 
 dorisProcessReset()
 {
@@ -33,29 +39,44 @@ dorisProcessReset()
 ##
 ## reset doris steps in the result files,
 ## up to the processing step you want
- 
+##
+    
  lineno=$(awk '/_Start_'$1'/{print NR-1}' $2);  # get me the line number of the process line - 1
+ 
  if [ "$lineno" != "" ]; then 
    echo "  ${1} found at ${lineno} in ${2}"
-   sed -i -e '/^'$1'/,/End_process_control/s/1/0/g' -e ''${lineno}',$ d' $2
-   [ $? -eq 0 ] && echo "  Undo Successful."
+   if [ ${3} == "only" ]; then
+     linenoEnd=$(awk '/End_'$1'/{print NR+1}' $2);  #get the line number for the end of step.
+     sed -i -e '/^'$1'/s/1/0/g' -e ''${lineno},${linenoEnd}' d' $2
+     [ $? -eq 0 ] && echo "  Undo Successful."
+   else
+     sed -i -e '/^'$1'/,/End_process_control/s/1/0/g' -e ''${lineno}',$ d' $2
+     [ $? -eq 0 ] && echo "  Undo Successful."
+   fi
  else
    echo "  ${1} not found in ${2}. This might not be important."
  fi
 }
 
-unset dorisStep
+local dorisStep only
+if [ "${1}" == "only" ];then
+  shift
+  only="only"
+else
+  only=""
+fi
+
 dorisStep=`pn2rs ${1}`
 
 if [ "${2-undefined}" != "undefined" ]; then
-  dorisProcessReset ${dorisStep} ${2}
+  dorisProcessReset ${dorisStep} ${2} ${only}
 elif [[ "${1}" == m_* ]]; then
-  dorisProcessReset ${dorisStep} ${m_resfile};
+  dorisProcessReset ${dorisStep} ${m_resfile} ${only};
 elif [[ "${1}" == s_* ]]; then
-  dorisProcessReset ${dorisStep} ${s_resfile}; 
+  dorisProcessReset ${dorisStep} ${s_resfile} ${only}; 
 else
-  dorisProcessReset ${dorisStep} ${m_resfile}
-  dorisProcessReset ${dorisStep} ${s_resfile}
-  dorisProcessReset ${dorisStep} ${i_resfile}
+  dorisProcessReset ${dorisStep} ${m_resfile} ${only}
+  dorisProcessReset ${dorisStep} ${s_resfile} ${only}
+  dorisProcessReset ${dorisStep} ${i_resfile} ${only}
 fi
 

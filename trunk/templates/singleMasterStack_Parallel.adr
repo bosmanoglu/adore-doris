@@ -17,6 +17,7 @@
 #  It runs the following DORIS steps:
 #    For crops: s_readfiles, s_porbits, s_crop, s_ovs 
 #    For i12s: coarseorb, coarsecorr, fine, coregpm, coregpm, resample, interfero, comprefpha, subtrrefpha
+#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
 #
 
 function parallelProcess(){
@@ -85,7 +86,7 @@ do
      cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
      cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
 
-     parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha"
+     parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;raster a resample -M1/5;raster p subtrrefpha -M1/5"
 done
 
 
