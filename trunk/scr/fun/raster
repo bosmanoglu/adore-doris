@@ -254,7 +254,7 @@ if [[ "${generate}" == *a* ]]; then
     [ -z "${o}" ] && parO="sunraster" || parO=${o}
     [ -z "${c}" ] && parC="gray"      || parC=${c}
     [ -z "${e}" ] && parE="0.5"       || parE=${e}
-    cpxfiddle -w ${width} -f ${format} -e ${e} -q ${parQ}  -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -e ${parE} -q ${parQ}  -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
     convert_raster A_${outName}
   fi
   echo "Name of rasterfile: A_${outName}.${raster_format}"
