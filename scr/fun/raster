@@ -93,7 +93,6 @@ else
   echo "Please check usage by: ? raster"
   return
 fi
-
 if [ ! -z "${remainder}" ]; then
   #get options changing the default
   while getopts "w:f:e:q:o:c:s:" flag "${@}"
