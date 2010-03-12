@@ -11,7 +11,7 @@ function dorisProcess2OutputFile(){
   local parameter=${2:-Data_output_file} #search parameter
   local grepM grepS grepI resfile firstPixel lastPixel numpixels multilookfactorPixels
   local firstLine lastLine numlines multilookfactorLines inputfile section notify grepStart grepEnd grepLength
-  local numHits matchingLine result format filename
+  local numHits matchingLine result format filename c
   #find which resfile to read.
   if [[ ${dorisStep} == m_* ]]; then
     dorisStep=`pn2rs ${dorisStep}`
