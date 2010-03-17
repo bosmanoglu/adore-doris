@@ -1,0 +1,33 @@
+#summary case insensitive string comparison function
+#labels Phase-Implementation,Function
+
+= strcmpi =
+
+strcmpi is an ADORE function. It may help ADORE users in writing their own ADORE scripts.
+
+It compares two strings inside ADORE in a case-insensitive fashion.
+
+==Usage==
+`strcmpi string1 string2`
+
+==Examples==
+{{{
+ADORE: strcmpi "adore" "ADORE" && echo "same" || echo "not same"
+same
+ADORE: strcmpi "ADORE" "ADORE" && echo "same" || echo "not same"
+same
+ADORE: strcmpi "ADORE1" "ADORE2" && echo "same" || echo "not same"
+not same
+}}}
+
+==Implementation==
+{{{
+function strcmpi()          # See "settings save" for example of use.
+{
+  if [ `echo ${1} | tr [:upper:] [:lower:]` == `echo ${2} | tr [:upper:]
+    return 0;
+  else
+    return 1;
+  fi
+}
+}}}
