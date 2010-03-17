@@ -97,8 +97,6 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   [ -e "/etc/bash_completion" ] && source /etc/bash_completion
   [ -e "${ADOREFOLDER}/scr/.inputrc" ] && source ${ADOREFOLDER}/scr/.inputrc
 
-  #trap ctrl-c and call ctrl_c()
-  trap ctrl_c 2 # ctrl+c=sigint 2
   
   history -r ${adoreHistoryFile}
   while [ 1 ]; do
@@ -124,6 +122,11 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
         eval ${command}
         ;;
     esac
+    #I'm placing the trap counter in the loop
+    #so that if a script changes the trap, when
+    #we are back to adore it goes back to ADORE's trap.
+    #trap ctrl-c and call ctrl_c()
+    trap ctrl_c 2 # ctrl+c=sigint 2
   done
 fi
 

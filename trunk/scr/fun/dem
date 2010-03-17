@@ -78,7 +78,7 @@ function makeSrtmDem(){
   construct_dem.sh ${name} ${dem_area} ${srtm}
   ## modify settings
   settings_file="${name}/input.doris_${name}"
-  updateDEMsettings ${settings_file}
+  updateSrtmDemsettings ${settings_file}
 }
 
 function updateSrtmDemsettings(){
@@ -151,7 +151,7 @@ function checkDem(){
   [ ! -e "${sam_in_dem}" ] && everythingOK=1;
   [ ! -e "${dac_in_dem}" ] && everythingOK=2;
   [ ! -e "${crd_in_dem}" ] && everythingOK=3;
-  if [ ${everythingOK} ]; then
+  if [ ${everythingOK} -ne 0 ]; then
     case ${everythingOK} in
     1)
       echo "Error: 1"
@@ -203,7 +203,7 @@ function main(){
       #read input settings 	
       if [ -e "${demFile}" ]; then
         if [[ "${demFile}" == *.dem* ]]; then
-          echo "You are using this SRTM DEM: ${sam_in_dem}"
+          echo "You are using this SRTM DEM: ${demFile}"
           #get input settings file.
           demPath=`dirname ${demFile}`
           demBasename=`basename ${demFile}`

@@ -60,6 +60,16 @@ function ask()          # See "settings save" for example of use.
   esac
 }
 
+function strcmpi()          # See "settings save" for example of use.
+{
+  if [ `echo ${1} | tr [:upper:] [:lower:]` == `echo ${2} | tr [:upper:] [:lower:]` ];then
+    return 0;
+  else
+    return 1;
+  fi  
+}
+
+
 function bold() 	#echo bold text.
 {
   echo -e "\033[1m${@}\033[0m"
@@ -101,16 +111,23 @@ function pp()
 function p()
 {
 #PROCESS
+  local fileName
   local dorisProcess=${1}
+  shift; #shift so that I can pass the remaining parameters.
   #if file is given with full path run that file.
   if [ -f "${dorisProcess}" ]; then
-  	. ${dorisProcess};
+  	. ${dorisProcess} ${@};
   #else check the scr/process to see if it is a process
   elif [ -f "${ADOREFOLDER}/scr/process/${dorisProcess}" ]; then
           . ${ADOREFOLDER}/scr/process/${dorisProcess}
   else
-  #else do default processing. Prepare drs file and run doris. 
-    if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+  # check path to see if we can find the file in the path
+    fileName=`find $P -name 'rs2pn' 2>/dev/null | head -n1`
+    if [ -f "${fileName}" ]; then
+      echo "Running: ${fileName} ${@}"
+      . ${fileName} ${@}
+    #else do default processing. Prepare drs file and run doris. 
+    elif [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
  #     rm -f ${outputFolder}/${dorisProcess}.drs
  #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
  #       newline=`eval echo -E ${line}`
