@@ -154,11 +154,16 @@ function settings_save(){
     dumpDefaultSettings ${tempFile}
     
     if [ -e "${saveFileName}" ]; then
-      if ask "Shall I delete the old ${saveFileName}?"
-        then 
-          rm  ${saveFileName}
+      if strcmpi "${overwrite}" "on"
+        then
+        rm  ${saveFileName}
       else
-        return
+        if ask "Shall I delete the old ${saveFileName}?"
+          then 
+            rm  ${saveFileName}
+        else
+          return
+        fi
       fi
     fi
     
@@ -323,12 +328,13 @@ function settings_apply(){
       #check if this parameter is an assignment statement
       inputPar="${!k}";
       if [[ "${inputPar}" == *=* ]]; then
-        #make the assignment
-        eval "${inputPar}"
         inputVar=${inputPar%%=*};
+        #make the assignment
+        eval ${inputVar}=\"${inputPar#*=}\"
       else
         inputVar=${inputPar};  
       fi
+      echo ${inputVar}=\"${!inputVar}\"
       #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
       #loop over _ref_variables. and check for changes.
       for var in ${!_rel_*}; do

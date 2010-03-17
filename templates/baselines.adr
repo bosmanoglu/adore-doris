@@ -1,0 +1,124 @@
+#!/bin/bash
+#
+# USAGE:
+#       p baselines.adr
+#
+# DESCRIPTION:
+#  baselines.adr is an ADORE script.  
+#  It generates a single master stack baseline information using the ADORE settings. 
+#
+# INPUT:
+#  There are no input parameters. 
+#  
+# OUTPUT:
+#  Creates ${projectFolder}/process/${runName}/baselines
+#  It runs the following DORIS steps:
+#    s_readfiles, s_porbits, coarseorb
+#  If GNUPLOT is installed it creates a baseline plot (eps).
+#  If IMAGEMAGICK is installed it converts the plot to a raster image.
+#
+
+function CTRL_C()
+{
+echo "Caught User-Interrupt!"
+echo "Setting back the old settings."
+echo "Note that slave is changed."
+echo "There might be some remaining files in ${outputFolder}"
+settings apply -r master=${stackMaster} outputFolder="."
+
+#go back to where we started
+cd ${CALLDIR}
+
+break
+}
+
+
+
+function checkAndProcess(){
+  if check -p ${1} 
+  then  
+    bold "Working in $PWD"
+    bold "p ${1}"
+    p ${1}
+  else    
+    return 1;
+  fi
+}
+
+  #trap ctrl-c and call ctrl_c()
+  trap CTRL_C 2 # ctrl+c=sigint 2
+
+
+# we will be changing directories
+# save the current dir.
+CALLDIR=$PWD;
+# DORIS does not allow master and slave to be the same. 
+# We assign master as dummy ans slave as the current scene.      
+stackMaster=${master};
+settings apply -r master="dummy"
+baselinesFolder=${runFolder}/baselines
+settings apply -r outputFolder="${baselinesFolder}"
+mkdir -p "${outputFolder}"
+cd "${outputFolder}"    
+settings save
+
+
+for scene in ${scenes_include[*]}
+do
+     bold "Processing ${scene}"
+     settings apply -r slave=${scene}
+
+     #see function checkAndProcess above...
+     checkAndProcess s_readfiles    
+     checkAndProcess s_porbits
+     
+     sleep 2 #pause two seconds to allow user interrupts
+done
+
+####Now the i12s
+#Set the stack master.
+settings apply -r master=${stackMaster}
+generateRandomString;	#used in plotting
+local tempFile=${randomString} #used in plotting
+echo ${master} > ${tempFile}_orbits.txt
+
+
+for scene in ${scenes_include[*]}
+do
+   if [ "${master}" == "${scene}" ]; then
+     continue
+   fi
+     bold "Processing ${master}_${scene}"
+     settings apply -r slave=${scene} outputFolder="${baselinesFolder}"
+     echo "${slave}" >> ${tempFile}_orbits.txt #used in plotting
+
+     checkAndProcess coarseorb
+
+     sleep 2 #pause two seconds to allow user interrupts
+done
+
+#### Generate Baselines Plot.
+echo "0" > ${tempFile}_perp.txt
+echo "0" > ${tempFile}_temp.txt
+grep Bperp ${outputFolder}/*_*.res | cut -d: -f3 | tr -s " "|cut -d" " -f2  >> ${tempFile}_perp.txt
+grep Btemp ${outputFolder}/*_*.res | cut -d: -f4 | tr -s " " |cut -d" " -f2 >> ${tempFile}_temp.txt
+paste ${tempFile}_temp.txt ${tempFile}_perp.txt ${tempFile}_orbits.txt > ${outputFolder}/baselines
+gnuplot_baseline ${outputFolder}/baselines
+if [ -e "${outputFolder}/baselines.eps" ]; then
+  echo "Temporal-Perpendicular baseline plot: ${outputFolder}/baselines.eps"
+  #try to convert to raster_format
+  convert "${outputFolder}/baselines.eps" "${outputFolder}/baselines.${raster_format}"
+  if [ $? -ne 0 ]; then
+    echo "Raster file created at: ${outputFolder}/baselines.${raster_format}"
+  fi
+else
+  echo "Could not create baseline plot (may be gnuplot is not available?)."
+  echo "List of baselines located at: ${outputFolder}/baselines" 
+fi
+rm -rf ${tempFile}_perp.txt ${tempFile}_temp.txt ${tempFile}_orbits.txt
+
+#go back to where we started
+cd ${CALLDIR}
+settings apply -r master=${stackMaster} outputFolder="."
+
+return 0

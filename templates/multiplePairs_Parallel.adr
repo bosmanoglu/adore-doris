@@ -1,0 +1,125 @@
+#!/bin/bash
+#
+# USAGE:
+#       p multiplePairs_Parallel.adr inputFile
+#
+# DESCRIPTION:
+#  multiplePairs_Parallel.adr is an ADORE script.  
+#  It generates several interferograms whose master and slave orbits are defined
+#  by the input file. 
+#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#
+# INPUT:
+#  inputFile: A comma-separated-value file where each line indicates an
+#    interferometric pair. First value defines the master and the second value defines the slave.
+#    As an example file should have this format:
+#    masterScene1,slaveScene1
+#    masterScene2,slaveScene2
+#    ...
+#  
+# OUTPUT:
+#  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
+#  It runs the following DORIS steps:
+#    For crops: s_readfiles, s_porbits, s_crop
+#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
+#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+#
+
+function CTRL_C(){
+bold "Caught user interrupt!"
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}
+return;
+}
+
+function parallelProcess(){
+# $1:outputFolder
+# $2:adore command
+# expects settings to be at outputFolder/settings.set
+cat >${1}/batch.sh<<_EOFFILE
+#! /bin/csh
+ #PBS -N parallelJob
+ #PBS -l nodes=1
+ #PBS -q batch
+ #PBS -V
+ #PBS -l walltime=5:00:00
+ cd ${1}
+ ${ADORESCR}/adore -u "${1}/settings.set" "${2}"
+_EOFFILE
+
+#submit the job to the que
+qsub ${1}/batch.sh
+}
+
+trap CTRL_C 2 #ctrl c is interrupt 2 
+
+local pairsFile=${1}
+
+# we will be changing directories
+# save the current dir.
+local CALLDIR=$PWD;
+
+generateRandomString
+local originalSettingsFile=${CALLDIR}/${randomString}.set
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+
+# DORIS does not allow master and slave to be the same. 
+# We assign master as dummy ans slave as the current scene.      
+settings apply -r master="dummy"
+
+#for scene in ${scenes_include[*]}
+for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+do
+     bold "Processing ${scene}"
+     settings apply -r slave=${scene} outputFolder="${cropsFolder}/${scene}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"    
+     settings save
+
+     parallelProcess "${outputFolder}" "s_readfiles;s_porbits;s_crop"
+     
+done
+
+while [ 1 ];
+do
+  #wait until last submitted job creates the ovs file. 
+  if [ -e "${outputFolder}/${slave}.crop" ]; then
+    sleep 10 #give some extra time just incase file is still being written.
+    break;
+  else
+    sleep 10
+  fi
+done
+
+####Now the i12s
+#Set the stack master.
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+for scenes in `cat ${pairsFile}`
+do
+   master=${scenes%%,*}
+   scene=${scenes#*,}   
+   if [ "${master}" == "${scene}" ]; then
+     continue
+   fi
+     bold "Processing ${master}_${scene}"
+     settings apply -r master=${master} slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"
+     settings save
+     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+
+     parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster a resample -M1/5;raster p subtrrefpha"
+done
+
+
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}
