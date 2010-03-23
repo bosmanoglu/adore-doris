@@ -22,11 +22,11 @@ ADORE requires the following packages to be installed on your system:
     TU-DELFT DORIS is used for all interferometric processing.
   * *GMT* http://gmt.soest.hawaii.edu/ {{{sudo apt-get install gmt}}}
     GMT is required for TU-DELFT DORIS and ADORE-DORIS uses it in MASK and SAVEAS commands.
-  * _GNUPLOT_ {{{sudo apt-get install gnuplot}}}
+  * _GNUPLOT_ http://www.gnuplot.info/ {{{sudo apt-get install gnuplot}}}
     GNUPLOT is used after the BASELINES command to create a post-script (PS) image of the temporal and perpendicular baselines.
-  * _Image-Magick_ {{{sudo apt-get install imagemagick }}}
+  * _Image-Magick_ http://www.imagemagick.org/ {{{sudo apt-get install imagemagick }}}
     Image-Magick is optional, it allows RASTER command to convert images from sun-raster format to supported formats (png, jpg, etc.). 
-  * _GDAL_ {{{sudo apt-get install gdal-bin}}}
+  * _GDAL_ http://www.gdal.org/ {{{sudo apt-get install gdal-bin}}}
     GDAL is optional, it allows ADORE-DORIS outputs to be exported to ArcGIS via SAVEAS command.
 
 
