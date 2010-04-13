@@ -15,7 +15,7 @@
 #  
 if [ -e "${u}" ]; then
   if [ -r "${u}" ]; then
-    u=`readlink -e ${u}`
+    u=`canonicalPath ${u}`
     echo "User Settings File: ${u}"
     source ${u} 					#load user project settings
   else
