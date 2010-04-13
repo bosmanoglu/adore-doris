@@ -92,6 +92,12 @@ function generateRandomString(){
   randomString=${randomString:1:8}; #get first 8 char
 }
 
+function canonicalPath(){
+  #from http://snipplr.com/view/18026/canonical-absolute-path/
+  echo $(cd $(dirname $1); pwd -P)/$(basename $1)
+}
+
+
 function pp()
 {
 #PREP, PRE-PROCESS
