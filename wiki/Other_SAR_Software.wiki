@@ -1,0 +1,23 @@
+#summary Links to other software for SAR processing.
+
+= Introduction =
+
+This is not an exhaustive list (yet). Please let me know if you know of a software that is not listed here. 
+
+= Software =
+
+===ROI-PAC===
+Repeat Orbit Interferometry PACkage by the Jet Propulsion Laboratory<br>
+ * roi-pac wiki: http://www.roipac.org/
+ * Open Channel Foundation for Download: http://www.openchannelfoundation.com/projects/ROI_PAC/index.html
+ * Wikipedia: http://en.wikipedia.org/wiki/ROI_PAC
+
+===RAT===
+Radar Tools by Berlin University of Technology<br>
+IDL virtual machine based SAR polarimetry and interferometry software
+  * Radar Tools Homepage: http://radartools.berlios.de/
+
+===IDIOT=== 
+INSAR DEFORMATION INSPECTION AND OBSERVATION TOOL by TU-Berlin<br>
+IDL virtual machine based SAR interferometry software for Envisat.
+  * IDIOT Homepage: http://srv-43-200.bv.tu-berlin.de/idiot/about.phtml
