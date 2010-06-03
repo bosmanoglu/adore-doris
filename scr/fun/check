@@ -2,20 +2,31 @@
 # USAGE:
 #	check
 #	check resultFile
+# 	check -p processName
 #
 # DESCRIPTION:
 #  CHECK is an internal ADORE command. 
 #  It shows the process control list from the result files.
+#
+#  Using the -p option it can be used to check whether a given step is possible
+#  to run. 
 #
 # INPUT:
 #  No required inputs.
 #   
 #   Optional:
 #     resultFile: If specified, only displays given files process control list.
-#  
+#
+#     -p processName: Check if ADORE can run the given doris process. This 
+#     function is currently under development. If no output is shown the it is
+#     OK to run the process. Otherwise error messages will hint at the problem.
+#
 # OUTPUT:
 #  Shows the process control list of given result file.
 #
+# Example:
+# check
+# check -p m_readfiles; echo $?
 
 function displayProcessControl(){
   local startline=`grep -n Start_process_control ${1} | cut -f1 -d":"`

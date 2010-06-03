@@ -39,17 +39,17 @@ local scene
 for scene in ${scenes_include[*]}
 do
    if [ "${master}" == "${scene}" ]; then
-     if [ ! -e ${i12sFolder}/${master}_${scene}/${master}.crop.cr4 ]; then 
+     if [ ! -e ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 ]; then 
        echo "Creating master_master folder: ${i12sFolder}/${master}_${scene}"
        mkdir -p ${i12sFolder}/${master}_${scene}
        cp ${cropsFolder}/${master}/${master}.res ${i12sFolder}/${master}_${scene}
        #convert from complex short to complex real. 
-       bkconvert ${cropsFolder}/${master}/${master}.crop ${i12sFolder}/${master}_${scene}/${master}.crop.cr4 2 4
+       bkconvert ${cropsFolder}/${master}/${master}.ovs ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 2 4
      fi  
      date_master=`readRes.sh ${cropsFolder}/${master}/${master}.res readfiles "First_pixel_azimuth_time (UTC):" | awk '{printf($1)}'`
      Bperp=0
      Btemp=0
-     slcrsmp=${i12sFolder}/${master}_${scene}/${master}.crop.cr4
+     slcrsmp=${i12sFolder}/${master}_${scene}/${master}.ovs.cr4
      interf=dummy
      h2ph=dummy
      atmo=dummy
@@ -70,10 +70,10 @@ do
      doppler_diff_orig=`echo ${doppler_master} ${doppler_slave} | awk '{printf("%0.2f", $1-$2 )}'`
      Bperp=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}_${scene}.res coarse_orbits "Bperp"`
      Btemp=`readRes.sh ${i12sFolder}/${master}_${scene}/${master}_${scene}.res coarse_orbits "Btemp"`
-     slcrsmp=${i12sFolder}/${master}_${scene}/${master}_${scene}.rs
-     interf=${i12sFolder}/${master}_${scene}/${master}_${scene}.cint
+     slcrsmp=${i12sFolder}/${master}_${scene}/${scene}.rs
+     interf=${i12sFolder}/${master}_${scene}/${master}_${scene}.${srpd}
      h2ph=${i12sFolder}/${master}_${scene}/${master}_${scene}.${srpd}h2ph
-     atmo=${process2}${ifg_dir}/${master}_${slave} # dummy
+     atmo=${i12sFolder}/${master}_${scene} # dummy
      l0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "First_line (w.r.t. original_master)"`
      lN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "Last_line (w.r.t. original_master)"`
      p0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res resample "First_pixel (w.r.t. original_master)"`
