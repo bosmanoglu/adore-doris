@@ -89,7 +89,7 @@
 ################### m_porbits
 [ -z "${m_orbdir}" 		] && m_orbdir="${unspecified}"
 [ -z "${m_orb_interval}" 	] && m_orb_interval=1
-[ -z "${m_orb_extratime}" 	] && m_orb_extratime=4
+[ -z "${m_orb_extratime}" 	] && m_orb_extratime=10
 [ -z "${m_orb_dump}" 		] && m_orb_dump=-1
 ################### m_crop
 [ -z "${m_crop_in}" 		] && m_crop_in=${m_in_dat}
@@ -172,10 +172,10 @@
 ################### coarsecorr
 [ -z "${cc_method}" 		] && cc_method="magfft"
 [ -z "${cc_in_pos}" 		] && cc_in_pos="${unspecified}"
-[ -z "${cc_nwin}" 		] && cc_nwin="11"
+[ -z "${cc_nwin}" 		] && cc_nwin="100"
 [ -z "${cc_winsize}" 		] && cc_winsize="64 64"
 [ -z "${cc_acc}" 		] && cc_acc="32 8"
-[ -z "${cc_initoff}" 		] && cc_initoff="0 0"
+[ -z "${cc_initoff}" 		] && cc_initoff="orbit"
 ################### m_filtazi
 [ -z "${af_blocksize}" 		] && af_blocksize="1024"
 [ -z "${af_overlap}" 		] && af_overlap="128"
@@ -188,11 +188,11 @@
 ################### s_filtazi -- nocards
 ################### fine
 [ -z "${fc_method}" 		] && fc_method="magfft"
-[ -z "${fc_nwin}" 		] && fc_nwin="400"
+[ -z "${fc_nwin}" 		] && fc_nwin="4000"
 [ -z "${fc_in_pos}" 		] && fc_in_pos="${unspecified}"
 [ -z "${fc_winsize}" 		] && fc_winsize="32 32"
 [ -z "${fc_acc}" 		] && fc_acc="4 4"
-[ -z "${fc_initoff}" 		] && fc_initoff="0 0"
+[ -z "${fc_initoff}" 		] && fc_initoff="coarsecorr"
 [ -z "${fc_osfactor}" 		] && fc_osfactor="16"
 [ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
 ################### reltiming
