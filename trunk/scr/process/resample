@@ -6,7 +6,11 @@ if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
   #if not check for rs_dbow
   if [ "${rs_dbow}" == "0 0 0 0" ]; then
    # get a smaller dbow from master. Otherwise the resampling may fail. 
-   rs_dbow=`${ADORESCR}/setinterfarea.sh ${m_resfile} ${rs_az_buffer} ${rs_rg_buffer} | tr -d "\n"`
+   local lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
+   local pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
+   local azshift=`echo ${rs_az_buffer} + ${lshift} | awk '{printf "%d", $1+$2}';`
+   local rgshift=`echo ${rs_rg_buffer} + ${pshift} | awk '{printf "%d", $1+$2}';`
+   rs_dbow=`${ADORESCR}/setinterfarea.sh ${m_resfile} ${azshift} ${rgshift} | tr -d "\n"`
 
     #get last step
     #masterLastProcessingStep=`check ${m_resfile}| grep 1 | tail -n 1 | cut -d: -f1`

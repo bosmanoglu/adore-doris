@@ -33,6 +33,34 @@
 #   dem check: Checks and displays possible problems fixes on stdout.
 #
 
+function updateSrtmDemsettings(){
+ #reads dem settings from settings file and modifies ADORE environment
+  settings_file=${1}
+  [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
+  echo "Loading settings for sam_, dac_, and crd_"
+  sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
+  sam_in_format=`readDrs.sh ${settings_file} SAM_IN_FORMAT | tr -d '\n'`
+  sam_in_size=`readDrs.sh ${settings_file} SAM_IN_SIZE | tr -d '\n'`
+  sam_in_delta=`readDrs.sh ${settings_file} SAM_IN_DELTA | tr -d '\n'`
+  sam_in_ul=`readDrs.sh ${settings_file} SAM_IN_UL | tr -d '\n'`
+  sam_in_nodata=`readDrs.sh ${settings_file} SAM_IN_NODATA | tr -d '\n'`
+  
+  dac_in_dem=${sam_in_dem}
+  dac_in_format=${sam_in_format}
+  dac_in_size=${sam_in_size}
+  dac_in_delta=${sam_in_delta}
+  dac_in_ul=${sam_in_ul}
+  dac_in_nodata=${sam_in_nodata}
+  
+  crd_in_dem=${sam_in_dem}
+  crd_in_format=${sam_in_format}
+  crd_in_size=${sam_in_size}
+  crd_in_delta=${sam_in_delta}
+  crd_in_ul=${sam_in_ul}
+  crd_in_nodata=${sam_in_nodata}
+}
+
+
 function makeSrtmDem(){
   local srtm buffer name center_lat center_lon size_rg size_az radar_band_width inc_angle
   local size_rg_km size_az_km dem_area settings_file
@@ -81,32 +109,6 @@ function makeSrtmDem(){
   updateSrtmDemsettings ${settings_file}
 }
 
-function updateSrtmDemsettings(){
- #reads dem settings from settings file and modifies ADORE environment
-  settings_file=${1}
-  [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
-  echo "Loading settings for sam_, dac_, and crd_"
-  sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
-  sam_in_format=`readDrs.sh ${settings_file} SAM_IN_FORMAT | tr -d '\n'`
-  sam_in_size=`readDrs.sh ${settings_file} SAM_IN_SIZE | tr -d '\n'`
-  sam_in_delta=`readDrs.sh ${settings_file} SAM_IN_DELTA | tr -d '\n'`
-  sam_in_ul=`readDrs.sh ${settings_file} SAM_IN_UL | tr -d '\n'`
-  sam_in_nodata=`readDrs.sh ${settings_file} SAM_IN_NODATA | tr -d '\n'`
-  
-  dac_in_dem=${sam_in_dem}
-  dac_in_format=${sam_in_format}
-  dac_in_size=${sam_in_size}
-  dac_in_delta=${sam_in_delta}
-  dac_in_ul=${sam_in_ul}
-  dac_in_nodata=${sam_in_nodata}
-  
-  crd_in_dem=${sam_in_dem}
-  crd_in_format=${sam_in_format}
-  crd_in_size=${sam_in_size}
-  crd_in_delta=${sam_in_delta}
-  crd_in_ul=${sam_in_ul}
-  crd_in_nodata=${sam_in_nodata}
-}
 
 function updateArcGisDemSettings(){
  #reads dem settings from .hdr file and modifies ADORE environment
