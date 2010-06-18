@@ -23,9 +23,9 @@ function dorisProcess2OutputFile(){
     #find which result file has info
     # resample is a interfero step but outputs to s etc.
     dorisStep=`pn2rs ${dorisStep}`
-    grepM=`readRes.sh ${m_resfile} process_control ${dorisStep}`
-    grepS=`readRes.sh ${s_resfile} process_control ${dorisStep}`
-    grepI=`readRes.sh ${i_resfile} process_control ${dorisStep}`
+    [ -f ${m_resfile} ] && grepM=`readRes.sh ${m_resfile} process_control ${dorisStep}`
+    [ -f ${s_resfile} ] && grepS=`readRes.sh ${s_resfile} process_control ${dorisStep}`
+    [ -f ${i_resfile} ] && grepI=`readRes.sh ${i_resfile} process_control ${dorisStep}`
   fi
 
   if [[ -n "${grepM}" ]]; then
