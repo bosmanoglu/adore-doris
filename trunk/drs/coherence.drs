@@ -22,7 +22,7 @@ s_az_t_error	${s_az_t_error}		//
 
 process         coherence               // 
 
-coh_method	${coh_method}		//
+coh_method	${coh_method}		// include_refdem or refphase_only
 coh_out_ccoh	${coh_out_ccoh}		//
 coh_out_coh	${coh_out_coh}		//
 coh_multilook	${coh_multilook}	//

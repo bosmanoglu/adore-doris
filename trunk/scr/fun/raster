@@ -3,8 +3,8 @@
 # Automatic Doris Environment
 #
 # USAGE:
-#	raster a|p|m dorisStep cpxfiddleOptions
-#	raster a|p|m dorisStep:filename cpxfiddleOptions
+#	raster a|p|m dorisStep -- cpxfiddleOptions
+#	raster a|p|m dorisStep:filename -- cpxfiddleOptions
 #
 # DESCRIPTION:
 #  RASTER is an internal ADORE command.  
@@ -31,8 +31,8 @@
 #	This is useful for generating rasters for *.demlp, *.notmasked files.
 #
 #  Optional:
-#	cpxfiddleOptions
-#           These options are passed to cpxfiddle. 
+#	-- cpxfiddleOptions
+#           These options are passed to cpxfiddle. They should start with "--".
 #	    User options supersede default options (see below).
 #	    Default values for w,f are read from result file. 
 # 	    Default value for q is defined by output type (amplitude, phase, mixed).
@@ -108,7 +108,7 @@ if [ ! -z "${remainder}" ]; then
       unset inArg[${OPTIND}]
     fi
   done
-  remainder=${inArg[@]:2};
+  remainder=${inArg[@]:3};
 fi
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
