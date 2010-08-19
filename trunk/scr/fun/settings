@@ -8,7 +8,7 @@
 #	settings fix
 #	settings raw
 #	settings save [fileName]
-#	settings load fileName
+#	settings load [fileName]
 #	settings reset
 #	settings clear
 #
@@ -39,7 +39,8 @@
 #  settings save [fileName]: saves the settings (raw) to the file.
 #	if fileName is not specified './settings.set' is used.
 #
-#  settings load fileName: loads the settings to the environment.
+#  settings load [fileName]: loads the settings to the environment.
+#	if filenName is not specified './settings.set' is used.
 #
 #  settings reset: initializes the environment. User settings file is loaded.
 #
@@ -211,7 +212,7 @@ function settings_save(){
 function settings_load(){
     #load settings from file
     if [ "${2-undefined}" == "undefined" ];then
-      loadFile=${u};
+      loadFile="./settings.set";
     else
       loadFile=${2};
     fi

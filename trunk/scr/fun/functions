@@ -183,20 +183,8 @@ function checkInitialSettings(){
 [ ! -d "${dataFolder}" ] && echo "dataFolder does not exist. Please set dataFolder. Current Setting: ${dataFolder}"
 }
 
-function raster(){
-	. ${ADORESCR}/fun/raster "$@"
-}
-
-function settings(){
-	. ${ADORESCR}/fun/settings "$@"
-}
-
-function initialize(){
-	. ${ADORESCR}/fun/initialize
-}
-
-function undo(){
-	. ${ADORESCR}/fun/undo "$@"
+function check(){
+	. ${ADORESCR}/fun/check "${@}"
 }
 
 function dem2slant2h(){
@@ -207,25 +195,42 @@ function dem(){
 	. ${ADORESCR}/fun/dem "${@}"
 }
 
-function saveas(){
-	. ${ADORESCR}/fun/saveas "${@}"
-}
-
-function check(){
-	. ${ADORESCR}/fun/check "${@}"
-}
-
 function exclude(){
 	. ${ADORESCR}/fun/exclude "${@}"
+}
+
+function initialize(){
+	. ${ADORESCR}/fun/initialize
 }
 
 function mask(){
 	. ${ADORESCR}/fun/mask "${@}"
 }
 
+function quejob(){
+	. ${ADORESCR}/fun/quejob "$@"
+}
+
+function raster(){
+	. ${ADORESCR}/fun/raster "$@"
+}
+
+function settings(){
+	. ${ADORESCR}/fun/settings "$@"
+}
+
+function saveas(){
+	. ${ADORESCR}/fun/saveas "${@}"
+}
+
 function scenes(){
 	. ${ADORESCR}/fun/scenes "${@}"
 }
+
+function undo(){
+	. ${ADORESCR}/fun/undo "$@"
+}
+
 
 function h(){
   [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
