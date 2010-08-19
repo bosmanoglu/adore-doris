@@ -1,0 +1,6 @@
+#labels Phase-Support
+#Frequently asked questions.
+
+= FAQ  =
+  # How do I run multiple processing steps?
+  Separate commands with semi-column (;). Ex: m_readfiles;m_porbits;m_crop;m_simamp
