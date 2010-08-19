@@ -6,7 +6,7 @@
 The core of ADORE is written in bash. Therefore it is expandable by functions, scripts and external executables. This document explains what an Adore function/script is and how they are different from external executables. 
 
 == Internal ADORE Commands ==
-These are bash scripts that use variables defined in ADORE environment. Therefore these commands will not work outside ADORE. 
+These are bash scripts that use variables defined in ADORE environment. Therefore these commands will not work outside ADORE. They are sourced not executed. 
 
 These commands are usually located inside the folder: ${ADOREFOLDER}/scr/fun
 
@@ -24,7 +24,7 @@ These commands are usually located inside the folder: ${ADOREFOLDER}/scr
 boundingBox.sh, km2deg.sh, lsprocess, modifyRes.sh, pn2rs, readDrs.sh, readRes.sh, rs2pn, setinterfarea.sh
 
 == ADORE Functions ==
-ADORE functions are bash functions that are defined in ADORE environment. These functions can only be used inside ADORE. Functions are generally used in ADORE scripts, and can return multiple values. 
+ADORE functions are bash functions that are defined in ADORE environment. These functions can only be used inside ADORE. Functions are generally used in ADORE scripts and internal ADORE commands, and can return multiple values. 
 
 These functions reside inside ${ADOREFOLDER}/scr/fun folder and generally have the .fun extension. 
 
