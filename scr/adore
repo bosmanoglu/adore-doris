@@ -36,7 +36,9 @@ ctrl_c()
 # if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
    #ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
    #bind redraw-current-line   
+   echo -n "^C"
    continue
+   #return 0
 # else
 #   echo " "
 #   echo "Saving History..."
@@ -44,6 +46,12 @@ ctrl_c()
 #   exit 0;
 # fi
 }
+
+if [ "${1-allEmpty}" == "allEmpty" ]; then
+  sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${0}
+  exit 0
+fi
+
 
 ###### GET INPUT OPTIONS
 #start a loop for getopts. I want to read parameters of options -n -i  etc. 
@@ -96,7 +104,7 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   #INPUTRC=${ADOREFOLDER}/scr/.inputrc
   [ -e "/etc/bash_completion" ] && source /etc/bash_completion
   [ -e "${ADOREFOLDER}/scr/.inputrc" ] && source ${ADOREFOLDER}/scr/.inputrc
-
+#  bind -f ${ADOREFOLDER}/scr/.bind
   
   history -r ${adoreHistoryFile}
   while [ 1 ]; do

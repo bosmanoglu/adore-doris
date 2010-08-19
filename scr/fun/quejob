@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# USAGE:
+#       quejob adore_command
+#
+# DESCRIPTION:
+#  quejob is an ADORE script.  
+#  It runs the given adore command in the Torque-PBS system.
+#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#
+# INPUT:
+#	adore_command: 
+#  
+# OUTPUT:
+#  Creates ./{randomFile}.set and  ./{randomFile}.sh 
+#
+
+local CALLDIR=$PWD;
+generateRandomString
+local queJobRandStr=${randomString}
+mkdir -p ${tmpFolder}
+local originalSettingsFile=${tmpFolder}/${queJobRandStr}.set
+settings save ${originalSettingsFile}
+
+cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
+#! /bin/csh
+ #PBS -N parallelJob
+ #PBS -l nodes=1
+ #PBS -q batch
+ #PBS -V
+ #PBS -l walltime=5:00:00
+ cd ${CALLDIR}
+ ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${@}"
+_EOFFILE
+
+#submit the job to the que
+qsub ${tmpFolder}/${queJobRandStr}.sh
