@@ -31,21 +31,22 @@
 #  dorisStep: SUCCESS for successful doris processing steps.
 #
 
-ctrl_c()
-{
-# if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
-   #ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
-   #bind redraw-current-line   
-   echo -n "^C"
-   continue
-   #return 0
-# else
-#   echo " "
-#   echo "Saving History..."
-#   history -w ${adoreHistoryFile}
-#   exit 0;
-# fi
-}
+#NOT NECESSARY WITH CHILD BASH PROCESS
+#ctrl_c()
+#{
+## if [ "${ctrl_c_counter-0}" -lt "1" ]; then 
+#   #ctrl_c_counter=`expr ${ctrl_c_counter} + 1`
+#   #bind redraw-current-line   
+#   echo -n "^C"
+#   continue
+#   #return 0
+## else
+##   echo " "
+##   echo "Saving History..."
+##   history -w ${adoreHistoryFile}
+##   exit 0;
+## fi
+#}
 
 if [ "${1-allEmpty}" == "allEmpty" ]; then
   sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${0}
@@ -62,7 +63,7 @@ do
   #index of the flag in the commandline and  the argument. If you just want
   #a flag then you simply remove the column from getopts line 
   #(i.e. to make n a flag "ni:a:...")  
-  eval ${flag}=${OPTARG}
+  eval export ${flag}=${OPTARG}
 done
 # now $u=userSettings, $p=dorisProcess, $d=defineVariables
 #below I use a for loop to remove already parsed parameters 
@@ -72,70 +73,65 @@ do
 done  
 unset flag OPTARG OPTIND
 # now I can assign values to the leftover parameters. 
-adoreCommand=$1
-dorisProcess=$p
+# Need to export the variables to make them available in interactive subshell
+export adoreCommand=$1
+export dorisProcess=$p
 
-###### LOAD SETTINGS
-ADORESCR=`dirname "${0}"`
-#load functions
-source ${ADORESCR}/fun/functions
-#initialize ADORE
-source ${ADORESCR}/fun/initialize
+export ADORESCR=`dirname "${0}"`
+echo ADORESCR=${ADORESCR}
 #adjust path
-PATH=${PATH}:${ADORESCR}
+export _ADOREPATH=${PATH}:${ADORESCR}
 
-if [ -n "${dorisProcess}" ]; then
-  p ${dorisProcess}
-fi
-#if adoreCommand was specified run adoreCommand.
-[ -n "${adoreCommand}" ] && eval "${adoreCommand}" #${ADOREFOLDER}/scr/${adoreCommand}.sh
-
-if [ "${i-notInteractive}" != "notInteractive" ]; then
-  set -o emacs
-  set -o histexpand
-  HISTCONTROL=ignoreboth
-  #set bind-tty-special-chars off
-  #bind TAB:complete
-  #bind '"TAB":complete-variable'  
-  #bind '"M-[A":history-search-backward'
-  #bind '"M-[B":history-search-forward'
-  #ctrl-r is reverse search history... bind Control-r:redraw-current-line
-  #adoreHistoryFile=${ADOREFOLDER}/scr/.history
-  #INPUTRC=${ADOREFOLDER}/scr/.inputrc
-  [ -e "/etc/bash_completion" ] && source /etc/bash_completion
-  [ -e "${ADOREFOLDER}/scr/.inputrc" ] && source ${ADOREFOLDER}/scr/.inputrc
-#  bind -f ${ADOREFOLDER}/scr/.bind
-  
-  history -r ${adoreHistoryFile}
-  while [ 1 ]; do
-    #PS1='ADORE: '
-    #echo -n "ADORE: "
-    #ctrl_c_counter_bck=${ctrl_c_counter}
-    read -r -p "ADORE: " -e command
-    [ -n "${command}" ] && history -s "${command}"  #add command to history if not empty
-    #echo TEST: ${command%% *} #get the first word.
-    case "${command%% *}" in 
-      exit)
-        history -w ${adoreHistoryFile} #save history
-        exit 0
-        ;;
-      \?)
-        if [ "${command#* }" == "?" ]; then
-          sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
-          continue;
-        fi
-        h ${command#* }      
-        ;;
-      *)
-        eval ${command}
-        ;;
-    esac
-    #I'm placing the trap counter in the loop
-    #so that if a script changes the trap, when
-    #we are back to adore it goes back to ADORE's trap.
-    #trap ctrl-c and call ctrl_c()
-    trap ctrl_c 2 # ctrl+c=sigint 2
-  done
+if [ "${i-notInteractive}" == "notInteractive" ]; then
+  #not interactive - batch processing
+  source .adore.rc
+else
+  bash --init-file "${ADORESCR}/.adore.rc" -i
+#  set -o emacs
+#  set -o histexpand
+#  HISTCONTROL=ignoreboth
+#  #set bind-tty-special-chars off
+#  #bind TAB:complete
+#  #bind '"TAB":complete-variable'  
+#  #bind '"M-[A":history-search-backward'
+#  #bind '"M-[B":history-search-forward'
+#  #ctrl-r is reverse search history... bind Control-r:redraw-current-line
+#  #adoreHistoryFile=${ADOREFOLDER}/scr/.history
+#  #INPUTRC=${ADOREFOLDER}/scr/.inputrc
+#  [ -e "/etc/bash_completion" ] && source /etc/bash_completion
+#  [ -e "${ADOREFOLDER}/scr/.inputrc" ] && source ${ADOREFOLDER}/scr/.inputrc
+# #  bind -f ${ADOREFOLDER}/scr/.bind
+#  
+#  history -r ${adoreHistoryFile}
+#  while [ 1 ]; do
+#    #PS1='ADORE: '
+#    #echo -n "ADORE: "
+#    #ctrl_c_counter_bck=${ctrl_c_counter}
+#    read -r -p "ADORE: " -e command
+#    [ -n "${command}" ] && history -s "${command}"  #add command to history if not empty
+#    #echo TEST: ${command%% *} #get the first word.
+#    case "${command%% *}" in 
+#      exit)
+#        history -w ${adoreHistoryFile} #save history
+#        exit 0
+#        ;;
+#      \?)
+#        if [ "${command#* }" == "?" ]; then
+#          sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
+#          continue;
+#        fi
+#        h ${command#* }      
+#        ;;
+#      *)
+#        eval ${command}
+#        ;;
+#    esac
+#    #I'm placing the trap counter in the loop
+#    #so that if a script changes the trap, when
+#    #we are back to adore it goes back to ADORE's trap.
+#    #trap ctrl-c and call ctrl_c()
+#    trap ctrl_c 2 # ctrl+c=sigint 2
+#  done
 fi
 
 exit 0

@@ -49,6 +49,7 @@
 
 clearSettings(){
     #unset all variables##
+    _ADORESCR=${ADORESCR}
     while read -r line; do
       #get right side of the line
         #if no && in the line move on...
@@ -60,8 +61,9 @@ clearSettings(){
       #clear the variable
       eval "unset ${varName}" 
     done < "${ADOREFOLDER}/set/default.set"
-    ADORESCR=`dirname $0`
+    ADORESCR=${_ADORESCR}
     ADOREFOLDER=${ADORESCR//\/scr/}
+    unset _ADORESCR
 }
 
 

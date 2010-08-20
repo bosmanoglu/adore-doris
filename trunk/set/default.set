@@ -197,7 +197,8 @@
 [ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
 ################### reltiming
 [ -z "${rte_threshold}" 	] && rte_threshold="0.4"
-[ -z "${rte_maxiter}" 		] && rte_maxiter="10000"
+[ -z "${rte_maxiter}" 		] && rte_maxiter="4000"
+[ -z "${_rel_rte_maxiter}" 	] && _rel_rte_maxiter='echo ${fc_nwin}'
 [ -z "${rte_k_alpha}" 		] && rte_k_alpha="1.97"
 ################### demassist
 [ -z "${dac_in_dem}" 		] && dac_in_dem="${sam_in_dem}"
@@ -224,7 +225,8 @@
 [ -z "${cpm_dump}" 		] && cpm_dump="off"
 [ -z "${cpm_plot}" 		] && cpm_plot="nobg"
 [ -z "${cpm_weight}" 		] && cpm_weight="bamler"
-[ -z "${cpm_maxiter}" 		] && cpm_maxiter="10"
+[ -z "${cpm_maxiter}" 		] && cpm_maxiter="4000"
+[ -z "${_rel_cpm_maxiter}"	] && _rel_cpm_maxiter='echo ${fc_nwin}'
 [ -z "${cpm_k_alpha}" 		] && cpm_k_alpha="1.97"
 ################### resample
 [ -z "${rs_method}" 		] && rs_method="knab6p"

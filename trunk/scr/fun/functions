@@ -4,6 +4,12 @@ source ${ADORESCR}/fun/resfile.fun
 source ${ADORESCR}/fun/plotting.fun
 
 ###### SOME FUNCTIONS
+
+function ?
+{
+ h "$@"
+}
+
 function call(){
   functionCall=$@;
   #parse left of equal
@@ -199,6 +205,24 @@ function exclude(){
 	. ${ADORESCR}/fun/exclude "${@}"
 }
 
+function h(){
+  [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
+  if [ "${1:-undefined}" == "undefined" ]; then
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
+  elif [ -e "${ADORESCR}/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
+  elif [ -e "${ADORESCR}/process/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
+  elif [ -e "${ADORESCR}/fun/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
+  elif [ -e "${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${1}
+  else
+    echo "Unknown ADORE command: ${1}"
+    echo 'You can get a list of ADORE commands with the command: ?'
+  fi
+}
+
 function initialize(){
 	. ${ADORESCR}/fun/initialize
 }
@@ -231,24 +255,6 @@ function undo(){
 	. ${ADORESCR}/fun/undo "$@"
 }
 
-
-function h(){
-  [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
-  if [ "${1:-undefined}" == "undefined" ]; then
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
-  elif [ -e "${ADORESCR}/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
-  elif [ -e "${ADORESCR}/process/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
-  elif [ -e "${ADORESCR}/fun/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
-  elif [ -e "${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${1}
-  else
-    echo "Unknown ADORE command: ${1}"
-    echo 'You can get a list of ADORE commands with the command: ?'
-  fi
-}
 
 ####################################################
 ################### DORIS FUNCTIONS ################

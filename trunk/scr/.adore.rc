@@ -1,0 +1,21 @@
+###### LOAD SETTINGS
+#load functions
+source ${ADORESCR}/fun/functions
+#initialize ADORE
+source ${ADORESCR}/fun/initialize
+
+if [ -n "${dorisProcess}" ]; then
+  p ${dorisProcess}
+fi
+
+#if adoreCommand was specified run adoreCommand.
+[ -n "${adoreCommand}" ] && eval "${adoreCommand}" #${ADOREFOLDER}/scr/${adoreCommand}.sh
+
+history -r ${adoreHistoryFile}
+PS1="ADORE: "
+
+#Only if interactive shell
+if [ "${i-notInteractive}" != "notInteractive" ]; then
+  PATH=${_ADOREPATH}
+  unset _ADOREPATH
+fi
