@@ -42,6 +42,7 @@ function dorisProcess2OutputFile(){
   fi
   if [ "${resfile:-undefined}" == "undefined" ]; then
     echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
+    _filename=${filename};_resfile=${resfile};_format=${format};_numpixels=${numpixels};_numlines=${numlines}
     return;
   fi
 
