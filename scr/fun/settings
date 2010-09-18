@@ -459,19 +459,19 @@ function settings_init(){
  
  #now ask some questions
  local variables
- echo "What is the projectFolder? [${projectFolder}]"
+ bold "What is the projectFolder? [${projectFolder}]"
  read userInput
  [ -n "${userInput}" ] && settings apply -r projectFolder="${userInput}"
 
- echo "What is the runName? [${runName}]"
+ bold "What is the runName? [${runName}]"
  read userInput
  [ -n "${userInput}" ] && settings apply -r runName="${userInput}"
  
- echo "What is the dataFolder? [${dataFolder}]"
+ bold "What is the dataFolder? [${dataFolder}]"
  read userInput
  [ -n "${userInput}" ] && apply -r dataFolder="${userInput}"
  
- echo "In the dataFolder I found the following scenes:"
+ bold "In the dataFolder I found the following scenes:"
  scenes include
  if ask "Do you want to exclude any scenes?"
  then 
@@ -479,7 +479,7 @@ function settings_init(){
    read userInput
    scenes exclude ${userInput}
  fi
- echo "What is the dataFile pattern? [${dataFile}]"
+ bold "What is the dataFile pattern? [${dataFile}]"
  echo "Here is the listing of the files in the current master folder."
  ls ${dataFolder}/${master}
  read userInput
@@ -488,28 +488,28 @@ function settings_init(){
  if ask "Do you also want to enter the patterns for leader, volume and null files?"
  then
 
-   echo "What is the leaderFile pattern? [${leaderFile}]"
+   bold "What is the leaderFile pattern? [${leaderFile}]"
    read userInput
    [ -n "${userInput}" ] && apply -r leaderFile="${userInput}"
-   echo "What is the volumeFile pattern? [${volumeFile}]"
+   bold "What is the volumeFile pattern? [${volumeFile}]"
    read userInput
    [ -n "${userInput}" ] && apply -r volumeFile="${userInput}"
-   echo "What is the nullFile pattern? [${nullFile}]"
+   bold "What is the nullFile pattern? [${nullFile}]"
    read userInput
-   [ -n "${userInput}" ] && apply -r nullFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r nullFile="${userInput}"
  fi  
 
- echo "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
+ bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
  echo "Current setting: [${m_in_method}]"
  read userInput
- [ -n "${userInput}" ] && apply -r m_in_method="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r m_in_method="${userInput}"
  
- echo "What is the m_orbdir? This is the folder that has the arclist file for getorb."
+ bold "What is the m_orbdir? This is the folder that has the arclist file for getorb."
  echo "Current setting: [${m_orbdir}]"
  read userInput
- [ -n "${userInput}" ] && apply -r m_orbdir="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r m_orbdir="${userInput}"
  
- echo "What would you like to name this settings file?"
+ bold "What would you like to name this settings file?"
  echo "Current setting: [settings.set]"
  read userInput
  settings save ${userInput}
