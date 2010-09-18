@@ -3,6 +3,7 @@
 #	check
 #	check resultFile
 # 	check -p processName
+#	check -j jobid
 #
 # DESCRIPTION:
 #  CHECK is an internal ADORE command. 
@@ -20,6 +21,17 @@
 #     -p processName: Check if ADORE can run the given doris process. This 
 #     function is currently under development. If no output is shown the it is
 #     OK to run the process. Otherwise error messages will hint at the problem.
+#
+#     -j jobid: Check if the job submitted by quejob is finished. Return 0 if finished.
+#		Job Status 	Output
+#		----------------------
+#		Completed	0
+#		Running		1
+#               Exiting		2
+#               Queued		3
+#               Waiting		4
+#               Transferred	5
+#               Held 		6
 #
 # OUTPUT:
 #  Shows the process control list of given result file.
@@ -428,10 +440,47 @@ case "${1}" in
 esac
 }
 
+function checkJobStatus(){
+#		Job Status 	Output
+#		----------------------
+#		Completed	0
+#		Running		1
+#               Exiting		2
+#               Queued		3
+#               Waiting		4
+#               Transferred	5
+#               Held 		6
+#
+local jobStat jobid qstatOut
+jobId=${1}
+qstat ${jobId} &> /dev/null #check if qstat works
+qstatOut=$?
+[ ${qstatOut} -ne 0 ] && return ${qstatOut}
+jobStat=`qstat ${jobId}| tail -n1 | tr -s " "|cut -d" " -f5` 
+if [ "${jobStat}" == "C" ]; then
+  return 0
+elif [ "${jobStat}" == "R" ]; then
+  return 1
+elif [ "${jobStat}" == "E" ]; then
+  return 2
+elif [ "${jobStat}" == "Q" ]; then
+  return 3
+elif [ "${jobStat}" == "W" ]; then
+  return 4
+elif [ "${jobStat}" == "T" ]; then
+  return 5
+elif [ "${jobStat}" == "H" ]; then
+  return 6
+fi  
+}
+
 #MAIN FUNCTION
 if [ "${1}" == "-p" ]; then
  shift 
  checkProcessFlag "${1}"
+elif [ "${1}" == "-j" ]; then
+ shift
+ checkJobStatus "${1}"
 else
  listProcessFlagsFromResultFiles "$@"
 fi 

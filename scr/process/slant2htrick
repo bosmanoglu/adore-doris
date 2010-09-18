@@ -1,0 +1,7 @@
+#!/bin/bash
+
+dem2slant2h
+[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"   
+
+
+

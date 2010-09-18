@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # USAGE:
-#       quejob adore_command
+#       quejob adore_command [outputFolder]
 #
 # DESCRIPTION:
 #  quejob is an ADORE script.  
@@ -9,18 +9,23 @@
 #  This script uses the Torque-PBS system to distribute jobs to other computers.
 #
 # INPUT:
-#	adore_command: 
+#	adore_command: commands to submit to the PBS. If multiple commands are used, this should be a string in quotations. See examples.
+#
+#   OPTIONAL:	
+#	outputFolder: specify output folder for the ADORE command. Default is current folder ("$PWD").
 #  
 # OUTPUT:
 #  Creates ./{randomFile}.set and  ./{randomFile}.sh 
 #
 
-local CALLDIR=$PWD;
-generateRandomString
+function createJob(){
+local commands=${1};
+local CALLDIR=${2-$PWD};
+generateRandomString 
 local queJobRandStr=${randomString}
-mkdir -p ${tmpFolder}
+mkdir -p ${tmpFolder} 
 local originalSettingsFile=${tmpFolder}/${queJobRandStr}.set
-settings save ${originalSettingsFile}
+settings save ${originalSettingsFile} 1>> ${tmpFolder}/${queJobRandStr}.log #Do not dump messages
 
 cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
 #! /bin/csh
@@ -30,8 +35,12 @@ cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
  #PBS -V
  #PBS -l walltime=5:00:00
  cd ${CALLDIR}
- ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${@}"
+ ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${commands}"
 _EOFFILE
 
 #submit the job to the que
 qsub ${tmpFolder}/${queJobRandStr}.sh
+
+}
+
+createJob "${@}"

@@ -41,10 +41,14 @@
 
 function updateSrtmDemsettings(){
  #reads dem settings from settings file and modifies ADORE environment
+  local settings_file dem_file
+  
   settings_file=${1}
+  dem_file=${2}
   [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
   echo "Loading settings for sam_, dac_, and crd_"
-  sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
+  #sam_in_dem=`readDrs.sh ${settings_file} SAM_IN_DEM | tr -d '\n'`
+  sam_in_dem=`canonicalPath ${dem_file}`
   sam_in_format=`readDrs.sh ${settings_file} SAM_IN_FORMAT | tr -d '\n'`
   sam_in_size=`readDrs.sh ${settings_file} SAM_IN_SIZE | tr -d '\n'`
   sam_in_delta=`readDrs.sh ${settings_file} SAM_IN_DELTA | tr -d '\n'`
@@ -75,7 +79,7 @@ function makeSrtmDem(){
   name=${3:-dem}
   #check resfiles
   [ ! -e ${m_resfile} ] && echo "I can not find the m_resfile. Is it defined? Are we in the wrong folder?" && return;
-  
+  [ ! -e ${i_resfile} ] && echo "I can not find the i_resfile. Is it defined? Are we in the wrong folder?" && return;
   echo "I'll generate ${srtm} DEM."
   echo "Extra buffer size is set to ${buffer}%."  
   ## get center coordinates
@@ -111,8 +115,8 @@ function makeSrtmDem(){
   echo "Creating DEM with: construct_dem.sh ${name} ${dem_area} ${srtm}"
   construct_dem.sh ${name} ${dem_area} ${srtm}
   ## modify settings
-  settings_file="${name}/input.doris_${name}"
-  updateSrtmDemsettings ${settings_file}
+  settings_file="${name}/input.doris_${name}"  
+  updateSrtmDemsettings "${settings_file}" "${name}/final_${name}.dem"
 }
 
 
@@ -199,15 +203,16 @@ function demUnload(){
 }
 
 function main(){
-  local srtm buffer demFile demPath demBasename settings_file
+  local srtm buffer name demFile demPath demBasename settings_file
   case ${1} in
     make)
       srtm=${2:-SRTM3}
       buffer=${3:-20}
+      name=${4:-dem}
       #check if dem exists. 
       #if not make new.
       if [ ! -e "${sam_in_dem}" ]; then
-        makeSrtmDem ${srtm} ${buffer}
+        makeSrtmDem ${srtm} ${buffer} ${name}
       else
         echo "It seems like you already have a DEM set for sam_in_dem: ${sam_in_dem}"
       fi
@@ -231,7 +236,7 @@ function main(){
           settings_file="input.doris_${demBasename}"        
           echo "I expect to find settings file at: ${demPath}/${settings_file}"
           if [ -e "${demPath}/${settings_file}" ]; then
-            updateSrtmDemsettings ${demPath}/${settings_file}
+            updateSrtmDemsettings ${demPath}/${settings_file} ${demFile}
           else 
             echo "I can not find the settings file. Can you check?"
           fi
