@@ -25,6 +25,7 @@
 # mask		: Mask DORIS file using snaphu output. 
 # p		: Process DORIS step.
 # pn2rs		: convert Process Name to Result file Section title.
+# quejob	: It runs the given adore command in the Torque-PBS system.
 # raster		: Create raster image from doris result.
 # s		: Show the input file for the DORIS step.
 # saveas 	: Export DORIS results to a different format.
