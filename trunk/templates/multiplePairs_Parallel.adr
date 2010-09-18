@@ -25,7 +25,17 @@
 #  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
 #
 
+# The following steps are processed for each crop
+cropSteps="m_readfiles;m_crop;m_simamp;m_timing"
+# The following steps are processed for each interferogram
+interferoSteps="coarseorb;coarsecorr;fine;reltiming;demassist;coregpm;resample;interfero;comprefpha;subtrrefpha;comprefdem;subtrrefdem;coherence;filtphase;unwrap;slant2htrick;geocode"
+
+#######################################################
+## DO NOT CHANGE ANYTHING BELOW
+## UNLESS YOU KNOW WHAT YOU ARE DOING.
+#######################################################
 function CTRL_C(){
+break; #if in while loop cancel the loop
 bold "Caught user interrupt!"
 #go back to where we started
 cd ${CALLDIR}
@@ -68,33 +78,49 @@ local originalSettingsFile=${CALLDIR}/${randomString}.set
 settings save ${originalSettingsFile}
 
 # DORIS does not allow master and slave to be the same. 
-# We assign master as dummy ans slave as the current scene.      
-settings apply -r master="dummy"
+# We assign slave as dummy and master as the current scene.      
+settings apply -r slave="dummy"
 
 #for scene in ${scenes_include[*]}
+jobIds=( ); #start empty list
 for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
 do
      bold "Processing ${scene}"
-     settings apply -r slave=${scene} outputFolder="${cropsFolder}/${scene}"
+     settings apply -r master=${scene} outputFolder="${cropsFolder}/${scene}"
      mkdir -p "${outputFolder}"
      cd "${outputFolder}"    
      settings save
 
-     parallelProcess "${outputFolder}" "s_readfiles;s_porbits;s_crop"
-     
+     #parallelProcess "${outputFolder}" "${cropSteps}"
+     jobId=`quejob "${cropSteps}" "${outputFolder}"`
+     jobIds=( ${jobIds[@]} ${jobId} )
 done
 
-while [ 1 ];
+echo "Waiting for jobs to finish."
+echo "Counter displays number of minutes passed."
+cntr=0
+for jobId in ${jobIds[*]}
 do
-  #wait until last submitted job creates the ovs file. 
-  if [ -e "${outputFolder}/${slave}.crop" ]; then
-    sleep 10 #give some extra time just incase file is still being written.
-    break;
-  else
-    sleep 10
-  fi
+  #check each job to see if they are all finished.
+  while [ 1 ]
+  do
+    cntr=$((${cntr}+1))
+    echo -n "${cntr} m..."
+    #wait until last submitted job finishes.
+    check -j ${jobId}
+    jobStatus=$?
+    if [ $jobStatus -eq 0 ]; then
+    	echo "Job ${jobId} finished."
+        break;
+    else
+      if [ $jobStatus -eq 134 ]; then
+        echo "Job ${jobId} not found."
+        break; #Testing this... It means job is not in the job list anymore. Might be long gone.
+      fi
+      sleep 60
+    fi
+  done
 done
-
 ####Now the i12s
 #Set the stack master.
 cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
@@ -114,7 +140,8 @@ do
      cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
      cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
 
-     parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster a resample -M1/5;raster p subtrrefpha"
+     #parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster a resample -M1/5;raster p subtrrefpha"
+     quejob "${interferoSteps}" "${outputFolder}"
 done
 
 

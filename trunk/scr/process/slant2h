@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #check if dinsar
-if [ -e "${sam_in_dem}" ]; then
+if [ -e "${sam_in_dem}" ] && [ -e "${srd_out_cint}" ]; then
   echo "I guess you are using external DEM for geocoding."
   echo "I'll run the dem2slant2h (slant2hTrick)."
   dem2slant2h
@@ -9,6 +9,7 @@ if [ -e "${sam_in_dem}" ]; then
 else
   echo "I guess you are trying differential interferometry."
   echo "I'll run the actual DORIS slant2h step."
+  echo "If you like to use DEM for geocoding run this instead: slant2htrick"
   pp ${dorisProcess}
   doris ${outputFolder}/${dorisProcess}.drs
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
