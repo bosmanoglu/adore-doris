@@ -469,7 +469,7 @@ function settings_init(){
  
  bold "What is the dataFolder? [${dataFolder}]"
  read userInput
- [ -n "${userInput}" ] && apply -r dataFolder="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r dataFolder="${userInput}"
  
  bold "In the dataFolder I found the following scenes:"
  scenes include
@@ -483,17 +483,17 @@ function settings_init(){
  echo "Here is the listing of the files in the current master folder."
  ls ${dataFolder}/${master}
  read userInput
- [ -n "${userInput}" ] && apply -r dataFile="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r dataFile="${userInput}"
 
  if ask "Do you also want to enter the patterns for leader, volume and null files?"
  then
 
    bold "What is the leaderFile pattern? [${leaderFile}]"
    read userInput
-   [ -n "${userInput}" ] && apply -r leaderFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r leaderFile="${userInput}"
    bold "What is the volumeFile pattern? [${volumeFile}]"
    read userInput
-   [ -n "${userInput}" ] && apply -r volumeFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r volumeFile="${userInput}"
    bold "What is the nullFile pattern? [${nullFile}]"
    read userInput
    [ -n "${userInput}" ] && settings apply -r nullFile="${userInput}"
