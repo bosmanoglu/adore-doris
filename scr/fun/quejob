@@ -4,9 +4,9 @@
 #       quejob adore_command [outputFolder]
 #
 # DESCRIPTION:
-#  quejob is an ADORE script.  
+#  quejob is an internal ADORE command.  
 #  It runs the given adore command in the Torque-PBS system.
-#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#  Quejob uses the Torque-PBS system to distribute jobs to other computers.
 #
 # INPUT:
 #	adore_command: commands to submit to the PBS. If multiple commands are used, this should be a string in quotations. See examples.
@@ -33,7 +33,7 @@ cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
  #PBS -l nodes=1
  #PBS -q batch
  #PBS -V
- #PBS -l walltime=5:00:00
+ #PBS -l walltime=8:00:00
  cd ${CALLDIR}
  ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${commands}"
 _EOFFILE
