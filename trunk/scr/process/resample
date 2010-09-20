@@ -7,20 +7,30 @@ if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
   if [ "${rs_dbow}" == "0 0 0 0" ]; then
    # get a smaller dbow from master. Otherwise the resampling may fail. 
    set -x
-   local lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
-   local pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
-   lshift=`echo ${lshift} | awk '{$1 = ($1 < 0 ) ? -$1 : $1; print }';` #absolute value. 
-   pshift=`echo ${pshift} | awk '{$1 = ($1 < 0 ) ? -$1 : $1; print }';` #absolute value
-   local azshift=`echo ${rs_az_buffer} ${lshift} | awk '{printf "%d", $1+$2}';`
-   local rgshift=`echo ${rs_rg_buffer} ${pshift} | awk '{printf "%d", $1+$2}';`
-   rs_dbow=`${ADORESCR}/setinterfarea.sh ${m_resfile} ${azshift} ${rgshift} | tr -d "\n"`
+   local l0 lN p0 pN lshift pshift 
+   l0=`${ADORESCR}/readRes.sh ${m_resfile} crop "First_line"`
+   lN=`${ADORESCR}/readRes.sh ${m_resfile} crop "Last_line"`
+   p0=`${ADORESCR}/readRes.sh ${m_resfile} crop "First_pixel"`
+   pN=`${ADORESCR}/readRes.sh ${m_resfile} crop "Last_pixel"`
+
+   lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
+   pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
+   if [ ${lshift} -gt 0 ] 
+     l0=$((${l0}+${lshift}+${rs_az_buffer}))
+     lN=$((${lN}-${rs_az_buffer}))
+   else 
+     l0=$((${l0}+${rs_az_buffer}))
+     lN=$((${lN}+${lshift}-${rs_az_buffer}))
+   fi
+   if [ ${pshift} -gt 0 ]
+     p0=$((${p0}+${pshift}+${rs_rg_buffer}))
+     pN=$((${pN}-${rs_rg_buffer}))
+   else
+     p0=$((${p0}+${rs_rg_buffer}))
+     pN=$((${pN}+${pshift}-${rs_rg_buffer}))
+   fi
+   rs_dbow="${l0} ${lN} ${p0} ${pN}"
    set +x
-    #get last step
-    #masterLastProcessingStep=`check ${m_resfile}| grep 1 | tail -n 1 | cut -d: -f1`
-    #firstLine=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "First_line (w.r.t. original_image)"
-    #lastLine=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "Last_line (w.r.t. original_image)"
-    #firstPixel=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "First_pixel (w.r.t. original_image)"
-    #lastPixel=readRes.sh  ${m_resfile}  ${masterLastProcessingStep} "Last_pixel (w.r.t. original_image)"
   fi
 fi
 
