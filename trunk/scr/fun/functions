@@ -362,6 +362,10 @@ function s_filtazi(){
 function slant2h(){
   p slant2h
 }
+
+function slant2htrick(){
+  p slant2htrick
+}
  
 function s_ovs(){
   p s_ovs
