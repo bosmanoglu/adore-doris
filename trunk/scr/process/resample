@@ -5,8 +5,8 @@ unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
 if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
   #if not check for rs_dbow
   if [ "${rs_dbow}" == "0 0 0 0" ]; then
-   # get a smaller dbow from master. Otherwise the resampling may fail. 
    set -x
+   # get a smaller dbow from master. Otherwise the resampling may fail. 
    local l0 lN p0 pN lshift pshift 
    l0=`${ADORESCR}/readRes.sh ${m_resfile} crop "First_line"`
    lN=`${ADORESCR}/readRes.sh ${m_resfile} crop "Last_line"`
@@ -15,19 +15,19 @@ if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
 
    lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
    pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
-   if [ ${lshift} -gt 0 ] 
-     l0=$((${l0}+${lshift}+${rs_az_buffer}))
+   if [ ${lshift} -lt 0 ]; then 
+     l0=$((${l0}-${lshift}+${rs_az_buffer}))
      lN=$((${lN}-${rs_az_buffer}))
    else 
      l0=$((${l0}+${rs_az_buffer}))
-     lN=$((${lN}+${lshift}-${rs_az_buffer}))
+     lN=$((${lN}-${lshift}-${rs_az_buffer}))
    fi
-   if [ ${pshift} -gt 0 ]
-     p0=$((${p0}+${pshift}+${rs_rg_buffer}))
+   if [ ${pshift} -lt 0 ]; then
+     p0=$((${p0}-${pshift}+${rs_rg_buffer}))
      pN=$((${pN}-${rs_rg_buffer}))
    else
      p0=$((${p0}+${rs_rg_buffer}))
-     pN=$((${pN}+${pshift}-${rs_rg_buffer}))
+     pN=$((${pN}-${pshift}-${rs_rg_buffer}))
    fi
    rs_dbow="${l0} ${lN} ${p0} ${pN}"
    set +x
