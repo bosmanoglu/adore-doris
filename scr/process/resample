@@ -8,10 +8,10 @@ if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
    set -x
    # get a smaller dbow from master. Otherwise the resampling may fail. 
    local l0 lN p0 pN lshift pshift 
-   l0=`${ADORESCR}/readRes.sh ${m_resfile} crop "First_line"`
-   lN=`${ADORESCR}/readRes.sh ${m_resfile} crop "Last_line"`
-   p0=`${ADORESCR}/readRes.sh ${m_resfile} crop "First_pixel"`
-   pN=`${ADORESCR}/readRes.sh ${m_resfile} crop "Last_pixel"`
+   l0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_line"`
+   lN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_line"`
+   p0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_pixel"`
+   pN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_pixel"`
 
    lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
    pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
