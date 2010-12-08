@@ -1,0 +1,116 @@
+complete -F "_check" -o "default" "check"
+complete -F "_dem" -o "default" "dem"
+complete -F "_scenes" -o "default" "scenes"
+complete -F "_settings" -o "default" "settings"
+complete -F "_undo" -o "default" "undo"
+
+function _check(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        #local opts=("-p" "-j" `ls *.res`)
+	local opts="-p -j *.res"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		-p)
+			#local prcs="m_readfiles m_porbits m_crop m_simamp m_timing m_ovs s_readfiles s_porbits s_crop s_ovs coarseorb coarsecorr m_filtazi s_filtazi fine reltiming demassist coregpm resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h geocode"
+			local prcs=`lsprocess | tail -n 6`
+			COMPREPLY=( $(compgen -W "${prcs}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+function _dem(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local opts="make load unload check"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		make)
+			local srtm="SRTM1 SRTM3"
+			COMPREPLY=( $(compgen -W "${srtm}" -- ${cur}) )
+			return 0
+			;;
+		load)
+			COMPREPLY=( $(compgen -f ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+function _scenes(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local opts="include exclude"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		include)
+			local optsX=`scenes`
+			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
+			return 0
+			;;
+		exclude)
+			local optsX=`scenes`
+			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+
+}
+
+function _settings(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local opts="apply check fix init raw save load reset clear"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		apply)
+			local optsX='eval echo \${!${prev}*}'
+			optsX=`eval ${optsX}`
+			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
+			return 0
+			;;
+		load)
+			COMPREPLY=( $(compgen -f ${cur}*.set) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+function _undo(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts=`lsprocess | tail -n 6`
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		only)
+			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "only ${opts}" -- ${cur}))
+}
+
+
+
+#Have a newline at the end

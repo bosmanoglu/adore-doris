@@ -30,7 +30,7 @@ if [ -z "${ADOREFOLDER}" ]; then
  ADOREFOLDER=${ADORESCR//\/scr/} # Remove the scripts folder. 
 fi
 source "${ADOREFOLDER}/set/default.set" 	#use defaults to fill in the rest.
-
+source "${ADOREFOLDER}/scr/fun/tabcompletion"   #add tabcompletion
 #Check settings and make suggestions
 checkInitialSettings
 
