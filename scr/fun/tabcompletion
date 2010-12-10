@@ -1,5 +1,9 @@
 complete -F "_check" -o "default" "check"
 complete -F "_dem" -o "default" "dem"
+complete -F "_mask" -o "default" "mask"
+complete -F "_p" -o "default" "p"
+complete -F "_raster" -o "default" "raster"
+complete -F "_saveas" -o "default" "saveas"
 complete -F "_scenes" -o "default" "scenes"
 complete -F "_settings" -o "default" "settings"
 complete -F "_undo" -o "default" "undo"
@@ -46,6 +50,62 @@ function _dem(){
 	esac
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
 }
+
+function _mask(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts="m_crop m_simamp m_ovs s_crop s_ovs m_filtazi s_filtazi resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+function _p(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts=`lsprocess | tail -n 6`
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	COMPREPLY=( $(compgen -W "*.adr ${opts}" -- ${cur}) )
+}
+
+
+function _raster(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts="a p m"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		a|p|m)
+			optsX="m_crop m_simamp m_ovs s_crop s_ovs m_filtazi s_filtazi resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h"
+			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "only ${opts}" -- ${cur}))
+}
+
+
+function _saveas(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts="envi arcgis"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		envi|arcgis)
+			optsX="m_crop m_simamp m_ovs s_crop s_ovs m_filtazi s_filtazi resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h"
+			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "only ${opts}" -- ${cur}))
+}
+
+
 
 function _scenes(){
 	COMPREPLY=()
