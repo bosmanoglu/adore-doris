@@ -3,13 +3,17 @@ Frequently asked questions.
 
 = FAQ  =
 *How do I run multiple processing steps?*
-  Separate commands with semi-column (`;`). Ex: `m_readfiles;m_porbits;m_crop;m_simamp`  
+  Separate commands with semicolon (`;`). Ex: `m_readfiles;m_porbits;m_crop;m_simamp`  
   
 *Does ADORE have tab completion? *
-  So far only the variable completion (`$m_res[tab]` completes to `$m_resfile`) and path completion is working.
+  ~~So far only the variable completion (`$m_res[tab]` completes to `$m_resfile`) and path completion is working.~~
+  Yes! With r121 tab completion was introduced. It is currently in development(15 Dec 2010). Variable and path completion still works of course.
 
 *How do I remove existing results?*
   There is a command called `undo` to remove steps from result files. It can remove all steps after a given step (default action) or remove only a single step.
 
 *How do I get a list of options the ADORE is using before running the step?*
   You can see what the Doris input files will be like using the show command. If you type `s coarsecorr` it will show you what adore thinks coarsecorr.drs should look like, without running the step.
+
+*How do I create an initial settings file?*
+  Command `settings init` will create an initial settings file by asking you several questions. Of course you can change any and every setting later on. 
