@@ -24,7 +24,7 @@ IDL virtual machine based SAR interferometry software for Envisat.
 
 ===NEST-DORIS=== 
 Next ESA SAR Toolbox - DORIS by Array Systems Computing Inc.<br>
-A user friendly open source toolbox for reading, post-processing, analysing and visualising ESA SAR data. DORIS version is currently under development.
+A user friendly open source toolbox for reading, post-processing, analysing and visualising ESA SAR data.
   * NEST Homepage: http://www.array.ca/nest/
 
 ===GMTSAR===
