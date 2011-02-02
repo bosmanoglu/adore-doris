@@ -1,6 +1,7 @@
 #!/bin/bash
 # USAGE:
 #	check
+# 	check setup
 #	check resultFile
 # 	check -p processName
 #	check -j jobid
@@ -11,6 +12,7 @@
 #
 #  Using the -p option it can be used to check whether a given step is possible
 #  to run. 
+#  "setup" option can be used to check if ADORE can find all the necessary libraries.
 #
 # INPUT:
 #  No required inputs.
@@ -33,13 +35,16 @@
 #               Transferred	5
 #               Held 		6
 #
+#     setup: Check several executables and returns assistive messages if executables are missing.
+#
 # OUTPUT:
 #  Shows the process control list of given result file.
 #
 # Example:
 # check
 # check -p m_readfiles; echo $?
-
+# check setup
+#
 function displayProcessControl(){
   local startline=`grep -n Start_process_control ${1} | cut -f1 -d":"`
   local endline=`grep -n End_process_control ${1} | cut -f1 -d":"`
@@ -474,6 +479,36 @@ elif [ "${jobStat}" == "H" ]; then
 fi  
 }
 
+function checkSetup(){
+#check if adore is in ADORESCR
+#this is not the case when adore is linked.
+[ -f "${ADORESCR}/adore" ] && echo "ADORE scripts are in: ${ADORESCR}" || (echo "ADORE scripts are not in ${ADORESCR}. Please reset ADORESCR.")
+checkExecutable "csh"
+checkExecutable "doris"
+checkExecutable "cpxfiddle"
+[ $? -ne 0 ] && bold "Please install SARTOOLS from DORIS package."
+checkExecutable "envisat_dump_data"
+[ $? -ne 0 ] && bold "Please install ENVISAT_TOOLS from DORIS package."
+checkExecutable "psxy"
+[ $? -ne 0 ] && bold "Please install GMT. On Ubuntu: sudo apt-get install gmt" && bold "If GMT is already installed make sure the gmt/bin directory is included in the PATH environment variable." 
+checkExecutable "gnuplot"
+[ $? -ne 0 ] && bold "Please install gnuplot. On Ubuntu: sudo apt-get install gnuplot" && bold "baselines command will not run without gnuplot." 
+checkExecutable "convert"
+[ $? -ne 0 ] && bold "Please install imagemagick. On Ubuntu: sudo apt-get install imagemagick"
+checkExecutable "gdal_translate"
+[ $? -ne 0 ] && bold "Please install gdal-bin. On Ubuntu: sudo apt-get install gdal-bin"
+}
+
+function checkExecutable(){
+pathCheck=`which ${1}`
+if [ "${pathCheck:-isEmpty}" != "isEmpty" ]; then
+  echo "${1} in ${pathCheck}"
+else
+  bold "can not find ${1}"
+  return 1;
+fi
+}
+
 #MAIN FUNCTION
 if [ "${1}" == "-p" ]; then
  shift 
@@ -481,6 +516,9 @@ if [ "${1}" == "-p" ]; then
 elif [ "${1}" == "-j" ]; then
  shift
  checkJobStatus "${1}"
+elif [ "${1}" == "setup" ];then
+ shift 
+ checkSetup
 else
  listProcessFlagsFromResultFiles "$@"
 fi 

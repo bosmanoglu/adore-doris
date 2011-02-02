@@ -19,6 +19,9 @@
 #
 
 function createJob(){
+local qsubPath=`which qsub`
+[ ${qsubPath:-IsEmpty}=="IsEmpty" ] && echo "Torque PBS, qsub, not found." && return 110
+
 local commands=${1};
 local CALLDIR=${2-$PWD};
 generateRandomString 
