@@ -75,22 +75,32 @@ esac
 generateIndexFile(){
 servername=$1
 filename=$2
-#generate temporary folder
-str0=$$ #get PID
-POS=2  # Starting from position 2 in the string.
-LEN=8  # Extract eight characters.
-str1=$( echo "$str0" | md5sum | md5sum )
-# Doubly scramble:     ^^^^^^   ^^^^^^
-tempFolder="${str1:$POS:$LEN}"
-#projectFolder=$PWD
-mkdir ${tempFolder}
-wget -q -k -nd -r -P"./${tempFolder}" -A*.html* "${servername}" #q:quiet, k:convert links, nd:no directories, r:recursive, P:output directory prefix, A:accept pattern
-cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM1.*hgt*" | cut -f1 --delimiter=\" >   ${filename}
-cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM3.*hgt*" | cut -f1 --delimiter=\" >>  ${filename}
-cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM30.*dem*" | cut -f1 --delimiter=\" >> ${filename}
-#cat index.html.* | egrep -o "http:.*version1.*SRTM3.*dem*" | cut -f1 --delimiter=\" >> ${projectFolder}/${filename}
-rm -rf ./${tempFolder}
-[ $? -ne 0 ] && exit 1
+# See if you can download it from osmanoglu.org
+if [ ${filename} == "dds.cr.usgs.gov" ]; then
+  wget "http://www.osmanoglu.org/supplement/modified-construct_dem/dds.cr.usgs.gov.tar.gz"
+  [ $? -eq 0 ] && tar -xvzf dds.cr.usgs.gov.tar.gz 
+  [ $? -eq 0 ] && rm -rf dds.cr.usgs.gov.tar.gz
+fi
+if [ ! -e ${filename} ]; then #if different server or if file is still missing generate
+  echo "Generating file list for ${servername}"
+  echo "This may take a while..."
+  #generate temporary folder
+  str0=$$ #get PID
+  POS=2  # Starting from position 2 in the string.
+  LEN=8  # Extract eight characters.
+  str1=$( echo "$str0" | md5sum | md5sum )
+  # Doubly scramble:     ^^^^^^   ^^^^^^
+  tempFolder="${str1:$POS:$LEN}"
+  #projectFolder=$PWD
+  mkdir ${tempFolder}
+  wget -q -k -nd -r -P"./${tempFolder}" -A*.html* "${servername}" #q:quiet, k:convert links, nd:no directories, r:recursive, P:output directory prefix, A:accept pattern
+  cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM1.*hgt*" | cut -f1 --delimiter=\" >   ${filename}
+  cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM3.*hgt*" | cut -f1 --delimiter=\" >>  ${filename}
+  cat ./${tempFolder}/index.html.* | egrep -o "http:.*version2.*SRTM30.*dem*" | cut -f1 --delimiter=\" >> ${filename}
+  #cat index.html.* | egrep -o "http:.*version1.*SRTM3.*dem*" | cut -f1 --delimiter=\" >> ${projectFolder}/${filename}
+  rm -rf ./${tempFolder}
+  [ $? -ne 0 ] && exit 1
+fi
 }
 
 # downloads DEM patch from ftp site
