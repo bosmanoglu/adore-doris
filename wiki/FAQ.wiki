@@ -17,3 +17,6 @@ Frequently asked questions.
 
 *How do I create an initial settings file?*
   Command `settings init` will create an initial settings file by asking you several questions. Of course you can change any and every setting later on. 
+
+*Snaphu displays `Killed`, and does not produce any outputs. What is wrong?*
+  It is probably due to low available memory and Linux is killing snaphu before it crashes the computer. If you are not using Linux, and if you have plenty of memory (>10xInterferogramSize) this is probably not the reason though.
