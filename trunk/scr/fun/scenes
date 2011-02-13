@@ -3,6 +3,7 @@
 #	scenes 
 #	scenes exclude orbitFolder1 orbitFolder2 ...
 #	scenes include orbitFolder1 orbitFolder2 ...
+#	scenes init /path/to/files
 #
 # DESCRIPTION:
 #  SCENES is an internal ADORE command. 
@@ -79,6 +80,21 @@ function scenes_include(){
   fi
 }
 
+function scenes_init(){
+local rawDataFolder=$1
+local file folderName absFilePath
+#get list of files
+for file in `ls ${rawDataFolder}/*.N1`
+do
+  #folderName=`echo $file|cut -c23-30`
+  folderName=`envisat_dump_header ${file} | awk '/^ABS_ORBIT /{printf "%s",$3}'`
+  absFilePath=`canonicalPath ${file}`
+  mkdir -p ${dataFolder}/${folderName} # create folder if missing
+  ln -s "${absFilePath}" ${dataFolder}/${folderName}/
+done
+
+}
+
 case "${1}" in 
 "")
  all_scenes
@@ -90,5 +106,9 @@ case "${1}" in
 "include")
  shift
  scenes_include "$@"
+ ;;
+"init")
+ shift
+ scenes_init "$@"
  ;;
 esac
