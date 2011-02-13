@@ -1,0 +1,112 @@
+#!/bin/bash
+
+function findGetorb(){
+ #this function is used to find the location of real getorb.
+ wgetorbPath="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
+ which -a getorb | grep -v ${wgetorbPath} | head -n1
+}
+
+function helpMsg(){
+cat << _EOF
+wgetorb -- a program to interpolate the ODR files
+
+usage: wgetorb [t=|ymd=|mjd=|doy=|sec=]t0[,t1,dt] [lon=lon0,lon1] [lat=lat0,lat1] [+]path
+
+where:
+
+  t0      Epoch for the orbit interpolation in various formats:
+          ymd=t0: [YY]YYMMDD.DDD or [YY]YYMMDDHHMMSS.SSS
+          mjd=t0: Modified Julian Dates (MJD.DDD)
+          doy=t0: Year and day-of-year ([YY]YYDDD.DDD)
+          sec=t0: UTC seconds since 1 Jan 1985
+          t=t0: best guess between ymd= and mjd=
+          t0: best guess between ymd= and mjd=
+                                             
+  t0,t1,dt  Interpolation for a time range (t0 to t1) requested
+            (formats as above) with step size dt (in seconds)
+            
+  lon0,lon1 longitude range (deg)
+  lat0,lat1 latitude range (deg)
+  
+  path    path name of directory or URL in which ODR files are stored
+ +path    path name of a single ODR file to be used (Local only)
+     
+  Examples:
+  wgetorb mjd=50001.500 /home/ers2/ODR  
+  wgetorb ymd=991231235959,000101000159,60 .
+  wgetorb 910809.1244,910809.1245,1 ftp://dutlru2.lr.tudelft.nl/pub/orbits/ODR.ERS-1/dgm-e04  
+_EOF
+}
+
+function whichODR(){
+orbitTime=${1}
+arcListFile=${2}
+
+arcs=0
+while read LINE; do
+  if [ "${LINE}" == "Arc# ------- Arc interval ------ -SLR-xover-altim  Repeat Ver  ---- Begin ----" ]; then
+    arcs=1
+  elif [ ${arcs} -eq 1 ]; then
+    arc=`echo ${LINE} | awk '{print $1}'`
+    arcStart=`echo ${LINE} | awk '{print $2}'`
+    arcEnd=`echo ${LINE} | awk '{print $5}'`
+    if [ ${arcStart} -lt ${orbitTime} ] && [ ${arcEnd} -gt ${orbitTime} ]; then
+      echo ${arc}
+      break
+    fi
+  fi
+done < ${arcListFile}
+}
+
+#main 
+[ $# -eq 0 ] && helpMsg && exit 0
+
+#this script can be named as getorb and placed ahead of real getorb in path. 
+#In this case we need to find real getorb
+getorbPath=`findGetorb`
+
+arcListLocation="${!#}" #last option, can be local folder or wget URL
+if [ ${arcListLocation:0:1} == "+" ]; then 
+  if [ -f ${arcListLocation:1} ]; then
+    # if regular file run getorb
+    ${getorbPath} ${@}
+    exit $?
+  fi
+fi
+if [ ! -d ${arcListLocation} ] ; then
+  timeInput="${1}" 
+  timeFormat=`echo ${timeInput%%=*}`
+  t0=`echo ${timeInput##*=}| cut -d"," -f1`
+  case ${timeFormat} in
+    ymd)
+      orbitStartDate=`mdate -y ${t0} | tail -n1 | awk '{print $4}'`
+    ;;
+    mjd)
+      orbitStartDate=`mdate -m ${t0} | tail -n1 | awk '{print $4}'`
+    ;;
+    doy)
+      orbitStartDate=`mdate -d ${t0} | tail -n1 | awk '{print $4}'`
+    ;;
+    sec)
+      orbitStartDate=`mdate -s ${t0} | tail -n1 | awk '{print $4}'`
+    ;;
+    *) #either t or nothing specified. guess between ymd or mjd
+      orbitStartDate=`mdate ${t0} | tail -n1 | awk '{print $4}'`
+    ;;
+  esac
+
+  #remove last parameter (the URL will be replaced with ODR file)
+  length=$(($#-1))
+  parameters=${@:1:$length}
+
+  #get arclist
+  wget -q "${arcListLocation}/arclist" -O arclist -o wgetorb.log
+  arc=`whichODR "${orbitStartDate}" ./arclist`
+  wget -q "${arcListLocation}/ODR.${arc}" -O ODR.${arc} -a wgetorb.log
+
+  ${getorbPath} ${parameters} +ODR.${arc}
+  exit $?
+else
+  ${getorbPath} $@
+  exit $?
+fi
