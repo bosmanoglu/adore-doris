@@ -77,7 +77,11 @@ unset flag OPTARG OPTIND
 export adoreCommand=$1
 export dorisProcess=$p
 
-export ADORESCR=`echo $(cd $(dirname ${0}); pwd -P)`
+if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
+  LSOF=$(lsof -p $$ | grep -E "/"$(basename $0)"$") # get the location of running script
+  [ $? -ne 0 ] && echo "ADORE could not define ADORESCR. Please set it as environment variable and retry. ex: export ADORESCR=/opt/adore/scr" && exit
+  export ADORESCR=$(dirname ${LSOF##* })
+fi
 echo ADORESCR=${ADORESCR}
 #adjust path
 export _ADOREPATH=${PATH}:${ADORESCR}
