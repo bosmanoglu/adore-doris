@@ -77,7 +77,7 @@ unset flag OPTARG OPTIND
 export adoreCommand=$1
 export dorisProcess=$p
 
-export ADORESCR=`dirname "${0}"`
+export ADORESCR=`echo $(cd $(dirname ${0}); pwd -P)`
 echo ADORESCR=${ADORESCR}
 #adjust path
 export _ADOREPATH=${PATH}:${ADORESCR}
