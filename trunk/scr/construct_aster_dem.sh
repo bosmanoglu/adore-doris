@@ -15,8 +15,9 @@
 #		password, category information. In that case no new tiles can be downloaded. 
 #	-s stitchMethod: Choice of stitching methods. Default is 0.
 #		stitchMethod 0 : No stitching, just download/unzip files
-#		stitchMethod 1 : Using buildvrt and gdal_translate (Mahmut Arikan)
-#		stitchMethod 2 : Using gdal_merge (Petar Marinkovic)
+#		stitchMethod 1 : Using buildvrt and gdal_translate Doris readable (ENVI) output (Mahmut Arikan)
+#		stitchMethod 2 : Using gdal_merge Doris readable (mff2) output(Petar Marinkovic)
+#		stitchMethod 3 : Using gdal_merge Gtiff output (Petar Marinkovic)
 #	W E S N: The corner coordinates of the study area. Enter West and South as - (negative)
 #		values. Decimals are ignored maximizing the area (i.e. floor(west), ceil(east)) 
 #
@@ -238,7 +239,9 @@ echo "--------------------------------------------------"
 echo "Downloading gdem and merging the tiles ..."
 echo "--------------------------------------------------"
 echo ""
-
+###################################################3333
+exit
+#######################################################
 countLat=1
 for ((lat=${S}; lat <= ${N}; lat++))
 do
@@ -280,7 +283,7 @@ done
 
 
 # merging tiles using gdal
-case in ${s}
+case ${s} in
   1)
     #method1: Thanks to Mahmut Arikan @ TU-DELFT
     gdalbuildvrt ${n}.vrt -input_file_list ${demListFile}
@@ -289,8 +292,11 @@ case in ${s}
   ;;
   2)
     #method2: Thanks to Petar Marinkovich 
-    gdal_merge.py -n -32768 -of GTiff -co "TFW=YES" -v -o ${n}.tif --optfile ${demListFile}
     gdal_merge.py -n -32768 -o ${n} -of mff2 -v --optfile ${demListFile}
+  ;;
+  3)
+    #method3: Thanks to Petar Marinkovich 
+    gdal_merge.py -n -32768 -of GTiff -co "TFW=YES" -v -o ${n}.tif --optfile ${demListFile}  
   ;;
   *)
     #no stitching.
