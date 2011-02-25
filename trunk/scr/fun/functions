@@ -208,7 +208,7 @@ function exclude(){
 function h(){
   [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
   if [ "${1:-undefined}" == "undefined" ]; then
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/?"
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/h"
   elif [ -e "${ADORESCR}/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
   elif [ -e "${ADORESCR}/process/${1}" ]; then 
