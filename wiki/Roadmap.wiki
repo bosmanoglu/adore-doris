@@ -8,6 +8,7 @@ This is an ongoing/continuously changing page for the proposed changes in ADORE.
 = Proposed features before alpha release =
 
 List of proposed changes in order of importance:
-  * Better manual, additional tutorials.
+  * *Work in Progress - Need Help*Better manual, additional tutorials.
   * *DONE* Tab completion for all adore commands (i.e. `settings [tab][tab]` should show options for settings command.
   * Add interface to display results. To display the related portion of the result file without opening the file. Visualize coarsecorr, finecorr offsets (turn on visualization using doris+gmt?)
+  * *DONE* Add interface to check setup.
