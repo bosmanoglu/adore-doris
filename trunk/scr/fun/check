@@ -480,23 +480,32 @@ fi
 }
 
 function checkSetup(){
-#check if adore is in ADORESCR
-#this is not the case when adore is linked.
-[ -f "${ADORESCR}/adore" ] && echo "ADORE scripts are in: ${ADORESCR}" || (echo "ADORE scripts are not in ${ADORESCR}. Please reset ADORESCR.")
-checkExecutable "csh"
-checkExecutable "doris"
-checkExecutable "cpxfiddle"
-[ $? -ne 0 ] && bold "Please install SARTOOLS from DORIS package."
-checkExecutable "envisat_dump_data"
-[ $? -ne 0 ] && bold "Please install ENVISAT_TOOLS from DORIS package."
-checkExecutable "psxy"
-[ $? -ne 0 ] && bold "Please install GMT. On Ubuntu: sudo apt-get install gmt" && bold "If GMT is already installed make sure the gmt/bin directory is included in the PATH environment variable." 
-checkExecutable "gnuplot"
-[ $? -ne 0 ] && bold "Please install gnuplot. On Ubuntu: sudo apt-get install gnuplot" && bold "baselines command will not run without gnuplot." 
-checkExecutable "convert"
-[ $? -ne 0 ] && bold "Please install imagemagick. On Ubuntu: sudo apt-get install imagemagick"
-checkExecutable "gdal_translate"
-[ $? -ne 0 ] && bold "Please install gdal-bin. On Ubuntu: sudo apt-get install gdal-bin"
+if [ $# -eq 0 ]; then
+ #check if adore is in ADORESCR
+ #this is not the case when adore is linked.
+ [ -f "${ADORESCR}/adore" ] && echo "ADORE scripts are in: ${ADORESCR}" || (echo "ADORE scripts are not in ${ADORESCR}. Please reset ADORESCR.")
+ checkExecutable "csh"
+ checkExecutable "doris"
+ checkExecutable "getorb"
+ [ $? -ne 0 ] && bold "Please install getorb from: http://www.deos.tudelft.nl/ers/precorbs/tools/."
+ checkExecutable "cpxfiddle"
+ [ $? -ne 0 ] && bold "Please install SARTOOLS from DORIS package."
+ checkExecutable "envisat_dump_data"
+ [ $? -ne 0 ] && bold "Please install ENVISAT_TOOLS from DORIS package."
+ checkExecutable "psxy"
+ [ $? -ne 0 ] && bold "Please install GMT. On Ubuntu: sudo apt-get install gmt" && bold "If GMT is already installed make sure the gmt/bin directory is included in the PATH environment variable." 
+ checkExecutable "gnuplot"
+ [ $? -ne 0 ] && bold "Please install gnuplot. On Ubuntu: sudo apt-get install gnuplot" && bold "baselines command will not run without gnuplot." 
+ checkExecutable "convert"
+ [ $? -ne 0 ] && bold "Please install imagemagick. On Ubuntu: sudo apt-get install imagemagick"
+ checkExecutable "gdal_translate"
+ [ $? -ne 0 ] && bold "Please install gdal-bin. On Ubuntu: sudo apt-get install gdal-bin"
+ if ask "Would you like me to run a test in this folder (Files will be downloaded and created. ~5min)?"; then
+   test1
+ fi
+else
+ $1
+fi
 }
 
 function checkExecutable(){
@@ -509,6 +518,15 @@ else
 fi
 }
 
+function test1(){
+wget http://adore-doris.googlecode.com/files/test1-r1.tar.gz
+gunzip test1-r*.tar.gz
+archive extract test1-r*
+coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence
+bold "Please check to see if the results match. You should see OK after the filenames."
+md5sum -c 1393_21066.md5
+}
+
 #MAIN FUNCTION
 if [ "${1}" == "-p" ]; then
  shift 
@@ -518,7 +536,7 @@ elif [ "${1}" == "-j" ]; then
  checkJobStatus "${1}"
 elif [ "${1}" == "setup" ];then
  shift 
- checkSetup
+ checkSetup "${@}"
 else
  listProcessFlagsFromResultFiles "$@"
 fi 
