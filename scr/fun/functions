@@ -10,6 +10,10 @@ function ?
  h "$@"
 }
 
+function archive(){
+  . ${ADORESCR}/fun/archive ${@}
+}
+
 function call(){
   functionCall=$@;
   #parse left of equal
@@ -103,6 +107,9 @@ function canonicalPath(){
   echo $(cd $(dirname $1); pwd -P)/$(basename $1)
 }
 
+function mvDorisFiles(){
+  . ${ADORESCR}/fun/mvDorisFiles ${@}
+}
 
 function pp()
 {

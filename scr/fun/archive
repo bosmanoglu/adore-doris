@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# USAGE:
+#	archive create [folderName]
+#
+# DESCRIPTION:
+#  archive is an ADORE function. 
+#  It creates a tar archive for the given folder, as well as creating
+#  checksums (md5sum) for each file. The md5sums are verified during
+#  extraction. 
+#
+# INPUT:
+#  folderName: The folder to archive. If omitted current folder "." is used.
+#  
+# OUTPUT:
+#  folderName.tar
+
+# create archive
+function archive_create(){
+ local inputPath=`echo ${1:-.}`
+ local folderPath=`canonicalPath ${1:-.}` 
+ local folderName=`echo ${folderPath##*/}`
+ if [ ${folderName} == "." ]; then
+   folderPath=`echo ${folderPath%/.}`
+   folderName=`echo ${folderPath##*/}`
+ fi
+ rm -rf /tmp/${folderName}.md5
+ echo ${folderPath} >> /tmp/${folderName}.md5
+ tar -cvf ${folderName}.tar ${inputPath} | xargs -I '{}' sh -c "test -f '{}' && md5sum '{}'" | tee -a /tmp/${folderName}.md5
+ mv /tmp/${folderName}.md5 ${folderName}.md5
+ tar -rf ${folderName}.tar ${folderName}.md5
+ rm -rf ${folderName}.md5
+}
+
+# extract archive
+function archive_extract(){
+ local outFolderPath=`canonicalPath ${1}`
+ outFolderPath=`dirname ${outFolderPath}`
+ local archiveName=`echo ${1%.*}`
+ #mkdir -p ${archiveName}
+ tar -xvf ${1} #-C ${archiveName}
+ local md5file=`ls *.md5`
+ local inFolderPath=`head -n1 ${md5file}`
+ sed -i 1d ${md5file}  
+ sed -i "s@ \./@ ${outFolderPath}/@g" ${md5file}
+ md5sum -c ${md5file}
+ mvDorisFiles -s ${inFolderPath} ${outFolderPath}
+}
+#Main
+case ${1} in
+  create)
+    shift 
+    archive_create ${@}
+  ;;
+  extract)
+    shift
+    archive_extract ${@}
+  ;;
+  *)
+    h archive
+  ;;
+esac
+  
