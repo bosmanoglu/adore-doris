@@ -67,12 +67,12 @@ function dorisProcess2OutputFile(){
   ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
   inputfile=${resfile}
   section=${dorisStep}
-  notify=notify
+  #notify=notify
   grepStart=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
   grepEnd=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
 
   grepLength=$((${grepEnd}-${grepStart}));
-  if [[ "${notify}" == "notify" ]]; then
+  if [[ "${batch}" == "off" ]]; then
     #get number of hits
     numHits=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|wc -l`    
     if [[ ${numHits} -gt 1 ]]; then
@@ -84,24 +84,34 @@ function dorisProcess2OutputFile(){
         matchingLine=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
         echo $c : ${matchingLine}      
       done
-      read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
-      result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
-      if [ -z "${result}" ]; then
-        echo "Something went wrong."
-        echo "Exiting..."
-        return; 
-      else
-        #get the format
-        format=`grep -A ${grepLength} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
-        format=${format##*:}    #Get the part after the LAST column
-      fi
+      while 1
+      do
+        read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
+        result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
+        if [ -z "${result}" ]; then
+          #echo "Something went wrong."
+          #echo "Exiting..."
+          #return; 
+          continue
+        else
+          #get the format
+          format=`grep -A ${grepLength} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
+          format=${format##*:}    #Get the part after the LAST column
+          break
+        fi
+      done
     else
+      # batch off - only one element
       result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}`
       format=`readRes.sh ${resfile} ${dorisStep} Data_output_format`
     fi
   else
-    result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}`
-    format=`readRes.sh ${resfile} ${dorisStep} Data_output_format`
+    #batch on - select the first one
+    result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==1"`    	    
+    format=`grep -A ${grepLength} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==1"`
+    format=${format##*:}    #Get the part after the LAST column
+    #selects last one#result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}`
+    #selects last one#format=`readRes.sh ${resfile} ${dorisStep} Data_output_format`
   fi
   result=${result##*:} 	#Get the part after the LAST column 
   result=${result%%//*}	# Remove the part after // (trailing comment)
