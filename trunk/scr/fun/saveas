@@ -363,14 +363,6 @@ function saveas_gdal(){
   fi
 }
 
-
-
-
-
-
-
-
-
 case ${1} in 
   envi)
     saveas_envi ${2}    

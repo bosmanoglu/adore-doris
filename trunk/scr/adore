@@ -83,12 +83,12 @@ if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
   export ADORESCR=$(dirname ${LSOF##* })
 fi
 echo ADORESCR=${ADORESCR}
-#adjust path
+#adjust path in /ADORESCR/.adore.rc, only if interactive
 export _ADOREPATH=${PATH}:${ADORESCR}
 
 if [ "${i-notInteractive}" == "notInteractive" ]; then
   #not interactive - batch processing
-  source .adore.rc
+  source ${ADORESCR}/.adore.rc
 else
   bash --init-file "${ADORESCR}/.adore.rc" -i
 #  set -o emacs
