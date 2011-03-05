@@ -519,7 +519,7 @@ fi
 }
 
 function test1(){
-wget http://adore-doris.googlecode.com/files/test1-r1.tar.gz
+wget http://adore-doris.googlecode.com/files/test1-r2.tar.gz
 gunzip test1-r*.tar.gz
 archive extract test1-r*
 settings load
