@@ -24,12 +24,12 @@ function archive_create(){
    folderPath=`echo ${folderPath%/.}`
    folderName=`echo ${folderPath##*/}`
  fi
- rm -rf /tmp/${folderName}.md5
- echo ${folderPath} >> /tmp/${folderName}.md5
- tar -cvf ${folderName}.tar ${inputPath} | xargs -I '{}' sh -c "test -f '{}' && md5sum '{}'" | tee -a /tmp/${folderName}.md5
- mv /tmp/${folderName}.md5 ${folderName}.md5
- tar -rf ${folderName}.tar ${folderName}.md5
- rm -rf ${folderName}.md5
+ rm -rf /tmp/archive.md5
+ echo ${folderPath} >> /tmp/archive.md5
+ tar -cvf ${folderName}.tar ${inputPath} | xargs -I '{}' sh -c "test -f '{}' && md5sum '{}'" | tee -a /tmp/archive.md5
+ mv /tmp/archive.md5 archive.md5
+ tar -rf ${folderName}.tar archive.md5
+ rm -rf archive.md5
 }
 
 # extract archive
@@ -39,7 +39,7 @@ function archive_extract(){
  local archiveName=`echo ${1%.*}`
  #mkdir -p ${archiveName}
  tar -xvf ${1} #-C ${archiveName}
- local md5file=`ls *.md5`
+ local md5file=archive.md5
  local inFolderPath=`head -n1 ${md5file}`
  sed -i 1d ${md5file}  
  sed -i "s@ \./@ ${outFolderPath}/@g" ${md5file}
