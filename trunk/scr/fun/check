@@ -522,6 +522,7 @@ function test1(){
 wget http://adore-doris.googlecode.com/files/test1-r1.tar.gz
 gunzip test1-r*.tar.gz
 archive extract test1-r*
+settings load
 coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence
 bold "Please check to see if the results match. You should see OK after the filenames."
 md5sum -c 1393_21066.md5
