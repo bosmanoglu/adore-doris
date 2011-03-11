@@ -75,5 +75,9 @@ case "${1}" in
   reltiming   ) echo timing_error   ;;
   comprefpha  ) echo comp_refphase  ;;
   unwrap      ) echo unwrap         ;;
+  ci2	      ) echo complex_short  ;;
+  cr4	      ) echo complex_real4  ;;
+  i2          ) echo short	    ;;
+  r4          ) echo real4          ;;
   *           ) echo ${1}           ;;
 esac

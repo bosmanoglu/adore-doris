@@ -3,9 +3,9 @@
 #	settings option [argument]
 #	settings
 #	settings apply variableName
-#	settings apply [-r] variableName1=variableValue1 [variableName2 variableName3=...]
+#	settings apply [-rq] variableName1=variableValue1 [variableName2 variableName3=...]
 #	settings check
-#	settings fix
+#	settings fix [-q]
 #	settings init
 #	settings raw
 #	settings save [fileName]
@@ -21,11 +21,12 @@
 # INPUT:
 #  settings: will list the current settings as seen by ADORE.
 #
-#  settings apply [-r] variableName: updates settings that depend on
+#  settings apply [-rq] variableName: updates settings that depend on
 #	variableName. By default this is not done in a recursive way. Use 
-#       'settings check' for possible mismatches. Recursive checks can be 
-# 	specified using -r option. Settings apply can also assign values 
-#       using the variableName=value syntax. 
+#       'settings check' for possible mismatches. Settings apply can also assign values 
+#       using the variableName=value syntax.  
+#       -r: Recursive checks can be specified using -r option. 
+#	-q: Quiet. Suppresses the printing of the changed settings.
 #
 #  settings check: looks for differences between ADORE's 
 #	expectations and current values. Handy for finding 
@@ -33,6 +34,7 @@
 #
 #  settings fix: after "check"ing you can accept suggested changes 
 #	using the variables. Check will display a reference line.
+#	-q: Quiet. Suppresses the printing of the changed settings.
 #
 #  settings init: will ask the user some questions to create an initial 
 #	settings file. Useful when starting a new project. 
@@ -323,15 +325,35 @@ function settings_check(){
 }
 
 function settings_apply(){
-  local recursive=1; #off=1, on=0
-  if [ "${2}" == "-r" ]; then
-    recursive=0;
-    shift;
-  fi
+  local r=1; #off=1, on=0
+  local q=1; #off=1, on=0
+  #echo "${@}"
+  unset OPTIND OPTARG
+  while getopts "rq" flag "${@}"
+  do
+    #echo "$flag" $OPTIND $OPTARG
+    if [ "${flag}" == "?" ]; then
+      continue;
+    else
+      [ "${flag}" == "r" ] && r=0
+      [ "${flag}" == "q" ] && q=0
+    fi
+  done
+  
+  #Remove already parsed options
+  local k
+  for ((k=1; k<$OPTIND; k++ ))
+  do
+    shift
+  done
+#  if [ "${2}" == "-r" ]; then
+#    recursive=0;
+#    shift;
+#  fi
   #Get the remaining 
-  if [ "${2-undefined}" != "undefined" ]; then
+  if [ "${1-undefined}" != "undefined" ]; then
     #loop over input. 
-    for (( k=2 ; k<=$# ; k++ )); do
+    for (( k=1 ; k<=$# ; k++ )); do
       #check if this parameter is an assignment statement
       inputPar="${!k}";
       if [[ "${inputPar}" == *=* ]]; then
@@ -341,7 +363,7 @@ function settings_apply(){
       else
         inputVar=${inputPar};  
       fi
-      echo ${inputVar}=\"${!inputVar}\"
+      [ "${q}" -eq "1" ] && echo ${inputVar}=\"${!inputVar}\"
       #apply setting with all dependents. like ${master} is changed so should ${m_resfiles}.
       #loop over _ref_variables. and check for changes.
       for var in ${!_rel_*}; do
@@ -349,23 +371,25 @@ function settings_apply(){
         #echo ${var}=${var##*_rel_} # display setting to be modified
         setting=${var##*_rel_} # get setting name
         relativeValue=`eval ${!var}`
-        if [[ "${!var}" == *${inputVar}* ]]; then
+        if [[ ${!var} == *${inputVar}* ]]; then
           #echo ${setting}=${!setting} #display current settings
           #echo ${setting}=${relativeValue}
           [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
           if [ "${!setting}" != "${relativeValue}" ]; then
-            echo ${setting}=${relativeValue}
+            [ "${q}" -eq "1" ] && echo ${setting}=${relativeValue}
             #eval ${setting}=\"${relativeValue}\"
             eval "${setting}=\"${relativeValue}\""
           fi
         fi
       done #for relative definitions
     done #for input
-
-    [ "${recursive}" -eq "1" ] && return; #if recursive is not requested return. 
+    #echo "r=${r}"
+    [ "${r}" -eq "1" ] && return; #if recursive is not requested return. 
     local loopCounter=0
+    local qFlag=""
+    [ "${q}" -eq "0" ] && qFlag="-q" #if quiet set flag for fix.
     while [ ${loopCounter} -lt 10 ]; do
-      settings fix 
+      settings fix ${qFlag} 
       [ settingsOK ] && break; #if no change is detected no need to continue.
       let loopCounter=loopCounter+1;
     done #while recursive 
@@ -381,9 +405,14 @@ function settings_apply(){
 }
 
 function settings_fix(){
+    local q=1;
+    if [[ "${2}" == "-q" ]]; then
+      q=0; #quiet on=0, off=1
+      shift
+    fi
     if [ "${2:-undefined}" == "undefined" ]; then
-      echo ""
-      echo "Applying all suggested changes."
+      [ "${q}" -eq "1" ] && echo ""
+      [ "${q}" -eq "1" ] && echo "Applying all suggested changes."
       for var in ${!_rel_*}
       do
         #echo ${var}=${!var} #display contents
@@ -394,7 +423,7 @@ function settings_fix(){
         #echo ${setting}=${relativeValue}
         [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
         if [ "${!setting}" != "${relativeValue}" ]; then
-          echo "${setting}=\"${relativeValue}\""        
+          [ ! ${q} ] && echo "${setting}=\"${relativeValue}\""        
           eval "${setting}=\"${relativeValue}\""
         fi
       done
@@ -406,7 +435,7 @@ function settings_fix(){
         relativeName="_rel_${!k}"
         #echo ${relativeName}
         relativeValue=`eval ${!relativeName}`
-        echo "${setting}=\"${relativeValue}\""
+        [ "${q}" -eq "1" ] && echo "${setting}=\"${relativeValue}\""
         eval "${setting}=\"${relativeValue}\"" 
       done
     fi
@@ -538,6 +567,7 @@ case ${1} in
     settings_check
   ;;  
   apply)
+    shift
     settings_apply "$@"
   ;;  
   fix)

@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+#
+#
+
+function create(){
+curFolder=${PWD}
+mkdir -p ${runFolder}/report
+reportFile=${runFolder}/report/index.html
+cat >> ${reportFile}<<_EOF
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+ <HEAD>
+  <TITLE>ADORE REPORT</TITLE>
+ </HEAD>
+ <BODY>
+_EOF
+
+for iFolder in `ls ${i12sFolder}`
+do
+  cd ${i12sFolder}/${iFolder}
+  settings load
+  raster_format=png
+  raster p subtrrefpha -- -M4/4
+  mv *srp.png ${runFolder}/report
+  raster p coherence -- -c gray -M4/4
+  mv *coh.png ${runFolder}/report
+done
+cd ${curFolder}
+}
+
+create ${@}

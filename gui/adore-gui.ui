@@ -1,0 +1,59 @@
+<ui>
+<menubar name="MenuBar">
+  <menu action="File">
+    <menuitem action="Quit"/>
+  </menu>
+  <menu action="Edit">
+    <menuitem action="Copy"/>
+    <menuitem action="Paste"/>
+  </menu>
+  <menu action="Process">
+    <menuitem action="m_readfiles"/>
+    <menuitem action="m_porbits"/>
+    <menuitem action="m_crop"/>
+    <menuitem action="m_simamp"/>
+    <menuitem action="m_timing"/>
+    <menuitem action="m_ovs"/>
+    <separator/>
+    <menuitem action="s_readfiles"/>
+    <menuitem action="s_porbits"/>
+    <menuitem action="s_crop"/>
+    <menuitem action="s_ovs"/>
+    <separator/>
+    <menuitem action="coarseorb"/>
+    <menuitem action="coarsecorr"/>
+    <menuitem action="m_filtazi"/>
+    <menuitem action="s_filtazi"/>
+    <menuitem action="fine"/>
+    <menuitem action="reltiming"/>
+    <menuitem action="demassist"/>
+    <menuitem action="coregpm"/>
+    <menuitem action="resample"/>
+    <menuitem action="filtrange"/>
+    <menuitem action="interfero"/>
+    <menuitem action="comprefpha"/>
+    <menuitem action="subtrrefpha"/>
+    <menuitem action="comprefdem"/>
+    <menuitem action="subtrrefdem"/>
+    <menuitem action="coherence"/>
+    <menuitem action="filtphase"/>
+    <menuitem action="unwrap"/>
+    <menuitem action="dinsar"/>
+    <menuitem action="slant2htrick"/>
+    <menuitem action="slant2h"/>
+    <menuitem action="geocode"/>
+  </menu>
+  <menu action="Settings">
+    <menuitem action="Check"/>
+    <menuitem action="Fix"/>
+    <menuitem action="Load"/>
+    <menuitem action="Save"/>
+    <separator/>
+    <menuitem action="Reset"/>
+  </menu>  
+  <menu action="About">
+    <menuitem action="Version"/>
+    <menuitem action="ShowAbout"/>
+  </menu>
+</menubar>
+</ui>

@@ -162,6 +162,10 @@ function p()
   fi
 }
 
+function report(){
+  . ${ADORESCR}/fun/report ${@}
+}
+
 function s()
 {
 #SHOW
@@ -355,7 +359,7 @@ function reltiming(){
 }
  
 function resample(){
-  p resample
+  p resample "$@"
 }
  
 function s_crop(){

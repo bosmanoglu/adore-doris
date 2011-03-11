@@ -84,7 +84,7 @@ function dorisProcess2OutputFile(){
         matchingLine=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
         echo $c : ${matchingLine}      
       done
-      while 1
+      while [ "1" == "1" ] #infinite loop
       do
         read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
         result=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    

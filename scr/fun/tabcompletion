@@ -1,3 +1,4 @@
+complete -F "_archive" -o "default" "archive"
 complete -F "_check" -o "default" "check"
 complete -F "_dem" -o "default" "dem"
 complete -F "_mask" -o "default" "mask"
@@ -7,6 +8,27 @@ complete -F "_saveas" -o "default" "saveas"
 complete -F "_scenes" -o "default" "scenes"
 complete -F "_settings" -o "default" "settings"
 complete -F "_undo" -o "default" "undo"
+
+function _archive(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        #local opts=("-p" "-j" `ls *.res`)
+	local opts="create extract"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		extract)
+			#local prcs="m_readfiles m_porbits m_crop m_simamp m_timing m_ovs s_readfiles s_porbits s_crop s_ovs coarseorb coarsecorr m_filtazi s_filtazi fine reltiming demassist coregpm resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h geocode"
+			local prcs=`ls *.tar`
+			COMPREPLY=( $(compgen -W "${prcs}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
 
 function _check(){
 	COMPREPLY=()
