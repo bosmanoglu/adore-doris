@@ -2,7 +2,7 @@
 ###   BASH Environment Variables    ###
 #######################################
 [ -z "${ADOREFOLDER}"		] && ADOREFOLDER=${ADORESCR//\/scr/}
-[ -z "${_rel_ADOREFOLDER}"	] && _rel_ADORESCR='echo ${ADORESCR//\/scr/}'
+[ -z "${_rel_ADOREFOLDER}"	] && _rel_ADOREFOLDER='echo ${ADORESCR//\/scr/}'
 #######################################
 ###  ADORE-BASH Run-Time Settings   ###
 #######################################

@@ -1,58 +1,182 @@
 #!/bin/bash
 
-unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
-#check if dbowgeo is set
-if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
-  #if not check for rs_dbow
-  if [ "${rs_dbow}" == "0 0 0 0" ]; then
-   set -x
-   # get a smaller dbow from master. Otherwise the resampling may fail. 
-   local l0 lN p0 pN lshift pshift 
-   l0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_line"`
-   lN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_line"`
-   p0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_pixel"`
-   pN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_pixel"`
-
-   lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
-   pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
-   if [ ${lshift} -lt 0 ]; then 
-     l0=$((${l0}-${lshift}+${rs_az_buffer}))
-     lN=$((${lN}-${rs_az_buffer}))
-   else 
-     l0=$((${l0}+${rs_az_buffer}))
-     lN=$((${lN}-${lshift}-${rs_az_buffer}))
-   fi
-   if [ ${pshift} -lt 0 ]; then
-     p0=$((${p0}-${pshift}+${rs_rg_buffer}))
-     pN=$((${pN}-${rs_rg_buffer}))
-   else
-     p0=$((${p0}+${rs_rg_buffer}))
-     pN=$((${pN}-${pshift}-${rs_rg_buffer}))
-   fi
-   rs_dbow="${l0} ${lN} ${p0} ${pN}"
-   set +x
+function trickResample(){
+  local rMaster=${1}
+  local dorisStep=`pn2rs "${2}"`
+  local rFile=`canonicalPath ${3}`
+  local rFFormat=`pn2rs "${4}"`
+  
+  #User can change the resampleFolder if they like. 
+  if [ "${resampleFolder:-isEmpty}" == "isEmpty" ]; then
+    local rFolder=${outputFolder}/resample/${rMaster}
+  else
+    local rFolder=${resampleFolder} 
   fi
+  local r_resfile=${cropsFolder}/${rMaster}/${rMaster}.res
+  local ri_resfile=${rFolder}/${rMaster}_${master}_${slave}.res
+  local CallDir=${PWD}
+  local oMaster=${master}
+  local oSlave=${slave}
+  local filename resfile format numpixels numlines
+
+  generateRandomString
+  local originalSettingsFile=${outputFolder}/${randomString}.set
+  #save current settings so that we can recall them at the end.
+  settings save ${originalSettingsFile}
+
+  mkdir -p ${rFolder}
+  call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+  [ "${resfile:-isEmpty}" == "isEmpty" ] && return
+  format=`pn2rs ${format}`
+  if [ "${rFile:-isEmpty}" != "isEmpty" ]; then
+    #user specified filename
+    filename=${rFile};
+  fi
+  if [ "${rFFormat:-isEmpty}" != "isEmpty" ]; then
+    #user specified format
+    format=${rFFormat};
+  fi
+  
+  if [[ ${format} != *complex* ]]; then
+    [ ! -e "${rFolder}/CPM_Data" ] && echo "Real files can only be resampled after coregistration parameters are calculated!" && echo "Resample a complex file (subtrrefpha etc.) first." && return
+    bold "Converting real file to complex. This may take some time..."
+    gmtconvert ${filename} ${filename} -bis1 -A -bos2 > ${filename}.cpx
+    filename="${filename}.cpx"
+    format="complex_${format}"
+  fi
+  # Below line copies the information from the requested step and copies it to a temporary file
+  sed -n "/_Start_${dorisStep}/,/End_${dorisStep}/p" ${resfile} | sed -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p'  > ${rFolder}/tmp.resample
+  # Remove the extra output lines
+  sed -i -e '/Data_output_file_/ d' -e '/Data_output_format_/ d' ${rFolder}/tmp.resample
+  # Replace the values of the filename and format, < is the split character $@ has a special meaning. can't use @
+  sed -i -e "s<^Data_output_file.*$<Data_output_file: ${filename}<g" -e "s<^Data_output_format.*$<Data_output_format: ${format}<g" ${rFolder}/tmp.resample
+  
+  if [ ! -e "${rFolder}/CPM_Data" ]; then
+    #if this is the first time we are resampling copy required files. 
+    cp ${r_resfile} ${rFolder}
+    cp ${m_resfile} ${rFolder}
+    #Also copy a resampled interferogram file: ri_resfile
+    cp ${i_resfile} ${ri_resfile}
+    undo coregpm ${ri_resfile}
+  fi    
+
+  settings apply -r -q master="${rMaster}" slave="${master}" outputFolder="${rFolder}"
+  cd ${outputFolder} #CD into OUTPUT FOLDER. This is required for temporary doris files to be created in outputFolder. 
+  settings save   
+  undo s_crop
+  # Re-write crop for resampling.
+  sed -i -e '/^crop/s/0/1/g' ${s_resfile}
+  echo "*******************************************************************" >> ${s_resfile}
+  echo "*_Start_crop:			master step01" >> ${s_resfile}
+  cat ${outputFolder}/tmp.resample >> ${s_resfile}
+  echo "* End_crop:_NORMAL" >> ${s_resfile}
+  echo "*******************************************************************" >> ${s_resfile}
+
+  undo resample
+  local outName=`basename ${filename}| tr '.' '_'`
+  rs_out_file="${outputFolder}/${outName}.rs"
+#  mv ${rs_out_file} ${outputFolder}/${outName}.rs
+
+  if [ -e "${outputFolder}/CPM_Data" ]; then  
+    eval resample
+  else
+    eval "coarseorb;coarsecorr;fine;coregpm;resample"
+  fi
+
+  #cp ${s_resfile} ${outputFolder}/${outName}.res
+  # Re-write the resampled step in the resampled interferogram file: ${outputFolder}/resample/${rMaster}/${rMaster}_${master}_${slave}.res
+  sed -n "/_Start_resample/,/End_resample/p" ${s_resfile} | sed -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p' > ${outputFolder}/tmp.resample
+  #get the status of result file:
+  local stat=`readRes.sh ${ri_resfile} process "${dorisStep}"`
+  if [[ $stat -eq 1 ]]; then 
+    dorisStep=`basename ${rs_out_file}`
+  else
+    sed -i -e "/^${dorisStep}/s/0/1/g" ${ri_resfile}
+  fi
+  echo "*******************************************************************" >> ${ri_resfile}
+  echo "*_Start_${dorisStep}:	 " >> ${ri_resfile}
+  cat ${outputFolder}/tmp.resample >> ${ri_resfile}
+  echo "* End_${dorisStep}:_NORMAL" >> ${ri_resfile}
+  echo "*******************************************************************" >> ${ri_resfile}
+      
+  cd ${CallDir} # CD back to Call Directory.
+  echo "Reloading user settings from temporary settings file."
+  settings load ${originalSettingsFile}
+  rm ${originalSettingsFile}  
+}
+
+function dorisResample(){
+  unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
+  #check if dbowgeo is set
+  if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
+    #if not check for rs_dbow
+    if [ "${rs_dbow}" == "0 0 0 0" ]; then
+     # get a smaller dbow from master. Otherwise the resampling may fail. 
+     local l0 lN p0 pN lshift pshift autoFlag
+     autoFlag=0; #0=on 1=off
+     l0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_line"`
+     lN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_line"`
+     p0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_pixel"`
+     pN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_pixel"`
+
+     lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
+     pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
+  #   ascFlag=`grep -i ascend ${s_resfile}`
+  #   if [ "${ascFlag:-isEmpty}" != "isEmpty" ];then 
+  #     lshift=$(( 0-${lshift} ))
+  #     pshift=$(( 0-${pshift} ))
+  #   fi
+     if [ ${lshift} -lt 0 ]; then 
+       l0=$((${l0}-${lshift}+${rs_az_buffer}))
+       lN=$((${lN}-${rs_az_buffer}))
+     else 
+       l0=$((${l0}+${rs_az_buffer}))
+       lN=$((${lN}-${lshift}-${rs_az_buffer}))
+     fi
+     if [ ${pshift} -lt 0 ]; then
+       p0=$((${p0}-${pshift}+${rs_rg_buffer}))
+       pN=$((${pN}-${rs_rg_buffer}))
+     else
+       p0=$((${p0}+${rs_rg_buffer}))
+       pN=$((${pN}-${pshift}-${rs_rg_buffer}))
+     fi
+     rs_dbow="${l0} ${lN} ${p0} ${pN}"
+    fi
+  fi
+
+  pp ${dorisProcess}
+
+  # remove undefined settings from .drs file so that doris handles it
+  # automatically
+
+  if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
+    grep -i -v -w "rs_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
+
+  ### This is actually not necessary. if dbow_geo exists this is omitted. If dbow_geo is all zeros then 
+  ### first part of the code sets rs_dbow anyway...
+  if [ "${rs_dbow}" == "0 0 0 0" ]; then
+  # get a smaller dbow from master. Otherwise the resampling may fail. 
+    grep -i -v -w "rs_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
+
+
+  #run doris
+  doris ${outputFolder}/${dorisProcess}.drs
+  [[ $? -eq 0 ]] && echo "${dorisProcess}: SUCCESS"
+  
+  if [[ ${autoFlag} -eq 0 ]]; then 
+    #reset rs_dbow to 0 0 0 0
+    rs_dbow="0 0 0 0"
+  fi
+}
+
+## MAIN
+if [[ $# -eq 0 ]]; then
+  dorisResample
+else
+  trickResample $@
 fi
 
-pp ${dorisProcess}
-
-# remove undefined settings from .drs file so that doris handles it
-# automatically
-
-if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
-  grep -i -v -w "rs_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
-fi
-
-### This is actually not necessary. if dbow_geo exists this is omitted. If dbow_geo is all zeros then 
-### first part of the code sets rs_dbow anyway...
-if [ "${rs_dbow}" == "0 0 0 0" ]; then
-# get a smaller dbow from master. Otherwise the resampling may fail. 
-  grep -i -v -w "rs_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
-fi
-
-
-#run doris
-doris ${outputFolder}/${dorisProcess}.drs
-[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"

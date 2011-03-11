@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # USAGE:
-#	archive create [folderName]
+#	archive create [path/to/folder] [archiveName]
 #
 # DESCRIPTION:
 #  archive is an ADORE function. 
@@ -10,8 +10,11 @@
 #  extraction. 
 #
 # INPUT:
-#  folderName: The folder to archive. If omitted current folder "." is used.
-#  
+#  path/to/folder: Relative (or full) path to the folder to be archived. 
+#    If omitted current folder "." is used.
+#  archiveName: Optional input for output archive file name. If omitted
+#    the name of the parent folder is used (last part of the path to folder.)
+#
 # OUTPUT:
 #  folderName.tar
 
@@ -20,15 +23,19 @@ function archive_create(){
  local inputPath=`echo ${1:-.}`
  local folderPath=`canonicalPath ${1:-.}` 
  local folderName=`echo ${folderPath##*/}`
- if [ ${folderName} == "." ]; then
+ local archiveName="${2}"
+ if [ ${folderName} == "." ]; then #if folder path is not specified use current folder
    folderPath=`echo ${folderPath%/.}`
    folderName=`echo ${folderPath##*/}`
  fi
+ if [ "${archiveName:-isEmpty}" == "isEmpty" ]; then #if archivename is not specified use parent folder
+   archiveName=${folderName};
+ fi
  rm -rf /tmp/archive.md5
  echo ${folderPath} >> /tmp/archive.md5
- tar -cvf ${folderName}.tar ${inputPath} | xargs -I '{}' sh -c "test -f '{}' && md5sum '{}'" | tee -a /tmp/archive.md5
+ tar -cvf ${archiveName}.tar ${inputPath} | xargs -I '{}' sh -c "test -f '{}' && md5sum '{}'" | tee -a /tmp/archive.md5
  mv /tmp/archive.md5 archive.md5
- tar -rf ${folderName}.tar archive.md5
+ tar -rf ${archiveName}.tar archive.md5
  rm -rf archive.md5
 }
 
@@ -36,7 +43,8 @@ function archive_create(){
 function archive_extract(){
  local outFolderPath=`canonicalPath ${1}`
  outFolderPath=`dirname ${outFolderPath}`
- local archiveName=`echo ${1%.*}`
+# local archiveName=`basename ${1}`
+# archiveName=`echo ${archiveName%.*}`
  #mkdir -p ${archiveName}
  tar -xvf ${1} #-C ${archiveName}
  local md5file=archive.md5
