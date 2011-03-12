@@ -15,12 +15,12 @@
 #	outputFolder: specify output folder for the ADORE command. Default is current folder ("$PWD").
 #  
 # OUTPUT:
-#  Creates ./{randomFile}.set and  ./{randomFile}.sh 
+#  Creates ${tmpFolder}/{randomFile}.set and  ${tmpFolder}/{randomFile}.sh 
 #
 
 function createJob(){
 local qsubPath=`which qsub`
-[ ${qsubPath:-IsEmpty}=="IsEmpty" ] && echo "Torque PBS, qsub, not found." && return 110
+[ "${qsubPath:-IsEmpty}" == "IsEmpty" ] && echo "Torque PBS, qsub, not found." && return 110
 
 local commands=${1};
 local CALLDIR=${2-$PWD};
