@@ -459,8 +459,9 @@ function settings_list(){
 
     #default: show settings
     cat "${ADOREFOLDER}/set/default.set" |while read -r line; do
-      #check if right side exists
-      if [[ "${line}" == *\&\&* ]]; then           
+      if [[ "${line}" == *SECTION* ]];then #check if section line 
+        echo "[${line##*=}]"
+      elif [[ "${line}" == *\&\&* ]]; then  #check if right side exists
         #get right side of the line after &&     
         #line=`eval echo "${line##*&&}"` 
         line=${line##*&&}

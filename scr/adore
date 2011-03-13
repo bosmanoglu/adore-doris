@@ -9,6 +9,7 @@
 #	adore -u user.set -p dorisProcess adoreCommand
 #	adore -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
 #	adore -i 
+#	adore -g
 #
 # DESCRIPTION:
 #	ADORE is an attempt to simplify processing of different interferometric stacks
@@ -21,7 +22,8 @@
 #  -u: user settings file. 
 #  -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
 #  -d: define variable (has priority over user settings file.)
-#  -i: open interactive session. Good for debugging.
+#  -i: open interactive session. 
+#  -g: flag for ADORE-GUI. This is useless if you are not using ADORE-GUI.
 #
 # if both adoreCommand and dorisProcess is used, first the dorisProcess
 # is run, and then the adoreCommand.
@@ -56,7 +58,7 @@ fi
 
 ###### GET INPUT OPTIONS
 #start a loop for getopts. I want to read parameters of options -n -i  etc. 
-while getopts  "iu:p:d:" flag
+while getopts  "giu:p:d:" flag
 do
   #echo "$flag" $OPTIND $OPTARG 
   # above line outputs the parameter flag (-n, etc.), 
@@ -90,7 +92,7 @@ if [ "${i-notInteractive}" == "notInteractive" ]; then
   #not interactive - batch processing
   source ${ADORESCR}/.adore.rc
 else
-  bash --init-file "${ADORESCR}/.adore.rc" -i
+  bash --init-file "${ADORESCR}/.adore.rc"
 #  set -o emacs
 #  set -o histexpand
 #  HISTCONTROL=ignoreboth

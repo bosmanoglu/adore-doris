@@ -1,6 +1,7 @@
 #######################################
 ###   BASH Environment Variables    ###
 #######################################
+### SECTION=adore
 [ -z "${ADOREFOLDER}"		] && ADOREFOLDER=${ADORESCR//\/scr/}
 [ -z "${_rel_ADOREFOLDER}"	] && _rel_ADOREFOLDER='echo ${ADORESCR//\/scr/}'
 #######################################
@@ -52,6 +53,7 @@
 #######################################
 ###     Default Doris Settings      ###
 #######################################
+### SECTION=general
 [ -z "${screen}"		] && screen=info
 [ -z "${beep}"			] && beep=off
 [ -z "${batch}" 		] && batch=on
@@ -76,6 +78,7 @@
 [ -z "${s_rg_t_error}" 		] && s_rg_t_error="0.0"
 [ -z "${s_az_t_error}" 		] && s_az_t_error="0.0"
 ################### m_readfiles
+### SECTION=m_readfiles
 [ -z "${m_in_method}" 		] && m_in_method=ERS
 [ -z "${m_in_dat}" 		] && m_in_dat=`ls ${dataFolder}/${master}/${dataFile} 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_m_in_dat}" 	] && _rel_m_in_dat='ls ${dataFolder}/${master}/${dataFile} 2>/dev/null | tr -d "\n"'
@@ -86,11 +89,13 @@
 [ -z "${m_in_null}" 		] && m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
 [ -z "${_rel_in_null}" 		] && _rel_in_null='ls ${dataFolder}/${master}/${nullFile} 2>/dev/null | tr -d "\n"'
 ################### m_porbits
+### SECTION=m_porbits
 [ -z "${m_orbdir}" 		] && m_orbdir="${unspecified}"
 [ -z "${m_orb_interval}" 	] && m_orb_interval=1
 [ -z "${m_orb_extratime}" 	] && m_orb_extratime=10
 [ -z "${m_orb_dump}" 		] && m_orb_dump=-1
 ################### m_crop
+### SECTION=m_crop
 [ -z "${m_crop_in}" 		] && m_crop_in=${m_in_dat}
 [ -z "${_rel_m_crop_in}" 	] && _rel_m_crop_in='echo ${m_in_dat}'
 [ -z "${m_crop_out}" 		] && m_crop_out=${outputFolder}/${master}.crop
@@ -98,6 +103,7 @@
 [ -z "${m_dbow}"		] && m_dbow="0 0 0 0"
 [ -z "${m_dbow_geo}" 		] && m_dbow_geo="0 0 0 0"
 ################### m_simamp
+### SECTION=m_simamp
 [ -z "${sam_in_dem}" 		] && sam_in_dem="${unspecified}"
 [ -z "${_rel_sam_in_dem}" 	] && _rel_sam_in_dem='echo ${crd_in_dem}'
 [ -z "${sam_in_format}"		] && sam_in_format="I2"
@@ -115,6 +121,7 @@
 [ -z "${sam_out_dem}" 		] && sam_out_dem="${outputFolder}/${master}.samdem"
 [ -z "${_rel_sam_out_dem}" 	] && _rel_sam_out_dem='echo ${outputFolder}/${master}.samdem'
 ################### m_timing
+### SECTION=m_timing
 [ -z "${mte_method}" 		] && mte_method="magspace"
 [ -z "${mte_in_pos}" 		] && mte_in_pos="${unspecified}"
 [ -z "${mte_nwin}" 		] && mte_nwin="16"
@@ -122,6 +129,7 @@
 [ -z "${mte_acc}" 		] && mte_acc="32 32"
 [ -z "${mte_initoff}" 		] && mte_initoff="0 0"
 ################### m_ovs
+### SECTION=m_ovs
 [ -z "${m_ovs_out}" 		] && m_ovs_out="${outputFolder}/${master}.ovs"
 [ -z "${_rel_m_ovs_out}" 	] && _rel_m_ovs_out='echo ${outputFolder}/${master}.ovs'
 [ -z "${m_ovs_out_format}"	] && m_ovs_out_format="ci2"
@@ -129,6 +137,7 @@
 [ -z "${m_ovs_fact_azi}" 	] && m_ovs_fact_azi="1"
 [ -z "${m_ovs_kernelsize}"	] && m_ovs_kernelsize="16"
 ################### s_readfiles
+### SECTION=s_readfiles
 [ -z "${s_in_method}" 		] && s_in_method=${m_in_method}
 [ -z "${_rel_s_in_method}" 	] && _rel_s_in_method='echo ${m_in_method}'
 [ -z "${s_in_dat}" 		] && s_in_dat=`ls ${dataFolder}/${slave}/${dataFile} 2>/dev/null | tr -d '\n'`
@@ -140,6 +149,7 @@
 [ -z "${s_in_null}" 		] && s_in_null=`ls ${dataFolder}/${slave}/${nullFile}  2>/dev/null | tr -d '\n'`
 [ -z "${_rel_s_in_null}" 	] && _rel_s_in_null='ls ${dataFolder}/${slave}/${nullFile} 2>/dev/null | tr -d "\n"'
 ################### s_porbits
+### SECTION=s_porbits
 [ -z "${s_orbdir}" 		] && s_orbdir=${m_orbdir}
 [ -z "${_rel_s_orbdir}" 	] && _rel_s_orbdir='echo ${m_orbdir}'
 [ -z "${s_orb_interval}" 	] && s_orb_interval=${m_orb_interval}
@@ -149,6 +159,7 @@
 [ -z "${s_orb_dump}" 		] && s_orb_dump=${m_orb_dump}
 [ -z "${_rel_s_orb_dump}" 	] && _rel_s_orb_dump='echo ${m_orb_dump}'
 ################### s_crop
+### SECTION=s_crop
 [ -z "${s_crop_in}" 		] && s_crop_in=${s_in_dat}
 [ -z "${_rel_s_crop_in}" 	] && _rel_s_crop_in='echo ${s_in_dat}'
 [ -z "${s_crop_out}" 		] && s_crop_out="${outputFolder}/${slave}.crop"
@@ -157,6 +168,7 @@
 [ -z "${s_dbow_geo}" 		] && s_dbow_geo="${m_dbow_geo}"
 [ -z "${_rel_s_dbow_geo}"	] && _rel_s_dbow_geo='echo ${m_dbow_geo}'
 ################### s_ovs
+### SECTION=s_ovs
 [ -z "${s_ovs_out}" 		] && s_ovs_out="${outputFolder}/${slave}.ovs"
 [ -z "${_rel_s_ovs_out}" 	] && _rel_s_ovs_out='echo ${outputFolder}/${slave}.ovs'
 [ -z "${s_ovs_out_format}"	] && s_ovs_out_format="${m_ovs_out_format}"
@@ -169,6 +181,7 @@
 [ -z "${_rel_s_ovs_kernelsize}"	] && _rel_s_ovs_kernelsize='echo ${m_ovs_kernelsize}'
 ################### coarseorb -- nocards
 ################### coarsecorr
+### SECTION=coarsecorr
 [ -z "${cc_method}" 		] && cc_method="magfft"
 [ -z "${cc_in_pos}" 		] && cc_in_pos="${unspecified}"
 [ -z "${cc_nwin}" 		] && cc_nwin="100"
@@ -176,6 +189,7 @@
 [ -z "${cc_acc}" 		] && cc_acc="32 8"
 [ -z "${cc_initoff}" 		] && cc_initoff="orbit"
 ################### m_filtazi
+### SECTION=m_filtazi
 [ -z "${af_blocksize}" 		] && af_blocksize="1024"
 [ -z "${af_overlap}" 		] && af_overlap="128"
 [ -z "${af_hamming}" 		] && af_hamming="0.75"
@@ -186,6 +200,7 @@
 [ -z "${af_out_format}" 	] && af_out_format="cr4"
 ################### s_filtazi -- nocards
 ################### fine
+### SECTION=fine
 [ -z "${fc_method}" 		] && fc_method="magfft"
 [ -z "${fc_nwin}" 		] && fc_nwin="4000"
 [ -z "${fc_in_pos}" 		] && fc_in_pos="${unspecified}"
@@ -195,11 +210,13 @@
 [ -z "${fc_osfactor}" 		] && fc_osfactor="16"
 [ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
 ################### reltiming
+### SECTION=reltiming
 [ -z "${rte_threshold}" 	] && rte_threshold="0.4"
 [ -z "${rte_maxiter}" 		] && rte_maxiter="4000"
 [ -z "${_rel_rte_maxiter}" 	] && _rel_rte_maxiter='echo ${fc_nwin}'
 [ -z "${rte_k_alpha}" 		] && rte_k_alpha="1.97"
 ################### demassist
+### SECTION=demassist
 [ -z "${dac_in_dem}" 		] && dac_in_dem="${sam_in_dem}"
 [ -z "${_rel_dac_in_dem}" 	] && _rel_dac_in_dem='echo ${sam_in_dem}'
 [ -z "${dac_in_format}" 	] && dac_in_format="${sam_in_format}"
@@ -219,6 +236,7 @@
 [ -z "${dac_out_dem_lp}" 	] && dac_out_dem_lp="${outputFolder}/${master}_${slave}.dacdem_lp"
 [ -z "${_rel_dac_out_dem_lp}" 	] && _rel_dac_out_dem_lp='echo ${outputFolder}/${master}_${slave}.dacdem_lp'
 ################### coregpm
+### SECTION=coregpm
 [ -z "${cpm_threshold}" 	] && cpm_threshold="0.4"
 [ -z "${cpm_degree}" 		] && cpm_degree="2"
 [ -z "${cpm_dump}" 		] && cpm_dump="off"
@@ -228,6 +246,7 @@
 [ -z "${_rel_cpm_maxiter}"	] && _rel_cpm_maxiter='echo ${fc_nwin}'
 [ -z "${cpm_k_alpha}" 		] && cpm_k_alpha="1.97"
 ################### resample
+### SECTION=resample
 [ -z "${rs_method}" 		] && rs_method="knab6p"
 [ -z "${rs_out_file}" 		] && rs_out_file="${outputFolder}/${slave}.rs"
 [ -z "${_rel_rs_out_file}" 	] && _rel_rs_out_file='echo ${outputFolder}/${slave}.rs'
@@ -236,6 +255,7 @@
 [ -z "${rs_dbow_geo}" 		] && rs_dbow_geo="0 0 0 0"
 [ -z "${rs_shiftazi}" 		] && rs_shiftazi="on"
 ################### filtrange
+### SECTION=filtrange
 [ -z "${rf_method}" 		] && rf_method="adaptive"
 [ -z "${rf_fftlength}" 		] && rf_fftlength="64"
 [ -z "${rf_overlap}" 		] && rf_overlap="0"
@@ -251,18 +271,21 @@
 [ -z "${_rel_rf_out_slave}" 	] && _rel_rf_out_slave='echo ${outputFolder}/${slave}.rf'
 [ -z "${rf_out_format}" 	] && rf_out_format="cr4"
 ################### interfero
+### SECTION=interfero
 [ -z "${int_out_cint}" 		] && int_out_cint="${outputFolder}/${master}_${slave}.cint"
 [ -z "${_rel_int_out_cint}" 	] && _rel_int_out_cint='echo ${outputFolder}/${master}_${slave}.cint'
 [ -z "${int_out_int}" 		] && int_out_int="${outputFolder}/${master}_${slave}.int"
 [ -z "${_rel_int_out_int}" 	] && _rel_int_out_int='echo ${outputFolder}/${master}_${slave}.int'
 [ -z "${int_multilook}" 	] && int_multilook="5 1"
 ################### comprefpha
+### SECTION=comprefpha
 [ -z "${fe_method}" 		] && fe_method="porbits"
 [ -z "${fe_degree}" 		] && fe_degree="5"
 [ -z "${fe_npoints}" 		] && fe_npoints="501"
 [ -z "${fe_in_pos}" 		] && fe_in_pos="${unspecified}"
 # [ -z "${fe_out_file}" 	] && fe_out_file=""
 ################### subtrrefpha
+### SECTION=subtrrefpha
 [ -z "${srp_method}" 		] && srp_method="polynomial"
 [ -z "${srp_out_cint}" 		] && srp_out_cint="${outputFolder}/${master}_${slave}.srp"
 [ -z "${_rel_srp_out_cint}" 	] && _rel_srp_out_cint='echo ${outputFolder}/${master}_${slave}.srp'
@@ -273,6 +296,7 @@
 [ -z "${srp_out_h2ph}" 		] && srp_out_h2ph="${outputFolder}/${master}_${slave}.srph2ph"
 [ -z "${_rel_srp_out_h2ph}" 	] && _rel_srp_out_h2ph='echo ${outputFolder}/${master}_${slave}.srph2ph'
 ################### comprefdem
+### SECTION=comprefdem
 [ -z "${crd_in_dem}" 		] && crd_in_dem="${sam_in_dem}"
 [ -z "${_rel_crd_in_dem}" 	] && _rel_crd_in_dem='echo ${sam_in_dem}'
 [ -z "${crd_in_format}" 	] && crd_in_format="${sam_in_format}"	
@@ -297,10 +321,12 @@
 [ -z "${crd_out_h2ph}" 		] && crd_out_h2ph="${outputFolder}/${master}_${slave}.crdh2ph"
 [ -z "${_rel_crd_out_h2ph}" 	] && _rel_crd_out_h2ph='echo ${outputFolder}/${master}_${slave}.crdh2ph'
 ################### subtrrefdem
+### SECTION=subtrrefdem
 [ -z "${srd_out_cint}" 		] && srd_out_cint="${outputFolder}/${master}_${slave}.srd"
 [ -z "${_rel_srd_out_cint}" 	] && _rel_srd_out_cint='echo ${outputFolder}/${master}_${slave}.srd'
 [ -z "${srd_offset}" 		] && srd_offset="0 0"
 ################### coherence
+### SECTION=coherence
 [ -z "${coh_method}" 		] && coh_method="include_refdem"
 [ -z "${coh_out_ccoh}" 		] && coh_out_ccoh="${outputFolder}/${master}_${slave}.ccoh"
 [ -z "${_rel_coh_out_ccoh}" 	] && _rel_coh_out_ccoh='echo ${outputFolder}/${master}_${slave}.ccoh'
@@ -310,6 +336,7 @@
 [ -z "${_rel_coh_multilook}"	] && _rel_coh_multilook='echo ${int_multilook}' #defaul "10 2"
 [ -z "${coh_winsize}" 		] && coh_winsize="10 2"
 ################### filtphase
+### SECTION=filtphase
 [ -z "${pf_method}" 		] && pf_method="goldstein"
 [ -z "${pf_out_file}" 		] && pf_out_file="${outputFolder}/${master}_${slave}.pf"
 [ -z "${_rel_pf_out_file}" 	] && _rel_pf_out_file='echo ${outputFolder}/${master}_${slave}.pf'
@@ -320,6 +347,7 @@
 [ -z "${pf_kernel}" 		] && pf_kernel="1 2 3 2 1"
 [ -z "${pf_in_kernel2d}" 	] && pf_in_kernel2d="${unspecified}"
 ################### unwrap
+### SECTION=unwrap
 [ -z "${uw_method}" 		] && uw_method="snaphu"
 [ -z "${uw_out_file}" 		] && uw_out_file="${outputFolder}/${master}_${slave}.uw"
 [ -z "${_rel_uw_out_file}" 	] && _rel_uw_out_file='echo ${outputFolder}/${master}_${slave}.uw'
@@ -332,6 +360,7 @@
 [ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
 [ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
 ################### dinsar
+### SECTION=dinsar
 [ -z "${di_out_file}" 		] && di_out_file="${outputFolder}/${master}_${slave}.di"
 [ -z "${_rel_di_out_file}" 	] && _rel_di_out_file='echo ${outputFolder}/${master}_${slave}.di'
 [ -z "${di_in_topomaster}" 	] && di_in_topomaster="${m_resfile}"
@@ -340,6 +369,7 @@
 [ -z "${di_in_topoint}" 	] && di_in_topoint="${unspecified}"
 [ -z "${di_out_scaled}" 	] && di_out_scaled="${unspecified}"
 ################### slant2h
+### SECTION=slant2h
 [ -z "${s2h_method}" 		] && s2h_method="ambiguity"
 [ -z "${s2h_out_hei}" 		] && s2h_out_hei="${outputFolder}/${master}_${slave}.s2hhei"
 [ -z "${_rel_s2h_out_hei}" 	] && _rel_s2h_out_hei='echo ${outputFolder}/${master}_${slave}.s2hhei'
@@ -353,6 +383,7 @@
 [ -z "${_rel_s2h_nheights}" 	] && _rel_s2h_nheights='echo $((${s2h_degree1d}+1))'
 [ -z "${s2h_degree2d}" 		] && s2h_degree2d="5"
 ################### geocode
+### SECTION=geocode
 [ -z "${geo_out_phi}" 		] && geo_out_phi="${outputFolder}/${master}_${slave}.geophi"
 [ -z "${_rel_geo_out_phi}" 	] && _rel_geo_out_phi='echo ${outputFolder}/${master}_${slave}.geophi'
 [ -z "${geo_out_lam}" 		] && geo_out_lam="${outputFolder}/${master}_${slave}.geolam"
