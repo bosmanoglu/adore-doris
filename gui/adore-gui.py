@@ -24,7 +24,7 @@ class MyGUI:
   #ui = ui_file.read()
 
   def __init__( self, title,argv):
-    self.argv=argv or "adore -i"
+    self.argv=argv or "/scr/adore -g -i"
     self.set = ConfigParser.ConfigParser()
     self.setFile="/tmp/adore.set"
     self.window = gtk.Window()
@@ -46,8 +46,11 @@ class MyGUI:
        ('File', None, '_File'),
        ('Quit', None, '_Quit', '<ALT>q', 'Quit ADORE.', self.file_quit),
        ('Edit', None, '_Edit'),
-       ('Copy', None, '_Copy', '<CTRL>c', 'Copy selected text.', self.edit_copy),
-       ('Paste', None, '_Paste','<CTRL>v', 'Paste text from clipboard.', self.edit_paste),
+       ('Copy', None, '_Copy', '<CTRL><SHIFT>c', 'Copy selected text.', self.edit_copy),
+       ('Paste', None, '_Paste','<CTRL><SHIFT>v', 'Paste text from clipboard.', self.edit_paste),
+       ('Check', None, '_Check'),
+       ('checkProcess', None, 'Process', None, '', self.runMenuCmd),
+       ('checkSetup', None, 'Setup', None, '', self.runMenuCmd),
        ('Process', None, '_Process'),
        ('Master', None, '_Master'),
        ('m_readfiles', None, 'm__readfiles', None, '', self.runMenuName),
@@ -86,11 +89,11 @@ class MyGUI:
        ('geocode', None, 'geocode', None, '', self.runMenuName),
        #('', None, '_', None, '', self.process_),
        ('Settings', None, '_Settings'),
-       ('Check', None, '_Check', None, 'Check settings against default values.', self.settings_check),
-       ('Fix', None, '_Fix', None, 'Fix settings using default relations.', self.settings_fix),
-       ('Load', None, '_Load', None, 'Load settings from current folder.', self.settings_load),
-       ('Save', None, '_Save', None, 'Save settings to current folder.', self.settings_save),
-       ('Reset',  None, '_Reset',  None, 'Reset settings to defaults', self.settings_reset),
+       ('settingsCheck', None, '_Check', None, 'Check settings against default values.', self.settings_check),
+       ('settingsFix', None, '_Fix', None, 'Fix settings using default relations.', self.settings_fix),
+       ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', self.settings_load),
+       ('settingsSave', None, '_Save', None, 'Save settings to current folder.', self.settings_save),
+       ('settingsReset',  None, '_Reset',  None, 'Reset settings to defaults', self.settings_reset),
        ('ShowAbout', gtk.STOCK_ABOUT, '_About', None, 'Show about information', self.show_about),
        ])
     # the uimanager
@@ -100,7 +103,7 @@ class MyGUI:
 
     self.uimanager.insert_action_group( self.actiongroup, 0)
     #self.uimanager.add_ui_from_string(self.ui)
-    self.uimanager.add_ui_from_file('adore-gui.ui')
+    self.uimanager.add_ui_from_file(ADOREFOLDER + '/gui/adore-gui.ui')
     # menu bar
     self.menu_bar = self.uimanager.get_widget( "/MenuBar")
     self.mainbox.pack_start( self.menu_bar, expand=False, fill=False)
@@ -132,8 +135,10 @@ class MyGUI:
 
   def runcmd(self, cmd):
     self.v.feed_child(cmd+'\n');
+#  def runMenuCmd #Is located at the bottom... Long function
   def runMenuName(self, w):
     self.runcmd(w.get_name());
+
   def destroy( self, w):
     gtk.main_quit()
 
@@ -175,13 +180,22 @@ class MyGUI:
     about.run()
     about.destroy()
 
+  def runMenuCmd(self, w):
+    if w.get_name() == "checkProcess":
+      self.runcmd('check')
+    elif w.get_name() == "checkSetup":
+      self.runcmd('check setup');
+    #else:
+      #do nothing.
+
 if __name__ == "__main__":
   ADOREGUIFOLDER=os.path.split(os.path.realpath(sys.argv[0]))[0]
   ADOREFOLDER=os.path.split(ADOREGUIFOLDER)[0]
-  print ADOREFOLDER
+  #print ADOREFOLDER
+  argv=ADOREFOLDER + "/scr/adore -g -i "
   if len(sys.argv[1:]) >0:
-    argv=ADOREFOLDER + "/scr/adore -g " + " ".join(sys.argv[1:]);
-    print argv
+    argv+= " ".join(sys.argv[1:]);
+    #print argv
   m = MyGUI("ADORE GUI",argv)  
   m.main()
 
