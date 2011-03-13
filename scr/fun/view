@@ -1,0 +1,274 @@
+#!/bin/bash
+# ADORE
+# Automatic Doris Environment
+#
+# USAGE:
+#	view a|p|m dorisStep -- cpxfiddleOptions
+#	view a|p|m dorisStep:filename -- cpxfiddleOptions
+#
+# DESCRIPTION:
+#  RASTER is an internal ADORE command.  
+#  It creates sunraster images of the DORIS products using 
+#  cpxfiddle.   
+# 
+#  ADORE variable raster_format controls the output type. For all images
+#  a sunraster image is created and converted to the requested format 
+#  using the convert command (imagemagick). 
+#
+# INPUT:
+#  a|p|m 
+#	a: creates amplitude image.
+#  	p: creates phase image.
+#	m: creates amplitude/phase mixed image.
+#
+#  dorisStep
+#       The step for the output. lsprocess can be used to 
+#       get a list of doris processes. 
+#       The step can be in the master, slave or interferogram result file.
+# 
+#  dorisStep:filename 
+#	Can be used to specify a filename that is not in the resultfile.
+#	This is useful for generating rasters for *.demlp, *.notmasked files.
+#
+#  Optional:
+#	-- cpxfiddleOptions
+#           These options are passed to cpxfiddle. They should start with "--".
+#	    User options supersede default options (see below).
+#	    Default values for w,f are read from result file. 
+# 	    Default value for q is defined by output type (amplitude, phase, mixed).
+#	    Other default options are shown in paranthesis. 
+#		for complex amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
+#		for real amplitude images:    -w -f -q -o (sunraster) -c (gray)
+#		for phase images:             -w -f -q -o (sunraster) -c (jet)
+#		for mixed images:             -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
+#
+# OUTPUT:
+#   Default raster format is set to "sunraster". 
+#   raster_format:
+#     If you prefer a different kind of output  RASTER can convert 
+#     the image using imagemagick "convert" tool. The format for the output
+#     is defined in the "raster_format" variable.
+#
+#   Raster image in the following naming convention:
+#	a: A_filename.ras
+#	p: P_filename.ras
+#	m: M_filename.ras
+#   *'.' (dot) character in the filename will be converted to '_'(underscore).
+#
+# VARIABLES:
+#   raster_format
+#
+
+#echo $@
+#echo $#
+#Clear Script Variables
+local generate dorisStep remainder #format grepM grepS grepI
+local generateCheck #resultFile firstPixel lastPixel width
+local fileName resFile format width numlines inputFileName
+local w f e q o c inArg parE parQ parO parC parS flag OPTIND OPTARG
+###### GET INPUT OPTIONS
+inArg=( ${@} ); #save input arguements for getopts.
+if [ $# -gt 2 ]; then
+    generate=${1};shift
+    dorisStep=${1};shift
+    remainder=$@;
+elif [ $# -eq 2 ];then
+  generate=${1};shift
+  dorisStep=${1};shift
+  remainder='';
+else
+  echo "Please check usage by: ? raster"
+  return
+fi
+if [ ! -z "${remainder}" ]; then
+  #get options changing the default
+  while getopts "w:f:e:q:o:c:s:" flag "${@}"
+  do
+    #echo "flag=${flag} optin=${OPTIND} optarg=${OPTARG}"
+    # assign value to variables w f e q o c s
+    if [ "${flag}" == "?" ]; then
+      continue;
+    else
+      eval ${flag}=${OPTARG}
+      paramInd=$(( ${OPTIND}-1 ));
+      unset inArg[${paramInd}]
+      unset inArg[${OPTIND}]
+    fi
+  done
+  remainder=${inArg[@]:3};
+fi
+# make generate lowercase to accommadate user entries in caps from APM
+generate=`echo ${generate} | tr [:upper:] [:lower:]`
+generateCheck=`echo ${generate} | tr -d [a,p,m]`
+if [ -z ${generateCheck} ]; then
+  if [ "${remainder:-undef}" != "undef" ]; then
+    echo "I'll pass these options to cpxfiddle: ..${remainder}.."
+  fi
+else
+  echo "I can only create phase(p), amplitude(a) or mixed(m) images."
+  echo "You provided some extra options: ${generateCheck}"
+  return -1;
+fi
+
+#check if filename is specified with dorisStep
+if [[ "${dorisStep}" == *:* ]]; then
+  inputFileName=`eval echo ${dorisStep#*:}`
+  dorisStep=${dorisStep%:*}
+  [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
+fi
+
+
+
+#if [[ ${dorisStep} == m_* ]]; then
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepM=`grep ${dorisStep} ${m_resfile}`
+#elif [[ ${dorisStep} == s_* ]]; then
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepS=`grep ${dorisStep} ${s_resfile}`
+#else
+#  #find which result file has info
+#  # resample is a interfero step but outputs to s etc.
+#  dorisStep=`pn2rs ${dorisStep}`
+#  grepM=`grep ${dorisStep} ${m_resfile}`
+#  grepS=`grep ${dorisStep} ${s_resfile}`
+#  grepI=`grep ${dorisStep} ${i_resfile}`
+#fi
+#
+#if [[ -n "${grepM}" ]]; then
+#  resultFile=${m_resfile};
+#elif [[ -n "${grepS}" ]]; then
+#  resultFile=${s_resfile};
+#elif [[ -n "${grepI}" ]]; then 
+#  resultFile=${i_resfile};
+#else
+#  echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
+#  return;
+#fi
+#
+#echo "Reading file information from: ${resultFile}"
+#firstPixel=`readRes.sh ${resultFile} ${dorisStep} First_pixel`
+#lastPixel=`readRes.sh ${resultFile} ${dorisStep} Last_pixel`
+#width=$((${lastPixel}-${firstPixel}+1));
+#readRes.sh ${resultFile} ${dorisStep} Data_output_file notify
+
+call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
+# if not empty and different from read value. 
+if [ ! -z ${w} ] && [ "${w}" != "${width}" ]; then
+  echo "Overwriting width(${width}) with user specified value: ${w}"
+  width=${width};
+fi  
+if [ ! -z ${f} ] && [ "${f}" != "${format}" ]; then
+  echo "Overwriting format(${format}) with user specified value: ${f}"
+  format=${f};
+fi  
+
+##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
+#inputfile=${resultFile}
+#section=${dorisStep}
+#parameter="Data_output_file"
+#notify=notify
+#startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
+#endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
+#
+#length=`echo ${endline} - ${startline} |bc`
+#if [[ "${notify}" == "notify" ]]; then
+#  #get number of hits
+#  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|wc -l`
+#  if [[ ${numHits} -gt 1 ]]; then
+#    echo " "
+#    echo "I found more than 1 match for your selection."    
+#    echo "Please enter the selection you want me to use."
+#    for (( c=1; c<=${numHits}; c++ ))
+#    do
+#      matchingLine=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
+#      echo $c : ${matchingLine}      
+#    done
+#    read -p "Please enter number between 1 and $((${c} -1)): " -e line2Read
+#    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${line2Read}"`    	    
+#    if [ -z "${result}" ]; then
+#      echo "Something went wrong."
+#      echo "Exiting..."
+#      return; 
+#    else
+#      #get the format
+#      format=`grep -A ${length} Start_${section} ${inputfile} | grep "Data_output_format" |awk "NR==${line2Read}"`
+#      format=${format##*:}    #Get the part after the LAST column
+#    fi
+#  else
+#    result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+#    format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+#  fi
+#else
+#  result=`grep -A ${length} Start_${section} ${inputfile} | grep ${parameter}`
+#  format=`readRes.sh ${resultFile} ${dorisStep} Data_output_format`
+#fi
+#result=${result##*:} 	#Get the part after the LAST column 
+#
+##echo "$startline $endline $length $parameter_length"
+##echo "$parameter"
+##echo $result
+#
+#fileName=${result}
+########################## END OF READRES.
+#echo $fileName
+
+if [ -z ${fileName} ]; then
+  echo "No data file for the step ${dorisStep} in ${resFile}"
+  return;
+fi
+#if specified change fileName to inputFileName
+[ "${inputFileName:-undefined}" != "undefined" ] && fileName=${inputFileName};
+
+#[ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
+#[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
+#[ "${format//[[:space:]]}" == "real4" ] && format="r4";
+#[ "${format//[[:space:]]}" == "short" ] && format="i2";
+echo Image Width  ..${width}..
+echo Image Format ..${format}..
+outName=`basename ${fileName}| tr '.' '_'`
+[ $? -ne 0 ] && { echo "I have problems finding filename: ${fileName}"; return 1; }
+#echo Outname  ..${outName}..
+if [[ "${generate}" == *a* ]]; then
+  if [[ ${#format} -eq 2 ]];then
+    #No log scaling if not complex. 
+    [ -z "${q}" ] && parQ="normal"    || parQ=${q}
+    [ -z "${c}" ] && parC="gray"      || parC=${c}
+    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+  else
+    [ -z "${q}" ] && parQ="mag"       || parQ=${q}
+    [ -z "${c}" ] && parC="gray"      || parC=${c}
+    [ -z "${e}" ] && parE="0.5"       || parE=${e}
+    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -e ${parE} -q ${parQ}  -c ${parC} ${remainder} ${fileName} &
+  fi
+fi
+if [[ "${generate}" == *p* ]]; then
+  if [[ ${#format} -eq 2 ]];then
+    [ -z "${q}" ] && parQ="normal"    || parQ=${q}
+    [ -z "${c}" ] && parC="jet"       || parC=${c}
+    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+  else
+    [ -z "${q}" ] && parQ="phase"     || parQ=${q}
+    [ -z "${c}" ] && parC="jet"       || parC=${c}  
+    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+  fi
+fi
+if [[ "${generate}" == *m* ]]; then
+  echo "Sorry! This is not implemented yet..."
+#  if [[ ${#format} -eq 2 ]];then
+#    echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
+#  else
+#    [ -z "${q}" ] && parQ="mixed"     || parQ=${q}
+#    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+#    [ -z "${c}" ] && parC="gray"      || parC=${c}
+#    [ -z "${e}" ] && parE="0.5"       || parE=${e}
+#    [ -z "${s}" ] && parS="1.2"       || parS=${s}
+#    cpxfiddle -w ${width} -f ${format} -q ${parQ} -e ${parE} -s ${parS} -o ${parO} -c ${parC} ${remainder} ${fileName} > M_${outName}.ras
+#    convert_raster M_${outName}
+#  fi
+#  echo "Name of rasterfile: M_${outName}.${raster_format}"    
+#  #cpxfiddle -w ${width} -f ${frmt} -e 0.5 -s 1.2 -q mixed -o sunraster -c cool -M${ratio} ${fname} > ${bname}_mixed.ras
+fi
+
+#go back to adore
+return 0;
+

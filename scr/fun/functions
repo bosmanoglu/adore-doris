@@ -266,6 +266,13 @@ function undo(){
 	. ${ADORESCR}/fun/undo "$@"
 }
 
+function view(){
+	. ${ADORESCR}/fun/view "$@"
+}
+
+function waitjob(){
+	. ${ADORESCR}/fun/waitjob "$@"
+}
 
 ####################################################
 ################### DORIS FUNCTIONS ################

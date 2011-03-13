@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# USAGE:
+#       p multiplePairs.adr inputFile
+#
+# DESCRIPTION:
+#  multiplePairs_Parallel.adr is an ADORE script.  
+#  It generates several interferograms whose master and slave orbits are defined
+#  by the input file. 
+#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#
+# INPUT:
+#  inputFile: A comma-separated-value file where each line indicates an
+#    interferometric pair. First value defines the master and the second value defines the slave.
+#    As an example file should have this format:
+#    masterScene1,slaveScene1
+#    masterScene2,slaveScene2
+#    ...
+#  
+# OUTPUT:
+#  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
+#  It runs the following DORIS steps:
+#    For crops: s_readfiles, s_porbits, s_crop
+#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
+#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+jobIds=($@)
+bold "Waiting for jobs to finish."
+echo "Counter displays number of minutes passed."
+cntr=0
+echo -n "${cntr}m."
+for jobId in ${jobIds[*]}
+do
+  #check each job to see if they are all finished.
+  while [ 1 ]
+  do
+    #wait until last submitted job finishes.
+    check -j ${jobId}
+    jobStatus=$?
+    if [ $jobStatus -eq 0 ]; then
+    	echo "Job ${jobId} finished." #qstat reports job as completed.
+        break;
+    elif [ $jobStatus -eq 134 ]; then
+        echo "Job ${jobId} not found."
+        break; #Testing this... It means job is not in the job list anymore. Might be long gone.
+    elif [ $jobStatus -eq 153 ]; then
+        break; #This is apparently normal: http://www.clusterresources.com/pipermail/torqueusers/2005-July/001677.html
+    fi
+    sleep 60
+    cntr=$((${cntr}+1))
+    echo -n "${cntr}m."
+  done
+done
+echo "" #print an empty line for the counter. 

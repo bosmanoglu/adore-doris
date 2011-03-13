@@ -535,6 +535,7 @@ if [ "${1}" == "-p" ]; then
 elif [ "${1}" == "-j" ]; then
  shift
  checkJobStatus "${1}"
+ return $?
 elif [ "${1}" == "setup" ];then
  shift 
  checkSetup "${@}"
