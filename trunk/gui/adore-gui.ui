@@ -7,6 +7,10 @@
     <menuitem action="Copy"/>
     <menuitem action="Paste"/>
   </menu>
+  <menu action="Check">
+    <menuitem action="checkProcess"/>
+    <menuitem action="checkSetup"/>
+  </menu>
   <menu action="Process">
     <menu action="Master">
       <menuitem action="m_readfiles"/>
@@ -50,12 +54,12 @@
     </menu>
   </menu>
   <menu action="Settings">
-    <menuitem action="Check"/>
-    <menuitem action="Fix"/>
-    <menuitem action="Load"/>
-    <menuitem action="Save"/>
+    <menuitem action="settingsCheck"/>
+    <menuitem action="settingsFix"/>
+    <menuitem action="settingsLoad"/>
+    <menuitem action="settingsSave"/>
     <separator/>
-    <menuitem action="Reset"/>
+    <menuitem action="settingsReset"/>
   </menu>  
   <menu action="About">
     <menuitem action="ShowAbout"/>
