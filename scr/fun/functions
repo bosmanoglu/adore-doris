@@ -162,6 +162,10 @@ function p()
   fi
 }
 
+function pn2rs(){
+  . ${ADORESCR}/fun/pn2rs ${@}
+}
+
 function report(){
   . ${ADORESCR}/fun/report ${@}
 }
@@ -176,6 +180,10 @@ function s()
       newline=`eval echo -E ${line}`
       echo $newline 
     done
+  elif [ "${dorisProcess}" == "result" ];then
+    dorisProcess=`pn2rs ${2}`
+    local resfile=`pn2rs -f ${2}`
+    sed -n "/_Start_${dorisProcess}/,/End_${dorisProcess}/p" ${resfile}    
   else
     variableNames='eval echo \${!${dorisProcess}*}'
     variableNames=`eval ${variableNames}`
