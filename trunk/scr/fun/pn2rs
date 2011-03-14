@@ -1,12 +1,16 @@
 #!/bin/bash
 # USAGE:
 #	pn2rs processName 
+#	pnr2rs -f processName
 #
 # DESCRIPTION:
-#  PN2RS is an external ADORE command.  
-#  It outputs the resultfile section name for the given processName.
+#  PN2RS is an internal ADORE function.  
+#  It outputs the resultfile section name or the 
+#  result file name for the given processName.
 #
 # INPUT:
+#  -f: Flag for filename. If present corresponding filename
+#	is returned. 
 #  processName: Doris step to lookup.
 #  
 # OUTPUT:
@@ -43,6 +47,7 @@
 #[ "$1" == "reltiming"  ] && echo timing_error
 #[ "$1" == "comprefpha"  ] && echo comp_refphase
 #[ "$1" == "unwrap"  ] && echo unwrap
+function getName(){
 case "${1}" in
   m_readfiles ) echo readfiles      ;;
   s_readfiles ) echo readfiles      ;;
@@ -81,3 +86,47 @@ case "${1}" in
   r4          ) echo real4          ;;
   *           ) echo ${1}           ;;
 esac
+}
+
+function getFile(){
+case "${1}" in
+  m_readfiles ) echo ${m_resfile}   ;;
+  s_readfiles ) echo ${s_resfile}   ;;
+  coarseorb   ) echo ${i_resfile}   ;;
+  demassist   ) echo ${i_resfile}   ;;
+  subtrrefpha ) echo ${i_resfile}   ;;
+  dinsar      ) echo ${i_resfile}   ;;
+  m_porbits   ) echo ${m_resfile}   ;;
+  s_porbits   ) echo ${s_resfile}   ;; 
+  coarsecorr  ) echo ${i_resfile}   ;;
+  coregpm     ) echo ${i_resfile}   ;;
+  comprefdem  ) echo ${i_resfile}   ;;
+  slant2h     ) echo ${i_resfile}   ;;
+  m_crop      ) echo ${m_resfile}   ;;
+  s_crop      ) echo ${s_resfile}   ;;
+  m_filtazi   ) echo ${m_resfile}   ;;
+  resample    ) echo ${s_resfile}   ;;
+  subtrrefdem ) echo ${i_resfile}   ;;
+  geocode     ) echo ${i_resfile}   ;;
+  m_simamp    ) echo ${m_resfile}   ;;
+  s_filtazi   ) echo ${s_resfile}   ;;
+  filtrange   ) echo ${i_resfile}   ;;
+  coherence   ) echo ${i_resfile}   ;;
+  m_timing    ) echo ${m_resfile}   ;;
+  fine        ) echo ${i_resfile}   ;;
+  interfero   ) echo ${i_resfile}   ;;
+  filtphase   ) echo ${i_resfile}   ;;
+  m_ovs       ) echo ${m_resfile}   ;;
+  s_ovs       ) echo ${s_resfile}   ;;
+  reltiming   ) echo ${i_resfile}   ;;
+  comprefpha  ) echo ${i_resfile}   ;;
+  unwrap      ) echo ${i_resfile}   ;;
+  *           ) echo ${1}           ;;
+esac
+}
+#main
+if [[ "${1}" != "-f" ]];then
+  getName $@
+else
+  getFile ${2}
+fi
