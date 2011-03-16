@@ -12,6 +12,8 @@ import subprocess
 import shlex
 import ConfigParser
 
+import settingsEditor
+
 try:
   import vte
 except:
@@ -89,6 +91,7 @@ class MyGUI:
        ('geocode', None, 'geocode', None, '', self.runMenuName),
        #('', None, '_', None, '', self.process_),
        ('Settings', None, '_Settings'),
+       ('settingsEditor', None, '_Editor', None, 'Graphical Editor for settings.', self.settings_editor),
        ('settingsCheck', None, '_Check', None, 'Check settings against default values.', self.settings_check),
        ('settingsFix', None, '_Fix', None, 'Fix settings using default relations.', self.settings_fix),
        ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', self.settings_load),
@@ -103,7 +106,7 @@ class MyGUI:
 
     self.uimanager.insert_action_group( self.actiongroup, 0)
     #self.uimanager.add_ui_from_string(self.ui)
-    self.uimanager.add_ui_from_file(ADOREFOLDER + '/gui/adore-gui.ui')
+    self.uimanager.add_ui_from_file(ADOREFOLDER + '/gui/agooey.ui')
     # menu bar
     self.menu_bar = self.uimanager.get_widget( "/MenuBar")
     self.mainbox.pack_start( self.menu_bar, expand=False, fill=False)
@@ -166,16 +169,19 @@ class MyGUI:
   def settings_reset( self, w):
     self.runcmd('settings reset');
 
+  def settings_editor( self, w):
+    se=settingsEditor.SettingsEditor(self.setFile);
+
   def show_about( self, w):
     #os.system("echo ADORE-GUI")#self.answer_label.set_label( "Created by Beda Kosata")
     about = gtk.AboutDialog()
-    about.set_program_name("ADORE-GUI")
+    about.set_program_name("ADORE-GOOEY")
     about.set_version("0.0.0")
     about.set_copyright("(c) Batuhan Osmanoglu")
-    about.set_license("GNU_GPL v2")
+    self.readSet();
+    about.set_license(open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"/license.txt", 'r').read())
     about.set_comments("Automated Doris Environment")
     about.set_website("http://code.google.com/p/adore-doris/")
-    self.readSet();
     about.set_logo(gtk.gdk.pixbuf_new_from_file(self.set.get('adore','ADOREFOLDER').strip('\'"') +"/man/adoreDoris_tud_um.png"))
     about.run()
     about.destroy()

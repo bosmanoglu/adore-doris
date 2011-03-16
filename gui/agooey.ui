@@ -54,6 +54,7 @@
     </menu>
   </menu>
   <menu action="Settings">
+    <menuitem action="settingsEditor"/>
     <menuitem action="settingsCheck"/>
     <menuitem action="settingsFix"/>
     <menuitem action="settingsLoad"/>
