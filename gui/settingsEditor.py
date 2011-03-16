@@ -25,7 +25,7 @@ class SettingsEditor:
 
         self.window.set_title("AGOOEY Settings Editor")
 
-        self.window.set_size_request(200, 400)
+        self.window.set_size_request(400, 600)
 
         self.window.connect("delete_event", self.delete_event)
 
@@ -42,21 +42,22 @@ class SettingsEditor:
         # create the TreeView using treestore
         self.treeview = gtk.TreeView(self.treestore)
 
+        # create a CellRendererText to render the data
+        self.cell = gtk.CellRendererText()
+        self.cell2 = gtk.CellRendererText()
+
         # create the TreeViewColumn to display the data
-        self.tvcolumn = gtk.TreeViewColumn('Settings')
-        self.tvcolumn2 = gtk.TreeViewColumn('Values')
+        self.tvcolumn = gtk.TreeViewColumn('Settings', self.cell, text=0)
+        self.tvcolumn2 = gtk.TreeViewColumn('Values', self.cell2, text=1)
 
         # add tvcolumn to treeview
         self.treeview.append_column(self.tvcolumn)
         self.treeview.append_column(self.tvcolumn2)
 
-        # create a CellRendererText to render the data
-        self.cell = gtk.CellRendererText()
-        self.cell2 = gtk.CellRendererText()
 
         # add the cell to the tvcolumn and allow it to expand
         self.tvcolumn.pack_start(self.cell, True)
-        self.tvcolumn2.pack_start(self.cell2, True)
+        #self.tvcolumn2.pack_start(self.cell2, True)
 
         # set the cell "text" attribute to column 0 - retrieve text
         # from that column in treestore
