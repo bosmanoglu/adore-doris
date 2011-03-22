@@ -1,0 +1,34 @@
+#!/bin/bash
+# USAGE:
+#	addrefpha2resample
+#
+# DESCRIPTION:
+#  ADDREFPHA2RESAMPLE is an internal ADORE command. 
+#  It is used in creating interferograms coregistered to a different scene, 
+#  as needed in Small Baselines (SBAS) interferometry. The command adds the  
+#  reference phase dumped by subtrrefpha (srp_dumprefpha=on) to the result
+#  of resampling step and modifies the slave result file accordingly. The 
+#  original result file is saved with a .bck extension.
+#
+# INPUT:
+#  There are no required input parameters for this command.
+#  
+# OUTPUT:
+#   Modifies the result file by changing the name of the resampling output file. 
+#   Also generates an output file with ".addrefpha" extension.
+#
+
+function funResample2Resample(){
+  [ ! -e "${rs_out_file}" ] && echo "Resample file not found. Please run resample step" && return
+  [ ! -e "${srp_out_refpha}" ] && echo "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return
+
+  bold "Adding reference phase to resampled slave..."
+  cpxmult ${rs_out_file} ${srp_out_refpha} ${rs_out_file}.addrefpha 1
+  cp ${s_resfile} ${s_resfile}.bck
+
+  modifyRes.sh "${s_resfile}" resample 'Data_output_file' ${rs_out_file}.addrefpha
+
+}
+
+###MAIN
+funResample2Resample ${@}
