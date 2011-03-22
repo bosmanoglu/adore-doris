@@ -1,12 +1,12 @@
 #!/bin/bash
 # USAGE:
 #	settings option [argument]
-#	settings
 #	settings apply variableName
 #	settings apply [-rq] variableName1=variableValue1 [variableName2 variableName3=...]
 #	settings check
 #	settings fix [-q]
-#	settings init
+#	settings init [-q]
+#	settings list
 #	settings raw
 #	settings save [fileName]
 #	settings load [fileName]
@@ -19,8 +19,6 @@
 #  settings.
 #
 # INPUT:
-#  settings: will list the current settings as seen by ADORE.
-#
 #  settings apply [-rq] variableName: updates settings that depend on
 #	variableName. By default this is not done in a recursive way. Use 
 #       'settings check' for possible mismatches. Settings apply can also assign values 
@@ -38,6 +36,8 @@
 #
 #  settings init: will ask the user some questions to create an initial 
 #	settings file. Useful when starting a new project. 
+#
+#  settings list: will list the current settings as seen by ADORE.
 #
 #  settings raw: displays the unprocessed settings with USERS
 #	changes. This can be saved with the save function.
@@ -92,7 +92,8 @@ dumpDefaultSettings(){
     tempFile=${1}
     #dump the default to a temp file. 
     rm -rf ${tempFile}
-    cat "${ADOREFOLDER}/set/default.set" | while read -r line; do
+    #cat "${ADOREFOLDER}/set/default.set" | while read -r line; do
+    grep -v "^$" "${ADOREFOLDER}/set/default.set" |grep -v "^#" | while read -r line; do
       #get right side of the line
       echo ${line##*&&} >> ${tempFile}
     done
@@ -485,21 +486,22 @@ function settings_list(){
 function settings_init(){
  #first apply settings passed in the command line
  shift
- [ -n "$@" ] && settings apply "$@"
+ [ "${1}"=="-q" ] && q='-q' && shift || q=''
+ [ -n "$@" ] && settings apply -r ${q} "$@"
  
  #now ask some questions
  local variables
  bold "What is the projectFolder? [${projectFolder}]"
  read userInput
- [ -n "${userInput}" ] && settings apply -r projectFolder="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} projectFolder="${userInput}"
 
  bold "What is the runName? [${runName}]"
  read userInput
- [ -n "${userInput}" ] && settings apply -r runName="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} runName="${userInput}"
  
  bold "What is the dataFolder? [${dataFolder}]"
  read userInput
- [ -n "${userInput}" ] && settings apply -r dataFolder="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} dataFolder="${userInput}"
  
  bold "In the dataFolder I found the following scenes:"
  scenes include
@@ -513,31 +515,31 @@ function settings_init(){
  echo "Here is the listing of the files in the current master folder."
  ls ${dataFolder}/${master}
  read userInput
- [ -n "${userInput}" ] && settings apply -r dataFile="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} dataFile="${userInput}"
 
  if ask "Do you also want to enter the patterns for leader, volume and null files?"
  then
 
    bold "What is the leaderFile pattern? [${leaderFile}]"
    read userInput
-   [ -n "${userInput}" ] && settings apply -r leaderFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r ${q} leaderFile="${userInput}"
    bold "What is the volumeFile pattern? [${volumeFile}]"
    read userInput
-   [ -n "${userInput}" ] && settings apply -r volumeFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r ${q} volumeFile="${userInput}"
    bold "What is the nullFile pattern? [${nullFile}]"
    read userInput
-   [ -n "${userInput}" ] && settings apply -r nullFile="${userInput}"
+   [ -n "${userInput}" ] && settings apply -r ${q} nullFile="${userInput}"
  fi  
 
  bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
  echo "Current setting: [${m_in_method}]"
  read userInput
- [ -n "${userInput}" ] && settings apply -r m_in_method="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"
  
  bold "What is the m_orbdir? This is the folder that has the arclist file for getorb."
  echo "Current setting: [${m_orbdir}]"
  read userInput
- [ -n "${userInput}" ] && settings apply -r m_orbdir="${userInput}"
+ [ -n "${userInput}" ] && settings apply -r ${q} m_orbdir="${userInput}"
  
  bold "What would you like to name this settings file?"
  echo "Current setting: [settings.set]"
@@ -577,7 +579,10 @@ case ${1} in
   init)
     settings_init "$@"
   ;;
-  *)
+  list)
     settings_list
+  ;;
+  *)
+    echo "Unknown option. You can get help with: ? settings"
   ;;
 esac

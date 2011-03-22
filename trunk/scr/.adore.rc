@@ -22,5 +22,5 @@ fi
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
   #Gui on
-  declare -r PROMPT_COMMAND="settings &> /tmp/adore.set"
+  declare -r PROMPT_COMMAND="settings list &> /tmp/adore.set"
 fi
