@@ -1,0 +1,24 @@
+ADORE stands for Automated DORIS Environment. It is developed at the University of Miami Geodesy Group, to help researchers generate interferograms with ease. Just like DORIS it is an open source project and it comes with the same license. ADORE can not do anything that DORIS doesn't, it's only a simplified user interface.
+
+Important Note: ADORE does not come with DORIS. It is 100% compatible with DORIS version 4.2. You can download the latest DORIS version at: http://enterprise.lr.tudelft.nl/doris/
+
+Main Goals:
+
+Generate high-quality interferograms with ease.
+Generate single-master-stack or short-baselines stack interferograms with ease.
+Streamline (speed-up) setting-up DORIS input parameters.
+While doing all of the above, do not loose any flexibility.
+Current Features:
+
+Automatic generation of DORIS input files with default parameters.
+An interactive mode to quickly generate/troubleshoot interferograms.
+A method to save,load,edit to easily modify project settings.
+Interface for cpxfiddle (to generate raster images)
+Interface to check project status.
+Interface to undo previous processing steps.
+Interface to generate SRTM DEM.
+Interface to load ArcGIS stitched DEM (with .hdr file).
+Export DORIS results to Envi, ArcGIS.
+Upcoming Features:
+
+- Export DORIS results to kmz, matlab.
