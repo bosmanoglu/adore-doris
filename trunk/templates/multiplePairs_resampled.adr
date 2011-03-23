@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# USAGE:
+#       p multiplePairs_resampled.adr pairsFile resample_master
+#
+# DESCRIPTION:
+#  multiplePairs_resampled.adr is an ADORE script.  
+#  It generates several interferograms whose master and slave orbits are defined
+#  by the input file. All images are resampled to resample_master before 
+#  interferogram generation. 
+#  
+#  The rs_dbow or rs_dbow_geo settings must be set before this script is run. 
+#  Otherwise there may be empty areas on the edges of the interferograms.
+#  Set rs_dbow or rs_dbow_geo such that all images cover the same area. 
+#
+#  The implementation is such that:
+#   1- All images are cropped with given settings 
+#   2- All images are resampled to the same master using rs_dbow
+#   3- Interferograms are created skipping the coregistration and reference phase
+#      steps. 
+#
+# INPUT:
+#  inputFile: A comma-separated-value file where each line indicates an
+#    interferometric pair. First value defines the master and the second value defines the slave.
+#    As an example file should have this format:
+#    masterScene1,slaveScene1
+#    masterScene2,slaveScene2
+#    ...
+#  
+# OUTPUT:
+#  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
+#  crops are located at ${cropsFolder}
+#  resampled crops are located at ${resampleFolder} #DEFINED IN THE SCRIPT
+#  interferograms are located at ${i12sFolder}
+#
+
+# The following steps are processed for each crop
+cropSteps="m_readfiles;m_porbits;m_crop" #;m_simamp;m_timing
+# The following steps are processed for resampling all crops to resampling Master
+resampleSteps='coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;settings apply -r -q srp_dumprefpha=on;subtrrefpha;addrefpha2crop'
+# The following steps are processed for each interferogram
+interferoSteps='coarseorb;copyRes.sh ${s_resfile} crop resample;settings apply -r -q int_multilook="20 4";interfero;coherence;raster p interfero;raster p coherence -- -c gray'
+resampleFolder="${runFolder}/resample"
+#######################################################
+## DO NOT CHANGE ANYTHING BELOW
+## UNLESS YOU KNOW WHAT YOU ARE DOING.
+## If you can understand/modify the following script, 
+## and would like to help, contact the developer.
+#######################################################
+function processCropSteps(){
+  # reload original settings
+  settings load ${originalSettingsFile}
+  local scene=${1}     
+  bold "Processing ${scene}"
+  settings apply -r -q master=${scene} slave="dummy" outputFolder="${cropsFolder}/${scene}"
+  [ "${scene}" == "${resampleMaster}" ] && settings apply -r -q m_dbow="${rs_dbow}" m_dbow_geo="${rs_dbow_geo}"
+  mkdir -p "${outputFolder}"
+  cd "${outputFolder}"    
+
+  #parallelProcess "${outputFolder}" "${cropSteps}"
+  #jobId=`quejob "${cropSteps}" "${outputFolder}"`
+  #jobIds=( ${jobIds[@]} ${jobId} )
+  eval ${cropSteps} #run cropsteps
+  settings save
+}
+
+function processResampleSteps(){
+   # reload original settings
+   settings load ${originalSettingsFile}
+   master=${resampleMaster}
+   local scene=${1}
+   if [ "${master}" == "${scene}" ]; then
+     continue #no interferometry possible
+   fi
+   if [ -d "${resampleFolder}/${master}_${scene}" ]; then
+     continue #already processed... Shouldn't happen but who knows.
+   fi
+   bold "Processing resample/${master}_${scene}"
+   settings apply -r -q master=${master} slave=${scene} outputFolder="${resampleFolder}/${master}_${scene}"
+   mkdir -p "${outputFolder}"
+   cd "${outputFolder}"
+   cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+   cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+
+   eval ${resampleSteps}
+   settings save
+}
+
+function processInterferoSteps(){
+   local scenes=${1}
+   # load original settings in case some settings were changed during process
+   settings load ${originalSettingsFile} 
+   bold "Processing ${scenes}"
+   master=${scenes%%,*}
+   slave=${scenes#*,}   
+   settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
+   mkdir -p "${outputFolder}"
+   cd "${outputFolder}"    
+   if [ ${master} == ${resampleMaster} ]; then
+     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+   else
+     cp ${resampleFolder}/${resampleMaster}_${master}/${master}.res ${outputFolder}/${master}.res
+   fi
+   if [ ${slave} == ${resampleMaster} ]; then
+     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+   else
+     cp ${resampleFolder}/${resampleMaster}_${slave}/${slave}.res ${outputFolder}/${slave}.res
+   fi
+
+   eval `eval 'echo "${interferoSteps}"'` #run interfero
+   settings save
+}
+#######################################################
+####  MAIN ####
+#######################################################
+local pairsFile=`canonicalPath ${1}`
+local resampleMaster=${2}
+
+# we will be changing directories
+# save the current dir.
+local CALLDIR=$PWD;
+
+generateRandomString
+local originalSettingsFile=${CALLDIR}/${randomString}.set
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+
+#### crop
+#<<ENDCOMMENT>/dev/null
+#ENDCOMMENT
+#for scene in ${scenes_include[*]}
+#jobIds=( ); #start empty list
+for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+do
+  processCropSteps ${scene}
+done
+# if resampleMaster was not cropped run the processCropSteps on it.
+[ ! -d "${cropsFolder}/${resampleMaster}" ] && processCropSteps ${resampleMaster}
+
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+#### resample
+for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+do
+  processResampleSteps ${scene}
+done
+
+
+####Now the i12s
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+for scenes in `cat ${pairsFile}`
+do
+  processInterferoSteps ${scenes}
+done
+
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}
