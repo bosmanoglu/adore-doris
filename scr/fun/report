@@ -1,13 +1,76 @@
 #!/bin/bash
 #
-#
-#
+# USAGE: 
+#	report [i12sFolder] "dorisSteps"
+# Example:
+#  report "interfero;coherence"
 
 function create(){
+generateRandomString
+curSetFile=${randomString}
+settings save ${curSetFile}
+
+local rFolder iFolder rSteps
+
+if [ $# -eq 2 ]; then
+  rFolder="./report"
+  iFolder=${1}
+  rSteps=${2}
+elif [ $# -eq 1 ]; then
+  if [ -d "${1}" ]; then 
+    rFolder="./report"
+    iFolder=${1}
+    rSteps="subtrrefpha;coherence"
+  else
+    rFolder=${runFolder}/report
+    iFolder=${i12sFolder}
+    rSteps=${1}
+  fi
+elif [ $# -eq 0 ];then
+  rFolder=${runFolder}/report
+  iFolder=${i12sFolder}
+  rSteps="subtrrefpha;coherence"
+else
+  echo "Wrong number of options. Try: ? report"  
+  return
+fi
+echo Input Parameters reportFolder=${rFolder} i12sFolder=${iFolder} reportSteps=${rSteps}
+
 curFolder=${PWD}
-mkdir -p ${runFolder}/report
-reportFile=${runFolder}/report/index.html
-cat >> ${reportFile}<<_EOF
+mkdir -p ${rFolder}
+rFile=${rFolder}/index.html
+
+writeHTMLHeader > ${rFile}
+for folder in `ls ${iFolder}`
+do
+  cd ${i12sFolder}/${folder}
+  settings load
+  raster_format=png
+  echo "<H1>${folder}</H1>" >> ${rFile}
+  for step in `echo ${rSteps} | tr ';' '\n'`
+  do
+    imgFile=`raster p ${step} -- -M4/4 | tail -n1| cut -d":" -f2`
+    mv ${imgFile} ${rFolder}
+    writePicture ${imgFile} 300 300 ${imgFile} >> ${rFile}
+  done
+  
+done
+writeHTMLFooter >> ${rFile}
+cd ${curFolder}
+
+bold "Reloading user settings from temporary backup file."
+settings load ${curSetFile}
+rm -rf ${curSetFile}
+}
+
+function writePicture(){
+cat << _EOFF
+<img src="${1}" width="${2}" height="${3}" alt="${4}" />
+_EOFF
+}
+
+function writeHTMLHeader(){
+cat <<_EOF
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
@@ -16,18 +79,13 @@ cat >> ${reportFile}<<_EOF
  </HEAD>
  <BODY>
 _EOF
+}
 
-for iFolder in `ls ${i12sFolder}`
-do
-  cd ${i12sFolder}/${iFolder}
-  settings load
-  raster_format=png
-  raster p subtrrefpha -- -M4/4
-  mv *srp.png ${runFolder}/report
-  raster p coherence -- -c gray -M4/4
-  mv *coh.png ${runFolder}/report
-done
-cd ${curFolder}
+function writeHTMLFooter(){
+cat <<_EOF
+ </BODY>
+</HTML>
+_EOF
 }
 
 create ${@}
