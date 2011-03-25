@@ -37,6 +37,9 @@ cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
  #PBS -q batch
  #PBS -V
  #PBS -l walltime=8:00:00
+ #PBS -m n
+ #PBS -e ${CALLDIR}/${queJobRandStr}.err
+ #PBS -o ${CALLDIR}/${queJobRandStr}.out
  cd ${CALLDIR}
  ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${commands}"
 _EOFFILE
