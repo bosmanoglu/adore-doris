@@ -58,7 +58,7 @@ dorisProcessReset()
  fi
 }
 
-local dorisStep only
+local dorisStep only resfile
 if [ "${1}" == "only" ];then
   shift
   only="only"
@@ -75,8 +75,13 @@ elif [[ "${1}" == m_* ]]; then
 elif [[ "${1}" == s_* ]]; then
   dorisProcessReset ${dorisStep} ${s_resfile} ${only}; 
 else
-  dorisProcessReset ${dorisStep} ${m_resfile} ${only}
-  dorisProcessReset ${dorisStep} ${s_resfile} ${only}
-  dorisProcessReset ${dorisStep} ${i_resfile} ${only}
+  resfile=`pn2rs -f ${1}`
+  if [ -e "${resfile}" ]; then 
+    dorisProcessReset ${dorisStep} "${resfile}" ${only}
+  else
+    dorisProcessReset ${dorisStep} ${m_resfile} ${only}
+    dorisProcessReset ${dorisStep} ${s_resfile} ${only}
+    dorisProcessReset ${dorisStep} ${i_resfile} ${only}
+  fi
 fi
 

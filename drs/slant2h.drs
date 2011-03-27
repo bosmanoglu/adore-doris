@@ -22,13 +22,13 @@ s_az_t_error	${s_az_t_error}		//
 
 process         slant2h                 // 
 
-s2h_method	${s2h_method}		//
-s2h_out_hei	${s2h_out_hei}		//
-s2h_out_phi	${s2h_out_phi}		//
-s2h_out_lam	${s2h_out_lam}		//
-s2h_npoints	${s2h_npoints}		//
-s2h_degree1d	${s2h_degree1d}		//
-s2h_nheights	${s2h_nheights}		//
-s2h_degree2d	${s2h_degree2d}		//
+s2h_method	${s2h_method}		// ambiguity, schwabisch, rodriguez
+s2h_out_hei	${s2h_out_hei}		// 
+s2h_out_phi	${s2h_out_phi}		// generated only for ambiguity
+s2h_out_lam	${s2h_out_lam}		// generated only for ambiguity
+s2h_npoints	${s2h_npoints}		// only for schwabisch
+s2h_degree1d	${s2h_degree1d}		// only for schwabisch
+s2h_nheights	${s2h_nheights}		// only for schwabisch
+s2h_degree2d	${s2h_degree2d}		// only for schwabisch
 
 stop

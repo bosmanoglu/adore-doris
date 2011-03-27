@@ -1,23 +1,18 @@
 #!/bin/bash
 #
 # USAGE:
-#       p multiplePairs_resampled.adr pairsFile resample_master
+#       p multiplePairs_resampled.adr inputFile resample_master
 #
 # DESCRIPTION:
 #  multiplePairs_resampled.adr is an ADORE script.  
 #  It generates several interferograms whose master and slave orbits are defined
-#  by the input file. All images are resampled to resample_master before 
-#  interferogram generation. 
+#  by the input file. 
 #  
-#  The rs_dbow or rs_dbow_geo settings must be set before this script is run. 
-#  Otherwise there may be empty areas on the edges of the interferograms.
-#  Set rs_dbow or rs_dbow_geo such that all images cover the same area. 
-#
+#  The rs_dbow or rs_dbow_geo settings must be set before this script is run.
 #  The implementation is such that:
-#   1- All images are cropped with given settings 
+#   1- All images are cropped with given settings (if you specify m_dbow make sure it covers rs_dbow)
 #   2- All images are resampled to the same master using rs_dbow
-#   3- Interferograms are created skipping the coregistration and reference phase
-#      steps. 
+#   3- Interferograms are created skipping the coregistration and reference phase steps.
 #
 # INPUT:
 #  inputFile: A comma-separated-value file where each line indicates an
@@ -29,9 +24,10 @@
 #  
 # OUTPUT:
 #  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
-#  crops are located at ${cropsFolder}
-#  resampled crops are located at ${resampleFolder} #DEFINED IN THE SCRIPT
-#  interferograms are located at ${i12sFolder}
+#  It runs the following DORIS steps:
+#    For crops (with resamplingMaster): m_readfiles, m_porbits, m_crop, coarseorb, coarsecorr, fine, coregpm, resample
+#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
+#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
 #
 
 # The following steps are processed for each crop
@@ -39,7 +35,7 @@ cropSteps="m_readfiles;m_porbits;m_crop" #;m_simamp;m_timing
 # The following steps are processed for resampling all crops to resampling Master
 resampleSteps='coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;settings apply -r -q srp_dumprefpha=on;subtrrefpha;addrefpha2crop'
 # The following steps are processed for each interferogram
-interferoSteps='coarseorb;copyRes.sh ${s_resfile} crop resample;settings apply -r -q int_multilook="20 4";interfero;coherence;raster p interfero;raster p coherence -- -c gray'
+interferoSteps='coarseorb;s_crop2resample;settings apply -r -q int_multilook="20 4" srp_dumprefpha=on;interfero;coherence;comprefpha;subtrrefpha;comprefdem;raster p interfero;raster p comprefdem;raster p coherence -- -c gray'
 resampleFolder="${runFolder}/resample"
 #######################################################
 ## DO NOT CHANGE ANYTHING BELOW
@@ -126,8 +122,7 @@ local originalSettingsFile=${CALLDIR}/${randomString}.set
 settings save ${originalSettingsFile}
 
 #### crop
-#<<ENDCOMMENT>/dev/null
-#ENDCOMMENT
+<<ENDCOMMENT>/dev/null
 #for scene in ${scenes_include[*]}
 #jobIds=( ); #start empty list
 for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
@@ -144,6 +139,7 @@ do
   processResampleSteps ${scene}
 done
 
+ENDCOMMENT
 
 ####Now the i12s
 cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.

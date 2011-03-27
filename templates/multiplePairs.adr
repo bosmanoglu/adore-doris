@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# USAGE:
+#       p multiplePairs.adr inputFile
+#
+# DESCRIPTION:
+#  multiplePairs_Parallel.adr is an ADORE script.  
+#  It generates several interferograms whose master and slave orbits are defined
+#  by the input file. 
+#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#
+# INPUT:
+#  inputFile: A comma-separated-value file where each line indicates an
+#    interferometric pair. First value defines the master and the second value defines the slave.
+#    As an example file should have this format:
+#    masterScene1,slaveScene1
+#    masterScene2,slaveScene2
+#    ...
+#  
+# OUTPUT:
+#  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
+#  It runs the following DORIS steps:
+#    For crops: s_readfiles, s_porbits, s_crop
+#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
+#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+#
+
+# The following steps are processed for each crop
+cropSteps="m_readfiles;m_porbits;m_crop" #;m_simamp;m_timing
+# The following steps are processed for each interferogram
+interferoSteps="coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence"
+
+#######################################################
+## DO NOT CHANGE ANYTHING BELOW
+## UNLESS YOU KNOW WHAT YOU ARE DOING.
+#######################################################
+local pairsFile=${1}
+
+# we will be changing directories
+# save the current dir.
+local CALLDIR=$PWD;
+
+generateRandomString
+local originalSettingsFile=${CALLDIR}/${randomString}.set
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+
+
+#for scene in ${scenes_include[*]}
+jobIds=( ); #start empty list
+for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+do
+     bold "Processing ${scene}"
+     settings apply -r -q master=${scene} slave=dummy outputFolder="${cropsFolder}/${scene}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"    
+     settings save
+
+     #parallelProcess "${outputFolder}" "${cropSteps}"
+     #jobId=`quejob "${cropSteps}" "${outputFolder}"`
+     #jobIds=( ${jobIds[@]} ${jobId} )
+     eval ${cropSteps} #run cropsteps
+done
+
+####Now the i12s
+#Set the stack master.
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+for scenes in `cat ${pairsFile}`
+do
+   # load original settings in case some settings were changed during process
+   settings load ${originalSettingsFile} 
+   master=${scenes%%,*}
+   scene=${scenes#*,}   
+   if [ "${master}" == "${scene}" ]; then
+     continue
+   fi
+
+     bold "Processing ${master}_${scene}"
+     settings apply -r -q master=${master} slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"
+     settings save
+     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+
+     #parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster a resample -M1/5;raster p subtrrefpha"
+     #quejob "${interferoSteps}" "${outputFolder}"
+     eval ${interferoSteps}
+done
+
+
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}

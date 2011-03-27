@@ -8,6 +8,15 @@ Usage: cpxview -w width [-f informat] [-q output]
 	[-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B swap] 
 	[-H bytes] [-V] [-b] [-h[elp]] inputfile
 """
+#
+# USAGE: cpxview -w width [-f informat] [-q output] 
+#	 [-e exp] [-s scale] [-l line] [-L line] [-p pixel] [-P pixel]
+#	 [-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B swap] 
+#	 [-H bytes] [-V] [-b] [-h[elp]] inputfile
+# DESCRIPTION:
+#   Opens complex files using numpy and matplotlib. Functionality and parameters are
+#   similar to cpxfiddle-part of TU-DELFT DORIS software.
+#
 import sys,os
 import getopt
 import pylab as mp;
@@ -17,15 +26,19 @@ def usage():
     print __doc__
 
 def main(argv):
-    inputfile=argv[-1];
-    argv=argv[0:-1];
-    if not os.path.exists(inputfile):
-        print "File not found:", inputfile
+    if not argv:
+        usage()
         sys.exit(2)
+    #inputfile=argv[-1];
+    #argv=argv[0:-1];
     try:
-        opts, args = getopt.getopt(argv, "w:f:q:e:s:l:L:p:P:S:M:m:c:r:B:H:Vbh")
+        opts, args = getopt.getopt(argv, "w:f:q:e:s:l:L:p:P:S:M:m:c:r:B:H:Vbht")
     except getopt.GetoptError:
         usage()
+        sys.exit(2)
+    inputfile=args[0];
+    if not os.path.exists(inputfile):
+        print "File not found:", inputfile
         sys.exit(2)
     cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
     cfg.setdefault("-f", "cr4")
@@ -40,9 +53,10 @@ def main(argv):
     cfg.setdefault("-M", "1/1")
     cfg.setdefault("-m", "")
     cfg.setdefault("-c", "gray")
-    cfg.setdefault("-r", "")
+    cfg.setdefault("-r", "0/0")
     cfg.setdefault("-B", "")
     cfg.setdefault("-H", "")
+    cfg.setdefault("-b", "")
     cfg["-w"]=int(cfg["-w"]) 
     cfg["-l"]=int(cfg["-l"]) 
     cfg["-L"]=int(cfg["-L"]) 
@@ -54,6 +68,8 @@ def main(argv):
     cfg["Mp"]=int(cfg["-M"].split("/")[1])    
     cfg["-s"]=float(cfg["-s"]) 
     cfg["-e"]=float(cfg["-e"]) 
+    cfg["rmin"]=int(cfg["-r"].split("/")[0])
+    cfg["rmax"]=int(cfg["-r"].split("/")[1])    
     data=getdata(inputfile,cfg["-w"],cfg["-f"])
     data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
     if "norm" in cfg["-q"]:
@@ -62,11 +78,27 @@ def main(argv):
         mp.matshow(cfg["-s"]*abs(data)**cfg["-e"])
     elif "pha" in cfg["-q"]:
         mp.matshow(cfg["-s"]*np.angle(data)**cfg["-e"])
+    elif "wrap" in cfg["-q"]:
+        mp.matshow(cfg["-s"]*wrapToPi(data)**cfg["-e"])
+        
     else:
         print "Unknown output type."
         return
-    mp.set_cmap(cfg["-c"])
+    # set colormap
+    mp.set_cmap(cfg["-c"])        
+    #rescale?
+    if cfg["-r"]!="0/0":
+        mp.clim([ cfg["rmin"], cfg["rmax"] ]);
+    #Place colorbar
+    if ("-b", "") in opts:
+        mp.colorbar()
+    #display file name as title.
+    if ("-t", "") in opts:
+        mp.title(os.path.basename(inputfile))
     mp.show()
+
+def wrapToPi(x):
+    return np.mod(x+np.pi,2*np.pi)-np.pi
 
 def getdata(fname, width, dataFormat, length=0):  
     complexFlag=False;
