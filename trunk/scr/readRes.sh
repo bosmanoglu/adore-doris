@@ -3,14 +3,15 @@ nargs=$#
 if [ ${nargs} -lt 3 ]
 then 
 cat<<_EOF
-USAGE: readRes.sh resultFile dorisStep parameter
+USAGE: readRes.sh resultFile dorisStep parameter [notify]
 
 INPUT:
   resultFile: is the DORIS result file (*.res)
   dorisStep: is the processing step to look for the parameter.
   parameter: field to be read in the result file. If the parameter includes a column(:) character
    	     value of the parameter is returned. (See last example.)
-
+  notify:    Default is "off". If "on", will warn user in case multiple lines matched the search parameter.
+  
 OUTPUT: 
   parameter value from the result file. 
 

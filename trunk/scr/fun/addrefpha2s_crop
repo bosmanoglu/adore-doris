@@ -29,12 +29,35 @@ function funResample2Crop(){
   generateRandomString
   local tmpFile=${randomString}
   # Below line copies the information from the requested step and copies it to a temporary file
-  sed -n "/_Start_resample/,/End_resample/p" ${s_resfile} | sed -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p'  > ${tmpFile}
+  #sed -n "/_Start_resample/,/End_resample/p" ${s_resfile} | sed -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p'  > ${tmpFile}
+  #sed -n "/_Start_resample/,/End_resample/p" ${s_resfile}  | sed -e 's/original_master/original_image/g' > ${tmpFile}
+  sed -n "/_Start_resample/,/End_resample/p" ${s_resfile} > ${tmpFile}
   # Remove the extra output lines
   sed -i -e '/Data_output_file_/ d' -e '/Data_output_format_/ d' ${tmpFile}
   # Replace the values of the filename and format, < is the split character $@ has a special meaning. can't use @
   sed -i -e "s<^Data_output_file.*$<Data_output_file: ${rs_out_file}.addrefpha<g" ${tmpFile}
-
+  local azoff rgoff val
+  azoff=`readRes.sh ${i_resfile} coarse_orbits "Coarse_orbits_translation_lines"`
+  rgoff=`readRes.sh ${i_resfile} coarse_orbits "Coarse_orbits_translation_pixels"`
+  #update first line
+  val=`readRes.sh ${tmpFile} resample "First_line (w.r.t. original_master)" `  
+  #modifyRes.sh ${tmpFile} resample "First_line (w.r.t. original_image)" $(( ${val}+${azoff} )) > ${tmpFile} ### ModifyRes does not like file being changed when it is looping in it.
+  sed -i "s/^First_line.*$/First_line (w.r.t. original_image):		$(( ${val}+${azoff} ))/g" ${tmpFile}
+  #update last line
+  val=`readRes.sh ${tmpFile} resample "Last_line (w.r.t. original_master)" `  
+  sed -i "s/^Last_line.*$/Last_line (w.r.t. original_image):		$(( ${val}+${azoff} ))/g" ${tmpFile}
+  #modifyRes.sh ${tmpFile} resample "Last_line (w.r.t. original_image)" $(( ${val}+${azoff} )) > ${tmpFile}
+  #update first pixel 
+  val=`readRes.sh ${tmpFile} resample "First_pixel (w.r.t. original_master)" `  
+  sed -i "s/^First_pixel.*$/First_pixel (w.r.t. original_image):		$(( ${val}+${rgoff} ))/g" ${tmpFile}
+  #modifyRes.sh ${tmpFile} resample "First_pixel (w.r.t. original_image)" $(( ${val}+${rgoff} )) > ${tmpFile}
+  #update last pixel
+  val=`readRes.sh ${tmpFile} resample "Last_pixel (w.r.t. original_master)" `  
+  sed -i "s/^Last_pixel.*$/Last_pixel (w.r.t. original_image):		$(( ${val}+${rgoff} ))/g" ${tmpFile}
+  #modifyRes.sh ${tmpFile} resample "Last_pixel (w.r.t. original_image)" $(( ${val}+${rgoff} )) > ${tmpFile}
+  #Remove the resample step header
+  sed -i -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p' ${tmpFile}
+  
   undo crop ${s_resfile}
 
   # Re-write crop for resampling.

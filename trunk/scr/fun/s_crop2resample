@@ -1,0 +1,27 @@
+#!/bin/bash
+# USAGE:
+#	s_crop2resample
+#
+# DESCRIPTION:
+#  S_CROP2RESAMPLE is an internal ADORE command. 
+#  It is used in creating interferograms coregistered to a different scene, 
+#  as needed in Small Baselines (SBAS) interferometry. The command copies
+#  the m_crop as s_resample and changes the data_output_file to the s_crop
+#  output file. 
+#
+# INPUT:
+#  There are no required input parameters for this command.
+#  
+# OUTPUT:
+#   Modifies the result file by copying the m_crop to s_resample 
+#
+
+function fun_s_crop2resample(){
+copyRes.sh ${m_resfile} crop ${s_resfile} resample
+local scropOut=`readRes.sh ${s_resfile} crop Data_output_file`
+local mcropOut=`readRes.sh ${m_resfile} crop Data_output_file`
+#modifyRes.sh ${s_resfile} resample "Data_output_file" ${scropOut}
+sed -i "s<${mcropOut}<${scropOut}<g" ${s_resfile}
+}
+###MAIN
+fun_s_crop2resample ${@}
