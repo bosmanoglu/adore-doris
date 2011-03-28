@@ -100,9 +100,11 @@ function linkERS(){
 #Modified from
 # STAMPS3.2/link_slcs:goodERS(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
+local date
   for f in $(ls -1d ${DATADIR}/*); do
     #echo info: $f
-    date=$( ${AWK} '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
+    #date=$( awk '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
+    date=`awk '/ORBIT/{print substr($5,1,8)}' ${f}/L*`
     mkdir -p ${dataFolder}/${date}
     ln -s ${f}/L* ${dataFolder}/${date}/
     ln -s ${f}/D* ${dataFolder}/${date}/
@@ -114,6 +116,8 @@ local DATADIR=${1}
 function linkASAR(){
 #get list of files
 local rawDataFolder=$1
+local file folderName absFilePath
+
 for file in `ls ${rawDataFolder}/*.N1`
 do
   #folderName=`echo $file|cut -c23-30`
@@ -128,25 +132,25 @@ function linkTSX(){
 #Modified from
 # STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
+local f bname date tsxdir cosfile cosbname 
   for f in $(find ${DATADIR} -name "T*.xml"); do
     #echo info: $f
     bname=$( basename ${f} )
-    date=$(echo $bname | ${AWK} -F '_' {'print substr($13,1,8)'} )
+    date=`echo $bname | awk -F '_' {'print substr($13,1,8)'}`
     tsxdir=${f%/*}
     cosfile=`find $tsxdir -name "*.cos"` 
     cosbname=$( basename ${cosfile} )
     
-    mkdir -p ${dataFolder}/${date}/
-    ln -s ${f} ${dataFolder}/${date}/                 # xml
+    mkdir -p ${dataFolder}/${date}
+    ln -s ${f} ${dataFolder}/${date}                 # xml
     #ln -s ${bname} leader.xml ${dataFolder}/${date}/  # xml
-    ln -s ${cosfile} ${dataFolder}/${date}/
+    ln -s ${cosfile} ${dataFolder}/${date}
     #ln -s ${cosbname} image.slc
   done
 }
 
 function scenes_init(){
-local rawDataFolder=$1
-local file folderName absFilePath
+local rawDataFolder=`canonicalPath "${1}"`
 mkdir -p ${dataFolder}
 detectSatellite ${rawDataFolder}; #sets m_in_method
 case "${m_in_method}" in
