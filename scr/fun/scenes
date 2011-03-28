@@ -3,7 +3,7 @@
 #	scenes 
 #	scenes exclude orbitFolder1 orbitFolder2 ...
 #	scenes include orbitFolder1 orbitFolder2 ...
-#	scenes init /path/to/files
+#	scenes init /path/to/data
 #
 # DESCRIPTION:
 #  SCENES is an internal ADORE command. 
@@ -80,10 +80,40 @@ function scenes_include(){
   fi
 }
 
-function scenes_init(){
-local rawDataFolder=$1
-local file folderName absFilePath
+function detectSatellite(){
+#Modified from
+# STAMPS3.2/link_slcs:goodSense(), Mahmut Arikan - 20091021 
+local DATADIR=${1}
+  echo "I can only detect ERS, ASAR and TSX images for now."
+  echo "If you are using other datasets please setup the dataFolder manually."
+
+  #local file=`find ${DATADIR} -name "*.cos" | head -n 1 `
+  local file=`find ${DATADIR} -name "T*.xml" | head -n 1 `
+  if [ -n "$file" ]; then
+    m_in_method='TSX'
+  else
+    m_in_method=$(ls -1 ${DATADIR}/*/ASA* &>/dev/null && echo ASAR || echo ERS)
+  fi
+}
+
+function linkERS(){
+#Modified from
+# STAMPS3.2/link_slcs:goodERS(), Mahmut Arikan - 20091021 
+local DATADIR=${1}
+  for f in $(ls -1d ${DATADIR}/*); do
+    #echo info: $f
+    date=$( ${AWK} '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
+    mkdir -p ${dataFolder}/${date}
+    ln -s ${f}/L* ${dataFolder}/${date}/
+    ln -s ${f}/D* ${dataFolder}/${date}/
+    ln -s ${f}/V* ${dataFolder}/${date}/
+    ln -s ${f}/N* ${dataFolder}/${date}/
+  done
+}
+
+function linkASAR(){
 #get list of files
+local rawDataFolder=$1
 for file in `ls ${rawDataFolder}/*.N1`
 do
   #folderName=`echo $file|cut -c23-30`
@@ -92,6 +122,51 @@ do
   mkdir -p ${dataFolder}/${folderName} # create folder if missing
   ln -s "${absFilePath}" ${dataFolder}/${folderName}/
 done
+}
+
+function linkTSX(){
+#Modified from
+# STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
+local DATADIR=${1}
+  for f in $(find ${DATADIR} -name "T*.xml"); do
+    #echo info: $f
+    bname=$( basename ${f} )
+    date=$(echo $bname | ${AWK} -F '_' {'print substr($13,1,8)'} )
+    tsxdir=${f%/*}
+    cosfile=`find $tsxdir -name "*.cos"` 
+    cosbname=$( basename ${cosfile} )
+    
+    mkdir -p ${dataFolder}/${date}/
+    ln -s ${f} ${dataFolder}/${date}/                 # xml
+    #ln -s ${bname} leader.xml ${dataFolder}/${date}/  # xml
+    ln -s ${cosfile} ${dataFolder}/${date}/
+    #ln -s ${cosbname} image.slc
+  done
+}
+
+function scenes_init(){
+local rawDataFolder=$1
+local file folderName absFilePath
+mkdir -p ${dataFolder}
+detectSatellite ${rawDataFolder}; #sets m_in_method
+case "${m_in_method}" in
+ERS)
+  dataFile="DAT_01.001"
+  leaderFile="LEA_01.001"
+  volumeFile="VDF_DAT.001"
+  nullFile="NUL_01.001"
+  linkERS ${rawDataFolder};
+  ;;
+ASAR)
+  dataFile="ASA*.N1"
+  linkASAR ${rawDataFolder};
+  ;;
+TSX)
+  dataFile="*.cos"
+  leaderFile="T*.xml"
+  linkTSX ${rawDataFolder};
+  ;;
+esac
 
 }
 
