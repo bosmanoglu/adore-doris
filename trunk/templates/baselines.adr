@@ -13,24 +13,24 @@
 # OUTPUT:
 #  Creates ${projectFolder}/process/${runName}/baselines
 #  It runs the following DORIS steps:
-#    s_readfiles, s_porbits, coarseorb
+#    m_readfiles, m_porbits, coarseorb
 #  If GNUPLOT is installed it creates a baseline plot (eps).
 #  If IMAGEMAGICK is installed it converts the plot to a raster image.
 #
 
-function CTRL_C()
-{
-echo "Caught User-Interrupt!"
-echo "Setting back the old settings."
-echo "Note that slave is changed."
-echo "There might be some remaining files in ${outputFolder}"
-settings apply -r master=${stackMaster} outputFolder="."
-
-#go back to where we started
-cd ${CALLDIR}
-
-break
-}
+#function CTRL_C()
+#{
+#echo "Caught User-Interrupt!"
+#echo "Setting back the old settings."
+#echo "Note that slave is changed."
+#echo "There might be some remaining files in ${outputFolder}"
+#settings apply -r master=${stackMaster} outputFolder="."
+#
+##go back to where we started
+#cd ${CALLDIR}
+#
+#return
+#}
 
 
 
@@ -46,7 +46,7 @@ function checkAndProcess(){
 }
 
   #trap ctrl-c and call ctrl_c()
-  trap CTRL_C 2 # ctrl+c=sigint 2
+  #trap CTRL_C 2 # ctrl+c=sigint 2
 
 
 # we will be changing directories
@@ -69,8 +69,8 @@ do
      settings apply -r slave=${scene}
 
      #see function checkAndProcess above...
-     checkAndProcess s_readfiles    
-     checkAndProcess s_porbits
+     checkAndProcess m_readfiles    
+     checkAndProcess m_porbits
      
      sleep 2 #pause two seconds to allow user interrupts
 done
