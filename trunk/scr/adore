@@ -80,9 +80,21 @@ export adoreCommand=$1
 export dorisProcess=$p
 
 if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
+  #Two methods to find ADORE path 
+  #LSOF is capable of following links. But not available on all systems
+  #dirname method can not follow links causing trouble when adore is a link. 
   LSOF=$(lsof -p $$ | grep -E "/"$(basename $0)"$") # get the location of running script
-  [ $? -ne 0 ] && echo "ADORE could not define ADORESCR. Please set it as environment variable and retry. ex: export ADORESCR=/opt/adore/scr" && exit
-  export ADORESCR=$(dirname ${LSOF##* })
+  if [ $? -ne 0 ]; then 
+   ADORESCR=`echo $(cd $(dirname ${0}); pwd -P)`
+   if [ -d ${ADORESCR}/fun ]; then 
+     export ADORESCR
+   else
+     echo "ADORE could not define ADORESCR. Please set it as environment variable and retry. ex: export ADORESCR=/opt/adore/scr"
+     exit
+   fi
+  else
+    export ADORESCR=$(dirname ${LSOF##* })
+  fi
 fi
 echo ADORESCR=${ADORESCR}
 #adjust path in /ADORESCR/.adore.rc, only if interactive

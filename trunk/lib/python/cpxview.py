@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """ cpxview
 Opens complex files using numpy and matplotlib. Functionality and parameters are
 similar to cpxfiddle-part of TU-DELFT DORIS software.

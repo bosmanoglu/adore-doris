@@ -10,12 +10,8 @@ function ?
  h "$@"
 }
 
-function addrefpha2crop(){
-	. ${ADORESCR}/fun/addrefpha2crop "${@}"
-}
-
-function addrefpha2resample(){
-	. ${ADORESCR}/fun/addrefpha2resample "${@}"
+function addrefpha2s_crop(){
+	. ${ADORESCR}/fun/addrefpha2s_crop "${@}"
 }
 
 function archive(){

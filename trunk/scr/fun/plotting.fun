@@ -12,7 +12,9 @@ function gnuplot_baseline(){
 
 #get x-range y-range
 local xRange=`minmax -C ${1} | awk '{printf "%d:%d", $1-100, $2+100};'`
+[ $? -ne 0 ] && return 1 
 local yRange=`minmax -C ${1} | awk '{printf "%d:%d", $3-100, $4+100};'`
+[ $? -ne 0 ] && return 1
 local fonts="arial,20"
 #DOWNLOADED FROM http://ilab.cs.byu.edu/cs360/ by Prof. Daniel Zappala
 gnuplot <<_ENDOFSCRIPT
