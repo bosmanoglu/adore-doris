@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "${m_orbdir:-isEmpty}" == "isEmpty" ]; then
+  bold "Orbit directory (m_orbdir) is not defined."
+  echo "Can not run precise orbits step. You may continue with HDR orbits."
+  echo "HDR orbits are already in the result file. No action necessary."
+  echo "${dorisProcess}: FAIL"
+else
+  #preprocess the drs file
+  pp ${dorisProcess}
+  #run doris
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+fi

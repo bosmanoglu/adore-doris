@@ -18,83 +18,47 @@
 #  If IMAGEMAGICK is installed it converts the plot to a raster image.
 #
 
-#function CTRL_C()
-#{
-#echo "Caught User-Interrupt!"
-#echo "Setting back the old settings."
-#echo "Note that slave is changed."
-#echo "There might be some remaining files in ${outputFolder}"
-#settings apply -r master=${stackMaster} outputFolder="."
-#
-##go back to where we started
-#cd ${CALLDIR}
-#
-#return
-#}
-
-
-
-function checkAndProcess(){
-  if check -p ${1} 
-  then  
-    bold "Working in $PWD"
-    bold "p ${1}"
-    p ${1}
-  else    
-    return 1;
-  fi
-}
-
-  #trap ctrl-c and call ctrl_c()
-  #trap CTRL_C 2 # ctrl+c=sigint 2
-
 
 # we will be changing directories
 # save the current dir.
 CALLDIR=$PWD;
+generateRandomString
+tmpSetFile=${randomString}
+echo "Backing up current user settings to ${tmpSetFile}"
+settings save ${tmpSetFile}
 # DORIS does not allow master and slave to be the same. 
-# We assign master as dummy ans slave as the current scene.      
+# We assign slave as dummy and master as the current scene.      
 stackMaster=${master};
-settings apply -r master="dummy"
 baselinesFolder=${runFolder}/baselines
-settings apply -r outputFolder="${baselinesFolder}"
+settings apply -r -q slave="dummy" outputFolder="${baselinesFolder}"
 mkdir -p "${outputFolder}"
-cd "${outputFolder}"    
+cd "${outputFolder}"  
+echo "Saving settings for baselines processing to ${outputFolder}/settings.set"  
 settings save
 
-
-for scene in ${scenes_include[*]}
+for scene in `scenes include`
 do
      bold "Processing ${scene}"
-     settings apply -r slave=${scene}
-
-     #see function checkAndProcess above...
-     checkAndProcess m_readfiles    
-     checkAndProcess m_porbits
-     
-     sleep 2 #pause two seconds to allow user interrupts
+     settings apply -r -q master=${scene} slave="dummy"
+     eval "m_readfiles; m_porbits" &> ${scene}.out
 done
 
 ####Now the i12s
 #Set the stack master.
-settings apply -r master=${stackMaster}
+settings apply -r -q master=${stackMaster}
 generateRandomString;	#used in plotting
 local tempFile=${randomString} #used in plotting
 echo ${master} > ${tempFile}_orbits.txt
 
-
-for scene in ${scenes_include[*]}
+for scene in `scenes include`
 do
    if [ "${master}" == "${scene}" ]; then
      continue
    fi
-     bold "Processing ${master}_${scene}"
-     settings apply -r slave=${scene} outputFolder="${baselinesFolder}"
-     echo "${slave}" >> ${tempFile}_orbits.txt #used in plotting
-
-     checkAndProcess coarseorb
-
-     sleep 2 #pause two seconds to allow user interrupts
+   bold "Processing ${master}_${scene}"
+   settings apply -r -q slave=${scene} outputFolder="${baselinesFolder}"
+   echo "${slave}" >> ${tempFile}_orbits.txt #used in plotting
+   coarseorb &> ${scene}.out
 done
 
 #### Generate Baselines Plot.
@@ -104,21 +68,26 @@ grep Bperp ${outputFolder}/*_*.res | cut -d: -f3 | tr -s " "|cut -d" " -f2  >> $
 grep Btemp ${outputFolder}/*_*.res | cut -d: -f4 | tr -s " " |cut -d" " -f2 >> ${tempFile}_temp.txt
 paste ${tempFile}_temp.txt ${tempFile}_perp.txt ${tempFile}_orbits.txt > ${outputFolder}/baselines
 gnuplot_baseline ${outputFolder}/baselines
-if [ -e "${outputFolder}/baselines.eps" ]; then
-  echo "Temporal-Perpendicular baseline plot: ${outputFolder}/baselines.eps"
-  #try to convert to raster_format
-  convert "${outputFolder}/baselines.eps" "${outputFolder}/baselines.${raster_format}"
-  if [ $? -ne 0 ]; then
-    echo "Raster file created at: ${outputFolder}/baselines.${raster_format}"
+if [ $? -eq 0 ]; then
+  if [ -e "${outputFolder}/baselines.eps" ]; then
+    echo "Temporal-Perpendicular baseline plot: ${outputFolder}/baselines.eps"
+    #try to convert to raster_format
+    convert "${outputFolder}/baselines.eps" "${outputFolder}/baselines.${raster_format}"
+    if [ $? -ne 0 ]; then
+      echo "Raster file created at: ${outputFolder}/baselines.${raster_format}"
+    fi
+  else
+    echo "Could not create baseline plot (may be gnuplot is not available?)."
+    echo "List of baselines located at: ${outputFolder}/baselines" 
   fi
+  rm -rf ${tempFile}_perp.txt ${tempFile}_temp.txt ${tempFile}_orbits.txt
 else
-  echo "Could not create baseline plot (may be gnuplot is not available?)."
-  echo "List of baselines located at: ${outputFolder}/baselines" 
-fi
-rm -rf ${tempFile}_perp.txt ${tempFile}_temp.txt ${tempFile}_orbits.txt
-
+  echo "There were some errors creating the baseline plot."
+  echo " Please check the baselines: ${outputFolder}/baselines"
 #go back to where we started
 cd ${CALLDIR}
-settings apply -r master=${stackMaster} outputFolder="."
+#settings apply -r master=${stackMaster} outputFolder="."
+settings load ${tmpSetFile}
+rm -rf ${tmpSetFile}
 
 return 0

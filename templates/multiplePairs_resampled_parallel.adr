@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # USAGE:
-#       p multiplePairs_resampled.adr inputFile resample_master
+#       p multiplePairs_resampled_parallel.adr inputFile resample_master
 #
 # DESCRIPTION:
 #  multiplePairs_resampled.adr is an ADORE script.  
@@ -35,7 +35,7 @@ cropSteps="m_readfiles;m_porbits;m_crop" #;m_simamp;m_timing
 # The following steps are processed for resampling all crops to resampling Master
 resampleSteps='settings apply -r -q int_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
 # The following steps are processed for each interferogram
-interferoSteps='settings apply -r -q int_multilook="1 1" srp_dumprefpha=on;coarseorb;s_crop2resample;interfero;coherence;comprefpha;subtrrefpha;comprefdem;raster p interfero;raster p coherence -- -c gray'
+interferoSteps='settings apply -r -q int_multilook="1 1" srp_dumprefpha=on;coarseorb;s_crop2resample;interfero;coherence;comprefpha;subtrrefpha;raster p interfero;raster p coherence -- -c gray'
 resampleFolder="${runFolder}/resample"
 #######################################################
 ## DO NOT CHANGE ANYTHING BELOW
@@ -54,9 +54,10 @@ function processCropSteps(){
   cd "${outputFolder}"    
 
   #parallelProcess "${outputFolder}" "${cropSteps}"
-  #jobId=`quejob "${cropSteps}" "${outputFolder}"`
-  #jobIds=( ${jobIds[@]} ${jobId} )
-  eval ${cropSteps} #run cropsteps
+  echo "running ${cropSteps} in ${outputFolder}"
+  jobId=`quejob "${cropSteps}" "${outputFolder}"`
+  jobIds=( ${jobIds[@]} ${jobId} )
+  #eval ${cropSteps} #run cropsteps
   settings save
 }
 
@@ -78,7 +79,9 @@ function processResampleSteps(){
    cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
    cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
 
-   eval ${resampleSteps}
+   #eval ${resampleSteps}
+   jobId=`quejob "${resampleSteps}" "${outputFolder}"`
+   jobIds=( ${jobIds[@]} ${jobId} )
    settings save
 }
 
@@ -103,7 +106,9 @@ function processInterferoSteps(){
      cp ${resampleFolder}/${resampleMaster}_${slave}/${slave}.res ${outputFolder}/${slave}.res
    fi
 
-   eval `eval 'echo "${interferoSteps}"'` #run interfero
+   #eval `eval 'echo "${interferoSteps}"'` #run interfero
+   jobId=`quejob "${interferoSteps}" "${outputFolder}"`
+   jobIds=( ${jobIds[@]} ${jobId} )
    settings save
 }
 #######################################################
@@ -122,28 +127,30 @@ local originalSettingsFile=${CALLDIR}/${randomString}.set
 settings save ${originalSettingsFile}
 
 #### crop
-#<<ENDCOMMENT>/dev/null
-#ENDCOMMENT
+<<ENDCOMMENT>/dev/null
+ENDCOMMENT
 #for scene in ${scenes_include[*]}
-#jobIds=( ); #start empty list
+jobIds=( ); #start empty list
 for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
 do
   processCropSteps ${scene}
 done
 # if resampleMaster was not cropped run the processCropSteps on it.
 [ ! -d "${cropsFolder}/${resampleMaster}" ] && processCropSteps ${resampleMaster}
+waitjob ${jobIds}
 
 cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
 #### resample
+jobIds=( ); #start empty list
 for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
 do
   processResampleSteps ${scene}
 done
+waitjob ${jobIds}
 
 
 ####Now the i12s
 cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
-
 for scenes in `cat ${pairsFile}`
 do
   processInterferoSteps ${scenes}
@@ -152,5 +159,6 @@ done
 #go back to where we started
 cd ${CALLDIR}
 echo "Replacing user settings"
+bold "Processes may still be running. Please check with: qstat"
 settings load ${originalSettingsFile}
 rm ${originalSettingsFile}

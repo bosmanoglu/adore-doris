@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # USAGE:
-#       quejob adore_command [outputFolder]
+#       quejob adore_command [outputFolder] -- [qsub options]
 #
 # DESCRIPTION:
 #  quejob is an internal ADORE command.  
@@ -23,7 +23,20 @@ local qsubPath=`which qsub`
 [ "${qsubPath:-IsEmpty}" == "IsEmpty" ] && echo "Torque PBS, qsub, not found." && return 110
 
 local commands=${1};
-local CALLDIR=${2-$PWD};
+local CALLDIR qsubOpts
+if [ "${2:-isEmpty}" == "isEmpty" ]; then
+  CALLDIR="${PWD}";
+  qsubOpts=""
+elif [ -d "${2}" ]; then 
+  CALLDIR="${2}"
+  qsubOpts="${@:4}"
+elif [ "${2}" == "--" ]; then 
+  CALLDIR="${PWD}";  
+  qsubOpts="${@:3}"
+else
+  echo "Wrong parameter. Please check usage with: ? quejob"
+fi
+
 generateRandomString 
 local queJobRandStr=${randomString}
 mkdir -p ${tmpFolder} 
@@ -31,21 +44,25 @@ local originalSettingsFile=${tmpFolder}/${queJobRandStr}.set
 settings save ${originalSettingsFile} 1>> ${tmpFolder}/${queJobRandStr}.log #Do not dump messages
 
 cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
-#! /bin/csh
+#!/bin/bash
  #PBS -N parallelJob
  #PBS -l nodes=1
- #PBS -q batch
  #PBS -V
  #PBS -l walltime=8:00:00
  #PBS -m n
  #PBS -e ${CALLDIR}/${queJobRandStr}.err
  #PBS -o ${CALLDIR}/${queJobRandStr}.out
+ 
+ export PATH="${PATH}"
+  
  cd ${CALLDIR}
  ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${commands}"
 _EOFFILE
-
+ #PBS -q batch # No need to specify quename. We send it to default que. 
+ #PATH is exported to prevent errors in case -V makes a mistake.
+ 
 #submit the job to the que
-qsub ${tmpFolder}/${queJobRandStr}.sh
+echo "qsub ${qsubOpts} ${tmpFolder}/${queJobRandStr}.sh"
 
 }
 

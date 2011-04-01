@@ -1,28 +1,27 @@
 #!/bin/bash
-#
 # USAGE:
-#       p multiplePairs.adr inputFile
+#       waitjob hostname.jobid
+#	waitjob (hostname.jobid1 hostname.jobid2 ...)
 #
 # DESCRIPTION:
-#  multiplePairs_Parallel.adr is an ADORE script.  
-#  It generates several interferograms whose master and slave orbits are defined
-#  by the input file. 
-#  This script uses the Torque-PBS system to distribute jobs to other computers.
+#  WAITJOB is an internal ADORE command.
+#  It loops over the given jobs and returns upon their completion.
+#  
+#  This script is compatible with the Torque-PBS system.
 #
 # INPUT:
-#  inputFile: A comma-separated-value file where each line indicates an
-#    interferometric pair. First value defines the master and the second value defines the slave.
-#    As an example file should have this format:
-#    masterScene1,slaveScene1
-#    masterScene2,slaveScene2
-#    ...
-#  
+#  hostname.jobid: hostname of the system running the job and the job number 
+#    separated by a dot. This is printed on the screen after each quejob command.
+#    Alternatively a list of jobs can be given. In this case this command 
+#    will return only after all jobs are finished.
+#
 # OUTPUT:
-#  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
-#  It runs the following DORIS steps:
-#    For crops: s_readfiles, s_porbits, s_crop
-#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
-#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+#    Displays the number of minutes passed on the screen. No files are generated.
+#
+# FILES:
+#   ${ADORESCR}/fun/waitjob
+
+
 jobIds=($@)
 bold "Waiting for jobs to finish."
 echo "Counter displays number of minutes passed."
