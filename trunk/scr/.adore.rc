@@ -1,3 +1,8 @@
+#verbose
+if [ "${v-notVerbose}" != "notVerbose" ]; then
+  set -x
+fi
+
 ###### LOAD SETTINGS
 #load functions
 source ${ADORESCR}/fun/functions

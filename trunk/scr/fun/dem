@@ -111,7 +111,7 @@ function makeSrtmDem(){
   echo "SLC resolution [Azimuth x Range]: ${slc_az_res} x ${slc_rg_res}"
   ## get center coordinates
   center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude  |awk '{printf "%f", $1};'`
-  center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude |awk '{printf "%f", $1};`
+  center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude |awk '{printf "%f", $1};'`
   ## get crop size
   #last_step="readfiles" #`check ${s_resfile} | grep -w "1" | cut -f2 -d:`
   #first_line=`readRes.sh ${m_resfile} ${last_step} First_line | tr -d '\n'`

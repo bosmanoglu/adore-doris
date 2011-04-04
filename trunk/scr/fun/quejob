@@ -53,8 +53,6 @@ cat >${tmpFolder}/${queJobRandStr}.sh<<_EOFFILE
  #PBS -e ${CALLDIR}/${queJobRandStr}.err
  #PBS -o ${CALLDIR}/${queJobRandStr}.out
  
- export PATH="${PATH}"
-  
  cd ${CALLDIR}
  ${ADORESCR}/adore -u "${tmpFolder}/${queJobRandStr}.set" "${commands}"
 _EOFFILE
@@ -62,7 +60,7 @@ _EOFFILE
  #PATH is exported to prevent errors in case -V makes a mistake.
  
 #submit the job to the que
-echo "qsub ${qsubOpts} ${tmpFolder}/${queJobRandStr}.sh"
+qsub ${qsubOpts} "${tmpFolder}/${queJobRandStr}.sh"
 
 }
 
