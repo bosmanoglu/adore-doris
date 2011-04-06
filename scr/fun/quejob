@@ -20,7 +20,7 @@
 
 function createJob(){
 local qsubPath=`which qsub`
-[ "${qsubPath:-IsEmpty}" == "IsEmpty" ] && echo "Torque PBS, qsub, not found." && return 110
+[ "${qsubPath:-IsEmpty}" == "IsEmpty" ] && echo "Torque PBS, qsub, not found." >&2 && return 110
 
 local commands=${1};
 local CALLDIR qsubOpts
@@ -34,7 +34,7 @@ elif [ "${2}" == "--" ]; then
   CALLDIR="${PWD}";  
   qsubOpts="${@:3}"
 else
-  echo "Wrong parameter. Please check usage with: ? quejob"
+  echo "Wrong parameter. Please check usage with: ? quejob" >&2
 fi
 
 generateRandomString 

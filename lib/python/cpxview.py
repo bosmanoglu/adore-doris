@@ -72,6 +72,8 @@ def main(argv):
     cfg["rmax"]=int(cfg["-r"].split("/")[1])    
     data=getdata(inputfile,cfg["-w"],cfg["-f"])
     data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
+    #multilook
+    data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
     if "norm" in cfg["-q"]:
         mp.matshow(cfg["-s"]*data**cfg["-e"]);
     elif "mag" in cfg["-q"]:
@@ -149,6 +151,23 @@ def isint(x):
         return int(x) == x
     except:
         return False
+
+def multilook(x,ratio):
+    """multilook(data,ratio)
+    data: is a numpy array.
+    ratio: is a list of ratios with number of elements equal to number of data dimensions.
+    CURRENTLY only 2D data is SUPPORTED.    
+    """
+    #http://lists.ipython.scipy.org/pipermail/numpy-discussion/2010-July/051760.html
+    #l=0;
+    L=x.shape[0];
+    #p=0;
+    P=x.shape[1];
+    outL=np.floor((L)/ratio[0])
+    outP=np.floor((P)/ratio[1])
+    x=x[0:ratio[0]*outL,0:ratio[1]*outP]    
+    out=x.reshape(outL,ratio[0],outP,ratio[1]);
+    return out.mean(axis=3).mean(axis=1);
 
     
 if __name__ == "__main__":
