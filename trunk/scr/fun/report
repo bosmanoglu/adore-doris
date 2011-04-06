@@ -34,24 +34,25 @@ else
   echo "Wrong number of options. Try: ? report"  
   return
 fi
+
+rFolder=`canonicalPath ${rFolder}`
+iFolder=`canonicalPath ${iFolder}`
 echo Input Parameters reportFolder=${rFolder} i12sFolder=${iFolder} reportSteps=${rSteps}
 
 curFolder=${PWD}
 mkdir -p ${rFolder}
-rFile=${rFolder}/index.html
+rFile=`canonicalPath ${rFolder}/index.html`
 
 writeHTMLHeader > ${rFile}
 for folder in `ls ${iFolder}`
 do
-  cd ${i12sFolder}/${folder}
+  cd ${iFolder}/${folder}
   settings load
   raster_format=png
   echo "<H1>${folder}</H1>" >> ${rFile}
   for step in `echo ${rSteps} | tr ';' '\n'`
   do
-    imgFile=`raster p ${step} -- -M4/4 | tail -n1| cut -d":" -f2`
-    mv ${imgFile} ${rFolder}
-    writePicture ${imgFile} 300 300 ${imgFile} >> ${rFile}
+    handleStep "${step}"
   done
   
 done
@@ -61,6 +62,104 @@ cd ${curFolder}
 bold "Reloading user settings from temporary backup file."
 settings load ${curSetFile}
 rm -rf ${curSetFile}
+}
+
+function handleStep(){
+ step="${1}"
+ case ${step} in
+ *readfiles)
+   reportText ${step}
+ ;;
+ *porbits)
+   reportText ${step}
+ ;;
+ m_simamp)
+   reportPicture ${step}
+ ;;
+ m_timing)
+   reportText ${step}
+ ;;
+ *ovs)
+   reportPicture ${step}
+ ;;
+ *crop)
+   reportPicture ${step}
+ ;;
+ coarseorb)
+   reportText ${step}
+ ;;    
+ *filtazi)
+   reportPicture ${step}
+ ;;
+ fine)
+   reportText ${step}
+ ;;
+ reltiming)
+   reportText ${step}
+ ;;
+ demassist)
+   reportText ${step}
+ ;;
+ coregpm)
+   reportText ${step}
+ ;;
+ resample)
+   reportPicture ${step}
+ ;;
+ filtrange)
+   reportPicture ${step}
+ ;;
+ interfero)
+   reportPicture ${step}
+ ;;
+ comprefpha)
+   reportPicture ${step}
+ ;;
+ subtrrefpha)
+   reportPicture ${step}
+ ;;
+ comprefdem)
+   reportPicture ${step}
+ ;;
+ subtrrefdem)
+   reportPicture ${step}
+ ;;
+ coherence)
+   reportPicture ${step}
+ ;;
+ filtphase)
+   reportPicture ${step}
+ ;;
+ unwrap)
+   reportPicture ${step}
+ ;;
+ dinsar)
+   reportPicture ${step}
+ ;;
+ slant2h)
+   reportPicture ${step}
+ ;;
+ geocode)
+   reportPicture ${step}
+ ;;
+ *)
+   reportText ${step}
+ ;;
+ esac
+}
+
+function reportText(){
+step="${1}"
+echo '<textarea readonly="readonly" rows="6" cols="80">' >> "${rFile}"
+s result ${step} >> ${rFile}
+echo '</textarea>' >>${rFile}
+}
+
+function reportPicture(){
+ step="${1}"
+ imgFile=`raster auto ${step} -- -M20/20 | tail -n1| cut -d":" -f2`
+ mv ${imgFile} "${rFolder}"
+ writePicture ${imgFile} 300 300 ${imgFile} >> "${rFile}"
 }
 
 function writePicture(){

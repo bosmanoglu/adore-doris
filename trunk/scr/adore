@@ -105,10 +105,10 @@ echo ADORESCR=${ADORESCR}
 #adjust path in /ADORESCR/.adore.rc, only if interactive
 export _ADOREPATH=${PATH}:${ADORESCR}
 
-if [ "${i:-notInteractive}" == "notInteractive" ]; then
-  #not interactive - batch processing
-  source ${ADORESCR}/.adore.rc
-else
+if [ "${i-notInteractive}" != "notInteractive" ]; then
+  #interactive - start shell
+  unset i #If this line is omitted, all spawned ADORE jobs
+          # will run in interactive mode.
   bash --init-file "${ADORESCR}/.adore.rc"
 #  set -o emacs
 #  set -o histexpand
@@ -155,6 +155,9 @@ else
 #    #trap ctrl-c and call ctrl_c()
 #    trap ctrl_c 2 # ctrl+c=sigint 2
 #  done
+else
+  #not interactive - batch processing
+  source ${ADORESCR}/.adore.rc
 fi
 
 exit 0

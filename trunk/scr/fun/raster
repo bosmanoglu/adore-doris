@@ -112,7 +112,7 @@ if [ ! -z "${remainder}" ]; then
 fi
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
-generateCheck=`echo ${generate} | tr -d [a,p,m]`
+generateCheck=`echo ${generate} | tr -d [a,p,m,auto]`
 if [ -z ${generateCheck} ]; then
   if [ "${remainder:-undef}" != "undef" ]; then
     echo "I'll pass these options to cpxfiddle: ..${remainder}.."
@@ -129,8 +129,6 @@ if [[ "${dorisStep}" == *:* ]]; then
   dorisStep=${dorisStep%:*}
   [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
 fi
-
-
 
 #if [[ ${dorisStep} == m_* ]]; then
 #  dorisStep=`pn2rs ${dorisStep}`
@@ -241,6 +239,59 @@ echo Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
 [ $? -ne 0 ] && { echo "I have problems finding filename: ${fileName}"; return 1; }
 #echo Outname  ..${outName}..
+#####
+#if generate is set to auto 
+if [[ "${generate}" == "auto" ]]; then
+  case "${dorisStep}" in
+  *crop)
+    generate="a"
+  ;;
+  m_simamp)
+    generate="a"
+  ;;
+  *ovs)
+    generate="a"
+  ;;
+  *_filtazi)
+    generate="a"
+  ;;
+  resample)
+    generate="a"
+  ;;
+  filtrange)
+    generate="a"
+  ;;
+  interfero)
+    generate="p"
+  ;;
+  subtrrefpha)
+    generate="p"
+  ;;
+  subtrrefdem)
+    generate="p"
+  ;;
+  coherence)
+    generate="p"
+    [ -z "${c}" ] && c=gray
+  ;;
+  filtphase)
+    generate="p"
+  ;;
+  unwrap)
+    generate="p"
+  ;;
+  dinsar)
+    generate="p"
+  ;;
+  slant2h)
+    generate="p"
+  ;;
+  geocode)
+    generate="p"
+  ;;
+  esac
+fi
+#####
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then
     #No log scaling if not complex. 
