@@ -18,6 +18,20 @@ function archive(){
   . ${ADORESCR}/fun/archive ${@}
 }
 
+function ask()          # See "settings save" for example of use.
+{
+  echo -n "$@" '[y/n] ' ; read ans
+  case "$ans" in
+    y*|Y*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+function bold() 	#echo bold text.
+{
+  echo -e "\033[1m${@}\033[0m"
+}
+
 function call(){
   functionCall=$@;
   #parse left of equal
@@ -65,29 +79,12 @@ function testFunction(){
 #echo "$a $b $c"
 #unset a b c
 
-function ask()          # See "settings save" for example of use.
+
+function error() 	#echo text to stderr.
 {
-  echo -n "$@" '[y/n] ' ; read ans
-  case "$ans" in
-    y*|Y*) return 0 ;;
-    *) return 1 ;;
-  esac
+  echo -e "${@}" >&2
 }
 
-function strcmpi()          # See "settings save" for example of use.
-{
-  if [ `echo ${1} | tr [:upper:] [:lower:]` == `echo ${2} | tr [:upper:] [:lower:]` ];then
-    return 0;
-  else
-    return 1;
-  fi  
-}
-
-
-function bold() 	#echo bold text.
-{
-  echo -e "\033[1m${@}\033[0m"
-}
 
 function getSystemEndianness()	# See saveas arcview for example
 {
@@ -200,6 +197,15 @@ function s()
       echo "Unknown process or variable: ${dorisProcess}"
     fi
   fi
+}
+
+function strcmpi()          # See "settings save" for example of use.
+{
+  if [ `echo ${1} | tr [:upper:] [:lower:]` == `echo ${2} | tr [:upper:] [:lower:]` ];then
+    return 0;
+  else
+    return 1;
+  fi  
 }
 
 function checkInitialSettings(){

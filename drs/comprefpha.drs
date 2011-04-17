@@ -12,6 +12,7 @@ s_resfile	${s_resfile}		//
 i_resfile	${i_resfile}		//
 
 orb_interp	${orb_interp}		//
+orb_prm         ${orb_prm}              // position or posvel
 dumpbaseline    ${dumpbaseline}         // eval baseline on grid
 height		${height}		// average height for the crop
 tiepoint	${tiepoint}		//

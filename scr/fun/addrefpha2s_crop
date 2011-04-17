@@ -18,16 +18,15 @@
 #   Also generates an output file with ".addrefpha" extension.
 #
 
-function funResample2Crop(){
-  [ ! -e "${rs_out_file}" ] && echo "Resample file not found. Please run resample step" && return
-  [ ! -e "${srp_out_refpha}" ] && echo "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return
+function funResample2Tmpfile(){
+  tmpFile=${1}
+  [ ! -e "${rs_out_file}" ] && error "Resample file not found. Please run resample step" && return 1
+  [ ! -e "${srp_out_refpha}" ] && error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return 1
 
   bold "Adding reference phase to resampled slave..."
   cpxmult ${rs_out_file} ${srp_out_refpha} ${rs_out_file}.addrefpha 1
   cp ${s_resfile} ${s_resfile}.bck
 
-  generateRandomString
-  local tmpFile=${randomString}
   # Below line copies the information from the requested step and copies it to a temporary file
   #sed -n "/_Start_resample/,/End_resample/p" ${s_resfile} | sed -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p'  > ${tmpFile}
   #sed -n "/_Start_resample/,/End_resample/p" ${s_resfile}  | sed -e 's/original_master/original_image/g' > ${tmpFile}
@@ -57,6 +56,14 @@ function funResample2Crop(){
   #modifyRes.sh ${tmpFile} resample "Last_pixel (w.r.t. original_image)" $(( ${val}+${rgoff} )) > ${tmpFile}
   #Remove the resample step header
   sed -i -n '/\*\*\*\*\*\*/,/\*\*\*\*\*\*/p' ${tmpFile}
+}
+
+function funResample2Crop(){
+  generateRandomString
+  local tmpFile=${randomString}
+ 
+  funResample2Tmpfile ${tmpFile}
+  [ $? -ne 0 ] && return 1 
   
   undo crop ${s_resfile}
 
@@ -71,5 +78,32 @@ function funResample2Crop(){
   rm -rf ${tmpFile}
 }
 
+function funResample2Ovs(){
+  generateRandomString
+  local tmpFile=${randomString}
+ 
+  funResample2Tmpfile ${tmpFile}
+  [ $? -ne 0 ] && return 1 
+  
+  undo oversample ${s_resfile}
+
+  # Re-write crop for resampling.
+  sed -i -e '/^oversample/s/0/1/g' ${s_resfile}
+  echo "*******************************************************************" >> ${s_resfile}
+  echo "*_Start_oversample:			master " >> ${s_resfile}
+  cat ${tmpFile} >> ${s_resfile}
+  echo "* End_oversample:_NORMAL" >> ${s_resfile}
+  echo "*******************************************************************" >> ${s_resfile}
+
+  rm -rf ${tmpFile}
+}
+
+
 ###MAIN
-funResample2Crop ${@}
+if [ `check -p s_ovs; echo $?` ]; then
+  funResample2Ovs ${@}
+elif [ `check -p s_crop; echo $?` ]; then
+  funResample2Crop ${@}
+else
+  error "addrefpha2s_crop: s_ovs or s_crop steps are not in s_resfile."
+fi

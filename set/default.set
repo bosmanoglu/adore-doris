@@ -70,6 +70,7 @@
 [ -z "${i_resfile}" 		] && i_resfile=${outputFolder}/${master}_${slave}.res
 [ -z "${_rel_i_resfile}"	] && _rel_i_resfile='echo ${outputFolder}/${master}_${slave}.res'
 [ -z "${orb_interp}" 		] && orb_interp="polyfit"
+[ -z "${orb_prm}" 		] && orb_prm="pos"
 [ -z "${dumpbaseline}" 		] && dumpbaseline="1 1" # default is "0 0" but fails at readinput.cc 1271
 [ -z "${height}" 		] && height=0.0
 [ -z "${tiepoint}"		] && tiepoint="0.0 0.0 0.0"
