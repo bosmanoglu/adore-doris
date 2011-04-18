@@ -16,13 +16,27 @@
 #	arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed).
 #       If not specified p(phase) is assumed. This can be used to export amplitude data as well if 
 #	you do not want to rescale the amplitude values. 
+#    
+#    saveas envi processName
+#       Generates an ENVI header (*.hdr) file for the given input file. 
+#       If file is complex, both real and imaginary channels can be opened
+#       in ENVI. Only corner coordinates are used for geocoding. ArcGIS (*.img)
+#       files can also be opened in ENVI if, geocoding of full image is required.
 #
-#    saveas gdal [a|p|m] processName [options for gdal]
+#    saveas gdal a|p|m processName [options for gdal] outputFileName
+#       Generates a interim file and passes it to gdal_translate. The output
+#       filename and all other parameters has to be input by the user. 
 #
 # OUTPUT:
-#  Generates an HDR file with the same name as the output file of the requested doris step (processName).
+#  ENVI:Generates an HDR file with the same name as the output file of the requested doris step (processName).
+#  ArcGIS: Generates an IMG file.
 #
-
+# EXAMPLES:
+#  saveas arcgis p unwrap
+#  saveas envi unwrap 
+#  saveas gdal p unwrap -of GTiff 200405_200703_uw.tiff
+#
+ 
 # $0 dorisStep  
 function saveas_envi(){
   local dorisStep=${1}
@@ -32,6 +46,7 @@ function saveas_envi(){
   geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
   if [ ${geocodeStatus} -eq "1" ]; then
     call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+    [ ! -f "${filename}" ] && error "File not found: ${filename}" && return
     call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
     # get the name of phi(lat) and lambda (lon) files
     phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
@@ -52,10 +67,10 @@ function saveas_envi(){
     lam_lNp0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`
     rotation=`echo "${phi_lNp0} ${phi_l0p0} ${lam_lNp0} ${lam_l0p0}" | awk '{PI=3.1415;printf "%.8f", 90+(atan2($1-$2, $3-$4)*180/PI)};'`
     #change format to envi 
-    [ ${format} == "cr4" ] && format="4" && bands="2"
-    [ ${format} == "ci2" ] && format="2" && bands="2"
-    [ ${format} == "r4" ] && format="4"  && bands="1"
-    [ ${format} == "i2" ] && format="2"  && bands="1"
+    [ "${format}" == "cr4" ] && format="4" && bands="2"
+    [ "${format}" == "ci2" ] && format="2" && bands="2"
+    [ "${format}" == "r4" ] && format="4"  && bands="1"
+    [ "${format}" == "i2" ] && format="2"  && bands="1"
 cat > ${filename}.hdr <<_EndHere
 ENVI
 description = {DORIS ${dorisStep} output: ${filename}}
@@ -254,12 +269,13 @@ function saveas_gdal(){
   local generateCheck phi_filename lam_filename slc_rg_res_km slc_az_res_km center_lat center_lon slc_res_deg region 
   local inc_angle radar_band_width
  
-  if [ ${2:-undefined} == "undefined" ]; then
-    generate="p"; echo "You only specified one parameter. I'm assuming you wanted (p)phase output."
-    dorisStep=${1}
+  if [ "${2:-undefined}" == "undefined" ]; then
+    error "Please check usage. Missing parameters."
   else
     generate=${1}
-    dorisStep=${2}
+    shift
+    dorisStep=${1}
+    shift
   fi
 
   geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
@@ -329,7 +345,7 @@ function saveas_gdal(){
         [ -z "${slc_az_res}" ] && slc_az_res=`echo "${slc_rg_res}" | awk '{printf "%d", $1/5};'`
         echo "SLC resolution [Azimuth x Range]: ${slc_az_res} x ${slc_rg_res}"
 	#################END DUPLICATE
-    dorisStep=`pn2rs ${2}`  #readRes.sh does not call pn2rs automatically...
+    dorisStep=`pn2rs ${dorisStep}`  #readRes.sh does not call pn2rs automatically...
     rg_multilooking=`${ADORESCR}/readRes.sh ${i_resfile} ${dorisStep} "Multilookfactor_range_direction"`    
     az_multilooking=`${ADORESCR}/readRes.sh ${i_resfile} ${dorisStep} "Multilookfactor_azimuth_direction"`    
     slc_rg_res_km=`echo "${slc_rg_res} ${rg_multilooking}" | awk '{printf "%f", $1*$2/1000};'`
@@ -365,6 +381,7 @@ function saveas_gdal(){
 
 case ${1} in 
   envi)
+    [ $# -gt 2 ] && "Please check usage: ? saveas"      
     saveas_envi ${2}    
   ;;
   arcgis)
