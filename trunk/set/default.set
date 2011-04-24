@@ -88,7 +88,7 @@
 [ -z "${m_in_lea}" 		] && m_in_lea=`ls "${dataFolder}/${master}/${leaderFile}" 2>/dev/null | tr -d '\n'`
 [ -z "${_rel_m_in_lea}" 	] && _rel_m_in_lea='ls ${dataFolder}/${master}/${leaderFile} 2>/dev/null | tr -d "\n"'
 [ -z "${m_in_null}" 		] && m_in_null=`ls "${dataFolder}/${master}/${nullFile}"  2>/dev/null | tr -d '\n'`
-[ -z "${_rel_in_null}" 		] && _rel_in_null='ls ${dataFolder}/${master}/${nullFile} 2>/dev/null | tr -d "\n"'
+[ -z "${_rel_m_in_null}" 	] && _rel_m_in_null='ls ${dataFolder}/${master}/${nullFile} 2>/dev/null | tr -d "\n"'
 ################### m_porbits
 ### SECTION=m_porbits
 [ -z "${m_orbdir}" 		] && m_orbdir="${unspecified}"
