@@ -23,6 +23,8 @@ PS1="ADORE: "
 if [ "${i-notInteractive}" != "notInteractive" ]; then
   PATH=${_ADOREPATH}
   unset _ADOREPATH
+  unset i #If this line is omitted, all spawned ADORE jobs
+          # will run in interactive mode.
 fi
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then

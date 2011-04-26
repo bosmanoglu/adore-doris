@@ -107,8 +107,6 @@ export _ADOREPATH=${PATH}:${ADORESCR}
 
 if [ "${i-notInteractive}" != "notInteractive" ]; then
   #interactive - start shell
-  unset i #If this line is omitted, all spawned ADORE jobs
-          # will run in interactive mode.
   bash --init-file "${ADORESCR}/.adore.rc"
 #  set -o emacs
 #  set -o histexpand
