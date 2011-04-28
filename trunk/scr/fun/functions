@@ -118,8 +118,8 @@ function pp()
   #this is the default processing
   rm -f ${outputFolder}/${dorisProcess}.drs
   dorisProcess=${1}
-  if [ -r "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
+  if [ -r "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline >> ${outputFolder}/${dorisProcess}.drs
     done
@@ -147,7 +147,7 @@ function p()
       echo "Running: ${fileName} ${@}"
       . ${fileName} ${@}
     #else do default processing. Prepare drs file and run doris. 
-    elif [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
+    elif [ -e "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
  #     rm -f ${outputFolder}/${dorisProcess}.drs
  #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
  #       newline=`eval echo -E ${line}`
@@ -176,8 +176,8 @@ function s()
 #SHOW
   local newline line dorisProcess var variableNames
   dorisProcess=${1}
-  if [ -e "${ADOREFOLDER}/drs/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read -r line; do
+  if [ -e "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline 
     done
