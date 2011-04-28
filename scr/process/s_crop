@@ -1,11 +1,12 @@
 #!/bin/bash
 
 #preprocess the drs file
-rm -f ${outputFolder}/${dorisProcess}.drs
-cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
-  newline=`eval echo -E ${line}`
-  echo $newline >> ${outputFolder}/${dorisProcess}.drs
-done
+pp ${dorisProcess}
+#rm -f ${outputFolder}/${dorisProcess}.drs
+#cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+#  newline=`eval echo -E ${line}`
+#  echo $newline >> ${outputFolder}/${dorisProcess}.drs
+#done
 
 # remove undefined settings from .drs file so that doris handles it
 # automatically
