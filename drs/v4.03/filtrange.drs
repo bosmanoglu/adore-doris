@@ -1,0 +1,38 @@
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
+
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
+
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
+
+process         filtrange               // 
+
+rf_method	${rf_method}		//
+rf_fftlength	${rf_fftlength}		//
+rf_overlap	${rf_overlap}		//
+rf_hamming	${rf_hamming}		//
+rf_slope	${rf_slope}		//
+rf_nlmean	${rf_nlmean}		//
+rf_threshold	${rf_threshold}		//
+rf_oversample	${rf_oversample}	//
+rf_weightcorr	${rf_weightcorr}	//
+rf_out_master	${rf_out_master}	//
+rf_out_slave	${rf_out_slave}		//
+rf_out_format	${rf_out_format}	//
+
+stop

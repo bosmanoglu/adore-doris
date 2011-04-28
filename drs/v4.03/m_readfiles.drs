@@ -1,0 +1,31 @@
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
+
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
+
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
+
+process         m_readfiles             //
+
+m_in_method	${m_in_method}		//
+m_in_vol        ${m_in_vol}       	// slc volume file
+m_in_lea        ${m_in_lea}      	// slc leaderfile
+m_in_dat        ${m_in_dat}      	// slc data file
+m_in_null       ${m_in_null}            //
+
+stop

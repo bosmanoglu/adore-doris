@@ -1,0 +1,39 @@
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
+
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
+
+orb_interp	${orb_interp}		//
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
+
+ process	comprefdem		// interpolate dem
+
+ crd_in_dem     ${crd_in_dem}		//
+ crd_in_format	${crd_in_format}	// 
+ crd_in_size    ${crd_in_size}		//
+ crd_in_delta   ${crd_in_delta}		//
+ crd_in_ul      ${crd_in_ul}		//
+ crd_in_nodata	${crd_in_nodata}	//
+ crd_include_fe ${crd_include_fe}	//
+ crd_out_dem	${crd_out_dem}		//
+ crd_out_demi   ${crd_out_demi}		//
+ crd_out_file   ${crd_out_file}		//
+ crd_out_dem_lp	${crd_out_dem_lp}	//
+ crd_out_h2ph	${crd_out_h2ph}		//
+
+stop                                    // mandatory
+
