@@ -79,6 +79,15 @@ function testFunction(){
 #echo "$a $b $c"
 #unset a b c
 
+function calculate_coh_multilook(){
+  echo "$(( ${srp_multilook% *} * ${int_multilook% *} )) $(( ${srp_multilook#* } * ${int_multilook#* } ))"
+}
+
+function calculate_coh_winsize(){
+  echo "$(( 2 * ${srp_multilook% *} * ${int_multilook% *} )) $(( 2 * ${srp_multilook#* } * ${int_multilook#* } ))"
+}
+  
+
 
 function error() 	#echo text to stderr.
 {
@@ -118,8 +127,8 @@ function pp()
   #this is the default processing
   rm -f ${outputFolder}/${dorisProcess}.drs
   dorisProcess=${1}
-  if [ -r "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" | while read -r line; do
+  if [ -r "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline >> ${outputFolder}/${dorisProcess}.drs
     done
@@ -147,7 +156,7 @@ function p()
       echo "Running: ${fileName} ${@}"
       . ${fileName} ${@}
     #else do default processing. Prepare drs file and run doris. 
-    elif [ -e "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
+    elif [ -e "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
  #     rm -f ${outputFolder}/${dorisProcess}.drs
  #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
  #       newline=`eval echo -E ${line}`
@@ -176,8 +185,8 @@ function s()
 #SHOW
   local newline line dorisProcess var variableNames
   dorisProcess=${1}
-  if [ -e "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" ]; then
-    cat "${ADOREFOLDER}/drs/${drsVer}/${dorisProcess}.drs" | while read -r line; do
+  if [ -e "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
+    cat "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" | while read -r line; do
       newline=`eval echo -E ${line}`
       echo $newline 
     done
@@ -187,7 +196,7 @@ function s()
     sed -n "/_Start_${dorisProcess}/,/End_${dorisProcess}/p" ${resfile}    
   else
     variableNames='eval echo \${!${dorisProcess}*}'
-    variableNames=`eval ${variableNames}`
+    variableNames=`eval ${variableNames}`    
     if [ -n "${variableNames}" ]; then
       for var in ${variableNames}
       do

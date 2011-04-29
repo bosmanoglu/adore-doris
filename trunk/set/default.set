@@ -26,6 +26,8 @@
 [ -z "${_rel_baselinesFolder}"	] && _rel_baselinesFolder='echo ${runFolder}/baselines'
 [ -z "${adoreHistoryFile}"	] && adoreHistoryFile=${projectFolder}/.history
 [ -z "${_rel_adoreHistoryFile}"	] && _rel_adoreHistoryFile='echo ${projectFolder}/.history'
+[ -z "${dorisVersion}"          ] && dorisVersion=`doris -v 2>&1 |grep version | cut -f5 -d" "| cut -d"-" -f1`
+[ -z "${_rel_dorisVersion}"     ] && _rel_dorisVersion='doris -v 2>&1 |grep version | cut -f5 -d" "| cut -d"-" -f1'
 [ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
 [ -z "${slave}"			] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
 [ -z "${excludesFile}"		] && excludesFile=${runFolder}/excludes
@@ -333,9 +335,10 @@
 [ -z "${_rel_coh_out_ccoh}" 	] && _rel_coh_out_ccoh='echo ${outputFolder}/${master}_${slave}.ccoh'
 [ -z "${coh_out_coh}" 		] && coh_out_coh="${outputFolder}/${master}_${slave}.coh"
 [ -z "${_rel_coh_out_coh}" 	] && _rel_coh_out_coh='echo ${outputFolder}/${master}_${slave}.coh'
-[ -z "${coh_multilook}"		] && coh_multilook=${int_multilook} #defaul "10 2"
-[ -z "${_rel_coh_multilook}"	] && _rel_coh_multilook='echo ${int_multilook}' #defaul "10 2"
-[ -z "${coh_winsize}" 		] && coh_winsize="10 2"
+[ -z "${coh_multilook}"		] && coh_multilook=`calculate_coh_multilook` #default "10 2"
+[ -z "${_rel_coh_multilook}"	] && _rel_coh_multilook='calculate_coh_multilook' #default "10 2"
+[ -z "${coh_winsize}" 		] && coh_winsize=`calculate_coh_winsize` #default "10 2"
+[ -z "${_rel_coh_winsize}" 	] && _rel_coh_winsize='calculate_coh_winsize' #default "10 2"
 ################### filtphase
 ### SECTION=filtphase
 [ -z "${pf_method}" 		] && pf_method="goldstein"
@@ -360,6 +363,7 @@
 [ -z "${_rel_uw_snaphu_log}" 	] && _rel_uw_snaphu_log='echo ${outputFolder}/${master}_${slave}.uwlog'
 [ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
 [ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
+[ -z "${uw_snaphu_dumponlyconf}"] && uw_snaphu_dumponlyconf="off"
 ################### dinsar
 ### SECTION=dinsar
 [ -z "${di_out_file}" 		] && di_out_file="${outputFolder}/${master}_${slave}.di"

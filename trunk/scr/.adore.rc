@@ -6,8 +6,6 @@ fi
 ###### LOAD SETTINGS
 #load functions
 source ${ADORESCR}/fun/functions
-#get doris version
-drsVer=`doris -v 2>&1 |grep version | cut -f5 -d" "| cut -d"-" -f1`
 #initialize ADORE
 source ${ADORESCR}/fun/initialize
 
