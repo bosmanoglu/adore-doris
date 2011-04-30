@@ -1,0 +1,9 @@
+#sidebar TableOfContents
+  * [Installation HOWTO Install]
+  * [Roadmap List of upcoming features]
+  * [FAQ Frequently Asked Questions]
+  * [Reference Command Reference]
+    * [cpxfiddle cpxfiddle]
+    * [quejob quejob]
+    * [saveas saveas]
+    * [dem dem]
