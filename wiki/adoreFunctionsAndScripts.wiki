@@ -1,5 +1,5 @@
+#summary Explains what is adore functions, scripts and internal/external commands are.
 #labels Phase-Deploy
-#Explains what is adore functions, scripts and internal/external commands are. 
 
 = Introduction =
 
