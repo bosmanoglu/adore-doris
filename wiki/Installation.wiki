@@ -1,7 +1,14 @@
 #summary How to install ADORE on Ubuntu.
 #labels Phase-Deploy
 
-= Installation =
+= Debian Package Installation =
+You can download and install the Debian packages under Debian based operating systems including Ubuntu. 
+
+Packages are available here: [http://code.google.com/p/adore-doris/downloads/list]
+
+Once downloaded use your favorite package manager (or simply double-click) on the package file. After the installation is complete you can run adore in a terminal window. 
+
+= Manual Installation =
 
 ADORE consists of bash shell scripts and has a simple setup.  
 
@@ -9,7 +16,6 @@ ADORE-DORIS installation consists of three steps.
   * Dependencies: Installation of dependencies.
   * SVN-Checkout: Checking out latest ADORE-DORIS from the svn. See instructions at: http://code.google.com/p/adore-doris/source/checkout
   * Setup: Setting your path to point to ADORE-DORIS executables (scr) directory.
-
 
 == Dependencies ==
 
