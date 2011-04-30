@@ -2,7 +2,7 @@
   * [Installation HOWTO Install]
   * [Roadmap List of upcoming features]
   * [FAQ Frequently Asked Questions]
-  * [Tips and Tricks]
+  * [TipsAndTricks Tips and Tricks]
   * [Reference Command Reference]
     * [adore adore]
     * [check check]
