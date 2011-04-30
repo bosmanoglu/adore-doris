@@ -20,3 +20,6 @@ Frequently asked questions.
 
 *Snaphu displays `Killed`, and does not produce any outputs. What is wrong?*
   It is probably due to low available memory and Linux is killing snaphu before it crashes the computer. If you are not using Linux, and if you have plenty of memory (>10xInterferogramSize) this is probably not the reason though.
+
+*What are internal/external ADORE commands, functions, scripts?*
+  Development of ADORE is built on different stages, and also includes different software and scripts developed previously, or for other software. To learn more about the differences, take a look at the wiki page [adoreFunctionsAndScripts ADORE Functions and Scripts].
