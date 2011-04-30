@@ -20,7 +20,6 @@
     * [strcmpi]
     * [undo]
   * [Scripts ADORE Scripts]
-    * [preparePsiInput.adr]
-    * [singleMasterStack.adr]
-    * [singleMasterStack_Parallel.adr]
-
+    * [preparePsiInput preparePsiInput.adr]
+    * [singleMasterStack singleMasterStack.adr]
+    * [singleMasterStack_Parallel singleMasterStack_Parallel.adr]
