@@ -3,7 +3,7 @@
 Opens complex files using numpy and matplotlib. Functionality and parameters are
 similar to cpxfiddle-part of TU-DELFT DORIS software.
 
-Usage: cpxview -w width [-f informat] [-q output] 
+Usage: cpxview -w width [-f informat] [-q output] [-o outformat]
 	[-e exp] [-s scale] [-l line] [-L line] [-p pixel] [-P pixel]
 	[-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B swap] 
 	[-H bytes] [-V] [-b] [-h[elp]] inputfile
@@ -32,8 +32,9 @@ def main(argv):
     #inputfile=argv[-1];
     #argv=argv[0:-1];
     try:
-        opts, args = getopt.getopt(argv, "w:f:q:e:s:l:L:p:P:S:M:m:c:r:B:H:Vbht")
+        opts, args = getopt.getopt(argv, "w:f:q:o:e:s:l:L:p:P:S:M:m:c:r:B:H:Vbht")
     except getopt.GetoptError:
+        print "Unknown option."
         usage()
         sys.exit(2)
     inputfile=args[0];
@@ -57,6 +58,7 @@ def main(argv):
     cfg.setdefault("-B", "")
     cfg.setdefault("-H", "")
     cfg.setdefault("-b", "")
+    cfg.setdefault("-o", "")
     cfg["-w"]=int(cfg["-w"]) 
     cfg["-l"]=int(cfg["-l"]) 
     cfg["-L"]=int(cfg["-L"]) 
@@ -97,7 +99,16 @@ def main(argv):
     #display file name as title.
     if ("-t", "") in opts:
         mp.title(os.path.basename(inputfile))
-    mp.show()
+    if cfg["-o"]: #if not empty
+        mp.savefig( sys.stdout, format=cfg["-o"])
+        ''' if above does not work: http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
+        pylab.savefig( "tempfile.png", format='png' )
+        import shutil
+        shutil.copyfileobj(open("tempfile.png",'rb'), sys.stdout)
+        #delete tempfile.
+        '''
+    else:
+        mp.show()
 
 def wrapToPi(x):
     return np.mod(x+np.pi,2*np.pi)-np.pi
