@@ -77,7 +77,7 @@ elif [ $# -eq 2 ];then
   dorisStep=${1};shift
   remainder='';
 else
-  echo "Please check usage by: ? raster"
+  error "Please check usage by: ? raster"
   return
 fi
 if [ ! -z "${remainder}" ]; then
@@ -102,11 +102,11 @@ generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
 if [ -z ${generateCheck} ]; then
   if [ "${remainder:-undef}" != "undef" ]; then
-    echo "I'll pass these options to cpxfiddle: ..${remainder}.."
+    error "I'll pass these options to cpxfiddle: ..${remainder}.."
   fi
 else
-  echo "I can only create phase(p), amplitude(a) or mixed(m) images."
-  echo "You provided some extra options: ${generateCheck}"
+  error "I can only create phase(p), amplitude(a) or mixed(m) images."
+  error "You provided some extra options: ${generateCheck}"
   return -1;
 fi
 
@@ -114,7 +114,7 @@ fi
 if [[ "${dorisStep}" == *:* ]]; then
   inputFileName=`eval echo ${dorisStep#*:}`
   dorisStep=${dorisStep%:*}
-  [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
+  [ ! -e "${inputFileName}" ] && { error "Can not find specified file: ${inputFileName}"; return 1; }
 fi
 
 
@@ -154,11 +154,11 @@ fi
 call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
 # if not empty and different from read value. 
 if [ ! -z ${w} ] && [ "${w}" != "${width}" ]; then
-  echo "Overwriting width(${width}) with user specified value: ${w}"
+  error "Overwriting width(${width}) with user specified value: ${w}"
   width=${width};
 fi  
 if [ ! -z ${f} ] && [ "${f}" != "${format}" ]; then
-  echo "Overwriting format(${format}) with user specified value: ${f}"
+  error "Overwriting format(${format}) with user specified value: ${f}"
   format=${f};
 fi  
 
@@ -213,7 +213,7 @@ fi
 #echo $fileName
 
 if [ -z ${fileName} ]; then
-  echo "No data file for the step ${dorisStep} in ${resFile}"
+  error "No data file for the step ${dorisStep} in ${resFile}"
   return;
 fi
 #if specified change fileName to inputFileName
@@ -223,10 +223,10 @@ fi
 #[ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";
 #[ "${format//[[:space:]]}" == "real4" ] && format="r4";
 #[ "${format//[[:space:]]}" == "short" ] && format="i2";
-echo Image Width  ..${width}..
-echo Image Format ..${format}..
+error Image Width  ..${width}..
+error Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
-[ $? -ne 0 ] && { echo "I have problems finding filename: ${fileName}"; return 1; }
+[ $? -ne 0 ] && { error "I have problems finding filename: ${fileName}"; return 1; }
 #echo Outname  ..${outName}..
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then
@@ -253,7 +253,7 @@ if [[ "${generate}" == *p* ]]; then
   fi
 fi
 if [[ "${generate}" == *m* ]]; then
-  echo "Sorry! This is not implemented yet..."
+  error "Sorry! This is not implemented yet..."
 #  if [[ ${#format} -eq 2 ]];then
 #    echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
 #  else

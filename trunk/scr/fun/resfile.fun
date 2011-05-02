@@ -41,12 +41,12 @@ function dorisProcess2OutputFile(){
     [ -n "${grepI}" ] && [ "${grepI##*:}" -eq 1 ] && resfile=${i_resfile};
   fi
   if [ "${resfile:-undefined}" == "undefined" ]; then
-    echo "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
+    error "I couldn't find that step in the resultfiles. Please check your master and slave settings are correct."
     _filename=${filename};_resfile=${resfile};_format=${format};_numpixels=${numpixels};_numlines=${numlines}
     return;
   fi
 
-  echo "Reading ${dorisStep} information from: ${resfile}"
+  error "Reading ${dorisStep} information from: ${resfile}"
   # get nr of lines
   firstPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_pixel`
   lastPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_pixel`  
@@ -76,13 +76,13 @@ function dorisProcess2OutputFile(){
     #get number of hits
     numHits=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|wc -l`    
     if [[ ${numHits} -gt 1 ]]; then
-      echo " "
-      echo "I found more than 1 match for your selection."    
-      echo "Please enter the selection you want me to use."
+      error " "
+      error "I found more than 1 match for your selection."    
+      error "Please enter the selection you want me to use."
       for (( c=1; c<=${numHits}; c++ ))
       do
         matchingLine=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|awk "NR==${c}"`
-        echo $c : ${matchingLine}      
+        error $c : ${matchingLine}      
       done
       while [ "1" == "1" ] #infinite loop
       do
