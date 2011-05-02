@@ -11,3 +11,7 @@ To process comprefdem step for all these pairs one can use the following command
 {{{
 ADORE: for pair in `ls`; do eval "cd ${pair};settings load;comprefdem;cd .."; done
 }}}
+If you would like to use quotes in the command do not forget to escape them with a preceding \.
+{{{
+ADORE: for pair in `ls`;do eval "cd ${pair}; settings load; quejob \"snaphu -f snaphu.conf *.srp 2800\" -- -l nodes=demeter:ppn=1; cd .."; done
+}}}
