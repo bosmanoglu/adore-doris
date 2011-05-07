@@ -20,133 +20,85 @@
 # OUTPUT:
 #  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
 #  It runs the following DORIS steps:
-#    For crops: s_readfiles, s_porbits, s_crop
+#    For crops: m_readfiles, m_porbits, m_crop
 #    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
 #  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
 #
 
 # The following steps are processed for each crop
-cropSteps="m_readfiles;m_crop;m_simamp;m_timing"
+cropSteps="m_readfiles;m_porbits;m_crop;"
 # The following steps are processed for each interferogram
-interferoSteps="coarseorb;coarsecorr;fine;reltiming;demassist;coregpm;resample;interfero;comprefpha;subtrrefpha;comprefdem;subtrrefdem;coherence;filtphase;unwrap;slant2htrick;geocode"
-
+interferoSteps="coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster auto coherence -- -M4/4;raster p subtrrefpha -- -M4/4"
+#Options for quejob/qsub 
+qsubOptions="" #"-l nodes=demeter:ppn=1" 
 #######################################################
 ## DO NOT CHANGE ANYTHING BELOW
 ## UNLESS YOU KNOW WHAT YOU ARE DOING.
 #######################################################
-function CTRL_C(){
-break; #if in while loop cancel the loop
-bold "Caught user interrupt!"
-#go back to where we started
-cd ${CALLDIR}
-echo "Replacing user settings"
-settings load ${originalSettingsFile}
-rm ${originalSettingsFile}
-return;
-}
-
-function parallelProcess(){
-# $1:outputFolder
-# $2:adore command
-# expects settings to be at outputFolder/settings.set
-cat >${1}/batch.sh<<_EOFFILE
-#! /bin/csh
- #PBS -N parallelJob
- #PBS -l nodes=1
- #PBS -q batch
- #PBS -V
- #PBS -l walltime=5:00:00
- cd ${1}
- ${ADORESCR}/adore -u "${1}/settings.set" "${2}"
-_EOFFILE
-
-#submit the job to the que
-qsub ${1}/batch.sh
-}
-
-trap CTRL_C 2 #ctrl c is interrupt 2 
-
-local pairsFile=${1}
-
-# we will be changing directories
-# save the current dir.
-local CALLDIR=$PWD;
-
-generateRandomString
-local originalSettingsFile=${CALLDIR}/${randomString}.set
-#save current settings so that we can recall them at the end.
-settings save ${originalSettingsFile}
-
-# DORIS does not allow master and slave to be the same. 
-# We assign slave as dummy and master as the current scene.      
-settings apply -r slave="dummy"
-
-#for scene in ${scenes_include[*]}
-jobIds=( ); #start empty list
+function processCropSteps(){
 for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
 do
+     settings load ${originalSettingsFile} 
      bold "Processing ${scene}"
-     settings apply -r master=${scene} outputFolder="${cropsFolder}/${scene}"
+     settings apply -r -q master=${scene} slave=dummy outputFolder="${cropsFolder}/${scene}"
      mkdir -p "${outputFolder}"
      cd "${outputFolder}"    
      settings save
 
      #parallelProcess "${outputFolder}" "${cropSteps}"
-     jobId=`quejob "${cropSteps}" "${outputFolder}"`
+     jobId=`quejob "${cropSteps}" "${outputFolder}" -- ${qsubOptions}`
      jobIds=( ${jobIds[@]} ${jobId} )
 done
+}
 
-echo "Waiting for jobs to finish."
-echo "Counter displays number of minutes passed."
-cntr=0
-for jobId in ${jobIds[*]}
-do
-  #check each job to see if they are all finished.
-  while [ 1 ]
-  do
-    cntr=$((${cntr}+1))
-    echo -n "${cntr} m..."
-    #wait until last submitted job finishes.
-    check -j ${jobId}
-    jobStatus=$?
-    if [ $jobStatus -eq 0 ]; then
-    	echo "Job ${jobId} finished."
-        break;
-    else
-      if [ $jobStatus -eq 134 ]; then
-        echo "Job ${jobId} not found."
-        break; #Testing this... It means job is not in the job list anymore. Might be long gone.
-      fi
-      sleep 60
-    fi
-  done
-done
-####Now the i12s
-#Set the stack master.
-cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
-
+function processInterferoSteps(){
 for scenes in `cat ${pairsFile}`
 do
+   settings load ${originalSettingsFile} 
    master=${scenes%%,*}
    scene=${scenes#*,}   
    if [ "${master}" == "${scene}" ]; then
      continue
    fi
-     bold "Processing ${master}_${scene}"
-     settings apply -r master=${master} slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
-     mkdir -p "${outputFolder}"
-     cd "${outputFolder}"
-     settings save
-     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
-     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+   bold "Processing ${master}_${scene}"
+   settings apply -r -q master=${master} slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
+   mkdir -p "${outputFolder}"
+   cd "${outputFolder}"
+   settings save
+   cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+   cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
 
-     #parallelProcess "${outputFolder}" "coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence;raster a resample -M1/5;raster p subtrrefpha"
-     quejob "${interferoSteps}" "${outputFolder}"
+   jobId=`quejob "${interferoSteps}" "${outputFolder}" -- ${qsubOptions}`
+   jobIds=( ${jobIds[@]} ${jobId} )
 done
+}
 
+local CALLDIR=$PWD
+local pairsFile=`canonicalPath ${1}`
+# we will be changing directories
+# save the current dir.
+
+generateRandomString
+local originalSettingsFile="${CALLDIR}/${randomString}.set"
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+
+jobIds=( ); #start empty list
+processCropSteps
+waitjob ${jobIds}
+ 
+####Now the i12s
+#Set the stack master.
+jobIds=( ); #start empty list
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+processInterferoSteps
 
 #go back to where we started
 cd ${CALLDIR}
 echo "Replacing user settings"
 settings load ${originalSettingsFile}
 rm ${originalSettingsFile}
+bold "Parallel job submission is complete."
+echo "You can CTRL+C the counter to get the prompt back."
+echo "However please keep in mind that jobs are still running."
+waitjob ${jobIds}
