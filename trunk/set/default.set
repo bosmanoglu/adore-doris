@@ -363,7 +363,7 @@
 [ -z "${_rel_uw_snaphu_log}" 	] && _rel_uw_snaphu_log='echo ${outputFolder}/${master}_${slave}.uwlog'
 [ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
 [ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
-[ -z "${uw_snaphu_dumponlyconf}"] && uw_snaphu_dumponlyconf="off"
+[ -z "${uw_snaphu_dumponlyconf}" ] && uw_snaphu_dumponlyconf="off"
 ################### dinsar
 ### SECTION=dinsar
 [ -z "${di_out_file}" 		] && di_out_file="${outputFolder}/${master}_${slave}.di"
