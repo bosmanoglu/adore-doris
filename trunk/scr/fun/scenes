@@ -4,10 +4,11 @@
 #	scenes exclude orbitFolder1 orbitFolder2 ...
 #	scenes include orbitFolder1 orbitFolder2 ...
 #	scenes init /path/to/data
+#	scenes rescan
 #
 # DESCRIPTION:
 #  SCENES is an internal ADORE command. 
-#  It has three usages: 
+#  It has the following usages: 
 #
 #  scenes: 
 #   	With no input parameters all available scenes are shown.
@@ -25,7 +26,13 @@
 # scenes include orbitFolder1 orbitFolder2 ...:
 #  	given orbit folders will be removed from the exclude list. 
 #
+# scenes init [/path/to/data/folder]:
+#	Initializes the $dataFolder and creates links to data files stored in the path to data folder. 
 #
+# scenes rescan: 
+#	rescan the $dataFolder and reset the included scenes
+#
+# 
 
 function all_scenes(){
   ls -F ${dataFolder}/ 2>/dev/null| grep "/"| tr -d "/"
@@ -84,16 +91,55 @@ function detectSatellite(){
 #Modified from
 # STAMPS3.2/link_slcs:goodSense(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
+local firstDATADIR=`canonicalPath ${DATADIR}/*| head -n 1`
   echo "I can only detect ERS, ASAR and TSX images for now."
   echo "If you are using other datasets please setup the dataFolder manually."
-
-  #local file=`find ${DATADIR} -name "*.cos" | head -n 1 `
-  local file=`find ${DATADIR} -name "T*.xml" | head -n 1 `
-  if [ -n "$file" ]; then
+  m_in_method='UNKNOWN'
+  if $( ls -1 ${firstDATADIR}/T*.xml &>/dev/null ); then
     m_in_method='TSX'
-  else
-    m_in_method=$(ls -1 ${DATADIR}/*/ASA* &>/dev/null && echo ASAR || echo ERS)
+    dataFile="*.cos"
+    leaderFile="T*.xml"
+  elif $( ls -1 ${firstDATADIR}/ASA* &>/dev/null ); then
+    m_in_method='ASAR'    
+    dataFile="ASA*.N1"
+  elif $( ls -1 ${firstDATADIR}/*001 &>/dev/null ); then
+    m_in_method='ERS'
+    dataFile="DAT_01.001"
+    leaderFile="LEA_01.001"
+    volumeFile="VDF_DAT.001"
+    nullFile="NUL_01.001"
+  else 
+    error "I could not define the image type."
+    
+    bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
+    echo "Current setting: [${m_in_method}]"
+    read userInput
+    [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"      
+
+    bold "What is the dataFile pattern? [${dataFile}]"
+    echo "Here is the listing of the files in the first data folder."
+    ls ${firstDATADIR}
+    read userInput
+    [ -n "${userInput}" ] && settings apply -r ${q} dataFile="${userInput}"
+
+    echo "Leader, volume and null files may be necessary for ${m_in_method} data."
+    if ask "Do you also want to enter the patterns for leader, volume and null files?"
+    then
+
+      bold "What is the leaderFile pattern? [${leaderFile}]"
+      read userInput
+      [ -n "${userInput}" ] && settings apply -r ${q} leaderFile="${userInput}"
+      bold "What is the volumeFile pattern? [${volumeFile}]"
+      read userInput
+      [ -n "${userInput}" ] && settings apply -r ${q} volumeFile="${userInput}"
+      bold "What is the nullFile pattern? [${nullFile}]"
+      read userInput
+      [ -n "${userInput}" ] && settings apply -r ${q} nullFile="${userInput}"
+    fi  
   fi
+  [ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
+  [ -z "${slave}"        	] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
+
 }
 
 function linkERS(){
@@ -104,12 +150,12 @@ local date
   for f in $(ls -1d ${DATADIR}/*); do
     #echo info: $f
     #date=$( awk '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
-    date=`awk '/ORBIT/{print substr($5,1,8)}' ${f}/L*`
+    date=`awk '/ORBIT/{print substr($5,1,8)}' ${f}/${leaderFile}`
     mkdir -p ${dataFolder}/${date}
-    ln -s ${f}/L* ${dataFolder}/${date}/
-    ln -s ${f}/D* ${dataFolder}/${date}/
-    ln -s ${f}/V* ${dataFolder}/${date}/
-    ln -s ${f}/N* ${dataFolder}/${date}/
+    ln -s ${f}/${leaderFile} ${dataFolder}/${date}/
+    ln -s ${f}/${dataFile} ${dataFolder}/${date}/
+    ln -s ${f}/${volumeFile} ${dataFolder}/${date}/
+    ln -s ${f}/${nullFile} ${dataFolder}/${date}/
   done
 }
 
@@ -118,7 +164,7 @@ function linkASAR(){
 local rawDataFolder=$1
 local file folderName absFilePath
 
-for file in `ls ${rawDataFolder}/*.N1`
+for file in $(find "${rawDataFolder}" -name "${dataFile}")
 do
   #folderName=`echo $file|cut -c23-30`
   folderName=`envisat_dump_header ${file} | awk '/^ABS_ORBIT /{printf "%s",$3}'`
@@ -133,7 +179,7 @@ function linkTSX(){
 # STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
 local f bname date tsxdir cosfile cosbname 
-  for f in $(find ${DATADIR} -name "T*.xml"); do
+  for f in $(find "${DATADIR}" -name "${leaderFile}"); do
     #echo info: $f
     bname=$( basename ${f} )
     date=`echo $bname | awk -F '_' {'print substr($13,1,8)'}`
@@ -151,29 +197,29 @@ local f bname date tsxdir cosfile cosbname
 
 function scenes_init(){
 local rawDataFolder=`canonicalPath "${1}"`
+local batchOn=${batch}
+batch="off"
+
 mkdir -p ${dataFolder}
 detectSatellite ${rawDataFolder}; #sets m_in_method
 case "${m_in_method}" in
 ERS)
-  dataFile="DAT_01.001"
-  leaderFile="LEA_01.001"
-  volumeFile="VDF_DAT.001"
-  nullFile="NUL_01.001"
   linkERS ${rawDataFolder};
   ;;
 ASAR)
-  dataFile="ASA*.N1"
   linkASAR ${rawDataFolder};
   ;;
 TSX)
-  dataFile="*.cos"
-  leaderFile="T*.xml"
   linkTSX ${rawDataFolder};
   ;;
 esac
 
+batch="${batchOn}"
 }
 
+function scenes_rescan(){
+  scenes_include=( `ls -F ${dataFolder}/  2>/dev/null | grep "/" | tr -d "/"` )  
+}
 case "${1}" in 
 "")
  all_scenes
@@ -189,5 +235,10 @@ case "${1}" in
 "init")
  shift
  scenes_init "$@"
+ scenes_rescan
+ ;;
+"rescan")
+ shift
+ scenes_rescan
  ;;
 esac

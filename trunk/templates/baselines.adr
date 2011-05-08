@@ -84,6 +84,7 @@ if [ $? -eq 0 ]; then
 else
   echo "There were some errors creating the baseline plot."
   echo " Please check the baselines: ${outputFolder}/baselines"
+fi
 #go back to where we started
 cd ${CALLDIR}
 #settings apply -r master=${stackMaster} outputFolder="."
