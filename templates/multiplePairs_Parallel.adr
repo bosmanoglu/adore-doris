@@ -85,7 +85,7 @@ settings save ${originalSettingsFile}
 
 jobIds=( ); #start empty list
 processCropSteps
-waitjob ${jobIds}
+waitjob ${jobIds[@]}
  
 ####Now the i12s
 #Set the stack master.
@@ -101,4 +101,4 @@ rm ${originalSettingsFile}
 bold "Parallel job submission is complete."
 echo "You can CTRL+C the counter to get the prompt back."
 echo "However please keep in mind that jobs are still running."
-waitjob ${jobIds}
+waitjob ${jobIds[@]}

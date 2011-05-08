@@ -489,63 +489,99 @@ function settings_init(){
  [ "${1}"=="-q" ] && q='-q' && shift || q=''
  [ $# -gt 0 ] && settings apply -r ${q} "$@"
  
- #now ask some questions
- local variables
- bold "What is the projectFolder? [${projectFolder}]"
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} projectFolder="${userInput}"
-
- bold "What is the runName? [${runName}]"
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} runName="${userInput}"
- 
- bold "What is the dataFolder? [${dataFolder}]"
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} dataFolder="${userInput}"
- 
- bold "In the dataFolder I found the following scenes:"
- scenes include
- if ask "Do you want to exclude any scenes?"
- then 
-   echo "Please specify the scenes separated by space"
+ bold "I am going to ask you a few questions to initialize your settings."
+ echo "The values shown in square brackets [] are existing settings."
+ echo "If the default settings is correct you can enter blank to continue with it."
+ if ask "Shall we start?"
+ then  
+   #now ask some questions
+   local variables
+   bold "What is the projectFolder? [${projectFolder}]"
+   echo "Your current path is: ${PWD}"
    read userInput
-   scenes exclude ${userInput}
+   [ -n "${userInput}" ] && settings apply -r ${q} projectFolder="${userInput}"
+
+   bold "What is the runName? [${runName}]"
+   read userInput
+   [ -n "${userInput}" ] && settings apply -r ${q} runName="${userInput}"
+   
+   if [ ! -d "${dataFolder}" ]; then 
+     if ask "$dataFolder does not exist. Would you like me to run create it?"
+     then
+       echo "Please specify where your data is currently located:"
+       read userInput
+       scenes init "${userInput}"
+     else
+       bold "dataFolder is currently set as: $dataFolder" 
+       if ask "Do you want to change the dataFolder? [${dataFolder}]"
+       then 
+         read userInput
+         [ -n "${userInput}" ] && settings apply -r ${q} dataFolder="${userInput}"
+       fi
+     fi
+   fi
+   
+   bold "In the dataFolder I found the following scenes:"
+   scenes include
+   if ask "Do you want to exclude any scenes?"
+   then 
+     echo "Please specify the scenes separated by space"
+     read userInput
+     scenes exclude ${userInput}
+   fi
+
+   if [ ! -f "${m_in_dat}" ]; then
+     if [ -z "${master}" ]; then
+       bold "Master folder is not set."
+       echo "Please enter the master from the following options:"
+       scenes include
+       read userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} master="${userInput}"
+     fi       
+     if [ -z "${slave}" ]; then
+       bold "Slave folder is not set."
+       echo "Please enter the slave from the following options:"
+       scenes include
+       read userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} slave="${userInput}"
+     fi       
+        
+     #Seems like scenes init was not run. 
+     bold "What is the dataFile pattern? [${dataFile}]"
+     echo "Here is the listing of the files in the current master folder."
+     ls ${dataFolder}/${master}
+     read userInput
+     [ -n "${userInput}" ] && settings apply -r ${q} dataFile="${userInput}"
+
+     if ask "Do you also want to enter the patterns for leader, volume and null files?"
+     then
+       bold "What is the leaderFile pattern? [${leaderFile}]"
+       read userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} leaderFile="${userInput}"
+       bold "What is the volumeFile pattern? [${volumeFile}]"
+       read userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} volumeFile="${userInput}"
+       bold "What is the nullFile pattern? [${nullFile}]"
+       read userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} nullFile="${userInput}"
+     fi  
+
+     bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
+     echo "Current setting: [${m_in_method}]"
+     read userInput
+     [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"
+   fi
+  
+   bold "What is the m_orbdir? This is the folder that has the arclist file for getorb."
+   echo "Current setting: [${m_orbdir}]"
+   read userInput
+   [ -n "${userInput}" ] && settings apply -r ${q} m_orbdir="${userInput}"
+   
+   bold "What would you like to name this settings file?"
+   echo "Current setting: [settings.set]"
+   read userInput
+   settings save ${userInput}
  fi
- bold "What is the dataFile pattern? [${dataFile}]"
- echo "Here is the listing of the files in the current master folder."
- ls ${dataFolder}/${master}
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} dataFile="${userInput}"
-
- if ask "Do you also want to enter the patterns for leader, volume and null files?"
- then
-
-   bold "What is the leaderFile pattern? [${leaderFile}]"
-   read userInput
-   [ -n "${userInput}" ] && settings apply -r ${q} leaderFile="${userInput}"
-   bold "What is the volumeFile pattern? [${volumeFile}]"
-   read userInput
-   [ -n "${userInput}" ] && settings apply -r ${q} volumeFile="${userInput}"
-   bold "What is the nullFile pattern? [${nullFile}]"
-   read userInput
-   [ -n "${userInput}" ] && settings apply -r ${q} nullFile="${userInput}"
- fi  
-
- bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
- echo "Current setting: [${m_in_method}]"
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"
- 
- bold "What is the m_orbdir? This is the folder that has the arclist file for getorb."
- echo "Current setting: [${m_orbdir}]"
- read userInput
- [ -n "${userInput}" ] && settings apply -r ${q} m_orbdir="${userInput}"
- 
- bold "What would you like to name this settings file?"
- echo "Current setting: [settings.set]"
- read userInput
- settings save ${userInput}
-
 }
 
 case ${1} in
