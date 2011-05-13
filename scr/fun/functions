@@ -151,12 +151,12 @@ function p()
           . ${ADOREFOLDER}/scr/process/${dorisProcess}
   else
   # check path to see if we can find the file in the path
-    fileName=`find $P -name 'rs2pn' 2>/dev/null | head -n1`
-    if [ -f "${fileName}" ]; then
-      echo "Running: ${fileName} ${@}"
-      . ${fileName} ${@}
-    #else do default processing. Prepare drs file and run doris. 
-    elif [ -e "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
+#    fileName=`find -name 'rs2pn' 2>/dev/null | head -n1`
+#    if [ -f "${fileName}" ]; then
+#      echo "Running: ${fileName} ${@}"
+#      . ${fileName} ${@}
+#    #else do default processing. Prepare drs file and run doris. 
+    if [ -e "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
  #     rm -f ${outputFolder}/${dorisProcess}.drs
  #     cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
  #       newline=`eval echo -E ${line}`
