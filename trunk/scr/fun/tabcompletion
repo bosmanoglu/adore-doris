@@ -157,12 +157,12 @@ function _settings(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
         local opts="apply check fix init raw save load reset clear"
-	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	local prev="${COMP_WORDS[1]}"
 	
 	case "${prev}" in
 		apply)
-			local optsX='eval echo \${!${prev}*}'
-			optsX=`eval ${optsX}`
+			local cmd="echo \${!${cur}*}"
+			local optsX=`eval ${cmd}`
 			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
 			return 0
 			;;
