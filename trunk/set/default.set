@@ -208,10 +208,10 @@
 [ -z "${fc_method}" 		] && fc_method="magfft"
 [ -z "${fc_nwin}" 		] && fc_nwin="4000"
 [ -z "${fc_in_pos}" 		] && fc_in_pos="${unspecified}"
-[ -z "${fc_winsize}" 		] && fc_winsize="32 32"
-[ -z "${fc_acc}" 		] && fc_acc="4 4"
+[ -z "${fc_winsize}" 		] && fc_winsize="64 64"
+[ -z "${fc_acc}" 		] && fc_acc="32 32"
 [ -z "${fc_initoff}" 		] && fc_initoff="coarsecorr"
-[ -z "${fc_osfactor}" 		] && fc_osfactor="16"
+[ -z "${fc_osfactor}" 		] && fc_osfactor="32"
 [ -z "${fc_plot}" 		] && fc_plot="0.4 NOBG"
 ################### reltiming
 ### SECTION=reltiming
