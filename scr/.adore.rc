@@ -21,6 +21,18 @@ PS1="ADORE: "
 
 #Only if interactive shell
 if [ "${i-notInteractive}" != "notInteractive" ]; then
+  ### ipython style history search
+  ### http://davidcramer.posterous.com/code/129/bash-trick-history-searching-ala-ipython.html
+  # Enable bash history
+  export HISTCONTROL=erasedups
+  export HISTSIZE=10000
+  shopt -s histappend
+
+  # These set up/down to do the history searching
+  bind '"\e[A"':history-search-backward
+  bind '"\e[B"':history-search-forward  
+  ### end ipython style history search 
+
   PATH=${_ADOREPATH}
   unset _ADOREPATH
   unset i #If this line is omitted, all spawned ADORE jobs
