@@ -12,3 +12,6 @@ List of proposed changes in order of importance:
   * *DONE* Tab completion for all adore commands (i.e. `settings [tab][tab]` should show options for settings command.
   * Add interface to display results. To display the related portion of the result file without opening the file. Visualize coarsecorr, finecorr offsets (turn on visualization using doris+gmt?)
   * *DONE* Add interface to check setup.
+
+= Ideas to consider =
+  * A mechanism to report errors easily (i.e. bugreport "failing command") [http://dl.dropbox.com/u/18918772/adore-wiki/index.html#bugreport bugreport on ADDW]
