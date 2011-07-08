@@ -20,11 +20,14 @@ function archive(){
 
 function ask()          # See "settings save" for example of use.
 {
-  echo -n "$@" '[y/n] ' ; read ans
-  case "$ans" in
-    y*|Y*) return 0 ;;
-    *) return 1 ;;
-  esac
+  while [ 1 -eq 1 ] ;
+  do
+    echo -n "$@" '[y/n] ' ; read ans
+    case "$ans" in
+      y*|Y*) return 0 ;;
+      n*|N*) return 1 ;;
+    esac
+  done
 }
 
 function bold() 	#echo bold text.
@@ -114,7 +117,7 @@ function generateRandomString(){
 
 function canonicalPath(){
   #from http://snipplr.com/view/18026/canonical-absolute-path/  
-  [ "${1:-isEmpty}" == "isEmpty" ] && echo "" || echo $(cd $(dirname $1); pwd -P)/$(basename $1)
+  [ "${1:-isEmpty}" == "isEmpty" ] && echo "" || echo $(cd $(dirname "$1"); pwd -P)/$(basename "$1")
 }
 
 function mvDorisFiles(){
@@ -244,21 +247,7 @@ function exclude(){
 }
 
 function h(){
-  [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
-  if [ "${1:-undefined}" == "undefined" ]; then
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/h"
-  elif [ -e "${ADORESCR}/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
-  elif [ -e "${ADORESCR}/process/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
-  elif [ -e "${ADORESCR}/fun/${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
-  elif [ -e "${1}" ]; then 
-    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${1}
-  else
-    echo "Unknown ADORE command: ${1}"
-    echo 'You can get a list of ADORE commands with the command: ?'
-  fi
+	. ${ADORESCR}/fun/h "${@}"
 }
 
 function initialize(){
@@ -443,7 +432,8 @@ function unwrap(){
 }
  
 function baselines(){
-  p baselines
+  #p baselines
+  p ${ADOREFOLDER}/templates/baselines.adr
 }
 
 function singleMasterStack(){
