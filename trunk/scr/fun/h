@@ -16,20 +16,27 @@
 # 
 # 
 # ******ADORE Commands******
-# ?		: Help
-# check		: Check completed steps in result file.
-# dem 		: Create, load and check dem
-# dem2slant2h	: Create DORIS slant2h output from comprefdem.
-# initialize	: Initialize default settings.
-# lsprocess	: list DORIS processes
-# mask		: Mask DORIS file using snaphu output. 
-# p		: Process DORIS step.
-# pn2rs		: convert Process Name to Result file Section title.
-# quejob	: It runs the given adore command in the Torque-PBS system.
-# raster		: Create raster image from doris result.
-# s		: Show the input file for the DORIS step.
-# saveas 	: Export DORIS results to a different format.
-# scenes 	: Include and exclude scenes from processing. 
-# settings	: Utility for listing, saving and loading ADORE variables.
-# undo		: Undo all processing after a given step.
 
+#RUN: typeset -F | cut -d" " -f3 | grep -v '^_' |grep -v 'command_not_found_handle'| column
+# typeset -F : show function names
+# cut -d" " -f3 : get field 3, which has the function name
+# grep -v '^_' : remove completion functions starting with _
+# grep -v 'command_not_found_handle': remove the command not found command...
+# column: columnize the output. 
+
+#  [ "${1:-undefined}" == "undefined" ] && echo "..${1}.."
+  if [ "${1:-undefined}" == "undefined" ]; then
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/h"
+    typeset -F | cut -d" " -f3 | grep -v '^_' |grep -v 'command_not_found_handle'| column
+  elif [ -e "${ADORESCR}/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
+  elif [ -e "${ADORESCR}/process/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/process/${1}              
+  elif [ -e "${ADORESCR}/fun/${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/fun/${1}
+  elif [ -e "${1}" ]; then 
+    sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${1}
+  else
+    echo "Unknown ADORE command: ${1}"
+    echo 'You can get a list of ADORE commands with the command: ?'
+  fi

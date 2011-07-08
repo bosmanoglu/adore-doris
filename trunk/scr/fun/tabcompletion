@@ -1,6 +1,8 @@
+complete -F "_h" -o "default" '?'
 complete -F "_archive" -o "default" "archive"
 complete -F "_check" -o "default" "check"
 complete -F "_dem" -o "default" "dem"
+complete -F "_h" -o "default" "h"
 complete -F "_mask" -o "default" "mask"
 complete -F "_p" -o "default" "p"
 complete -F "_raster" -o "default" "raster"
@@ -71,6 +73,13 @@ function _dem(){
 		;;
 	esac
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+function _h(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local opts=`typeset -F | cut -d" " -f3`	
+	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 
 function _mask(){
