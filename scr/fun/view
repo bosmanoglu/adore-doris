@@ -66,6 +66,7 @@ local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
 local w f e q o c inArg parE parQ parO parC parS flag OPTIND OPTARG
+local cmd
 ###### GET INPUT OPTIONS
 inArg=( ${@} ); #save input arguements for getopts.
 if [ $# -gt 2 ]; then
@@ -233,23 +234,31 @@ if [[ "${generate}" == *a* ]]; then
     #No log scaling if not complex. 
     [ -z "${q}" ] && parQ="normal"    || parQ=${q}
     [ -z "${c}" ] && parC="gray"      || parC=${c}
-    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+    #          ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+    cmd=`echo "${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &"`
+    eval "${cmd}"
   else
     [ -z "${q}" ] && parQ="mag"       || parQ=${q}
     [ -z "${c}" ] && parC="gray"      || parC=${c}
     [ -z "${e}" ] && parE="0.5"       || parE=${e}
-    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -e ${parE} -q ${parQ}  -c ${parC} ${remainder} ${fileName} &
+    #          ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -e ${parE} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+    cmd=`echo "${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -e ${parE} -q ${parQ} -c ${parC} ${remainder} ${fileName} &"`
+    eval "${cmd}"
   fi
 fi
 if [[ "${generate}" == *p* ]]; then
   if [[ ${#format} -eq 2 ]];then
     [ -z "${q}" ] && parQ="normal"    || parQ=${q}
     [ -z "${c}" ] && parC="jet"       || parC=${c}
-    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+        #      ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+    cmd=`echo "${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &"`
+    eval "${cmd}"
   else
     [ -z "${q}" ] && parQ="phase"     || parQ=${q}
     [ -z "${c}" ] && parC="jet"       || parC=${c}  
-    ${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
+    cmd=`echo "${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &"`
+    eval "${cmd}"
+    #${ADOREFOLDER}/lib/python/cpxview.py -w ${width} -f ${format} -q ${parQ} -c ${parC} ${remainder} ${fileName} &
   fi
 fi
 if [[ "${generate}" == *m* ]]; then
