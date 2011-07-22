@@ -32,7 +32,7 @@ def main(argv):
     #inputfile=argv[-1];
     #argv=argv[0:-1];
     try:
-        opts, args = getopt.getopt(argv, "w:f:q:o:e:s:l:L:p:P:S:M:m:c:r:B:H:Vbht")
+        opts, args = getopt.getopt(argv, "w:f:q:o:e:s:l:L:p:P:S:M:m:c:r:BH:Vbhtk", )
     except getopt.GetoptError:
         print "Unknown option."
         usage()
@@ -72,14 +72,18 @@ def main(argv):
     cfg["-e"]=float(cfg["-e"]) 
     cfg["rmin"]=int(cfg["-r"].split("/")[0])
     cfg["rmax"]=int(cfg["-r"].split("/")[1])    
-    data=getdata(inputfile,cfg["-w"],cfg["-f"])
+    #byteswap on?
+    byteSwapFlag=False;
+    if ("-B", "") in opts:
+        byteSwapFlag=True;
+    data=getdata(inputfile,cfg["-w"],cfg["-f"],0,byteSwapFlag)
     data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
     #multilook
     data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
     if "norm" in cfg["-q"]:
         mp.matshow(cfg["-s"]*data**cfg["-e"]);
     elif "mag" in cfg["-q"]:
-        mp.matshow(cfg["-s"]*abs(data)**cfg["-e"])
+        fg=mp.matshow(cfg["-s"]*abs(data)**cfg["-e"],picker=5)
     elif "pha" in cfg["-q"]:
         mp.matshow(cfg["-s"]*np.angle(data)**cfg["-e"])
     elif "wrap" in cfg["-q"]:
@@ -108,12 +112,20 @@ def main(argv):
         #delete tempfile.
         '''
     else:
+        if ("-k", "") in opts:
+            fg=mp.gcf()
+            def onpick(event):
+                ax = mp.gca()
+                inv = ax.transData.inverted()
+                A=inv.transform((event.mouseevent.x,  event.mouseevent.y))
+                print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"]))
+            fg.canvas.mpl_connect('pick_event', onpick)
         mp.show()
-
+    
 def wrapToPi(x):
     return np.mod(x+np.pi,2*np.pi)-np.pi
 
-def getdata(fname, width, dataFormat, length=0):  
+def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):  
     complexFlag=False;
     #### Handle the long format specifier: i.e. complex_real4
     if "real4" in dataFormat:
@@ -134,6 +146,9 @@ def getdata(fname, width, dataFormat, length=0):
     elif dataFormat=="ci2":
         datatype="i2"
         complexFlag=True;
+    elif dataFormat=="ci4":
+        datatype="i4"
+        complexFlag=True;
     elif  dataFormat=="i2":
         datatype="i2"
     #else: dtype is already set to dataFormat
@@ -149,11 +164,15 @@ def getdata(fname, width, dataFormat, length=0):
             print("Width(*2 if complex): %f, Length: %f, FileSize: %d" ,width,length,filesize)
         length=int(length);
 
+
+    data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+    if byteSwapFlag:
+        #data=data.byteswap()
+        data.byteswap(True)
     if complexFlag:
-        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
         data=data[:,0:-1:2]+1j*data[:,1::2]
-    else:
-        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+#    else:
+#        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
     return data
     
 def isint(x):

@@ -119,46 +119,54 @@ local resampleMaster=${2}
 
 # we will be changing directories
 # save the current dir.
-local CALLDIR=$PWD;
+local CALLDIR="$PWD";
 
 generateRandomString
-local originalSettingsFile=${CALLDIR}/${randomString}.set
+local originalSettingsFile="${CALLDIR}/${randomString}.set"
 #save current settings so that we can recall them at the end.
 settings save ${originalSettingsFile}
 
 #### crop
-<<ENDCOMMENT>/dev/null
-ENDCOMMENT
+#<<ENDCOMMENT>/dev/null
+#ENDCOMMENT
 #for scene in ${scenes_include[*]}
-jobIds=( ); #start empty list
-for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
-do
-  processCropSteps ${scene}
-done
-# if resampleMaster was not cropped run the processCropSteps on it.
-[ ! -d "${cropsFolder}/${resampleMaster}" ] && processCropSteps ${resampleMaster}
-waitjob ${jobIds}
+if [ -n "${cropSteps}" ]; then
+  jobIds=( ); #start empty list
+  for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+  do
+    processCropSteps ${scene}
+  done
+  # if resampleMaster was not cropped run the processCropSteps on it.
+  [ ! -d "${cropsFolder}/${resampleMaster}" ] && processCropSteps ${resampleMaster}
+  waitjob ${jobIds[@]}
+fi
 
 cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
 #### resample
-jobIds=( ); #start empty list
-for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
-do
-  processResampleSteps ${scene}
-done
-waitjob ${jobIds}
-
+if [ -n "${resampleSteps}" ]; then
+  jobIds=( ); #start empty list
+  for scene in `cat ${pairsFile} | tr "," "\n" | sort --unique`
+  do
+    processResampleSteps ${scene}
+  done
+  waitjob ${jobIds[@]}
+fi	
 
 ####Now the i12s
-cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
-for scenes in `cat ${pairsFile}`
-do
-  processInterferoSteps ${scenes}
-done
+if [ -n "${interferoSteps}" ]; then
+  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+  jobIds=( ); #start empty list
+  for scenes in `cat ${pairsFile}`
+  do
+    processInterferoSteps ${scenes}
+  done
+fi
 
 #go back to where we started
 cd ${CALLDIR}
 echo "Replacing user settings"
-bold "Processes may still be running. Please check with: qstat"
+echo "You can cancel the wait loop by CTRL+C."
+bold "However, processes may still be running. Please check with: qstat"
 settings load ${originalSettingsFile}
 rm ${originalSettingsFile}
+waitjob ${jobIds[@]}

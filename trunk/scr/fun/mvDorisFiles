@@ -1,20 +1,20 @@
 #!/bin/bash
-#USAGE:
-# ${0} sourceFolder destinationFolder
-# ${0} -s "/exact/path/to/source/Folder" destinationFolder
+# USAGE:
+#  ${0} sourceFolder destinationFolder
+#  ${0} -s "/exact/path/to/source/Folder" destinationFolder
 # 
-#DESCRIPTION:
-# This script modifies Doris Result Files (*.res) and Doris Input Files
-# (*.drs) by changing locations of the output files to their current locations. 
-# It is a mere string replacement utility. It does not check for errors.
-# Each modified file is backed up with a .bck suffix (i.e *.res.bck) 
+# DESCRIPTION:
+#  This script modifies Doris Result Files (*.res) and Doris Input Files
+#  (*.drs) by changing locations of the output files to their current locations. 
+#  It is a mere string replacement utility. It does not check for errors.
+#  Each modified file is backed up with a .bck suffix (i.e *.res.bck) 
 # 
-# -s: option is used to update *.res files that are already moved to their
-#     destination, i.e. scp'ed from a different computer. With this option
-#     ${0} only tries to update files without actually moving anything. 
+#  -s: option is used to update *.res files that are already moved to their
+#      destination, i.e. scp'ed from a different computer. With this option
+#      ${0} only tries to update files without actually moving anything. 
 # 
-#EXAMPLES:
-# ${0} -s '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'
+# EXAMPLES:
+#  ${0} -s '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'
 #
 
 

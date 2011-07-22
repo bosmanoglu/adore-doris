@@ -32,6 +32,12 @@ function ask()          # See "settings save" for example of use.
 
 function bold() 	#echo bold text.
 {
+# USAGE: 
+#   bold "Text to print bold"
+#
+# Ex:
+#   bold "This is important."
+#
   echo -e "\033[1m${@}\033[0m"
 }
 
