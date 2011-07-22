@@ -1,0 +1,23 @@
+USAGE:
+	s_crop2resample
+
+DESCRIPTION:
+ S_CROP2RESAMPLE is an internal ADORE command. 
+ It is used in creating interferograms coregistered to a different scene, 
+ as needed in Small Baselines (SBAS) interferometry. 
+
+ s_crop2resample copies the result of m_ovs or the m_crop as s_resample
+ and changes the data_output_file to the s_crop(or s_ovs) output file. 
+
+ Selection between ovs and crop is done automatically. If m_ovs is in the
+ process control flag, ovs is used. Otherwise m_crop is used. 
+
+ Master and Slave should be processed in the same way. They both have to 
+ be oversampled or not.  
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OUTPUT:
+  Modifies the result file by copying the m_crop(m_ovs) to s_resample 
+

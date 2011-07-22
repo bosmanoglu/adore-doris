@@ -1,0 +1,31 @@
+USAGE:
+	s dorisProcess
+	s variableName
+
+DESCRIPTION:
+ s is a builtin ADORE command.  
+ It can show the input file for the given DORIS processing step. It can 
+ also be used to display ADORE variables.
+
+INPUT:
+ dorisProcess: Name of the DORIS processing step to run. List of available
+     processes can be found at the end of this help message or using lsprocess
+     whenever required.
+
+ variableName: Name of the DORIS setting (ADORE variable) to display. This
+     can be a partial name. For example if given m_ as variable name ADORE will
+     display all variables and their values starting with m_
+ 
+ 
+OUTPUT:
+ Dumps input file for the given step to the stdout. 
+
+Available DORIS processes:
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+

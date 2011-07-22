@@ -1,0 +1,46 @@
+USAGE:
+	check
+	check setup
+	check resultFile
+	check -p processName
+	check -j jobid
+
+DESCRIPTION:
+ CHECK is an internal ADORE command. 
+ It shows the process control list from the result files.
+
+ Using the -p option it can be used to check whether a given step is possible
+ to run. 
+ "setup" option can be used to check if ADORE can find all the necessary libraries.
+
+INPUT:
+ No required inputs.
+  
+  Optional:
+    resultFile: If specified, only displays given files process control list.
+
+    -p processName: Check if ADORE can run the given doris process. This 
+    function is currently under development. If no output is shown the it is
+    OK to run the process. Otherwise error messages will hint at the problem.
+
+    -j jobid: Check if the job submitted by quejob is finished. Return 0 if finished.
+		Job Status 	Output
+		----------------------
+		Completed	0
+		Running		1
+              Exiting		2
+              Queued		3
+              Waiting		4
+              Transferred	5
+              Held 		6
+
+    setup: Check several executables and returns assistive messages if executables are missing.
+
+OUTPUT:
+ Shows the process control list of given result file.
+
+Example:
+check
+check -p m_readfiles; echo $?
+check setup
+

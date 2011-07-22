@@ -1,0 +1,28 @@
+USAGE:
+ comprefpha 
+
+DESCRIPTION:
+ COMPREFPHA is an ADORE process which runs the DORIS step with the same name.
+ This step can be performed as soon as the precise orbits are known. The recommended approach is to compute this only after the computation of the interferogram, and then use the step SUBTRREFPHA to subtract it. This step is not required if method "exact" is used in step SUBTRREFPHA.
+  
+INPUT:
+ There are no required input parameters for this command.
+  
+ OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT:
+ SUCCESS is printed to STDOUT on successful completion of process.
+
+FILES and REFERENCES:
+ ${ADOREFOLDER}/scr/process/comprefpha
+ ${ADOREFOLDER}/drs/${dorisVersion}/comprefpha.drs
+ http://doris.tudelft.nl/usermanual/node97.html
+
+EXAMPLE:
+ comprefpha
+
+KNOWN BUGS:
+ None. 
+
+
