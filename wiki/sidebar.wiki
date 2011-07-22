@@ -2,6 +2,7 @@
   * [Installation HOWTO Install]
   * [Roadmap List of upcoming features]
   * [FAQ Frequently Asked Questions]
+  * [MailingList Users Mailing List]
   * [TipsAndTricks Tips and Tricks]
   * [Reference Command Reference]
     * [adore adore]
