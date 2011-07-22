@@ -1,0 +1,17 @@
+USAGE:
+	archive create [path/to/folder] [archiveName]
+
+DESCRIPTION:
+ archive is an ADORE function. 
+ It creates a tar archive for the given folder, as well as creating
+ checksums (md5sum) for each file. The md5sums are verified during
+ extraction. 
+
+INPUT:
+ path/to/folder: Relative (or full) path to the folder to be archived. 
+   If omitted current folder "." is used.
+ archiveName: Optional input for output archive file name. If omitted
+   the name of the parent folder is used (last part of the path to folder.)
+
+OUTPUT:
+ folderName.tar

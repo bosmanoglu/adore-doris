@@ -1,0 +1,15 @@
+USAGE:
+	. initialize
+
+DESCRIPTION:
+ INITIALIZE is an internal ADORE command.  
+ It is used to load and check user settings. Regular users will probably not
+ need to use it. For saving and loading user settings see "? settings" 
+
+INPUT:
+ No input parameters are required.
+
+OUTPUT:
+ Output's user settings file path.
+ 
+Check settings and make suggestions

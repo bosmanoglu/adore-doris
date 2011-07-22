@@ -1,0 +1,22 @@
+USAGE:
+	undo processName [fileName]
+	undo processName
+	undo only processName
+
+DESCRIPTION:
+ UNDO is an internal ADORE command. It removes the 
+ given processName from the result files.   
+
+INPUT:
+ only: if specified undo removes only a single step and keep 
+   the information for the following steps. Use with caution.
+ processName: Doris step to be deleted from the resultfile.
+ 
+ Optional:
+   fileName: If omitted undo will try to remove the given doris
+     step from master, slave and interferograms result files.    
+     If specified undo will only remove steps from the given file.
+
+OUTPUT:
+ Undo Successful: if DORIS step was found and removed.
+ 

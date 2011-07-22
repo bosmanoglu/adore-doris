@@ -1,0 +1,4 @@
+USAGE: 
+	report [i12sFolder] "dorisSteps"
+Example:
+ report "interfero;coherence"
