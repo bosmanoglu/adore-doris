@@ -141,7 +141,7 @@ function _saveas(){
 function _scenes(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
-        local opts="include exclude"
+        local opts="include init exclude rescan"
 	local prev="${COMP_WORDS[COMP_CWORD-1]}"
 	
 	case "${prev}" in

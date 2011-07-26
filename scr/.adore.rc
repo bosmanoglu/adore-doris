@@ -37,6 +37,11 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   unset _ADOREPATH
   unset i #If this line is omitted, all spawned ADORE jobs
           # will run in interactive mode.
+
+  declare -r PROMPT_COMMAND="setPS1" #setPS1 function will check the 
+                                     # settings file folder and if not in
+                                     # current folder will change the prompt
+                                     # to !ADORE:
 fi
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
