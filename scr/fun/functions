@@ -220,12 +220,17 @@ function s()
 function setPS1()
 {
 local setDir
-setDir=`dirname ${u}`
-if [ "${PWD}" == "${setDir}" ]; then
-  PS1="ADORE: "
+
+if [ -n "${u}" ]; then
+  setDir=`dirname ${u}`
+  if [ "${PWD}" == "${setDir}" ]; then
+    PS1="ADORE: "
+  else
+    PS1="!ADORE: "
+  fi
 else
   PS1="!ADORE: "
-fi
+fi  
 }
 
 function strcmpi()          # See "settings save" for example of use.
