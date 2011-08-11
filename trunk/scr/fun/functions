@@ -343,10 +343,6 @@ function dinsar(){
   p dinsar
 }
  
-function filter(){
-  p filter
-}
- 
 function filtphase(){
   p filtphase
 }
