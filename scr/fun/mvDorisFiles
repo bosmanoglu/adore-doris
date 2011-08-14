@@ -1,7 +1,7 @@
 #!/bin/bash
 # USAGE:
-#  ${0} sourceFolder destinationFolder
-#  ${0} -s "/exact/path/to/source/Folder" destinationFolder
+#  mvDorisFiles sourceFolder destinationFolder
+#  mvDorisFiles -s "/exact/path/to/source/Folder" destinationFolder
 # 
 # DESCRIPTION:
 #  This script modifies Doris Result Files (*.res) and Doris Input Files
@@ -11,10 +11,10 @@
 # 
 #  -s: option is used to update *.res files that are already moved to their
 #      destination, i.e. scp'ed from a different computer. With this option
-#      ${0} only tries to update files without actually moving anything. 
+#      mvDorisFiles only tries to update files without actually moving anything. 
 # 
 # EXAMPLES:
-#  ${0} -s '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'
+#  mvDorisFiles -s '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'
 #
 
 

@@ -1,0 +1,38 @@
+USAGE:
+ m_porbits
+
+DESCRIPTION:
+ M_PORBITS is an ADORE process and runs the DORIS step with the same name.  
+
+We use the DEOS fortran program getorb for obtaining the precise orbits.
+(This program has to be installed separately, see
+http://www.deos.tudelft.nl/ers/precorbs/) This step actually is
+only a system call to getorb, and converts the output to a 4 column table:
+secofday,x,y,z.
+
+It requires the Orbital Data Records (ODR files) to be in an archive
+directory. The arclist file (which should be downloaded together with the
+ODR archives) has to be present in this directory. The ODR files have to be
+untarred and unzipped as from version 2.5.
+
+INPUT:
+ There are no required input parameters for this command.
+  
+ OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT:
+ Orbit information is written under the precise_orbits step in the result
+file.
+
+FILES and REFERENCES:
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_porbits.drs
+ http://doris.tudelft.nl/usermanual/node18.html
+
+EXAMPLE:
+ m_porbits
+
+KNOWN BUGS:
+ None. 
+
+

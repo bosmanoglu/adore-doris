@@ -454,8 +454,4 @@ function baselines(){
   p ${ADOREFOLDER}/templates/baselines.adr
 }
 
-function singleMasterStack(){
-  p singleMasterStack
-}
-
 #Have a new line at the end
