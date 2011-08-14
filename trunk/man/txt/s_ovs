@@ -1,0 +1,29 @@
+USAGE:
+ s_ovs
+
+DESCRIPTION:
+ S_OVS is an ADORE process and it runs the DORIS step with the same name.  
+ 
+ This step can be run optionally to oversample the cropped data, and is done
+ after S_CROP.
+
+INPUT:
+ There are no required input parameters for this command.
+  
+ OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT:
+  ${master}.ovs file is generated. 
+
+FILES and REFERENCES:
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_ovs.drs
+ http://doris.tudelft.nl/usermanual/node43.html
+
+EXAMPLE:
+ s_ovs
+
+KNOWN BUGS:
+ None. 
+
+
