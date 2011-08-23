@@ -26,7 +26,7 @@ INPUT:
 	Can be used to specify a filename that is not in the resultfile.
 	This is useful for generating rasters for *.demlp, *.notmasked files.
 
- Optional:
+ OPTIONAL:
 	-- cpxfiddleOptions
           These options are passed to cpxfiddle. They should start with "--".
 	    User options supersede default options (see below).

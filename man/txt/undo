@@ -12,7 +12,7 @@ INPUT:
    the information for the following steps. Use with caution.
  processName: Doris step to be deleted from the resultfile.
  
- Optional:
+ OPTIONAL:
    fileName: If omitted undo will try to remove the given doris
      step from master, slave and interferograms result files.    
      If specified undo will only remove steps from the given file.

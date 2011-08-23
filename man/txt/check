@@ -16,7 +16,7 @@ DESCRIPTION:
 INPUT:
  No required inputs.
   
-  Optional:
+  OPTIONAL:
     resultFile: If specified, only displays given files process control list.
 
     -p processName: Check if ADORE can run the given doris process. This 
