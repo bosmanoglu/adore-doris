@@ -10,7 +10,7 @@ INPUT:
  exportFormat: envi, arcgis, gdal, grd. 
  processName: Doris step to be exported.
  
- Optional:
+ OPTIONAL:
    saveas arcgis [a|p|m] processName
 	arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed).
       If not specified p(phase) is assumed. This can be used to export amplitude data as well if 
