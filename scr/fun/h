@@ -28,6 +28,8 @@
   if [ "${1:-undefined}" == "undefined" ]; then
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/h"
     typeset -F | cut -d" " -f3 | grep -v '^_' |grep -v 'command_not_found_handle'| column
+  elif [ -e "${ADOREFOLDER}/man/txt/${1}" ]; then
+    cat "${ADOREFOLDER}/man/txt/${1}"
   elif [ -e "${ADORESCR}/${1}" ]; then 
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < ${ADORESCR}/${1}
   elif [ -e "${ADORESCR}/process/${1}" ]; then 
