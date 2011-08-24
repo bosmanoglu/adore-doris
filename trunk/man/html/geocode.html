@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp geocode<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp GEOCODE is an ADORE process and it runs the DORIS step with the same name.<BR>
+&nbsp In this step the radar coded heights are converted to geocoded coordinates<BR>
+&nbsp (i.e., to a known reference system). Input is the height file from the step <BR>
+&nbsp SLANT2H. Output are two files containing the latitude (phi) and longitude <BR>
+&nbsp (lambda) corresponding to the height file.  <BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Geocoded output is written into two files. <BR>
+&nbsp ${master}_${slave}.geophi: Output file name for latitude.<BR>
+&nbsp ${master}_${slave}.geolam: Output file name for longitude.<BR>
+<H3>FILES and REFERENCES</H3><PRE> <BR>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/geocode.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node137.html">http://doris.tudelft.nl/usermanual/node137.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp geocode<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None.<BR>
+<BR><a href=links.html>Back to List</a>

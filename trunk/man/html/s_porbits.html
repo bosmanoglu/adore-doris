@@ -1,0 +1,29 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp s_porbits<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp S_PORBITS is an ADORE process and runs the DORIS step with the same name.  <BR>
+We use the DEOS fortran program getorb for obtaining the precise orbits.<BR>
+(This program has to be installed separately, see<BR>
+<a href="http://www.deos.tudelft.nl/ers/precorbs/)">http://www.deos.tudelft.nl/ers/precorbs/)</a> This step actually is<BR>
+only a system call to getorb, and converts the output to a 4 column table:<BR>
+secofday,x,y,z.<BR>
+It requires the Orbital Data Records (ODR files) to be in an archive<BR>
+directory. The arclist file (which should be downloaded together with the<BR>
+ODR archives) has to be present in this directory. The ODR files have to be<BR>
+untarred and unzipped as from version 2.5.<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Orbit information is written under the precise_orbits step in the result<BR>
+file.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/s_porbits.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node39.html">http://doris.tudelft.nl/usermanual/node39.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp s_porbits<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None. <BR>
+<BR><a href=links.html>Back to List</a>

@@ -1,0 +1,20 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbspcoarseorb <BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp &nbspCOARSEORB is an ADORE process and it runs the DORIS step with the same name. <BR>
+&nbsp &nbspThe coregistration based on the orbits of slave and master is computed with an accuracy of about 30 pixels (precise orbits). This is a fast way to get the coarse offsets. Before the FINE coregistration however the step COARSECORR has to be run, in order to get the coarse offsets within a few pixels. (FINE requires the initial estimated offset within a few pixels.)<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp SUCCESS is printed to STDOUT on successful completion of process. <BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/coarseorb.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node45.html">http://doris.tudelft.nl/usermanual/node45.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp coarseorb<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None<BR>
+<BR><a href=links.html>Back to List</a>

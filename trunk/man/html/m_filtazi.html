@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp m_filtazi<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp M_FILTAZI is an ADORE process and it runs the DORIS step with the same name. <BR>
+&nbsp This optional step filters the spectrum of the master in azimuth direction.<BR>
+The part of the spectrum that does not overlap with the spectrum of the<BR>
+slave is filtered out. This non overlap is due to the selection of a Doppler<BR>
+centroid frequency in the SAR processing, which normally is not equal for<BR>
+master and slave image. This step can in general best be performed after the <BR>
+COARSE coregistration and before the FINE.<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp ${master}.af file is created.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/m_filtazi.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node55.html">http://doris.tudelft.nl/usermanual/node55.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp m_filtazi<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None. <BR>
+<BR><a href=links.html>Back to List</a>

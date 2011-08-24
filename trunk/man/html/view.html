@@ -1,0 +1,48 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspview a|p|m dorisStep -- cpxfiddleOptions<BR>
+&nbsp &nbsp &nbsp &nbspview a|p|m dorisStep:filename -- cpxfiddleOptions<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp RASTER is an internal ADORE command.  <BR>
+&nbsp It creates sunraster images of the DORIS products using <BR>
+&nbsp cpxfiddle.&nbsp &nbsp &nbsp <BR>
+&nbsp ADORE variable raster_format controls the output type. For all images<BR>
+&nbsp a sunraster image is created and converted to the requested format <BR>
+&nbsp using the convert command (imagemagick). <BR>
+<H3>INPUT</H3>
+&nbsp a|p|m <BR>
+&nbsp &nbsp &nbsp &nbspa: creates amplitude image.<BR>
+&nbsp &nbsp &nbsp &nbsp &nbspp: creates phase image.<BR>
+&nbsp &nbsp &nbsp &nbspm: creates amplitude/phase mixed image.<BR>
+&nbsp dorisStep<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspThe step for the output. lsprocess can be used to <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspget a list of doris processes. <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspThe step can be in the master, slave or interferogram result file.<BR>
+&nbsp dorisStep:filename <BR>
+&nbsp &nbsp &nbsp &nbspCan be used to specify a filename that is not in the resultfile.<BR>
+&nbsp &nbsp &nbsp &nbspThis is useful for generating rasters for *.demlp, *.notmasked files.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbsp &nbsp &nbsp-- cpxfiddleOptions<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp  These options are passed to cpxfiddle. They should start with "--".<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp User options supersede default options (see below).<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp Default values for w,f are read from result file. <BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp Default value for q is defined by output type (amplitude, phase, mixed).<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp Other default options are shown in paranthesis. <BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbspfor complex amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbspfor real amplitude images:&nbsp &nbsp &nbsp &nbsp -w -f -q -o (sunraster) -c (gray)<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbspfor phase images:&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp -w -f -q -o (sunraster) -c (jet)<BR>
+&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbspfor mixed images:&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)<BR>
+<H3>OUTPUT</H3>
+&nbsp &nbspDefault raster format is set to "sunraster". <BR>
+&nbsp &nbspraster_format:<BR>
+&nbsp &nbsp &nbsp &nbsp If you prefer a different kind of output  RASTER can convert <BR>
+&nbsp &nbsp &nbsp &nbsp the image using imagemagick "convert" tool. The format for the output<BR>
+&nbsp &nbsp &nbsp &nbsp is defined in the "raster_format" variable.<BR>
+&nbsp &nbspRaster image in the following naming convention:<BR>
+&nbsp &nbsp &nbsp &nbspa: A_filename.ras<BR>
+&nbsp &nbsp &nbsp &nbspp: P_filename.ras<BR>
+&nbsp &nbsp &nbsp &nbspm: M_filename.ras<BR>
+&nbsp &nbsp*'.' (dot) character in the filename will be converted to '_'(underscore).<BR>
+VARIABLES:<BR>
+&nbsp &nbspraster_format<BR>
+<BR><a href=links.html>Back to List</a>

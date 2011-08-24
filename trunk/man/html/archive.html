@@ -1,0 +1,31 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbsparchive create [path/to/folder] [archiveName]<BR>
+&nbsp &nbsp &nbsp &nbsparchive extract /path/to/archive/file.tar<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp archive is an internal ADORE function. <BR>
+&nbsp It creates a tar archive for the given folder, as well as creating checksums <BR>
+&nbsp (md5sum) for each file. <BR>
+&nbsp The extract option is used to extract the archives to the current directory.<BR>
+&nbsp The recorded checksums during archive process are verified during extraction.<BR>
+&nbsp In addition, the paths are corrected in the DORIS input and output files <BR>
+&nbsp using mvDorisFiles. <BR>
+<H3>INPUT</H3>
+&nbsp create: Creates an archive file. The archive is not compressed.<BR>
+&nbsp extract: Extracts an archive file to the current directory. Extract<BR>
+&nbsp &nbsp &nbsp command requires the archive file to be passed as the first parameter.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbsp &nbsp path/to/folder: Relative (or full) path to the folder to be archived. <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp If omitted current folder "." is used.<BR>
+&nbsp &nbsp &nbsp archiveName: Optional input for output archive file name. If omitted<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp the name of the parent folder is used (last part of the path to folder.)<BR>
+<H3>OUTPUT</H3>
+&nbsp folderName.tar<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/archive<BR>
+&nbsp ${ADOREFOLDER}/scr/fun/mvDorisFiles<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp &nbsparchive create process/run2/ IstanbulRun2<BR>
+&nbsp &nbsparchive extract IstanbulRun2.tar<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None.<BR><BR><a href=links.html>Back to List</a>

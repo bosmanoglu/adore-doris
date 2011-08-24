@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp resample<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp RESAMPLE is an ADORE process and runs the DORIS step with the same name.<BR>
+&nbsp The slave image is resampled (reconstruction of original signal from the<BR>
+&nbsp samples by correlation with interpolation kernels in space domain)<BR>
+&nbsp accordingly to the transformation model from the step COREG_PM and<BR>
+&nbsp optionally DEMASSIST. This model states with sub-pixel accuracy which points<BR>
+&nbsp of the slave correspond to the master grid.<BR>
+&nbsp Note: This step may be fairly time consuming.<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp ${slave}.rs file is generated.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/resample.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node79.html">http://doris.tudelft.nl/usermanual/node79.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp resample<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None. <BR>
+<BR><a href=links.html>Back to List</a>

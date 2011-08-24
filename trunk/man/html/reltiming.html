@@ -1,0 +1,26 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp reltiming<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp RELTIMING is an ADORE process and runs the DORIS step with the same name.  <BR>
+&nbsp &nbspThe relative timing error between the master and slave is computed using<BR>
+the (precise) orbits and the result of the fine coregistration. Therefore,<BR>
+this step can only be run after the steps COARSE_ORBIT and FINE. The timing<BR>
+error in azimuth as well as in range direction is estimated.<BR>
+This step is of influence for the coregistration using a DEM ( DEMASSIST<BR>
+step). For this coregistration the master and slave images should be aligned<BR>
+as good as possible with the DEM. The master is aligned with respect to the<BR>
+DEM using a simulated amplitude image (M_TIMING step).<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Relative timing errors are written to the result file. <BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/reltiming.drs<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp reltiming<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None. <BR>
+<BR><a href=links.html>Back to List</a>

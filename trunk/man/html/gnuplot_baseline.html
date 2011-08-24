@@ -1,0 +1,26 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp gnuplot_baseline baselinesList<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp GNUPLOT_BASELINE is an intenal ADORE function to show the calculated<BR>
+temporal-perpendicular baselines as a scatterplot. It uses gnuplot for the<BR>
+generation of the image in encapsulated post script (EPS) format. <BR>
+<H3>INPUT</H3>
+&nbsp baselinesList: The file that contains the data in three colums separated by<BR>
+space. The order of columns are: temporal baseline, perpendicular baseline,<BR>
+and orbit names. <BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Generates an image of the calculated temporal and perpendicular baselines<BR>
+named baselines.eps.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/plotting.fun<BR>
+&nbsp <a href="http://ilab.cs.byu.edu/cs360/">http://ilab.cs.byu.edu/cs360/</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp gnuplot_baseline ${outputFolder}/baselines<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp Fails when the baselinesList file has bad formatting, which may happen due<BR>
+to no estimation of perpendicular or temporal baseline. In that case the<BR>
+baselines file has to be edited manually.  <BR>
+<BR><a href=links.html>Back to List</a>

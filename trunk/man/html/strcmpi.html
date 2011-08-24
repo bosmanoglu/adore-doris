@@ -1,0 +1,27 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp strcmpi string1 string2<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp STRCMPI is an ADORE function.<BR>
+&nbsp It compares two strings inside ADORE in a case-insensitive fashion. 0 is<BR>
+returned if the strings match. Otherwise 1 is returned. <BR>
+<H3>INPUT</H3>
+&nbsp string1: First string to be matched. <BR>
+&nbsp string2: Second string to be matched to first.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Returns 0 if strings match.<BR>
+&nbsp Returns 1 if strings do not match.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp ADORE: strcmpi "adore" "ADORE" && echo "same" || echo "not same"<BR>
+&nbsp same<BR>
+&nbsp ADORE: strcmpi "ADORE" "ADORE" && echo "same" || echo "not same"<BR>
+&nbsp same<BR>
+&nbsp ADORE: strcmpi "ADORE1" "ADORE2" && echo "same" || echo "not same"<BR>
+&nbsp not same<BR>
+</PRE><H3>KNOWN BUGS</H3>
+None. <BR>
+<BR><a href=links.html>Back to List</a>

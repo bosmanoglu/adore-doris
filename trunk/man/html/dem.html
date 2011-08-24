@@ -1,0 +1,35 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspdem operation parameters<BR>
+&nbsp &nbsp &nbsp &nbspdem make [SRTM1/SRTM3] [extraBufferPercentage] [name]<BR>
+&nbsp &nbsp &nbsp &nbspdem load [path/to/demfile.dem]<BR>
+&nbsp &nbsp &nbsp &nbspdem unload<BR>
+&nbsp &nbsp &nbsp &nbspdem check <BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp DEM is an internal ADORE command.  <BR>
+&nbsp It can generate and load DEM settings to the environment.&nbsp &nbsp &nbsp <BR>
+<H3>INPUT</H3>
+&nbsp dem: <BR>
+&nbsp &nbsp &nbsp &nbspdefaults to "dem check"<BR>
+&nbsp dem make SRTM1/SRTM3 extraBufferPercentage name<BR>
+&nbsp &nbsp &nbsp &nbspCalculates the master scene coverage and issues a call to construct_dem.sh <BR>
+&nbsp &nbsp &nbsp &nbspArea if padded (enlarged) in all directions with the extraBufferPercentage.<BR>
+&nbsp &nbsp &nbsp &nbspYou can call this function with no/some arguments. Defaults are: SRTM3 20 dem<BR>
+&nbsp dem load path/to/demfile.dem<BR>
+&nbsp &nbsp &nbsp &nbspLoad's the specified dem file. <BR>
+&nbsp &nbsp &nbsp &nbspCurrently supported DEM formats:<BR>
+&nbsp &nbsp &nbsp &nbsp  -output of "dem make"<BR>
+&nbsp &nbsp &nbsp &nbsp  -construct_dem.sh (from TU-DELFT).<BR>
+&nbsp &nbsp &nbsp &nbsp  -ArcGIS .flt files (with .flt and .hdr files should be in the same folder and have the same name.)<BR>
+&nbsp &nbsp &nbsp &nbsp  -GMT .grd files. (Creates .dem and input_doris files in the current directory.)<BR>
+&nbsp dem unload<BR>
+&nbsp &nbsp &nbsp &nbspClears sam_in_dem, dac_in_dem and crd_in_dem. If you want to re-run dem make <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspthis can be used.<BR>
+&nbsp dem check:<BR>
+&nbsp &nbsp &nbsp &nbspChecks the environment DEM settings and suggests fixes to problems.<BR>
+<H3>OUTPUT</H3>
+&nbsp &nbspdem make: Generates a folder with the dem. Leaves the hgt files in the current folder.<BR>
+&nbsp &nbspdem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.<BR>
+&nbsp &nbspdem unload: Displays a text message indicating cleared variables.<BR>
+&nbsp &nbspdem check: Checks and displays possible problems fixes on stdout.<BR>
+<BR><a href=links.html>Back to List</a>

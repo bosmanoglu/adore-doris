@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbsps dorisProcess<BR>
+&nbsp &nbsp &nbsp &nbsps variableName<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp s is a builtin ADORE command.  <BR>
+&nbsp It can show the input file for the given DORIS processing step. It can <BR>
+&nbsp also be used to display ADORE variables.<BR>
+<H3>INPUT</H3>
+&nbsp dorisProcess: Name of the DORIS processing step to run. List of available<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp processes can be found at the end of this help message or using lsprocess<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp whenever required.<BR>
+&nbsp variableName: Name of the DORIS setting (ADORE variable) to display. This<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp can be a partial name. For example if given m_ as variable name ADORE will<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp display all variables and their values starting with m_<BR>
+<H3>OUTPUT</H3>
+&nbsp Dumps input file for the given step to the stdout. <BR>
+Available DORIS processes:<BR>
+m_readfiles  s_readfiles  coarseorb&nbsp &nbsp &nbsp demassist&nbsp &nbsp &nbsp &nbsp  subtrrefpha  dinsar<BR>
+m_porbits&nbsp &nbsp &nbsp &nbsp s_porbits&nbsp &nbsp &nbsp &nbsp  coarsecorr  coregpm&nbsp &nbsp &nbsp &nbsp  comprefdem&nbsp &nbsp &nbsp slant2h<BR>
+m_crop&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp s_crop&nbsp &nbsp &nbsp &nbsp  m_filtazi&nbsp &nbsp &nbsp resample&nbsp &nbsp &nbsp &nbsp  subtrrefdem  geocode<BR>
+m_simamp&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp  s_filtazi&nbsp &nbsp &nbsp filtrange&nbsp &nbsp &nbsp &nbsp  coherence<BR>
+m_timing&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp  fine&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp &nbspinterfero&nbsp &nbsp &nbsp &nbsp  filtphase<BR>
+m_ovs&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp s_ovs&nbsp &nbsp &nbsp &nbsp  reltiming&nbsp &nbsp &nbsp comprefpha  unwrap<BR>
+<BR><a href=links.html>Back to List</a>

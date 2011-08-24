@@ -1,0 +1,29 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp mvDorisFiles sourceFolder destinationFolder<BR>
+&nbsp mvDorisFiles -s "/exact/path/to/source/Folder" destinationFolder<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp MVDORISFILES is an internal ADORE function which modifies Doris Result Files <BR>
+&nbsp (*.res) and Doris Input Files (*.drs) by changing locations of the output <BR>
+&nbsp files to their current locations. <BR>
+&nbsp It is a mere string replacement utility. It does not check for errors.<BR>
+&nbsp Each modified file is backed up with a .bck suffix (i.e *.res.bck)<BR>
+<H3>INPUT</H3>
+&nbsp sourceFolder: The path where the procesing was originally done. This string<BR>
+&nbsp &nbspwill be searched and replaced with the destination folder.<BR>
+&nbsp destinationFolder: The path where the files are being moved to. This string<BR>
+&nbsp &nbspwill replace the sourceFolder in the *.res and *.drs files.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbsp-s: option is used to update *.res files that are already moved to their<BR>
+&nbsp &nbsp &nbsp &nbsp destination, e.g. scp'ed from a different computer. With this option<BR>
+&nbsp &nbsp &nbsp &nbsp mvDorisFiles only tries to update files without actually moving anything. <BR>
+<H3>OUTPUT</H3>
+&nbsp The files are moved to a new folder and input/output (*.drs/*.res) files<BR>
+are modified.  <BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/src/fun/mvDorisFiles<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp &nbspmvDorisFiles -s '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None.  <BR>
+<BR><a href=links.html>Back to List</a>

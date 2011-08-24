@@ -13,7 +13,7 @@ INPUT:
 OUTPUT:
  Prints the input string in bold characters to STDOUT.
 
-FILES:
+FILES and REFERENCES:
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:

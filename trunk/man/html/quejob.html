@@ -1,0 +1,14 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspquejob adore_command [outputFolder] -- [qsub options]<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp quejob is an internal ADORE command.  <BR>
+&nbsp It runs the given adore command in the Torque-PBS system.<BR>
+&nbsp Quejob uses the Torque-PBS system to distribute jobs to other computers.<BR>
+<H3>INPUT</H3>
+&nbsp &nbsp &nbsp &nbspadore_command: commands to submit to the PBS. If multiple commands are used, this should be a string in quotations. See examples.<BR>
+&nbsp &nbsp<H4>OPTIONAL</H4>&nbsp &nbsp &nbsp &nbsp<BR>
+&nbsp &nbsp &nbsp &nbspoutputFolder: specify output folder for the ADORE command. Default is current folder ("$PWD").<BR>
+<H3>OUTPUT</H3>
+&nbsp Creates ${tmpFolder}/{randomFile}.set and  ${tmpFolder}/{randomFile}.sh <BR>
+<BR><a href=links.html>Back to List</a>
