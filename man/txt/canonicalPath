@@ -2,7 +2,8 @@ USAGE:
  canonicalPath file
 
 DESCRIPTION:
- CANONICALPATH is an internal ADORE function which returns the absolute path for a given file or folder. 
+ CANONICALPATH is an internal ADORE function which returns the absolute path
+ for a given file or folder. 
 
 INPUT:
  file: valid path to file.

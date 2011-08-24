@@ -1,0 +1,27 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbspcall (filename resfile format numpixels numlines)=dorisProcess2OutputFile dorisStep [searchparameter]<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp &nbspDORISPROCESS2OUTPUTFILE is an internal ADORE function. Given a DORIS step<BR>
+it finds the output filename and relavant information.&nbsp &nbsp &nbsp <BR>
+<H3>INPUT</H3>
+&nbsp dorisStep: Name of the DORIS step. <BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspsearchparameter: The name of the field in the result file containing the<BR>
+output file. This is useful when the dorisStep has multiple output files. <BR>
+<H3>OUTPUT</H3>
+&nbsp Output is split into five variables.<BR>
+&nbsp filename: The name of the DORIS output file for the Doris process.<BR>
+&nbsp resfile: Name of the result file. <BR>
+&nbsp format: The format of the output file. Can be cr4, ci2, r4, or i2.<BR>
+&nbsp c=complex, r=real, i=integer, 2=2 bytes, 4=4 bytes.<BR>
+&nbsp numpixels: Number of pixels of the output file.<BR>
+&nbsp numlines: Number of lines of the output file.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/resfile.fun <BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp &nbspcall (filename resfile format numpixels numlines)=dorisProcess2OutputFile subttrefpha <BR>
+&nbsp &nbspcall (filename resfile format numpixels numlines)=dorisProcess2OutputFile geocode Data_output_file_hei<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None.<BR>
+<BR><a href=links.html>Back to List</a>

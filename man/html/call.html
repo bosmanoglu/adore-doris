@@ -1,0 +1,29 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp call "(out1 out2 ... outK)=functionName in1 in2 ... inK ;"<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp CALL is an internal ADORE function to return multiple variables from a BASH <BR>
+&nbsp function. <BR>
+&nbsp BASH functions can only return an integer number, and multiple variables can<BR>
+&nbsp only be assigned if variable names are known beforehand. CALL function creates<BR>
+&nbsp the specified output variables in the environment for the given function in<BR>
+&nbsp functionName. The function can have multiple input and output parameters. <BR>
+&nbsp Names of output parameters should be declared in a special variable which <BR>
+&nbsp starts with the functionName and has the _outputs suffix.<BR>
+&nbsp See "? testFunction" for more details.<BR>
+<H3>INPUT</H3>
+&nbsp string: A formatted text string has to be passed with the output variables in<BR>
+&nbsp &nbspparanthesis. Equal sign separates the output from the function name and <BR>
+&nbsp &nbspinput variables follow the function name in typical BASH fashion.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp The declared output variables are created returning the output values from the<BR>
+&nbsp function.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp ADORE: call "(a b c)=testFunction ONE Two Three ;"<BR>
+&nbsp ADORE: echo "$a $b $c"<BR>
+&nbsp Two ONE Three<BR>
+<BR><a href=links.html>Back to List</a>

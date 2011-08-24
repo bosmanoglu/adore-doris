@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp canonicalPath file<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp CANONICALPATH is an internal ADORE function which returns the absolute path<BR>
+&nbsp for a given file or folder. <BR>
+<H3>INPUT</H3>
+&nbsp file: valid path to file.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Absolute path to a given file.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+&nbsp <a href="http://snipplr.com/view/18026/canonical-absolute-path/">http://snipplr.com/view/18026/canonical-absolute-path/</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp regular file...<BR>
+&nbsp ADORE: canonicalPath resample.kml<BR>
+&nbsp /home/bosmanoglu/tmp/resample.kml<BR>
+&nbsp linked file...<BR>
+&nbsp ADORE: canonicalPath '/home/bosmanoglu/Examples/Ubuntu_Free_Culture_Showcase/How\ fast.ogg'<BR>
+&nbsp /usr/share/example-content/Ubuntu_Free_Culture_Showcase/How\ fast.ogg<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp Links of links (multiple levels of links) can not be resolved. <BR>
+<BR><a href=links.html>Back to List</a>

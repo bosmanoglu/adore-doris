@@ -1,0 +1,43 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspcheck<BR>
+&nbsp &nbsp &nbsp &nbspcheck setup<BR>
+&nbsp &nbsp &nbsp &nbspcheck resultFile<BR>
+&nbsp &nbsp &nbsp &nbspcheck -p processName<BR>
+&nbsp &nbsp &nbsp &nbspcheck -j jobid<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp CHECK is an internal ADORE command. <BR>
+&nbsp It shows the process control list from the result files.<BR>
+&nbsp Using the -p option it can be used to check whether a given step is possible<BR>
+&nbsp to run. <BR>
+&nbsp "setup" option can be used to check if ADORE can find all the necessary <BR>
+&nbsp libraries.<BR>
+<H3>INPUT</H3>
+&nbsp No required inputs.<BR>
+&nbsp &nbsp<H4>OPTIONAL</H4>
+&nbsp &nbsp &nbsp &nbsp resultFile: If specified, only displays given files process control list.<BR>
+&nbsp &nbsp &nbsp &nbsp -p processName: Check if ADORE can run the given doris process. This <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp function is currently under development. If no output is shown the it is<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp OK to run the process. Otherwise error messages will hint at the problem.<BR>
+&nbsp &nbsp &nbsp &nbsp -j jobid: Check if the job submitted by quejob is finished. Return 0 if <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp finished.<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbspOutput: Job Status<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp------------------<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp0: Completed<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp1: Running<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp2: Exiting<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp3: Queued<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp4: Waiting<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp5: Transferred<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp6: Held<BR>
+&nbsp &nbsp &nbsp &nbsp setup: Check several executables and returns assistive messages if executables <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp are missing.<BR>
+<H3>OUTPUT</H3>
+&nbsp Shows the process control list of given result file.<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp check<BR>
+&nbsp check -p m_readfiles; echo $?<BR>
+&nbsp check setup<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None.<BR>
+<BR><a href=links.html>Back to List</a>

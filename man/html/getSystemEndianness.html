@@ -1,0 +1,21 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp getSystemEndianness<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp GETSYSTEMENDIANNESS is an internal ADORE function. It finds and prints<BR>
+endianness to the stdout. "big" is printed for big-endian systems. "little"<BR>
+is printed for little-endian systems.&nbsp &nbsp &nbsp <BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Prints "big", "little" or "unknown" depending on the system endianness.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp getSystemEndianness<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp On AIX systems this function may fail. Timothy Brown suggested the<BR>
+following to be used instead:<BR>
+&nbsp printf 1 | od -to4 | head -n1| cut -c19<BR><BR><a href=links.html>Back to List</a>

@@ -1,0 +1,23 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp ask "input string"<BR>
+&nbsp if ask "input string"<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp ASK is an internal ADORE function.<BR>
+&nbsp It is used in ADORE scripts and commands to get user input.<BR>
+&nbsp The string " [y/n]" is appended to the end of the input string.<BR>
+&nbsp The user can use lowercase or uppercase Y or N characters as an answer.<BR>
+&nbsp For multiple character long answers, second and later characters are ignored. <BR>
+&nbsp If the user input does not start with a Y or N character the question is asked again until a valid answer is given.&nbsp &nbsp &nbsp <BR>
+<H3>INPUT</H3>
+&nbsp input string: Yes or no question asked to the user. <BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Returns 0 for yes and 1 for no, compatible with conditionals for if statements etc. <BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp ask "Shall I continue?" && echo yes || echo no<BR>
+&nbsp if ask "Shall I delete the old ${saveFileName}?"<BR>
+<BR><a href=links.html>Back to List</a>

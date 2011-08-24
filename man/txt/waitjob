@@ -17,5 +17,5 @@ INPUT:
 OUTPUT:
    Displays the number of minutes passed on the screen. No files are generated.
 
-FILES:
+FILES and REFERENCES:
   ${ADORESCR}/fun/waitjob

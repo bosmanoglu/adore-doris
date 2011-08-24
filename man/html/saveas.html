@@ -1,0 +1,33 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspsaveas exportFormat [optionalParameters] processName<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp SAVEAS is an internal ADORE command. <BR>
+&nbsp It prepares DORIS results so that they can be opened by other programs. <BR>
+&nbsp Currently ENVI and ArcGIS are supported. <BR>
+<H3>INPUT</H3>
+&nbsp exportFormat: envi, arcgis, gdal, grd. <BR>
+&nbsp processName: Doris step to be exported.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbsp &nbsp saveas arcgis [a|p|m] processName<BR>
+&nbsp &nbsp &nbsp &nbsparcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed).<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspIf not specified p(phase) is assumed. This can be used to export amplitude data as well if <BR>
+&nbsp &nbsp &nbsp &nbspyou do not want to rescale the amplitude values. <BR>
+&nbsp &nbsp &nbsp saveas envi processName<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspGenerates an ENVI header (*.hdr) file for the given input file. <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspIf file is complex, both real and imaginary channels can be opened<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspin ENVI. Only corner coordinates are used for geocoding. ArcGIS (*.img)<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspfiles can also be opened in ENVI if, geocoding of full image is required.<BR>
+&nbsp &nbsp &nbsp saveas gdal a|p|m processName [options for gdal] outputFileName<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspGenerates a interim file and passes it to gdal_translate. The output<BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspfilename and all other parameters has to be input by the user. <BR>
+<H3>OUTPUT</H3>
+&nbsp ENVI:Generates an HDR file with the same name as the output file of the requested doris step (processName).<BR>
+&nbsp ArcGIS: Generates an IMG file.<BR>
+EXAMPLES:<BR>
+&nbsp saveas grd p unwrap<BR>
+&nbsp saveas arcgis p unwrap<BR>
+&nbsp saveas envi unwrap <BR>
+&nbsp saveas gdal p unwrap -of GTiff 200405_200703_uw.tiff<BR>
+$0 dorisStep  <BR>
+<BR><a href=links.html>Back to List</a>

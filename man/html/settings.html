@@ -1,0 +1,43 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspsettings option [argument]<BR>
+&nbsp &nbsp &nbsp &nbspsettings apply variableName<BR>
+&nbsp &nbsp &nbsp &nbspsettings apply [-rq] variableName1=variableValue1 [variableName2 variableName3=...]<BR>
+&nbsp &nbsp &nbsp &nbspsettings check<BR>
+&nbsp &nbsp &nbsp &nbspsettings fix [-q]<BR>
+&nbsp &nbsp &nbsp &nbspsettings init [-q]<BR>
+&nbsp &nbsp &nbsp &nbspsettings list<BR>
+&nbsp &nbsp &nbsp &nbspsettings raw<BR>
+&nbsp &nbsp &nbsp &nbspsettings save [fileName]<BR>
+&nbsp &nbsp &nbsp &nbspsettings load [fileName]<BR>
+&nbsp &nbsp &nbsp &nbspsettings reset<BR>
+&nbsp &nbsp &nbsp &nbspsettings clear<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp SETTINGS is an internal ADORE command. <BR>
+&nbsp It aims at providing a smooth interface for modifying ADORE <BR>
+&nbsp settings.<BR>
+<H3>INPUT</H3>
+&nbsp settings apply [-rq] variableName: updates settings that depend on<BR>
+&nbsp &nbsp &nbsp &nbspvariableName. By default this is not done in a recursive way. Use <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp'settings check' for possible mismatches. Settings apply can also assign values <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbspusing the variableName=value syntax.  <BR>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp-r: Recursive checks can be specified using -r option. <BR>
+&nbsp &nbsp &nbsp &nbsp-q: Quiet. Suppresses the printing of the changed settings.<BR>
+&nbsp settings check: looks for differences between ADORE's <BR>
+&nbsp &nbsp &nbsp &nbspexpectations and current values. Handy for finding <BR>
+&nbsp &nbsp &nbsp &nbsperrors due to recursive dependancies.<BR>
+&nbsp settings fix: after "check"ing you can accept suggested changes <BR>
+&nbsp &nbsp &nbsp &nbspusing the variables. Check will display a reference line.<BR>
+&nbsp &nbsp &nbsp &nbsp-q: Quiet. Suppresses the printing of the changed settings.<BR>
+&nbsp settings init: will ask the user some questions to create an initial <BR>
+&nbsp &nbsp &nbsp &nbspsettings file. Useful when starting a new project. <BR>
+&nbsp settings list: will list the current settings as seen by ADORE.<BR>
+&nbsp settings raw: displays the unprocessed settings with USERS<BR>
+&nbsp &nbsp &nbsp &nbspchanges. This can be saved with the save function.<BR>
+&nbsp settings save [fileName]: saves the settings (raw) to the file.<BR>
+&nbsp &nbsp &nbsp &nbspif fileName is not specified './settings.set' is used.<BR>
+&nbsp settings load [fileName]: loads the settings to the environment.<BR>
+&nbsp &nbsp &nbsp &nbspif filenName is not specified './settings.set' is used.<BR>
+&nbsp settings reset: initializes the environment. User settings file is loaded.<BR>
+&nbsp settings clear: clears all ADORE settings and resets ${ADORESCR} and ${ADOREFOLDER}<BR>
+<BR><a href=links.html>Back to List</a>

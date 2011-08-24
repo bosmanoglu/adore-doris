@@ -1,0 +1,21 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp &nbsp &nbsp &nbspp dorisProcess<BR>
+&nbsp &nbsp &nbsp &nbspp adoreScript.adr<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp p is a builtin ADORE command.  <BR>
+&nbsp It runs the given DORIS processing step or the ADORE script. <BR>
+<H3>INPUT</H3>
+&nbsp dorisProcess: Name of the DORIS processing step to run. List of available<BR>
+&nbsp processes can be found at the end of this help message.<BR>
+&nbsp adoreScript: Full path to ADORE script. <BR>
+<H3>OUTPUT</H3>
+&nbsp dorisProcess: SUCCESS is output if DORIS finishes successfully. <BR>
+Available DORIS processes:<BR>
+m_readfiles  s_readfiles  coarseorb&nbsp &nbsp &nbsp demassist&nbsp &nbsp &nbsp &nbsp  subtrrefpha  dinsar<BR>
+m_porbits&nbsp &nbsp &nbsp &nbsp s_porbits&nbsp &nbsp &nbsp &nbsp  coarsecorr  coregpm&nbsp &nbsp &nbsp &nbsp  comprefdem&nbsp &nbsp &nbsp slant2h<BR>
+m_crop&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp s_crop&nbsp &nbsp &nbsp &nbsp  m_filtazi&nbsp &nbsp &nbsp resample&nbsp &nbsp &nbsp &nbsp  subtrrefdem  geocode<BR>
+m_simamp&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp  s_filtazi&nbsp &nbsp &nbsp filtrange&nbsp &nbsp &nbsp &nbsp  coherence<BR>
+m_timing&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp  fine&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp &nbspinterfero&nbsp &nbsp &nbsp &nbsp  filtphase<BR>
+m_ovs&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp &nbsp s_ovs&nbsp &nbsp &nbsp &nbsp  reltiming&nbsp &nbsp &nbsp comprefpha  unwrap<BR>
+<BR><a href=links.html>Back to List</a>

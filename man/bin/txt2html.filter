@@ -3,15 +3,21 @@ DESCRIPTION:,</PRE><H3>DESCRIPTION</H3>
 INPUT:,<H3>INPUT</H3>
 OPTIONAL:,<H4>OPTIONAL</H4>
 OUTPUT:,<H3>OUTPUT</H3>
-FILES and REFERENCES:,<H3>FILES and REFERENCES</H3>
-EXAMPLE:,<H3>EXAMPLE</H3>
-KNOWN BUGS:,<H3>KNOWN BUGS</H3>
-$,<br>
-</H3><br>,</H3>
-</H4><br>,</H4>
-^     ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp 
-^    ,\&nbsp \&nbsp \&nbsp \&nbsp 
-^   ,\&nbsp \&nbsp \&nbsp 
-^  ,\&nbsp \&nbsp 
+FILES and REFERENCES:,<H3>FILES and REFERENCES</H3><PRE>
+EXAMPLE:,</PRE><H3>EXAMPLE</H3><PRE>
+KNOWN BUGS:,</PRE><H3>KNOWN BUGS</H3>
+http[:]//[^ ]*,<a href=\"\0\">\0</a>
+$,<BR>
+</H3><BR>,</H3>
+</H4><BR>,</H4>
+         ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp 
+        ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp
+       ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp
+      ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp \&nbsp
+     ,\&nbsp \&nbsp \&nbsp \&nbsp \&nbsp 
+    ,\&nbsp \&nbsp \&nbsp \&nbsp 
+   ,\&nbsp \&nbsp \&nbsp 
+^  ,\&nbsp \&nbsp
 ^ ,\&nbsp 
-
+\t,\&nbsp \&nbsp \&nbsp \&nbsp
+</H3><PRE><BR>,</H3><PRE>

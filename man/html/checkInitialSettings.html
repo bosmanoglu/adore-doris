@@ -1,0 +1,24 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp checkInitialSettings<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp CHECKINITIALSETTINGS is an internal ADORE function. <BR>
+&nbsp It runs a set of simple tests on the ADORE settings at initialization, and output some suggestions/warnings to the STDOUT. <BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Outputs several warning messages depending on the values of the following variables: projectFolder, master, m_in_dat, s_in_dat, runName, dataFolder.<BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/scr/fun/functions<BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp ADORE: checkInitialSettings<BR>
+&nbsp projectFolder is set to ".". Use with caution. In general your data should be located at projectFolder/data<BR>
+&nbsp It seems like dataFolder and/or projectFolder is not set correctly.<BR>
+&nbsp It seems like dataFile and/or master is not set correctly. Please set the SLC file pattern(dataFile).<BR>
+&nbsp It seems like slave is not set correctly. Please set the SLC file pattern.<BR>
+&nbsp runName is set to "default"<BR>
+&nbsp Any batch processing results (baselines, singleMasterStack) will be under ./process/default<BR>
+</PRE><H3>KNOWN BUGS</H3>
+<BR><a href=links.html>Back to List</a>

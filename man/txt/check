@@ -11,7 +11,9 @@ DESCRIPTION:
 
  Using the -p option it can be used to check whether a given step is possible
  to run. 
- "setup" option can be used to check if ADORE can find all the necessary libraries.
+
+ "setup" option can be used to check if ADORE can find all the necessary 
+ libraries.
 
 INPUT:
  No required inputs.
@@ -20,27 +22,31 @@ INPUT:
     resultFile: If specified, only displays given files process control list.
 
     -p processName: Check if ADORE can run the given doris process. This 
-    function is currently under development. If no output is shown the it is
-    OK to run the process. Otherwise error messages will hint at the problem.
+     function is currently under development. If no output is shown the it is
+     OK to run the process. Otherwise error messages will hint at the problem.
 
-    -j jobid: Check if the job submitted by quejob is finished. Return 0 if finished.
-		Job Status 	Output
-		----------------------
-		Completed	0
-		Running		1
-              Exiting		2
-              Queued		3
-              Waiting		4
-              Transferred	5
-              Held 		6
+    -j jobid: Check if the job submitted by quejob is finished. Return 0 if 
+     finished.
+       Output: Job Status
+       ------------------
+       0: Completed
+       1: Running
+       2: Exiting
+       3: Queued
+       4: Waiting
+       5: Transferred
+       6: Held
 
-    setup: Check several executables and returns assistive messages if executables are missing.
+    setup: Check several executables and returns assistive messages if executables 
+     are missing.
 
 OUTPUT:
  Shows the process control list of given result file.
 
-Example:
-check
-check -p m_readfiles; echo $?
-check setup
+EXAMPLE:
+ check
+ check -p m_readfiles; echo $?
+ check setup
 
+KNOWN BUGS:
+ None.

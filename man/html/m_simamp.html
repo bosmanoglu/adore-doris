@@ -1,0 +1,25 @@
+<a href=links.html>Back to List</a><BR>
+<H3>USAGE</H3><PRE>
+&nbsp m_simamp<BR>
+</PRE><H3>DESCRIPTION</H3>
+&nbsp M_SIMAMP is an ADORE process which runs the DORIS step with the same name.  <BR>
+&nbsp This step requires an external digital elevation model (DEM) such as SRTM<BR>
+(Shuttle Radar Topography Mission) elevation data. This step can be<BR>
+performed optionally to simulate the master amplitude and should be done<BR>
+after the M_CROP step. In the following step M_TIMING, the synthetic<BR>
+amplitude can be used to compute the absolute timing error of the master<BR>
+acquisition.<BR>
+<H3>INPUT</H3>
+&nbsp There are no required input parameters for this command.<BR>
+&nbsp <H4>OPTIONAL</H4>
+&nbsp &nbspThere are no optional input parameters for this command.<BR>
+<H3>OUTPUT</H3>
+&nbsp Simulated amplitude file (${master}.sam) is created. <BR>
+<H3>FILES and REFERENCES</H3><PRE>
+&nbsp ${ADOREFOLDER}/drs/${dorisVersion}/m_simamp.drs<BR>
+&nbsp <a href="http://doris.tudelft.nl/usermanual/node25.html">http://doris.tudelft.nl/usermanual/node25.html</a><BR>
+</PRE><H3>EXAMPLE</H3><PRE>
+&nbsp m_simamp<BR>
+</PRE><H3>KNOWN BUGS</H3>
+&nbsp None. <BR>
+<BR><a href=links.html>Back to List</a>
