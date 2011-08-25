@@ -5,18 +5,22 @@ similar to cpxfiddle-part of TU-DELFT DORIS software.
 
 Usage: cpxview -w width [-f informat] [-q output] [-o outformat]
 	[-e exp] [-s scale] [-l line] [-L line] [-p pixel] [-P pixel]
-	[-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B swap] 
-	[-H bytes] [-V] [-b] [-h[elp]] inputfile
+	[-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B] 
+	[-b] [-t] [-h] inputfile
+	
+For longer help message please specify -h. 
 """
 #
 # USAGE: cpxview -w width [-f informat] [-q output] 
 #	 [-e exp] [-s scale] [-l line] [-L line] [-p pixel] [-P pixel]
-#	 [-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B swap] 
-#	 [-H bytes] [-V] [-b] [-h[elp]] inputfile
+#	 [-S x/y] [-M x/y] [-m mirror] [-c file] [-r rmin/rmax] [-B] 
+#	 [-b] [-h[elp]] inputfile
 # DESCRIPTION:
 #   Opens complex files using numpy and matplotlib. Functionality and parameters are
 #   similar to cpxfiddle-part of TU-DELFT DORIS software.
 #
+#
+
 import sys,os
 import getopt
 import pylab as mp;
@@ -25,6 +29,64 @@ import numpy as np;
 def usage():
     print __doc__
 
+def usageLong():
+    print """
+  DESCRIPTION [default]:
+   -w mandatory      Line length (width, rangepixels, X direction)
+   -e [1.0]          Exponent: out=scale*output^exp
+   -s [1.0]          Scale     out=scale*output^exp
+   -l [1]            First (azimuth Y) line
+   -L []             Last (azimuth Y) line (default, all lines)
+   -p [1]            First (range X) pixel
+   -P []             Last (range X) pixel (default, all pixels)
+   -M [1/1]          Multilook factor in X/Y direction (range/azimuth)
+                      No subsampling can be used combined with this
+                      option. (Multilooking takes complex sum over
+                       window(X,Y), divides by number of looks)
+                      Output size: [floor(P-p+1)/mlX; floor(L-l+1)/mlY].
+   -S [1/1]          Subsample factor in X/Y (range/azimuth)
+
+                      Output dimensionY = ceil((L-l+1)/Y).
+                      The last line does not have to equal -L.
+                      Output dimensionX = ceil((P-p+1)/X).
+                      The last pixel does not have to equal -P.
+   -q [mag]          What to output:
+                     NORMAL | MAG | PHASE | MIXED | REAL | IMAG
+                      normal    = (real, imag),
+                      magnitude = sqrt(real^2 + imag^2),
+                      phase     = atan2(imag,real),
+                      wrapped   = plot wrapped the phase (of unwrapped file)
+                      real      = line[2*j],
+                      imag      = line[2*j+1].
+                     Normal option can be (mis)used to fiddle with, e.g.,
+                      float files (though even linelength required?).
+   -f [cr4]          Input format identifier:
+                     CC1 | CUC1 | CI2 | CI4 | CR4 | CR8
+                      for complex 2x1B char, unsigned char, 
+                      short integer, integer, float, double
+                      (major row order pixel interleaved complex data.)
+   -o []             Output format identifier (to stdout):
+                      png, pdf, ps, eps and svg.
+                      write binary to stdout!
+   -c [gray]         Colormap option.
+                     gray | jet | hot | cool | hsv
+                     autumn | bone | copper | flag | pink
+                     prism | spring | summer | winter | spectral
+   -m code           Flag to mirror file content in X or Y direction:
+                     X | Y | XY 
+   -r [rmin/rmax]    uses given minimum and maximum range on data as scalling parameters. 
+                      Basically, it skips data sampling step for statistics (min,max,mean) computation
+                      and defines (min,max,mean) values from given parameters.
+                      It only effects magnitude, normal and mixed mode outputs.
+                      For example, use it to scale coherence maps to  0-1 range.
+                      Tip: no need to use --ignorenan when you are using -r option.
+   -B                Swap bytes.
+   -b                Add a scalebar.
+   -t		     Print file name as figure title. 
+   -k 		     Print pixel coordinates to stdout on left-click.
+   -h                This help.
+    """
+    
 def main(argv):
     if not argv:
         usage()
@@ -37,7 +99,15 @@ def main(argv):
         print "Unknown option."
         usage()
         sys.exit(2)
-    inputfile=args[0];
+    if ("-h", "") in opts:
+        usageLong()
+        sys.exit(2)
+    try:
+        inputfile=args[0];
+    except:
+        print "Input file not specified."
+        sys.exit(2)
+        
     if not os.path.exists(inputfile):
         print "File not found:", inputfile
         sys.exit(2)
@@ -80,6 +150,11 @@ def main(argv):
     data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
     #multilook
     data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
+    # mirror ?
+    if X in cfg["-m"]:
+        data=fliplr(data);
+    if Y in cfg["-m"]:
+        data=flipud(data);
     if "norm" in cfg["-q"]:
         mp.matshow(cfg["-s"]*data**cfg["-e"]);
     elif "mag" in cfg["-q"]:
@@ -88,6 +163,10 @@ def main(argv):
         mp.matshow(cfg["-s"]*np.angle(data)**cfg["-e"])
     elif "wrap" in cfg["-q"]:
         mp.matshow(cfg["-s"]*wrapToPi(data)**cfg["-e"])
+    elif "real" in cfg["-q"]:
+        fg=mp.matshow(cfg["-s"]*data.real()**cfg["-e"],picker=5)
+    elif "imag" in cfg["-q"]:
+        mp.matshow(cfg["-s"]*data.imag()**cfg["-e"])
         
     else:
         print "Unknown output type."
@@ -164,7 +243,9 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
             print("Width(*2 if complex): %f, Length: %f, FileSize: %d" ,width,length,filesize)
         length=int(length);
 
-
+#    if complexFlag:
+#        datatype=np.dtype( [ ("real", datatype), ("imag", datatype) ] );
+#    data=np.memmap(fname, dtype=datatype,mode="r", shape=(length,width))
     data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
     if byteSwapFlag:
         #data=data.byteswap()
