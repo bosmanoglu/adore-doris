@@ -37,7 +37,7 @@ echo "Destination F: ${destinationFolder}"
 #find ${destinationFolder} -name *.drs >> temporary.file
 #find ${destinationFolder} -name *.md5 >> temporary.file
 #for file in `ls ${destinationFolder}/*{res,drs}`
-for file in `find ${destinationFolder} \( -name "*.res" -o -name "*.drs" \) `
+for file in `find ${destinationFolder} \( -name "*.res" -o -name "*.drs" -o -name "*.set" \) `
 do
 #	sed "s@${sourceFolder}@${destinationFolder}@g" ${file} > ${file}.new
 #	mv ${file} ${file}.bck

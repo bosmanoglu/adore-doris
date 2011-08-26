@@ -3,12 +3,16 @@
 Calculates a best fitting plane to the phase of the unwrapped interferogram and removes the plane.
 
 Usage: 
- deramp.py -w WIDTH -f FORMAT FILE
+ deramp.py -w WIDTH -f FORMAT [-e ESTIMATEFILE] FILE
 
 INPUT:
  WIDTH:number of pixels (range samples) for the FILE.
- FORMAT
-
+ FORMAT: The format for the input files. DORIS convention is used: r4=real4
+ ESTIMATEFILE: This file is subtracted before plane fitting. For unwrapping of 
+   SNAPHU topo results it may be possible that the actual topography has a 
+   plane. This file is added back to the result before the result is saved.
+ FILE: The unwrapping result file. 
+ 
 EXAMPLES:
  ./deramp.py -w 1189 -f r4 200311_200404.uw
  Writing output to: 200311_200404.uwderamp
@@ -34,12 +38,14 @@ scipy.pkgload('optimize')
 def usage():
     print __doc__
 
-def deramp(inData):
+def deramp(inData, estData=None):
     X,Y = np.meshgrid(np.r_[0:inData.shape[1]],np.r_[0:inData.shape[0]])
     #X=X[inData<0.1];
     fitX=X.ravel()[0::1000]
     #Y=Y[inData<0.1];
     fitY=Y.ravel()[0::1000]
+    if estData is not None:
+        inData=inData-estData;
     fitData=inData.ravel()[0::1000]
     
     fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y 
@@ -47,7 +53,10 @@ def deramp(inData):
     planefit, success=scipy.optimize.leastsq(errfunc, fitData, args=(fitX,fitY,fitData))
     
     #X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
-    return inData-fitfunc(planefit,X,Y)
+    outData=inData-fitfunc(planefit,X,Y)
+    if estData is not None:
+        outData=outData+estData
+    return outData
     #np.save(fldr+'snaphuDEMdetrended.npy', snaphuDEMdetrended)
 
 def dataFormat2dataType(dataFormat):
@@ -117,15 +126,21 @@ def main(argv):
         print "File not found:", inputfile
         sys.exit(2)
     try:
-        opts, args = getopt.getopt(argv, "w:f:")
+        opts, args = getopt.getopt(argv, "w:f:e:")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
     cfg.setdefault("-f", "cr4")
+    cfg.setdefault("-e", "")
     cfg["-w"]=int(cfg["-w"]) 
+    
     data=getdata(inputfile,cfg["-w"],cfg["-f"])
-    outData=deramp(data);
+    if cfg["-e"]:
+        eData=getdata(cfg["-e"],cfg["-w"],cfg["-f"])
+    else:
+        eData=None;
+    outData=deramp(data, eData);
     print "Writing output to:", inputfile+'deramp'
     writedata(inputfile+'deramp',outData,cfg["-f"]);
     
