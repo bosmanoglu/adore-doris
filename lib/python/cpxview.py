@@ -51,11 +51,11 @@ def usageLong():
                       Output dimensionX = ceil((P-p+1)/X).
                       The last pixel does not have to equal -P.
    -q [mag]          What to output:
-                     NORMAL | MAG | PHASE | MIXED | REAL | IMAG
+                     normal | mag | phase | wrap | real | imag
                       normal    = (real, imag),
                       magnitude = sqrt(real^2 + imag^2),
                       phase     = atan2(imag,real),
-                      wrapped   = plot wrapped the phase (of unwrapped file)
+                      wrap      = plot wrapped the phase (of unwrapped file)
                       real      = line[2*j],
                       imag      = line[2*j+1].
                      Normal option can be (mis)used to fiddle with, e.g.,
@@ -73,7 +73,7 @@ def usageLong():
                      autumn | bone | copper | flag | pink
                      prism | spring | summer | winter | spectral
    -m code           Flag to mirror file content in X or Y direction:
-                     X | Y | XY 
+                     x | y | xy 
    -r [rmin/rmax]    uses given minimum and maximum range on data as scalling parameters. 
                       Basically, it skips data sampling step for statistics (min,max,mean) computation
                       and defines (min,max,mean) values from given parameters.
@@ -151,9 +151,9 @@ def main(argv):
     #multilook
     data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
     # mirror ?
-    if X in cfg["-m"]:
+    if "x" in cfg["-m"]:
         data=fliplr(data);
-    if Y in cfg["-m"]:
+    if "y" in cfg["-m"]:
         data=flipud(data);
     if "norm" in cfg["-q"]:
         mp.matshow(cfg["-s"]*data**cfg["-e"]);
@@ -164,9 +164,9 @@ def main(argv):
     elif "wrap" in cfg["-q"]:
         mp.matshow(cfg["-s"]*wrapToPi(data)**cfg["-e"])
     elif "real" in cfg["-q"]:
-        fg=mp.matshow(cfg["-s"]*data.real()**cfg["-e"],picker=5)
+        fg=mp.matshow(cfg["-s"]*data.real**cfg["-e"],picker=5)
     elif "imag" in cfg["-q"]:
-        mp.matshow(cfg["-s"]*data.imag()**cfg["-e"])
+        mp.matshow(cfg["-s"]*data.imag**cfg["-e"])
         
     else:
         print "Unknown output type."
