@@ -1,0 +1,55 @@
+.TH ADORE-DORIS 1 "August 27, 2011"
+.SH NAME
+adore-doris \- Automated DORIS Environment
+.SH SYNOPSIS
+.B adore
+.RI [ options ]
+.br
+.B adore
+.RI [ options ]
+adoreCommand
+.SH DESCRIPTION
+.B adore
+is a shell environment designed to simplify and streamline
+interferometry with DORIS.
+ADORE is an attempt to simplify processing of different interferometric
+stacks like, single-master-stack, or short-baselines.
+It is highly configurable and provides sensible default options.
+Each doris step can be run.
+They should have a corresponding *.drs file in the drs folder.
+.PP
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+.B adoreCommand
+see the manual for available adoreCommands
+.TP
+.B \-u
+user settings file
+.TP
+.B \-p
+process Doris step. (m_readfiles, s_readfiles, interfero...)
+.TP
+.B \-d
+define variable (has priority over user settings file)
+.TP
+.B \-i
+open interactive session
+.TP
+.B \-g
+flag for ADORE-GUI. This is useless if you are not using ADORE-GUI
+.TP
+.B \-v
+verbose. For troubleshooting. Equivalent to: set \-x
+.SH SEE ALSO
+.BR doris (1),
+.BR snaphu (1).
+.BR getorb (1).
+.br
+.SH AUTHOR
+adore-doris was written by Batuhan Osmanoglu.
+.PP
+This manual page was written by Antonio Valentino <antonio.valentino@tiscali.it>,
+for the Debian project (and may be used by others).

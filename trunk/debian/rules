@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	chmod +x scr/modifyfile.pl
+	chmod +x scr/rs2pn
+	chmod +x scr/deprecated/deprecated.fun
+	chmod +x scr/deprecated/process/baselines
+	chmod +x scr/fun/*
+	chmod +x scr/process/*
+	chmod +x templates/*.adr
+
+	chmod -x scr/process/process_help_tmp
+	chmod -x scr/fun/tabcompletion
+
+# Orig source
+UPSTREAM_VERSION=$(shell dpkg-parsechangelog | sed -rne 's,^Version: ([^-]+).*,\1,p')
+
+get-orig-source:
+	svn export http://adore-doris.googlecode.com/svn/trunk/ adore-doris
+	tar -cf - adore-doris | gzip -9f - > adore-doris_$(UPSTREAM_VERSION).orig.tar.gz
+	rm -rf adore-doris
+
+.PHONY: get-orig-source override_dh_auto_install
