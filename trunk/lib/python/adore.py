@@ -269,6 +269,21 @@ def process2dict(fileDict, processName):
                   'Number of lines': None,
                   'Number of pixels': None,   
                   }
+    elif processName == 'slant2h':
+        reDict = {'Method': None,
+                  'Data_output_file': "Data_output_file:[\s]+(.*)",
+                  'Data_output_format': "Data_output_format:[\s]+(.*)",
+                  'Data_output_file_phi': None,
+                  'Data_output_file_lam': None,
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,   
+                  'Multilookfactor_azimuth_direction': None,
+                  'Multilookfactor_range_direction': None,
+                  'Ellipsoid': "Ellipsoid.*:[\s]+(.*)",
+                  }                
+        
 
 #    elif processName == '':
 #        reDict = {'': None,
