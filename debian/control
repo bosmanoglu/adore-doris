@@ -11,7 +11,7 @@ Vcs-Browser: http://code.google.com/p/adore-doris/source/browse/
 Package: adore-doris
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
-         doris, getorb, snaphu, gmt, gnuplot, imagemagick, gdal-bin
+         doris, getorb, snaphu, gmt, gnuplot, imagemagick, gdal-bin, mawk|awk
 Recommends: www-browser
 Description: Automated DORIS Environment
  ADORE is a shell environment designed to simplify and streamline
@@ -19,4 +19,4 @@ Description: Automated DORIS Environment
  ADORE is an attempt to simplify processing of different interferometric
  stacks like, single-master-stack, or short-baselines.
  It is highly configurable and provides sensible default options.
- Each doris step can be run.
+ Each doris step can be run individually.

@@ -223,7 +223,8 @@ local setDir
 
 if [ -n "${u}" ]; then
   setDir=`dirname ${u}`
-  if [ "${PWD}" == "${setDir}" ]; then
+  cPWD=`canonicalPath "${PWD}"`
+  if [ "${cPWD}" == "${setDir}" ]; then
     PS1="ADORE: "
   else
     PS1="!ADORE: "
