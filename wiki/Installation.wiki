@@ -1,6 +1,16 @@
 #summary How to install ADORE on Ubuntu.
 #labels Phase-Deploy
 
+= From EO-Tools Repository =
+You can add the EO-Tools repository to your apt-sources and get the following packages: `adore-doris, doris, getorb, snaphu`<br>
+Thanks to *Antonio Valentino* for packaging these applications.
+
+To add the repository:<br>
+`sudo add-apt-repository ppa:a.valentino/eotools`
+
+To install adore-doris (this should also install doris, getorb and snaphu)<br>
+`sudo apt-get install adore-doris`
+
 = Debian Package Installation =
 You can download and install the Debian packages under Debian based operating systems including Ubuntu. 
 
@@ -8,7 +18,7 @@ Packages are available here: [http://code.google.com/p/adore-doris/downloads/lis
 
 Once downloaded use your favorite package manager (or simply double-click) on the package file. After the installation is complete you can run adore in a terminal window. 
 
-= Manual Installation =
+= Manual Installation of Latest Development Version =
 
 ADORE consists of bash shell scripts and has a simple setup.  
 
