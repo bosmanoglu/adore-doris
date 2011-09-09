@@ -245,12 +245,27 @@ function strcmpi()          # See "settings save" for example of use.
 
 function checkInitialSettings(){
 ########################### CHECK INPUT - MAKE SUGGESTIONS#
-[ "${projectFolder}" == "." ] && echo "projectFolder is set to \".\". Use with caution. In general your data should be located at projectFolder/data"
-[ -z "${master}" ] && echo "It seems like dataFolder and/or projectFolder is not set correctly."
-[ ! -e "${m_in_dat}" ] && echo "It seems like dataFile and/or master is not set correctly. Please set the SLC file pattern(dataFile)."
-[ ! -e "${s_in_dat}" ] && echo "It seems like slave is not set correctly. Please set the SLC file pattern."
-[ "${runName}" == "default" ] && echo "runName is set to \"default\"" && echo "Any batch processing results (baselines, singleMasterStack) will be under ${processFolder}/default"
-[ ! -d "${dataFolder}" ] && echo "dataFolder does not exist. Please set dataFolder. Current Setting: ${dataFolder}"
+[ "${projectFolder}" == "." ] && echo "projectFolder is set to \".\". Use with caution."
+if [ ! -d "${dataFolder}" ]; then 
+  echo "Please set dataFolder or run: settings init."
+else
+  [ -z "${master}" ] && echo "No scenes in dataFolder."
+fi
+if [ ! -e "${m_in_dat}" ]; then
+  if [ -L "${m_in_dat}" ]; then
+    echo "m_in_dat points to a broken link."
+  elif [ -n "${master}" ]; then
+    echo "dataFile (filename pattern for SLC) is not set correctly."
+  fi
+fi
+if [ ! -e "${s_in_dat}" ]; then
+  if [ -L "${s_in_dat}" ]; then
+    echo "s_in_dat points to a broken link."
+  elif [ -n "${slave}" ]; then
+    echo "Can not find dataFile in slave data folder."
+  fi
+fi
+[ "${runName}" == "default" ] && echo "runName is set to \"default\"" && echo "Any batch processing results (baselines, scripts with .adr ending) will be created under ${processFolder}/default"
 }
 
 function check(){
