@@ -3,8 +3,8 @@
 # Automatic Doris Environment
 #
 # USAGE:
-#	view a|p|m dorisStep -- cpxviewOptions
-#	view a|p|m dorisStep:filename -- cpxviewOptions
+#	view a|p|m dorisStep cpxviewOptions
+#	view a|p|m dorisStep:filename cpxviewOptions
 #
 # DESCRIPTION:
 #  VIEW is an internal ADORE command.  
@@ -35,8 +35,8 @@
 #	This is useful for generating rasters for *.demlp, *.notmasked files.
 #
 #  Optional:
-#	-- cpxviewOptions
-#           These options are passed to cpxview. These have to start with --.
+#	cpxviewOptions
+#           These options are passed to cpxview.
 #	    User options supersede default options (see below).
 #	    Default values for w,f are read from result file. 
 # 	    Default value for q is defined by output type (amplitude, phase, mixed).
@@ -61,7 +61,7 @@ local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
 local w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
-local cmd passOn
+local cmd passOn lenRemainder
 ###### GET INPUT OPTIONS
 if [ $# -gt 2 ]; then
     generate=${1};shift
@@ -76,24 +76,30 @@ else
   return
 fi
 passOn=()
-if [ -n "${remainder}" ]; then
-  #get options changing the default
-  while ((OPTIND <= $# )); do
-    if getopts ":w:f:e:q:o:c:s:" flag ${remainder[@]}; then
-    #echo "flag=${flag} optin=${OPTIND} optarg=${OPTARG}"
-    # assign value to variables w f e q o c s
-      if [ "${flag}" == "?" ]; then
-        passOn+=(-$OPTARG)
-      else
-        eval ${flag}=${OPTARG}
-      fi
-    else
-      passOn+=(${!OPTIND});
-      let OPTIND++
-    fi
+while [ -n "${remainder}" ]; 
+do
+  inArg="${remainder##*-}"
+  if [ -z "${inArg}" ]; then
+    inArg=${remainder};
+    remainder=""
+  else
+    inArg="-${inArg}"
+  fi
+  lenRemainder=$(( ${#remainder} - ${#inArg} ))
+  remainder="${remainder:0:${lenRemainder}}"
+  unset OPTIND
+  while getopts ":w:f:e:q:o:c:s:" flag ${inArg};
+  do
+    case $flag in
+      w|f|e|q|o|c|s)
+        eval ${flag}=${OPTARG};;
+      *)
+        passOn+=($inArg)
+        break
+      ;;
+    esac
   done
-  remainder=${passOn[@]};
-fi
+done
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
@@ -113,7 +119,6 @@ if [[ "${dorisStep}" == *:* ]]; then
   dorisStep=${dorisStep%:*}
   [ ! -e "${inputFileName}" ] && { error "Can not find specified file: ${inputFileName}"; return 1; }
 fi
-
 #if [[ ${dorisStep} == m_* ]]; then
 #  dorisStep=`pn2rs ${dorisStep}`
 #  grepM=`grep ${dorisStep} ${m_resfile}`
