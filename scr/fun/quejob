@@ -23,7 +23,7 @@ local qsubPath=`which qsub`
 [ "${qsubPath:-IsEmpty}" == "IsEmpty" ] && echo "Torque PBS, qsub, not found." >&2 && return 110
 
 local commands=${1};
-local CALLDIR qsubOpts
+local CALLDIR qsubOpts jobId
 if [ "${2:-isEmpty}" == "isEmpty" ]; then
   CALLDIR="${PWD}";
   qsubOpts=""
@@ -34,7 +34,7 @@ elif [ "${2}" == "--" ]; then
   CALLDIR="${PWD}";  
   qsubOpts="${@:3}"
 else
-  echo "Wrong parameter. Please check usage with: ? quejob" >&2
+  echo "Wrong parameter. Please check usage with: ? quejob" >&2 && return 110
 fi
 
 generateRandomString 
@@ -60,8 +60,8 @@ _EOFFILE
  #PATH is exported to prevent errors in case -V makes a mistake.
  
 #submit the job to the que
-qsub ${qsubOpts} "${tmpFolder}/${queJobRandStr}.sh"
-
+jobId=`qsub ${qsubOpts} "${tmpFolder}/${queJobRandStr}.sh"`
+echo "${jobId}@${HOSTNAME}"
 }
 
 createJob "${@}"

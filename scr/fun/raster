@@ -78,9 +78,9 @@ function convert_raster(){
 local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
-local w f e q o c inArg parE parQ parO parC parS flag OPTIND OPTARG
+local w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
+local cmd passOn
 ###### GET INPUT OPTIONS
-inArg=( ${@} ); #save input arguements for getopts.
 if [ $# -gt 2 ]; then
     generate=${1};shift
     dorisStep=${1};shift
@@ -93,22 +93,24 @@ else
   echo "Please check usage by: ? raster"
   return
 fi
-if [ ! -z "${remainder}" ]; then
+passOn=()
+if [ -n "${remainder}" ]; then
   #get options changing the default
-  while getopts "w:f:e:q:o:c:s:" flag "${@}"
-  do
+  while ((OPTIND <= $# )); do
+    if getopts ":w:f:e:q:o:c:s:" flag ${remainder[@]}; then
     #echo "flag=${flag} optin=${OPTIND} optarg=${OPTARG}"
     # assign value to variables w f e q o c s
-    if [ "${flag}" == "?" ]; then
-      continue;
+      if [ "${flag}" == "?" ]; then
+        passOn+=(-$OPTARG)
+      else
+        eval ${flag}=${OPTARG}
+      fi
     else
-      eval ${flag}=${OPTARG}
-      paramInd=$(( ${OPTIND}-1 ));
-      unset inArg[${paramInd}]
-      unset inArg[${OPTIND}]
+      passOn+=(${!OPTIND});
+      let OPTIND++
     fi
   done
-  remainder=${inArg[@]:3};
+  remainder=${passOn[@]};
 fi
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
@@ -164,14 +166,14 @@ fi
 
 call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
 # if not empty and different from read value. 
-if [ ! -z ${w} ] && [ "${w}" != "${width}" ]; then
-  echo "Overwriting width(${width}) with user specified value: ${w}"
-  width=${width};
+if [ -n "${w}" ] && [ "${w}" != "${width}" ]; then
+  error "Overwriting width(${width}) with user specified value: ${w}"
+  width=${w};
 fi  
-if [ ! -z ${f} ] && [ "${f}" != "${format}" ]; then
-  echo "Overwriting format(${format}) with user specified value: ${f}"
-  format=${f};
-fi  
+if [ -n "${f}" ] && [ "${f}" != "${format}" ]; then
+    error "Overwriting format(${format}) with user specified value: ${f}"
+    format=${f};
+fi
 
 ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
 #inputfile=${resultFile}

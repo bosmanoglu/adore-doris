@@ -3,17 +3,21 @@
 # Automatic Doris Environment
 #
 # USAGE:
-#	view a|p|m dorisStep -- cpxfiddleOptions
-#	view a|p|m dorisStep:filename -- cpxfiddleOptions
+#	view a|p|m dorisStep -- cpxviewOptions
+#	view a|p|m dorisStep:filename -- cpxviewOptions
 #
 # DESCRIPTION:
-#  RASTER is an internal ADORE command.  
-#  It creates sunraster images of the DORIS products using 
-#  cpxfiddle.   
+#  VIEW is an internal ADORE command.  
+#  It displays the DORIS image files using python-pylab (cpxview). 
 # 
-#  ADORE variable raster_format controls the output type. For all images
-#  a sunraster image is created and converted to the requested format 
-#  using the convert command (imagemagick). 
+#  The input parameters are almost identical to RASTER command. There are minor
+#  differences between cpxfiddle and cpxview. For additional information refer
+#  to cpxview extended help: cpxview -h
+#
+#  Some cpxview specific features:
+#  -t: Print file name as figure title.
+#  -k: Print pixel coordinates to stdout on left-click.
+#  -o: Output format identifier (to stdout): png, pdf, ps, eps and svg
 #
 # INPUT:
 #  a|p|m 
@@ -31,33 +35,24 @@
 #	This is useful for generating rasters for *.demlp, *.notmasked files.
 #
 #  Optional:
-#	-- cpxfiddleOptions
-#           These options are passed to cpxfiddle. They should start with "--".
+#	-- cpxviewOptions
+#           These options are passed to cpxview. These have to start with --.
 #	    User options supersede default options (see below).
 #	    Default values for w,f are read from result file. 
 # 	    Default value for q is defined by output type (amplitude, phase, mixed).
 #	    Other default options are shown in paranthesis. 
-#		for complex amplitude images: -w -f -e (0.5) -q -o (sunraster) -c (gray)
-#		for real amplitude images:    -w -f -q -o (sunraster) -c (gray)
-#		for phase images:             -w -f -q -o (sunraster) -c (jet)
-#		for mixed images:             -w -f -e (0.5) -s (1.2) -o (sunraster) -c (jet)
+#		for complex amplitude images: -w -f -e (0.5) -q -c (gray)
+#		for real amplitude images:    -w -f -q -c (gray)
+#		for phase images:             -w -f -q -c (jet)
+#		for mixed images:             -w -f -e (0.5) -s (1.2) -c (jet)
 #
 # OUTPUT:
-#   Default raster format is set to "sunraster". 
-#   raster_format:
-#     If you prefer a different kind of output  RASTER can convert 
-#     the image using imagemagick "convert" tool. The format for the output
-#     is defined in the "raster_format" variable.
+#   Displays a figure window with the data. 
 #
-#   Raster image in the following naming convention:
-#	a: A_filename.ras
-#	p: P_filename.ras
-#	m: M_filename.ras
-#   *'.' (dot) character in the filename will be converted to '_'(underscore).
-#
-# VARIABLES:
-#   raster_format
-#
+# EXAMPLES:
+# view p subtrrefpha
+# view a m_crop -- -M10/50 
+# view p comprefdem:17016_15012.crd -- -M10/50 -b -qwrap
 
 #echo $@
 #echo $#
@@ -65,10 +60,9 @@
 local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
-local w f e q o c inArg parE parQ parO parC parS flag OPTIND OPTARG
-local cmd
+local w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
+local cmd passOn
 ###### GET INPUT OPTIONS
-inArg=( ${@} ); #save input arguements for getopts.
 if [ $# -gt 2 ]; then
     generate=${1};shift
     dorisStep=${1};shift
@@ -81,29 +75,31 @@ else
   error "Please check usage by: ? raster"
   return
 fi
-if [ ! -z "${remainder}" ]; then
+passOn=()
+if [ -n "${remainder}" ]; then
   #get options changing the default
-  while getopts "w:f:e:q:o:c:s:" flag "${@}"
-  do
+  while ((OPTIND <= $# )); do
+    if getopts ":w:f:e:q:o:c:s:" flag ${remainder[@]}; then
     #echo "flag=${flag} optin=${OPTIND} optarg=${OPTARG}"
     # assign value to variables w f e q o c s
-    if [ "${flag}" == "?" ]; then
-      continue;
+      if [ "${flag}" == "?" ]; then
+        passOn+=(-$OPTARG)
+      else
+        eval ${flag}=${OPTARG}
+      fi
     else
-      eval ${flag}=${OPTARG}
-      paramInd=$(( ${OPTIND}-1 ));
-      unset inArg[${paramInd}]
-      unset inArg[${OPTIND}]
+      passOn+=(${!OPTIND});
+      let OPTIND++
     fi
   done
-  remainder=${inArg[@]:3};
+  remainder=${passOn[@]};
 fi
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
 if [ -z ${generateCheck} ]; then
   if [ "${remainder:-undef}" != "undef" ]; then
-    error "I'll pass these options to cpxfiddle: ..${remainder}.."
+    error "I'll pass these options to cpxview: ..${remainder}.."
   fi
 else
   error "I can only create phase(p), amplitude(a) or mixed(m) images."
@@ -117,8 +113,6 @@ if [[ "${dorisStep}" == *:* ]]; then
   dorisStep=${dorisStep%:*}
   [ ! -e "${inputFileName}" ] && { error "Can not find specified file: ${inputFileName}"; return 1; }
 fi
-
-
 
 #if [[ ${dorisStep} == m_* ]]; then
 #  dorisStep=`pn2rs ${dorisStep}`
@@ -154,15 +148,14 @@ fi
 
 call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
 # if not empty and different from read value. 
-if [ ! -z ${w} ] && [ "${w}" != "${width}" ]; then
+if [ -n "${w}" ] && [ "${w}" != "${width}" ]; then
   error "Overwriting width(${width}) with user specified value: ${w}"
-  width=${width};
+  width=${w};
 fi  
-if [ ! -z ${f} ] && [ "${f}" != "${format}" ]; then
-  error "Overwriting format(${format}) with user specified value: ${f}"
-  format=${f};
-fi  
-
+if [ -n "${f}" ] && [ "${f}" != "${format}" ]; then
+    error "Overwriting format(${format}) with user specified value: ${f}"
+    format=${f};
+fi
 ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########
 #inputfile=${resultFile}
 #section=${dorisStep}
