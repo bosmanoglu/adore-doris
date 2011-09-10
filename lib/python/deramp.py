@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """ deramp
 Calculates a best fitting plane to the phase of the unwrapped interferogram and removes the plane.
 

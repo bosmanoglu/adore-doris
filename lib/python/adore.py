@@ -14,110 +14,8 @@ mres2dicts(resfiles)
 """
 import os, re
 import numpy as np
-try:
-  import tables
-except:
-  print "Can not find python-tables. You will not be able to use some functions."
-  pass
-import basic
-import insar
-import path
-import glob
-
-def res2h5ich(resfiles, h5fname=None, products=['interfero','coherence','*.srph2ph'], width=None, formats=None, wl=0.0562356, ml=[1,1], crop='[0:,0:]'):
-    '''res2h5ich(resfiles, h5fname=None, products=['interfero','coherence','*.h2ph'], width=None, formats=None, wl=0.0562356, ml=[1,1], crop='[0:,0:]'):
-        Read the Doris result files into kabum input format. 
-        resfiles: path to single result file or list of result file paths.
-        h5name: Name of output file. If not specified 2nd last folder of first path is used.
-        products: result file steps or regex filename. If no step names are given, width must be specified.
-                  default is ['interfero','coherence','*.h2ph']
-        width: optional width of the input files.
-        ml: multilooking factors. default is [1,1]
-        crop: optional string to crop the input files. Default is '[0:,0:]'
-    '''
-    if h5fname==None:
-        h5fname=resfiles[0].split(os.sep)[-2]+".h5"
-    h5f = tables.openFile(h5fname, mode = "w", title = "ADORE Results")
-    group = h5f.createGroup("/", 'insar', 'InSAR Results')
-
-    for resfile in resfiles:
-        print "Reading: ", resfile;
-        if isresfile(resfile):
-            dct=res2dict(resfile)
-        else:
-            dct={}
-            if not width: #empty
-                raise NameError('NoResultFileNoWidth')
-
-        cint=np.empty(0);
-        coh=np.empty(0);
-        h2ph=np.empty(0)
-        for k in xrange(len(products)):
-            prod=products[k];
-            if not width:
-                #check if we can find width
-                try:
-                    width=dct[prod]['Number of pixels']
-                except KeyError:
-                    raise 
-                if not width: #if width is empty
-                    try:
-                        width=dct[prod]['Last_pixel']-dct[prod]['First_pixel']+1;
-                    except KeyError:
-                        raise
-                if not width:
-                    raise NameError('NoProductNoWidth')
-            #Now we have width. Get filename
-            try:
-                filename=dct[prod]['Data_output_file']
-            except KeyError:
-                filename=glob.glob(os.path.dirname(resfile)+'/'+prod)[0]
-                if not os.path.isfile(filename):
-                    raise NameError('NoProductFile')                
-            #Now we should have name and width.
-            #Get format
-            if not formats:
-                try:
-                    fmt=dct[prod]['Data_output_format']
-                except:
-                    raise NameError('NoFormat')
-            else:
-                fmt=formats[k]
-            #We have everything move on.
-            data=getdata(filename,width,fmt)
-            data=eval('data' + crop)
-            data=insar.multilook(data,ml)
-            if cint.size==0:
-                cint=data;
-            elif coh.size==0:
-                coh=data;
-            elif h2ph.size==0:
-                #wl=wavelength
-                h2ph=(-4*np.pi/wl)*data
-        #end products for         
-        stdpha=insar.coh2stdpha(coh,20,100);
-        fd=path.fisherDistance2(cint,stdpha)
-        b=np.array([dct['coarse_orbits']['Bperp']]); #array of 1x1
-
-        if not group.__contains__('bperp'):
-            bperpA=h5f.createEArray(group, 'bperp',  tables.Float64Atom(shape=b.shape), (0,), "Perpendicular Baseline", expectedrows=len(resfiles))
-            resfA =h5f.createEArray(group, 'file',   tables.StringAtom(itemsize=1024,shape=(1,)), (0,), "Result file location", expectedrows=len(resfiles))
-            cintA =h5f.createEArray(group, 'cint',   tables.ComplexAtom(itemsize=16,shape=cint.shape), (0,), "Complex Interferogram", expectedrows=len(resfiles),chunkshape=(1,))
-            cohA  =h5f.createEArray(group, 'coh',    tables.Float64Atom(shape=coh.shape), (0,), "Coherence", expectedrows=len(resfiles),chunkshape=(1,))
-            h2phA =h5f.createEArray(group, 'h2ph',   tables.Float64Atom(shape=h2ph.shape), (0,), "Height to Phase", expectedrows=len(resfiles),chunkshape=(1,))
-            stdphaA=h5f.createEArray(group,'stdpha', tables.Float64Atom(shape=stdpha.shape), (0,), "Phase Standard Deviation", expectedrows=len(resfiles),chunkshape=(1,))
-            fdA   =h5f.createEArray(group, 'fd',     tables.Float64Atom(shape=fd.shape), (0,), "Fishers Distance", expectedrows=len(resfiles),chunkshape=(1,))
-        bperpA.append(b);
-        resfA.append(resfile);
-        cintA.append(cint);
-        cohA.append(coh);
-        h2phA.append(h2ph);
-        stdphaA.append(stdpha);
-        fdA.append(fd);
-    #end file for loop
-    h5f.flush()
-    h5f.close()
-    
+import basic 
+  
 def res2dict(resfile):
     '''dict=res2dict(resfile)
     Converts a doris resultfile into a python dict.    
@@ -465,30 +363,7 @@ def getval(fileDict, key, lines=None, processName=None, regexp=None):
     return out
 
 def getdata(fname, width, dataFormat, length=0):  
-    complexFlag=False;
-    #### Handle the long format specifier: i.e. complex_real4
-    if "real4" in dataFormat:
-        datatype="f4"
-    elif "short" in dataFormat:
-        datatype="i2"
-    else:
-        datatype=dataFormat
-
-    if "complex" in dataFormat:
-        complexFlag=True;
-    ### Handle the short format specifier: i.e. cr4    
-    if dataFormat=="cr4":
-        datatype="f4"        
-        complexFlag=True;
-    elif dataFormat=="r4":
-        datatype="f4"
-    elif dataFormat=="ci2":
-        datatype="i2"
-        complexFlag=True;
-    elif  dataFormat=="i2":
-        datatype="i2"
-    #else: dtype is already set to dataFormat
-        
+    datatype, complexFlag=dataFormat2dataType(dataFormat);        
     if complexFlag==True:
         width=2*width;
 
@@ -518,6 +393,32 @@ def csv2Array(fileDict, lStart, rows, cols, dtype=np.float):
     for r in xrange(rows):
         out[r,:]=np.fromstring(fileDict[str(lStart+r)], dtype, cols, ' ')
     return out
+
+def dataFormat2dataType(dataFormat):
+    complexFlag=False;
+    #### Handle the long format specifier: i.e. complex_real4
+    if "real4" in dataFormat:
+        datatype="f4"
+    elif "short" in dataFormat:
+        datatype="i2"
+    else:
+        datatype=dataFormat
+
+    if "complex" in dataFormat:
+        complexFlag=True;
+    ### Handle the short format specifier: i.e. cr4    
+    if dataFormat=="cr4":
+        datatype="f4"        
+        complexFlag=True;
+    elif dataFormat=="r4":
+        datatype="f4"
+    elif dataFormat=="ci2":
+        datatype="i2"
+        complexFlag=True;
+    elif  dataFormat=="i2":
+        datatype="i2"
+    #else: dtype is already set to dataFormat
+    return (datatype, complexFlag);    
     
 def isresfile(resfile,lines=30):  
     '''
@@ -533,4 +434,8 @@ def isresfile(resfile,lines=30):
         return False
     else:
         return False    
-        
+
+def writedata(fname, data, dataFormat):
+    datatype,complexFlag=dataFormat2dataType(dataFormat);
+    data.astype(np.dtype(datatype)).tofile(fname) 
+       
