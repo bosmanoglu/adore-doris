@@ -19,11 +19,11 @@ INPUT:
  OUTPUTFILE: The complex result file. 
  
 EXAMPLES:
-
+ real2cpx.py -w 8000 -m 1 -p 17016_18018.crd 17016_18018.crd.cpx
 
  To view the files one can use cpxview.py:
- cpxview.py -w 1189 -f cr4 -q phase -c jet -b  &
- cpxview.py -w 1189 -f cr4 -q mag -c jet -b  &
+ cpxview.py -w 8000 -f r4 -q normal -c jet -b 17016_18018.crd &
+ cpxview.py -w 8000 -f cr4 -q phase -c jet -b 17016_18018.crd.cpx &
  
 DEPENDENCIES:
  python-numpy python-scipy
@@ -68,20 +68,16 @@ def main(argv):
         if os.path.exists(cfg["-m"]):
             mData=adore.getdata(cfg["-m"],w,cfg["-f"])
             if l==0:                
-                print "setting L:"+str(mData.shape[0])
                 l=mData.shape[0];
         if os.path.exists(cfg["-p"]):
             pData=adore.getdata(cfg["-p"],w,cfg["-f"])
             if l==0:
-                print "setting L:"+str(pData.shape[0])
                 l=pData.shape[0]
         if not os.path.exists(cfg["-m"]):
             print [cfg["-w"],l]
             mData=float(cfg["-m"])*np.ones([l,w]);
         if not os.path.exists(cfg["-p"]):
             pData=float(cfg["-p"])*np.ones([l,w]);
-        print mData.shape 
-        print pData.shape            
         outData=mData*np.exp(1j*pData);        
     elif cfg["-r"]:
         if os.path.exists(cfg["-r"]):
