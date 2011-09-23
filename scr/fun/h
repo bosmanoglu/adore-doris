@@ -7,8 +7,6 @@
 #  ? is a builtin ADORE command.  
 #  It displays the help for given adore command.   
 #
-#  HTML version of the ADORE help can be accessed by browsing to:
-#  file:///${ADOREFOLDER}/man/html/links.html
 #
 # INPUT:
 #  commandName: ADORE command name to get help. A list of commands 
@@ -31,6 +29,9 @@
   if [ "${1:-undefined}" == "undefined" ]; then
     sed -n -e '/^# USAGE:/,/^$/ s/^# \?//p' < "${ADORESCR}/fun/h"
     typeset -F | cut -d" " -f3 | grep -v '^_' |grep -v 'command_not_found_handle'| column
+    echo ""
+    echo "HTML version of the ADORE help can be accessed by browsing to:"
+    echo "file:///${ADOREFOLDER}/man/html/links.html"
   elif [ -e "${ADOREFOLDER}/man/txt/${1}" ]; then
     cat "${ADOREFOLDER}/man/txt/${1}"
   elif [ -e "${ADORESCR}/${1}" ]; then 
