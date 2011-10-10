@@ -46,17 +46,21 @@ def main(argv):
     cfg.setdefault("-o", "cpxmean.out")
     w=int(cfg["-w"]) 
 
-    outData=None:
     for file in args:
         data=adore.getdata(file,w,cfg["-f"]);
-        if any(outData):
+        if "outData" in locals():
             outData=outData * data;
         else:
             outData=data; #first file.
-    outData=outData**(1/args.len());
+    outData=outData**(1./len(args));
     print "Writing output to:", cfg["-o"]
     adore.writedata(cfg["-o"],outData,cfg["-f"]);
     
 if __name__ == "__main__":
-    main(sys.argv[1:]);    
+    try:
+        main(sys.argv[1:]);    
+    except:
+        usage()
+        sys.exit(2)
+       
 
