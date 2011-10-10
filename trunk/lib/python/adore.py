@@ -437,5 +437,11 @@ def isresfile(resfile,lines=30):
 
 def writedata(fname, data, dataFormat):
     datatype,complexFlag=dataFormat2dataType(dataFormat);
-    data.astype(np.dtype(datatype)).tofile(fname) 
+    if complexFlag:
+        bipData=np.empty([data.shape[0], data.shape[1]*2]);
+        bipData[:,0::2]=data.real;
+        bipData[:,1::2]=data.imag;
+        bipData.astype(np.dtype(datatype)).tofile(fname) 
+    else:
+        data.astype(np.dtype(datatype)).tofile(fname) 
        

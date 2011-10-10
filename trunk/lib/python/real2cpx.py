@@ -93,11 +93,8 @@ def main(argv):
         if not os.path.exists(cfg["-i"]):
             iData=float(cfg["-i"])*np.ones([l,w]);
         outData=rData+1j*iData;
-    bipData=np.empty([outData.shape[0], outData.shape[1]*2]);
-    bipData[:,0::2]=outData.real;
-    bipData[:,1::2]=outData.imag;
     print "Writing output to:", outputFile
-    adore.writedata(outputFile,bipData,cfg["-f"]);
+    adore.writedata(outputFile,outData,cfg["-o"]);
     
 if __name__ == "__main__":
     main(sys.argv[1:]);    
