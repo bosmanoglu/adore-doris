@@ -222,6 +222,11 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
         complexFlag=True;
     elif dataFormat=="r4":
         datatype="f4"
+    if dataFormat=="cr8":
+        datatype="f8"        
+        complexFlag=True;
+    elif dataFormat=="r8":
+        datatype="f8"
     elif dataFormat=="ci2":
         datatype="i2"
         complexFlag=True;
@@ -230,6 +235,16 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
         complexFlag=True;
     elif  dataFormat=="i2":
         datatype="i2"
+    elif dataFormat=="cc1":
+        datatype="i1"
+        complexFlag=True;        
+    elif dataFormat=="c1":
+        datatype="i1"
+    elif dataFormat=="cu1":
+        datatype="u1"
+        complexFlag=True;                
+    elif dataFormat=="u1":
+        datatype="u1"
     #else: dtype is already set to dataFormat
         
     if complexFlag==True:
