@@ -51,8 +51,8 @@
 #
 # EXAMPLES:
 # view p subtrrefpha
-# view a m_crop -- -M10/50 
-# view p comprefdem:17016_15012.crd -- -M10/50 -b -qwrap
+# view a m_crop -M10/50 
+# view p comprefdem:17016_15012.crd -M10/50 -b -qwrap
 
 #echo $@
 #echo $#
@@ -103,6 +103,7 @@ done
 # make generate lowercase to accommadate user entries in caps from APM
 generate=`echo ${generate} | tr [:upper:] [:lower:]`
 generateCheck=`echo ${generate} | tr -d [a,p,m]`
+remainder="${passOn[@]}" #set remainder to passed on variables for cpxfiddle
 if [ -z ${generateCheck} ]; then
   if [ "${remainder:-undef}" != "undef" ]; then
     error "I'll pass these options to cpxview: ..${remainder}.."
