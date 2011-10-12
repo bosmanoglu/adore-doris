@@ -157,9 +157,13 @@ echo '</textarea>' >>${rFile}
 
 function reportPicture(){
  step="${1}"
- imgFile=`raster auto ${step} -- -M20/20 | tail -n1| cut -d":" -f2`
- mv ${imgFile} "${rFolder}"
- writePicture ${imgFile} 300 300 ${imgFile} >> "${rFile}"
+ imgFile=`raster auto ${step} -M20/20 | tail -n1| cut -d":" -f2`
+ if [ ! -f "${imgFile}" ]; then
+   error "Can not find result for step ${step}."
+ else
+   mv ${imgFile} "${rFolder}"
+   writePicture ${imgFile} 300 300 ${imgFile} >> "${rFile}"
+ fi
 }
 
 function writePicture(){
