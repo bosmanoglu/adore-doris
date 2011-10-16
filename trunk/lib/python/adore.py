@@ -412,11 +412,29 @@ def dataFormat2dataType(dataFormat):
         complexFlag=True;
     elif dataFormat=="r4":
         datatype="f4"
+    elif dataFormat=="cr8":
+        datatype="f8"        
+        complexFlag=True;
+    elif dataFormat=="r8":
+        datatype="f8"
     elif dataFormat=="ci2":
         datatype="i2"
         complexFlag=True;
     elif  dataFormat=="i2":
         datatype="i2"
+    elif dataFormat=="ci4":
+        datatype="i4"
+        complexFlag=True;
+    elif dataFormat=="cc1":
+        datatype="i1"
+        complexFlag=True;        
+    elif dataFormat=="c1":
+        datatype="i1"
+    elif dataFormat=="cu1":
+        datatype="u1"
+        complexFlag=True;                
+    elif dataFormat=="u1":
+        datatype="u1"
     #else: dtype is already set to dataFormat
     return (datatype, complexFlag);    
     
