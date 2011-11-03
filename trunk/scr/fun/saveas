@@ -374,7 +374,7 @@ function saveas_grd(){
       echo "SUCCESS: saveas_grd"
     fi
   else
-    echo "Please first do the geocoding step to export to ArcGIS."
+    echo "Please first do the geocoding step to export to GRD format."
   fi
 }
 

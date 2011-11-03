@@ -7,10 +7,12 @@ res2h5ich(resfiles, h5fname=None, products=['interfero','coherence','*.srph2ph']
 res2dict(resfile)
 isresfile(resfile,lines=30)
 getdata(fname, width, dataFormat, length=0)
+getProduct(rdict, process, filename=None, width=None, dataFormat=None)
 getval(fileDict, key, lines=None, processName=None, regexp=None)
 process2dict(fileDict, processName)
 file2dict(filename)
 mres2dicts(resfiles)
+
 """
 import os, re
 import numpy as np
@@ -258,6 +260,21 @@ def process2dict(fileDict, processName):
                   'Data_output_format': "Data_output_format:[\s]+(.*)",
                   'Data_output_file_complex_coherence': None,
                   'Data_output_format_complex_coherence': None,
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,   
+                  'Multilookfactor_azimuth_direction': None,
+                  'Multilookfactor_range_direction': None,
+                  'Number of lines': None,
+                  'Number of pixels': None,   
+                  }
+    elif processName == 'filtphase':
+        reDict = {'Method_phasefilt': "Method_phasefilt:[\s]+(.*)",
+                  '1D Smoothing kernel': "1D Smoothing kernel for |spectrum|:[\s]+(.*)" ,
+                  'Input_file': None,
+                  'Data_output_file': None,
+                  'Data_output_format': None,
                   'First_line': None,
                   'Last_line': None,
                   'First_pixel': None,
