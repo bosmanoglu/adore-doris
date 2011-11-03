@@ -462,4 +462,18 @@ def writedata(fname, data, dataFormat):
         bipData.astype(np.dtype(datatype)).tofile(fname) 
     else:
         data.astype(np.dtype(datatype)).tofile(fname) 
+
+def getProduct(rdict, process, filename=None, width=None, dataFormat=None):
+    """getProduct(rdict, process, filename=None, width=None, dataFormat=None)
+    """
+    if filename is None:
+        filename=rdict[process]['Data_output_file']
+    if width is None:
+        if rdict[process].has_key('Number of pixels'):
+            width=int(rdict[process]['Number of pixels'])
+        else:
+            width=int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1
+    if dataFormat is None:
+        dataFormat=rdict[process]['Data_output_format']        
+    return getdata(filename, width, dataFormat);
        
