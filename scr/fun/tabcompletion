@@ -164,14 +164,19 @@ function _scenes(){
 
 function _settings(){
 	COMPREPLY=()
-        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local cur=${COMP_WORDS[COMP_CWORD]}
+        cur=${cur##* }; #delete everything before if there is space. 
+                        #if previous parameter has quotes this variable
+                        #shows parts of the previous parameter and adore
+                        #setting. removing everything before the last space
+                        #only leaves the latest adore setting.
         local opts="apply check fix init raw save load reset clear"
-	local prev="${COMP_WORDS[1]}"
+	local prev=${COMP_WORDS[1]}	
 	
 	case "${prev}" in
 		apply)
 			local cmd="echo \${!${cur}*}"
-			local optsX=`eval ${cmd}`
+			local optsX=`eval ${cmd} 2> /dev/null`
 			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
 			return 0
 			;;
