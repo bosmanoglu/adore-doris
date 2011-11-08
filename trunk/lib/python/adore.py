@@ -379,7 +379,7 @@ def getval(fileDict, key, lines=None, processName=None, regexp=None):
         out=out[0]; #if singleton return value not a list.
     return out
 
-def getdata(fname, width, dataFormat, length=0):  
+def getdata(fname, width, dataFormat, length=0, byteswap=False):  
     datatype, complexFlag=dataFormat2dataType(dataFormat);        
     if complexFlag==True:
         width=2*width;
@@ -394,12 +394,16 @@ def getdata(fname, width, dataFormat, length=0):
 
     if complexFlag:
         data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
-        #data=np.vectorize(complex)(data[:,0:-1:2],data[:,1::2])        
+        #data=np.vectorize(complex)(data[:,0:-1:2],data[:,1::2])
+        if byteswap:
+            data.byteswap(True);
         data=data[:,0:-1:2]+1j*data[:,1::2]
         #data=np.zeros((length,width/2),np.complex);
         #data+=dataP;
     else:
         data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+        if byteswap:
+            data.byteswap(True);
     return data
 
 def csv2Array(fileDict, lStart, rows, cols, dtype=np.float):

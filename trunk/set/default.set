@@ -137,8 +137,8 @@
 [ -z "${m_ovs_out}" 		] && m_ovs_out="${outputFolder}/${master}.ovs"
 [ -z "${_rel_m_ovs_out}" 	] && _rel_m_ovs_out='echo ${outputFolder}/${master}.ovs'
 [ -z "${m_ovs_out_format}"	] && m_ovs_out_format="ci2"
-[ -z "${m_ovs_fact_rng}" 	] && m_ovs_fact_rng="1"
-[ -z "${m_ovs_fact_azi}" 	] && m_ovs_fact_azi="1"
+[ -z "${m_ovs_fact_rng}" 	] && m_ovs_fact_rng="2"
+[ -z "${m_ovs_fact_azi}" 	] && m_ovs_fact_azi="2"
 [ -z "${m_ovs_kernelsize}"	] && m_ovs_kernelsize="16"
 ################### s_readfiles
 ### SECTION=s_readfiles
