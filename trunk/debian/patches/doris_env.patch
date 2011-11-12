@@ -1,0 +1,17 @@
+Automatically set the DORIS path on debian systems
+--- a/scr/adore
++++ b/scr/adore
+@@ -111,6 +111,13 @@
+   exit
+ fi
+ 
++# Use the default path for DORIS binaries and scripts on Debian/Ubuntu
++# systems if it is not specified via environment
++if [ "${DORISBIN:-isEmpty}" = "isEmpty" ]; then
++  DORISBIN=/usr/lib/doris
++fi
++export _ADOREPATH=:${DORISBIN}:${_ADOREPATH}
++
+ if [ "${i-notInteractive}" != "notInteractive" ]; then
+   #interactive - start shell
+   bash --init-file "${ADORESCR}/.adore.rc"
