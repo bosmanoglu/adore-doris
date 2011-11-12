@@ -4,3 +4,4 @@ scr/* usr/share/adore-doris/scr
 set/* usr/share/adore-doris/set
 templates/* usr/share/adore-doris/templates
 man/bin usr/share/adore-doris/man
+version usr/share/adore-doris
