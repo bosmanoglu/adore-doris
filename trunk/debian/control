@@ -3,7 +3,7 @@ Section: contrib/science
 Priority: optional
 Maintainer: Antonio Valentino <antonio.valentino@tiscali.it>
 Build-Depends: debhelper (>= 8.0.0)
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Homepage: http://code.google.com/p/adore-doris
 Vcs-Svn: http://adore-doris.googlecode.com/svn/trunk/
 Vcs-Browser: http://code.google.com/p/adore-doris/source/browse/
@@ -11,7 +11,7 @@ Vcs-Browser: http://code.google.com/p/adore-doris/source/browse/
 Package: adore-doris
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
-         doris, getorb, snaphu, gmt, gnuplot, imagemagick, gdal-bin, mawk|awk
+         doris, getorb, snaphu, gmt, gnuplot, imagemagick, gdal-bin
 Recommends: www-browser
 Description: Automated DORIS Environment
  ADORE is a shell environment designed to simplify and streamline
