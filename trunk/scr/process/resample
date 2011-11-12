@@ -107,17 +107,24 @@ function trickResample(){
 
 function dorisResample(){
   unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
+  local cropSource
   #check if dbowgeo is set
   if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
     #if not check for rs_dbow
     if [ "${rs_dbow}" == "0 0 0 0" ]; then
+     local stat=`readRes.sh $s_resfile process "oversample"`
+     if [[ stat -eq 1 ]]; then
+       cropSource="oversample"
+     else
+       cropSource="crop"
+     fi
      # get a smaller dbow from master. Otherwise the resampling may fail. 
      local l0 lN p0 pN lshift pshift autoFlag
      autoFlag=0; #0=on 1=off
-     l0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_line"`
-     lN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_line"`
-     p0=`${ADORESCR}/readRes.sh ${s_resfile} crop "First_pixel"`
-     pN=`${ADORESCR}/readRes.sh ${s_resfile} crop "Last_pixel"`
+     l0=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^First_line"`
+     lN=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^Last_line"`
+     p0=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^First_pixel"`
+     pN=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^Last_pixel"`
 
      lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
      pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
@@ -143,7 +150,6 @@ function dorisResample(){
      rs_dbow="${l0} ${lN} ${p0} ${pN}"
     fi
   fi
-
   pp ${dorisProcess}
 
   # remove undefined settings from .drs file so that doris handles it
