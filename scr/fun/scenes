@@ -92,10 +92,13 @@ function detectSatellite(){
 # STAMPS3.2/link_slcs:goodSense(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
 local firstDATADIR=`canonicalPath ${DATADIR}/*| head -n 1`
-  echo "I can only detect ERS, ASAR, TSX, PALSAR(L1.1) and GAMMA SLC images for now."
+  echo "I can only detect ERS, ASAR, TSX, CSK, PALSAR(L1.1) and GAMMA SLC images for now."
   echo "If you are using other datasets please setup the dataFolder manually."
   m_in_method='UNKNOWN'
-  if $( ls -1 ${firstDATADIR}/T*.xml &>/dev/null ); then
+  if $( ls -1 ${firstDATADIR}/CSK*.h5 &> /dev/null ); then
+    m_in_method='CSK';
+    dataFile="CSK*.h5"
+  elif $( ls -1 ${firstDATADIR}/T*.xml &>/dev/null ); then
     m_in_method='TSX'
     dataFile="*.cos"
     leaderFile="T*.xml"
@@ -127,7 +130,6 @@ local firstDATADIR=`canonicalPath ${DATADIR}/*| head -n 1`
   fi  
   [ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
   [ -z "${slave}"        	] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
-
 }
 
 function getInfoFromUser(){
@@ -253,6 +255,20 @@ local date
   done
 }
 
+function linkCSK(){
+#Modified from
+# STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
+local DATADIR=${1}
+local f bname date 
+  for f in $(find "${DATADIR}" -name "${dataFile}"); do
+    #echo info: $f
+    bname=$( basename ${f} )
+    date=`echo $bname | awk -F '_' {'print substr($9,1,8)'}`
+    
+    mkdir -p ${dataFolder}/${date}
+    ln -s ${f} ${dataFolder}/${date}                 # h5
+  done
+}
 
 function scenes_init(){
 local rawDataFolder=`canonicalPath "${1}"`
@@ -276,6 +292,11 @@ ALOS)
   ;;
 GAMMA)
   linkGAMMA ${rawDataFolder};
+  ;;
+CSK)
+  set -x
+  linkCSK ${rawDataFolder};
+  set +x
   ;;
 esac
 
