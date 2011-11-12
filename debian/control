@@ -10,8 +10,8 @@ Vcs-Browser: http://code.google.com/p/adore-doris/source/browse/
 
 Package: adore-doris
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
-         doris, getorb, snaphu, gmt, gnuplot, imagemagick, gdal-bin
+Depends: ${misc:Depends}, ${python:Depends}, doris, getorb, snaphu, gmt,
+         gdal-bin, gnuplot, imagemagick
 Recommends: www-browser
 Description: Automated DORIS Environment
  ADORE is a shell environment designed to simplify and streamline
