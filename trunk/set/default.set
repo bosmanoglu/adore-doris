@@ -373,7 +373,8 @@
 [ -z "${_rel_di_in_topomaster}" ] && _rel_di_in_topomaster='echo ${m_resfile}'
 [ -z "${di_in_toposlave}" 	] && di_in_toposlave="${unspecified}"
 [ -z "${di_in_topoint}" 	] && di_in_topoint="${unspecified}"
-[ -z "${di_out_scaled}" 	] && di_out_scaled="${unspecified}"
+[ -z "${di_out_scaled}" 	] && di_out_scaled="${outputFolder}/${master}_${slave}.discaled"
+[ -z "${_rel_di_out_scaled}" 	] && _rel_di_out_scaled='echo ${outputFolder}/${master}_${slave}.discaled'
 ################### slant2h
 ### SECTION=slant2h
 [ -z "${s2h_method}" 		] && s2h_method="ambiguity"
