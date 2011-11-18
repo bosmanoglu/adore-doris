@@ -310,7 +310,19 @@ def process2dict(fileDict, processName):
                   'Multilookfactor_range_direction': None,
                   'Ellipsoid': "Ellipsoid.*:[\s]+(.*)",
                   }                        
-                  
+    elif processName == 'unwrap':
+        reDict = {'Data_output_file': None,
+                  'Data_output_format': None,
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,   
+                  'Multilookfactor_azimuth_direction': None,
+                  'Multilookfactor_range_direction': None,
+                  'Number of lines': None,
+                  'Number of pixels': None,   
+                  'Program used for unwrapping': None,
+                  }                  
 #    elif processName == '':
 #        reDict = {'': None,
 #                  '': None,
@@ -319,15 +331,25 @@ def process2dict(fileDict, processName):
 
     else:
         return {}
+
+    lStart,lEnd=getProcessLines(fileDict, processName)        
+    lines=[]
+    for k in np.r_[lStart:lEnd]:
+        lines.append(str(k))
     
-    out={}
+    out={}    
     for key in reDict:
-        val=getval(fileDict,key, None,processName, reDict[key])
+        val=getval(fileDict,key, lines,processName, reDict[key])
         if val is None:
             continue
         else:
             out[key]=val
-        
+
+    #Start process specific extraction... 
+    if processName=="coarse_correl":
+        out['results']=csv2Array(fileDict, lStart+8, int(out['Number of correlation windows'].split("of")[0]), 6, dtype=np.float)
+    if processName=="fine_coreg":
+        out['results']=csv2Array(fileDict, lStart+10, out['Number_of_correlation_windows'], 6, dtype=np.float)
     return out
     
 def getval(fileDict, key, lines=None, processName=None, regexp=None):
@@ -343,14 +365,7 @@ def getval(fileDict, key, lines=None, processName=None, regexp=None):
             if fileDict[k].find(key)>-1:
                 lines.append(k)
     if lines is None: #this means processName is given but lines is empty.
-        lines=[];lstart=-1;lend=-1
-        for k in fileDict.keys():
-            if fileDict[str(k)].find('Start_'+processName)>-1:
-                lstart=int(k);
-            if fileDict[str(k)].find('End_'+processName)>-1:
-                lend=int(k);
-            if lstart>-1 and lend>-1:
-                break
+        lstart,lend=getProcessLines(fileDict, processName)        
         lines=[]
         for k in np.r_[lstart:lend]:
             lines.append(str(k))
@@ -406,9 +421,24 @@ def getdata(fname, width, dataFormat, length=0, byteswap=False):
             data.byteswap(True);
     return data
 
+def getProcessLines(fileDict, processName):
+    """
+    lstart,lend=getProcessLines(fileDict, processName);
+    Returns -1 if can not find start or end of process.
+    """
+    lstart=-1;lend=-1
+    for k in fileDict.keys():
+        if fileDict[str(k)].find('Start_'+processName)>-1:
+            lstart=int(k);
+        if fileDict[str(k)].find('End_'+processName)>-1:
+            lend=int(k);
+        if lstart>-1 and lend>-1:
+            break
+    return (lstart, lend)
+
 def csv2Array(fileDict, lStart, rows, cols, dtype=np.float):
     '''
-    csv2Array(fileDict, key, lines=None, processName=None, regexp=None):
+    csv2Array(fileDict, lStart, rows, cols, dtype=np.float):
     '''
     out=np.empty((rows,cols), dtype);
     for r in xrange(rows):
