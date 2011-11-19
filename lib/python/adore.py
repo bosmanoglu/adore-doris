@@ -239,6 +239,22 @@ def process2dict(fileDict, processName):
                   'Number of lines': None,
                   'Number of pixels': None,   
                   }
+    elif processName == 'comp_refdem':
+        reDict = {'Include_flatearth': None,
+                  'DEM source file': None,
+                  'Min. of input DEM': None,
+                  'Max. of input DEM': None,
+                  'Data_output_file': None,
+                  'Data_output_format': None,                  
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,
+                  'Multilookfactor_azimuth_direction': None,
+                  'Multilookfactor_range_direction': None,
+                  'Number of lines': None,
+                  'Number of pixels': None,
+                  }
     elif processName == 'subtr_refdem':
         reDict = {'Method': None,
                   'Additional_azimuth_shift': None,
