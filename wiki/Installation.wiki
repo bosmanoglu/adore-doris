@@ -8,6 +8,9 @@ Thanks to *Antonio Valentino* for packaging these applications.
 To add the repository:<br>
 `sudo add-apt-repository ppa:a.valentino/eotools`
 
+Update the package list:<br>
+`sudo apt-get update`
+
 To install adore-doris (this should also install doris, getorb and snaphu)<br>
 `sudo apt-get install adore-doris`
 
