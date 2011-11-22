@@ -37,6 +37,14 @@ class SettingsEditor:
         self.window.destroy()
         return False
 
+    def applyButtonClicked(self, widget, treestore):
+        settxt="settings apply -r "
+        for section in treestore:
+            for row in treestore[(section.path[0])].iterchildren():
+                if row[0] == True:
+                    settxt=settxt +" " + row[1]+'="'+ row[2]+'"';
+        self.runcmd(settxt);  
+
     def __init__(self,mainWindow):
         #Load settings 
         self.set=ConfigParser.ConfigParser()
@@ -112,7 +120,7 @@ class SettingsEditor:
         self.treeview.show()
 
         self.applyButton=gtk.Button(label='Apply', stock=None, use_underline=True);        
-        self.applyButton.connect("clicked", self.applyButton, self.treeview)
+        self.applyButton.connect("clicked", self.applyButtonClicked, self.treestore)
         self.applyButton.set_flags(gtk.CAN_DEFAULT);
         self.applyButton.show();
         self.vbox.pack_start(self.treeview);
