@@ -170,7 +170,7 @@ class MyGUI:
     self.runcmd('settings reset');
 
   def settings_editor( self, w):
-    se=settingsEditor.SettingsEditor(self.setFile);
+    se=settingsEditor.SettingsEditor(self); #input is main window.
 
   def show_about( self, w):
     #os.system("echo ADORE-GUI")#self.answer_label.set_label( "Created by Beda Kosata")

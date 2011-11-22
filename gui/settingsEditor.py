@@ -37,20 +37,28 @@ class SettingsEditor:
         self.window.destroy()
         return False
 
-    def __init__(self,setFile):
+    def __init__(self,mainWindow):
         #Load settings 
         self.set=ConfigParser.ConfigParser()
-        self.setFile=setFile;
+        self.setFile=mainWindow.setFile;
+        self.runcmd=mainWindow.runcmd;
 #        self.set=ConfigParser.ConfigParser()
 #        self.set.read(setFile)
         # Create a new window
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-
+        
+        self.window = gtk.Window()#hadjustment=None, vadjustment=None)
+        self.swindow = gtk.ScrolledWindow(hadjustment=None, vadjustment=None)
+        self.swindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
         self.window.set_title("AGOOEY Settings Editor")
 
         self.window.set_size_request(400, 600)
 
         self.window.connect("delete_event", self.delete_event)
+        self.vbox = gtk.VBox(homogeneous=False, spacing=0);
+
+#        adj = gtk.Adjustment(0.0, 0.0, 100.0, 1.0, 10.0, 0.0)
+#        scrollbar = gtk.HScale(adj)
+#        self.vbox.pack_start(scrollbar, False, False, 0)
 
         # create a TreeStore with one string column to use as the model
         self.treestore = gtk.TreeStore(bool, str, str)
@@ -101,12 +109,20 @@ class SettingsEditor:
 
         # Allow drag and drop reordering of rows
         self.treeview.set_reorderable(True)
+        self.treeview.show()
 
-        self.window.add(self.treeview)
-
-        self.window.show_all()
-
-
+        self.applyButton=gtk.Button(label='Apply', stock=None, use_underline=True);        
+        self.applyButton.connect("clicked", self.applyButton, self.treeview)
+        self.applyButton.set_flags(gtk.CAN_DEFAULT);
+        self.applyButton.show();
+        self.vbox.pack_start(self.treeview);
+        self.vbox.pack_end(self.applyButton);
+        self.window.set_default(self.applyButton);
+        
+        self.swindow.add_with_viewport(self.vbox)
+        self.window.add(self.swindow)
+        #self.vbox.show()
+        self.window.show_all();
 
 def main():
     gtk.main()
