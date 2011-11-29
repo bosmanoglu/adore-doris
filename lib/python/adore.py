@@ -210,6 +210,14 @@ def process2dict(fileDict, processName):
                   }                  
     elif processName == 'comp_coregpm':
         reDict = {'Degree_cpm': None,
+                  'Deltaline_slave00_poly': None,
+                  'Deltapixel_slave00_poly': None,
+                  'Deltaline_slave0N_poly': None,
+                  'Deltapixel_slave0N_poly': None,
+                  'Deltaline_slaveN0_poly': None,
+                  'Deltapixel_slaveN0_poly': None,
+                  'Deltaline_slaveNN_poly': None,
+                  'Deltapixel_slaveNN_poly': None,
                   }
     elif processName == 'interfero':
         reDict = {'Data_output_file': "Data_output_file:[\s]+(.*)",
@@ -365,7 +373,13 @@ def process2dict(fileDict, processName):
     if processName=="coarse_correl":
         out['results']=csv2Array(fileDict, lStart+8, int(out['Number of correlation windows'].split("of")[0]), 6, dtype=np.float)
     if processName=="fine_coreg":
-        out['results']=csv2Array(fileDict, lStart+10, out['Number_of_correlation_windows'], 6, dtype=np.float)
+        try:
+            out['results']=csv2Array(fileDict, lStart+10, int(out['Number_of_correlation_windows']), 6, dtype=np.float)
+        except:
+            pass
+    if processName=="comp_coregpm":
+        out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, 2*(int(out['Degree_cpm'])+1), 3, dtype=np.float)
+        out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+2*(int(out['Degree_cpm'])+1), 2*(int(out['Degree_cpm'])+1), 3, dtype=np.float)        
     return out
     
 def getval(fileDict, key, lines=None, processName=None, regexp=None):
