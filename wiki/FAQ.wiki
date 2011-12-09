@@ -7,7 +7,10 @@ Frequently asked questions.
   
 *Does ADORE have tab completion? *
   ~~So far only the variable completion (`$m_res[tab]` completes to `$m_resfile`) and path completion is working.~~
-  Yes! With r121 tab completion was introduced. It is currently in development(15 Dec 2010). Variable and path completion still works of course.
+  Yes! With r121 tab completion was introduced. You can do things like:
+||`setti<TAB>` || will complete to settings ||
+||`settings <TAB><TAB>`|| will show available commands `apply  check  clear  fix    init   load   raw    reset  save`||
+||`settings apply -r mas<TAB>`|| will complete the word "master"||
 
 *How do I remove existing results?*
   There is a command called `undo` to remove steps from result files. It can remove all steps after a given step (default action) or remove only a single step.
