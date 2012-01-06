@@ -28,62 +28,74 @@ function checkAndProcess(){
   fi
 }
 
+function processCrops(){
+    # DORIS does not allow master and slave to be the same. 
+    # We assign master as dummy ans slave as the current scene.      
+    stackMaster=${master};
+    settings apply -r master="dummy"
+
+    for scene in ${scenes_include[*]}
+    do   
+         bold "Processing ${scene}"
+         settings apply -r slave=${scene} outputFolder="${cropsFolder}/${scene}"
+         mkdir -p "${outputFolder}"
+         cd "${outputFolder}"      
+         settings save
+
+         #see function checkAndProcess above...
+         checkAndProcess s_readfiles
+         checkAndProcess s_porbits
+         checkAndProcess s_crop
+         checkAndProcess s_ovs
+
+         sleep 2 #pause two seconds to allow user interrupts
+    done
+}
+
+function processI12s(){
+    for scene in ${scenes_include[*]}
+    do
+       if [ "${master}" == "${scene}" ]; then
+         continue
+       fi
+         settings load ${originalSettingsFile}
+         #Set the stack master.
+         settings apply -r master=${stackMaster}
+         bold "Processing ${master}_${scene}"
+         settings apply -r slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
+         mkdir -p "${outputFolder}"
+         cd "${outputFolder}"
+         settings save
+         cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+         cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+
+         checkAndProcess coarseorb
+         checkAndProcess coarsecorr
+         checkAndProcess fine
+         checkAndProcess coregpm
+         checkAndProcess resample
+         checkAndProcess interfero
+         checkAndProcess comprefpha
+         checkAndProcess subtrrefpha
+
+         sleep 2 #pause two seconds to allow user interrupts
+    done
+}
+
 # we will be changing directories
 # save the current dir.
 CALLDIR=$PWD;
-# DORIS does not allow master and slave to be the same. 
-# We assign master as dummy ans slave as the current scene.      
-stackMaster=${master};
-settings apply -r master="dummy"
+# save the current settings and reload at the end.
+generateRandomString
+local originalSettingsFile=${CALLDIR}/${randomString}.set
+settings save ${originalSettingsFile}
 
-for scene in ${scenes_include[*]}
-do
-     bold "Processing ${scene}"
-     settings apply -r slave=${scene} outputFolder="${cropsFolder}/${scene}"
-     mkdir -p "${outputFolder}"
-     cd "${outputFolder}"    
-     settings save
-
-     #see function checkAndProcess above...
-     checkAndProcess s_readfiles    
-     checkAndProcess s_porbits
-     checkAndProcess s_crop
-     checkAndProcess s_ovs
-     
-     sleep 2 #pause two seconds to allow user interrupts
-done
-
+processCrops
 ####Now the i12s
-#Set the stack master.
-settings apply -r master=${stackMaster}
-
-for scene in ${scenes_include[*]}
-do
-   if [ "${master}" == "${scene}" ]; then
-     continue
-   fi
-     bold "Processing ${master}_${scene}"
-     settings apply -r slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
-     mkdir -p "${outputFolder}"
-     cd "${outputFolder}"
-     settings save
-     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
-     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
-
-     checkAndProcess coarseorb
-     checkAndProcess coarsecorr
-     checkAndProcess fine
-     checkAndProcess coregpm
-     checkAndProcess resample
-     checkAndProcess interfero
-     checkAndProcess comprefpha
-     checkAndProcess subtrrefpha
-
-     sleep 2 #pause two seconds to allow user interrupts
-done
-
+processI12s
 
 #go back to where we started
 cd ${CALLDIR}
 
 return 0
+
