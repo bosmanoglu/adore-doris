@@ -378,8 +378,9 @@ def process2dict(fileDict, processName):
         except:
             pass
     if processName=="comp_coregpm":
-        out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, 2*(int(out['Degree_cpm'])+1), 3, dtype=np.float)
-        out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+2*(int(out['Degree_cpm'])+1), 2*(int(out['Degree_cpm'])+1), 3, dtype=np.float)        
+        numCoef=[1,3,6,10]#2*(int(out['Degree_cpm'])+1)
+        out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)
+        out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+numCoef[int(out['Degree_cpm'])], numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)        
     return out
     
 def getval(fileDict, key, lines=None, processName=None, regexp=None):

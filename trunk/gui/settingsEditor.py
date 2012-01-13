@@ -45,6 +45,10 @@ class SettingsEditor:
                     settxt=settxt +" " + row[1]+'="'+ row[2]+'"';
         self.runcmd(settxt);  
 
+    def refreshButtonClicked(self, widget, treestore):
+        treestore.clear()
+        self.displayOptions(self.setFile, treestore);
+
     def __init__(self,mainWindow):
         #Load settings 
         self.set=ConfigParser.ConfigParser()
@@ -63,6 +67,7 @@ class SettingsEditor:
 
         self.window.connect("delete_event", self.delete_event)
         self.vbox = gtk.VBox(homogeneous=False, spacing=0);
+        self.hbox = gtk.HBox(homogeneous=False, spacing=0);
 
 #        adj = gtk.Adjustment(0.0, 0.0, 100.0, 1.0, 10.0, 0.0)
 #        scrollbar = gtk.HScale(adj)
@@ -123,8 +128,17 @@ class SettingsEditor:
         self.applyButton.connect("clicked", self.applyButtonClicked, self.treestore)
         self.applyButton.set_flags(gtk.CAN_DEFAULT);
         self.applyButton.show();
-        self.vbox.pack_start(self.treeview);
-        self.vbox.pack_end(self.applyButton);
+
+        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
+        self.refreshButton.connect("clicked", self.refreshButtonClicked, self.treestore)
+        self.refreshButton.set_flags(gtk.CAN_DEFAULT);
+        self.refreshButton.show();
+
+        self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 10);
+        self.hbox.pack_start(self.applyButton, expand = False, fill = False, padding = 20);
+
+        self.vbox.pack_start(self.hbox);
+        self.vbox.pack_end(self.treeview);
         self.window.set_default(self.applyButton);
         
         self.swindow.add_with_viewport(self.vbox)

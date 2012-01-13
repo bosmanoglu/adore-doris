@@ -30,3 +30,4 @@ mkepmlist -g root -u root --prefix /opt/adore /tmp/adore/ >> adore.list
 echo "l 000 root root /usr/bin/adore /opt/adore/scr/adore" >> adore.list
 cd ${SVNFOLDER}/build
 sudo epm -a all -f deb adore
+sudo epm -a all -f rpm adore
