@@ -96,7 +96,40 @@ function calculate_coh_winsize(){
   echo "$(( 2 * ${srp_multilook% *} * ${int_multilook% *} )) $(( 2 * ${srp_multilook#* } * ${int_multilook#* } ))"
 }
   
+function calculate_rs_dbow(){
+  local stat=`readRes.sh $s_resfile process "oversample"`
+  #To-Do: also check for m_resfile:oversample
+  if [[ stat -eq 1 ]]; then
+    cropSource="oversample"
+  else
+    cropSource="crop"
+  fi
+  # get a smaller dbow from master. Otherwise the resampling may fail. 
+  local l0 lN p0 pN lshift pshift
+  l0=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^First_line"`
+  lN=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^Last_line"`
+  p0=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^First_pixel"`
+  pN=`${ADORESCR}/readRes.sh ${s_resfile} ${cropSource} "^Last_pixel"`
 
+  lshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_lines"`
+  pshift=`${ADORESCR}/readRes.sh ${i_resfile} coarse_correl "Coarse_correlation_translation_pixels"`
+  if [ ${lshift} -lt 0 ]; then 
+    l0=$((${l0}-${lshift}+${rs_az_buffer}))
+    lN=$((${lN}-${rs_az_buffer}))
+  else 
+    l0=$((${l0}+${rs_az_buffer}))
+    lN=$((${lN}-${lshift}-${rs_az_buffer}))
+  fi
+  if [ ${pshift} -lt 0 ]; then
+    p0=$((${p0}-${pshift}+${rs_rg_buffer}))
+    pN=$((${pN}-${rs_rg_buffer}))
+  else
+    p0=$((${p0}+${rs_rg_buffer}))
+    pN=$((${pN}-${pshift}-${rs_rg_buffer}))
+  fi
+  #rs_dbow="${l0} ${lN} ${p0} ${pN}"
+  echo "${l0} ${lN} ${p0} ${pN}"
+}
 
 function error() 	#echo text to stderr.
 {

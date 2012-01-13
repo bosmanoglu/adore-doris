@@ -33,6 +33,11 @@ class MyGUI:
     self.title = title
     self.window.set_title( title)
     self.window.set_size_request( 800, 600)
+    try:
+      self.window.set_icon_from_file(ADOREGUIFOLDER+"/adore-doris-icon-256px.png")
+    except Exception, e:
+      print e.message
+      pass
     self.window.connect( "destroy", self.destroy)
     self.create_interior()
     self.window.show_all()
@@ -97,6 +102,8 @@ class MyGUI:
        ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', self.settings_load),
        ('settingsSave', None, '_Save', None, 'Save settings to current folder.', self.settings_save),
        ('settingsReset',  None, '_Reset',  None, 'Reset settings to defaults', self.settings_reset),
+       ('Help', None, '_Help'),
+       ('helpCommandReference', None, '_Command Reference', None, 'ADORE Command Reference wiki page.', self.help_commandreference),
        ('ShowAbout', gtk.STOCK_ABOUT, '_About', None, 'Show about information', self.show_about),
        ])
     # the uimanager
@@ -153,6 +160,9 @@ class MyGUI:
     
   def edit_paste( self, w):
     self.v.paste_clipboard();
+
+  def help_commandreference( self, w):
+    gtk.show_uri(None, "http://code.google.com/p/adore-doris/wiki/Reference", gtk.gdk.CURRENT_TIME)
 
   def settings_check( self, w):
     self.runcmd('settings check');
