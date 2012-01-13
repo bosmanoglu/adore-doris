@@ -62,7 +62,8 @@
     <separator/>
     <menuitem action="settingsReset"/>
   </menu>  
-  <menu action="About">
+  <menu action="Help">
+    <menuitem action="helpCommandReference"/>
     <menuitem action="ShowAbout"/>
   </menu>
 </menubar>

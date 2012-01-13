@@ -182,7 +182,7 @@ function linkASAR(){
 local rawDataFolder=$1
 local file folderName absFilePath
 
-for file in $(find "${rawDataFolder}" -name "${dataFile}")
+for file in $(find -L "${rawDataFolder}" -name "${dataFile}")
 do
   #folderName=`echo $file|cut -c23-30`
   folderName=`envisat_dump_header ${file} | awk '/^ABS_ORBIT /{printf "%s",$3}'`
@@ -197,12 +197,12 @@ function linkTSX(){
 # STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
 local f bname date tsxdir cosfile cosbname 
-  for f in $(find "${DATADIR}" -name "${leaderFile}"); do
+  for f in $(find -L "${DATADIR}" -name "${leaderFile}"); do
     #echo info: $f
     bname=$( basename ${f} )
     date=`echo $bname | awk -F '_' {'print substr($13,1,8)'}`
     tsxdir=${f%/*}
-    cosfile=`find $tsxdir -name "*.cos"` 
+    cosfile=`find -L $tsxdir -name "*.cos"` 
     cosbname=$( basename ${cosfile} )
     
     mkdir -p ${dataFolder}/${date}
@@ -260,7 +260,7 @@ function linkCSK(){
 # STAMPS3.2/link_slcs:goodTSX(), Mahmut Arikan - 20091021 
 local DATADIR=${1}
 local f bname date 
-  for f in $(find "${DATADIR}" -name "${dataFile}"); do
+  for f in $(find -L "${DATADIR}" -name "${dataFile}"); do
     #echo info: $f
     bname=$( basename ${f} )
     date=`echo $bname | awk -F '_' {'print substr($9,1,8)'}`
@@ -294,9 +294,7 @@ GAMMA)
   linkGAMMA ${rawDataFolder};
   ;;
 CSK)
-  set -x
   linkCSK ${rawDataFolder};
-  set +x
   ;;
 esac
 

@@ -142,7 +142,7 @@ getTile(){
   downloadSite=`grep download_immediate_site ${downloadsFile} | cut -d">" -f2 |cut -d"<" -f1`
   fileName=`grep _gd_download_file_name ${downloadsFile} | cut -d'"' -f6`
   echo ${downloadSite}${fileName}
-  wget --load-cookies ${cookieFile} -O${tmpFolder}/${fileName} --post-data "_gd_download_file_name=${fileName}" "${downloadSite}gdServlet/Download"
+  wget --tries=2 --load-cookies ${cookieFile} -O${tmpFolder}/${fileName} --post-data "_gd_download_file_name=${fileName}" "${downloadSite}gdServlet/Download"
   unzip -j -d ${f} ${tmpFolder}/${fileName}
   if [[ $? -ne 0 ]]; then
     echo "Error downloading tile. Non-existing tile. Might be all water."
