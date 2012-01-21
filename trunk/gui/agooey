@@ -196,6 +196,12 @@ class MyGUI:
     about.run()
     about.destroy()
 
+  def capture_text(self,text,text2,text3,text4):
+    #read current window with:
+    #    print self.v.get_text(self.capture_text);
+    return True
+
+
   def runMenuCmd(self, w):
     if w.get_name() == "checkProcess":
       self.runcmd('check')
