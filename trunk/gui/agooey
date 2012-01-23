@@ -125,7 +125,14 @@ class MyGUI:
   def create_interior( self):
     self.mainbox = gtk.VBox()
     self.window.add( self.mainbox)
-    # vte term
+    # eventbox
+    #http://www.eurion.net/python-snippets/snippet/Get%20Selection.html
+    # The eventbox allows us to read the selection in the vte-terminal
+    self.eventbox = gtk.EventBox()
+    self.eventbox.connect("selection_received", self.selection_received)
+    self.mainbox.pack_start(self.eventbox)
+    self.eventbox.show()
+          
     # create action group
     self.actiongroup = gtk.ActionGroup('MyActionGroup')
     self.actiongroup.add_actions(
@@ -287,13 +294,16 @@ class MyGUI:
     # vte term
     self.v = vte.Terminal()
     self.v.connect("child-exited", lambda term: gtk.main_quit())
-    self.v.connect('button-press-event', self.do_button_press)
+    self.v.connect('button-press-event', self.do_button_press)    
+    self.v.connect_object('selection-changed', self.get_stringtarget, self.eventbox)
+    self.v.set_word_chars("-0-9A-Za-z,./<>?;':\"[]{}\\|_+=!@#$%^&*()`~");
     #self.argv="adore -i -u /home/bosmanoglu/tmp/test/settings.set"
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i" ])
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i -u /home/bosmanoglu/tmp/test/settings.set"])
     self.vPid=self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
     #self.v.fork_command("sh", shlex.split(self.argv))
-    self.mainbox.pack_start(self.v)
+    #self.mainbox.pack_start(self.v)
+    self.eventbox.add(self.v)
     
     # show the box
     self.mainbox.show()
@@ -394,6 +404,19 @@ class MyGUI:
 #      self.runcmd('check setup');
     #else:
       #do nothing.
+
+  def get_stringtarget(self, widget):
+    # And request the "STRING" target for the primary selection
+    ret = widget.selection_convert("PRIMARY", "STRING")
+    return
+
+  # Signal handler called when the selections owner returns the data
+  def selection_received(self, widget, selection_data, data):
+    # Make sure we got the data in the expected form    
+    if str(selection_data.type) == "STRING":
+      self.selectionText=selection_data.get_text();
+    return False
+
   def create_popup(self, event):
     menu = gtk.Menu()
 
@@ -407,7 +430,7 @@ class MyGUI:
                                          gtk.ICON_SIZE_MENU)
     paste_item.set_image(paste_icon)
     
-#    open_item = gtk.ImageMenuItem('_Open')
+    open_item = gtk.ImageMenuItem('_Open')
 
     clipboard = gtk.clipboard_get(gtk.gdk.SELECTION_CLIPBOARD)
     if not clipboard.wait_is_text_available():
@@ -415,19 +438,19 @@ class MyGUI:
 
     if not self.v.get_has_selection():
         copy_item.set_sensitive(False)
-#        open_item.set_sensitive(False)
-
+        open_item.set_sensitive(False)
+        
     #menu.append(gtk.SeparatorMenuItem())
     menu.append(copy_item)
     menu.append(paste_item)
-#    menu.append(open_item)
+    menu.append(open_item)
     #menu.append(gtk.SeparatorMenuItem())
     #menu.append(gtk.SeparatorMenuItem())
     #menu.append(im_menu)
 
     copy_item.connect('activate', lambda x: self.v.copy_clipboard())
     paste_item.connect('activate', lambda x: self.v.paste_clipboard())
-#    open_item.connect('activate', lambda x: self.runcmd('echo ' + str(self.vPid) ))
+    open_item.connect('activate', lambda x: self.runcmd('xdg-open ' + self.selectionText) )
     menu.show_all()
     menu.popup(None, None, None, 3, event.time)
 
