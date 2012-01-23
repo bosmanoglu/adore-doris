@@ -13,7 +13,7 @@ import shlex
 import ConfigParser
 
 import settingsEditor
-
+import dialogs
 try:
   import vte
 except:
@@ -29,6 +29,86 @@ class MyGUI:
     self.argv=argv or "/scr/adore -g -i"
     self.set = ConfigParser.ConfigParser()
     self.setFile="/tmp/adore.set"
+    self.menuCommands={"checkProcess": "check",
+                       "checkSetup": "check setup",
+                       "demCheck": "dem check",
+                       "demMake": "dem make",
+                       "demUnload": "dem unload",
+                       "hcr_?": "?",
+                       "hcr_addrefpha2s_crop": "? addrefpha2s_crop",
+                       "hcr_archive": "? archive",
+                       "hcr_ask": "? ask",
+                       "hcr_baselines": "? baselines",
+                       "hcr_bold": "? bold",
+                       "hcr_calculate_coh_multilook": "? calculate_coh_multilook",
+                       "hcr_calculate_coh_winsize": "? calculate_coh_winsize",
+                       "hcr_calculate_rs_dbow": "? calculate_rs_dbow",
+                       "hcr_call": "? call",
+                       "hcr_canonicalPath": "? canonicalPath",
+                       "hcr_check": "? check",
+                       "hcr_checkInitialSettings": "? checkInitialSettings",
+                       "hcr_coarsecorr": "? coarsecorr",
+                       "hcr_coarseorb": "? coarseorb",
+                       "hcr_coherence": "? coherence",
+                       "hcr_comprefdem": "? comprefdem",
+                       "hcr_comprefpha": "? comprefpha",
+                       "hcr_coregpm": "? coregpm",
+                       "hcr_dem": "? dem",
+                       "hcr_dem2slant2h": "? dem2slant2h",
+                       "hcr_demassist": "? demassist",
+                       "hcr_dinsar": "? dinsar",
+                       "hcr_dorisProcess2OutputFile": "? dorisProcess2OutputFile",
+                       "hcr_error": "? error",
+                       "hcr_exclude": "? exclude",
+                       "hcr_filtphase": "? filtphase",
+                       "hcr_filtrange": "? filtrange",
+                       "hcr_fine": "? fine",
+                       "hcr_generateRandomString": "? generateRandomString",
+                       "hcr_geocode": "? geocode",
+                       "hcr_getSystemEndianness": "? getSystemEndianness",
+                       "hcr_gnuplot_baseline": "? gnuplot_baseline",
+                       "hcr_h": "? h",
+                       "hcr_initialize": "? initialize",
+                       "hcr_interfero": "? interfero",
+                       "hcr_m_crop": "? m_crop",
+                       "hcr_m_filtazi": "? m_filtazi",
+                       "hcr_m_ovs": "? m_ovs",
+                       "hcr_m_porbits": "? m_porbits",
+                       "hcr_m_readfiles": "? m_readfiles",
+                       "hcr_m_simamp": "? m_simamp",
+                       "hcr_m_timing": "? m_timing",
+                       "hcr_mask": "? mask",
+                       "hcr_mvDorisFiles": "? mvDorisFiles",
+                       "hcr_p": "? p",
+                       "hcr_pn2rs": "? pn2rs",
+                       "hcr_pp": "? pp",
+                       "hcr_quejob": "? quejob",
+                       "hcr_raster": "? raster",
+                       "hcr_reltiming": "? reltiming",
+                       "hcr_report": "? report",
+                       "hcr_resample": "? resample",
+                       "hcr_s": "? s",
+                       "hcr_s_crop": "? s_crop",
+                       "hcr_s_crop2resample": "? s_crop2resample",
+                       "hcr_s_filtazi": "? s_filtazi",
+                       "hcr_s_ovs": "? s_ovs",
+                       "hcr_s_porbits": "? s_porbits",
+                       "hcr_s_readfiles": "? s_readfiles",
+                       "hcr_saveas": "? saveas",
+                       "hcr_scenes": "? scenes",
+                       "hcr_setPS1": "? setPS1",
+                       "hcr_settings": "? settings",
+                       "hcr_slant2h": "? slant2h",
+                       "hcr_slant2htrick": "? slant2htrick",
+                       "hcr_strcmpi": "? strcmpi",
+                       "hcr_subtrrefdem": "? subtrrefdem",
+                       "hcr_subtrrefpha": "? subtrrefpha",
+                       "hcr_testFunction": "? testFunction",
+                       "hcr_undo": "? undo",
+                       "hcr_unwrap": "? unwrap",
+                       "hcr_view": "? view",
+                       "hcr_waitjob": "? waitjob",                       
+                      }
     self.window = gtk.Window()
     self.title = title
     self.window.set_title( title)
@@ -58,6 +138,11 @@ class MyGUI:
        ('Check', None, '_Check'),
        ('checkProcess', None, 'Process', None, '', self.runMenuCmd),
        ('checkSetup', None, 'Setup', None, '', self.runMenuCmd),
+       ('DEM', None, '_DEM'),
+       ('demCheck', None, 'Check', None, '', self.runMenuCmd),
+       ('demLoad', None, 'Load...', None, '', self.demLoad),
+       ('demMake', None, 'Make...', None, '', self.demMake),
+       ('demUnload', None, 'Unload', None, '', self.runMenuCmd),
        ('Process', None, '_Process'),
        ('Master', None, '_Master'),
        ('m_readfiles', None, 'm__readfiles', None, '', self.runMenuName),
@@ -103,7 +188,82 @@ class MyGUI:
        ('settingsSave', None, '_Save', None, 'Save settings to current folder.', self.settings_save),
        ('settingsReset',  None, '_Reset',  None, 'Reset settings to defaults', self.settings_reset),
        ('Help', None, '_Help'),
-       ('helpCommandReference', None, '_Command Reference', None, 'ADORE Command Reference wiki page.', self.help_commandreference),
+       ('helpCommandReference', None, 'Offline _Command Reference'),
+       ('hcr_?', None, '?', None, 'Help on ?', self.runMenuCmd),
+       ('hcr_addrefpha2s_crop', None, 'addrefpha2s__crop', None, 'Help on addrefpha2s_crop', self.runMenuCmd),
+       ('hcr_archive', None, 'archive', None, 'Help on archive', self.runMenuCmd),
+       ('hcr_ask', None, 'ask', None, 'Help on ask', self.runMenuCmd),
+       ('hcr_baselines', None, 'baselines', None, 'Help on baselines', self.runMenuCmd),
+       ('hcr_bold', None, 'bold', None, 'Help on bold', self.runMenuCmd),
+       ('hcr_calculate_coh_multilook', None, 'calculate__coh__multilook', None, 'Help on calculate_coh_multilook', self.runMenuCmd),
+       ('hcr_calculate_coh_winsize', None, 'calculate__coh__winsize', None, 'Help on calculate_coh_winsize', self.runMenuCmd),
+       ('hcr_calculate_rs_dbow', None, 'calculate__rs__dbow', None, 'Help on calculate_rs_dbow', self.runMenuCmd),
+       ('hcr_call', None, 'call', None, 'Help on call', self.runMenuCmd),
+       ('hcr_canonicalPath', None, 'canonicalPath', None, 'Help on canonicalPath', self.runMenuCmd),
+       ('hcr_check', None, 'check', None, 'Help on check', self.runMenuCmd),
+       ('hcr_checkInitialSettings', None, 'checkInitialSettings', None, 'Help on checkInitialSettings', self.runMenuCmd),
+       ('hcr_coarsecorr', None, 'coarsecorr', None, 'Help on coarsecorr', self.runMenuCmd),
+       ('hcr_coarseorb', None, 'coarseorb', None, 'Help on coarseorb', self.runMenuCmd),
+       ('hcr_coherence', None, 'coherence', None, 'Help on coherence', self.runMenuCmd),
+       ('hcr_comprefdem', None, 'comprefdem', None, 'Help on comprefdem', self.runMenuCmd),
+       ('hcr_comprefpha', None, 'comprefpha', None, 'Help on comprefpha', self.runMenuCmd),
+       ('hcr_coregpm', None, 'coregpm', None, 'Help on coregpm', self.runMenuCmd),
+       ('hcr_dem', None, 'dem', None, 'Help on dem', self.runMenuCmd),
+       ('hcr_dem2slant2h', None, 'dem2slant2h', None, 'Help on dem2slant2h', self.runMenuCmd),
+       ('hcr_demassist', None, 'demassist', None, 'Help on demassist', self.runMenuCmd),
+       ('hcr_dinsar', None, 'dinsar', None, 'Help on dinsar', self.runMenuCmd),
+       ('hcr_dorisProcess2OutputFile', None, 'dorisProcess2OutputFile', None, 'Help on dorisProcess2OutputFile', self.runMenuCmd),
+       ('hcr_error', None, 'error', None, 'Help on error', self.runMenuCmd),
+       ('hcr_exclude', None, 'exclude', None, 'Help on exclude', self.runMenuCmd),
+       ('hcr_filtphase', None, 'filtphase', None, 'Help on filtphase', self.runMenuCmd),
+       ('hcr_filtrange', None, 'filtrange', None, 'Help on filtrange', self.runMenuCmd),
+       ('hcr_fine', None, 'fine', None, 'Help on fine', self.runMenuCmd),
+       ('hcr_generateRandomString', None, 'generateRandomString', None, 'Help on generateRandomString', self.runMenuCmd),
+       ('hcr_geocode', None, 'geocode', None, 'Help on geocode', self.runMenuCmd),
+       ('hcr_getSystemEndianness', None, 'getSystemEndianness', None, 'Help on getSystemEndianness', self.runMenuCmd),
+       ('hcr_gnuplot_baseline', None, 'gnuplot__baseline', None, 'Help on gnuplot_baseline', self.runMenuCmd),
+       ('hcr_h', None, 'h', None, 'Help on h', self.runMenuCmd),
+       ('hcr_initialize', None, 'initialize', None, 'Help on initialize', self.runMenuCmd),
+       ('hcr_interfero', None, 'interfero', None, 'Help on interfero', self.runMenuCmd),
+       ('hcr_m_crop', None, 'm__crop', None, 'Help on m_crop', self.runMenuCmd),
+       ('hcr_m_filtazi', None, 'm__filtazi', None, 'Help on m_filtazi', self.runMenuCmd),
+       ('hcr_m_ovs', None, 'm__ovs', None, 'Help on m_ovs', self.runMenuCmd),
+       ('hcr_m_porbits', None, 'm__porbits', None, 'Help on m__porbits', self.runMenuCmd),
+       ('hcr_m_readfiles', None, 'm__readfiles', None, 'Help on m_readfiles', self.runMenuCmd),
+       ('hcr_m_simamp', None, 'm__simamp', None, 'Help on m_simamp', self.runMenuCmd),
+       ('hcr_m_timing', None, 'm__timing', None, 'Help on m_timing', self.runMenuCmd),
+       ('hcr_mask', None, 'mask', None, 'Help on mask', self.runMenuCmd),
+       ('hcr_mvDorisFiles', None, 'mvDorisFiles', None, 'Help on mvDorisFiles', self.runMenuCmd),
+       ('hcr_p', None, 'p', None, 'Help on p', self.runMenuCmd),
+       ('hcr_pn2rs', None, 'pn2rs', None, 'Help on pn2rs', self.runMenuCmd),
+       ('hcr_pp', None, 'pp', None, 'Help on pp', self.runMenuCmd),
+       ('hcr_quejob', None, 'quejob', None, 'Help on quejob', self.runMenuCmd),
+       ('hcr_raster', None, 'raster', None, 'Help on raster', self.runMenuCmd),
+       ('hcr_reltiming', None, 'reltiming', None, 'Help on reltiming', self.runMenuCmd),
+       ('hcr_report', None, 'report', None, 'Help on report', self.runMenuCmd),
+       ('hcr_resample', None, 'resample', None, 'Help on resample', self.runMenuCmd),
+       ('hcr_s', None, 's', None, 'Help on s', self.runMenuCmd),
+       ('hcr_s_crop', None, 's__crop', None, 'Help on s_crop', self.runMenuCmd),
+       ('hcr_s_crop2resample', None, 's__crop2resample', None, 'Help on s_crop2resample', self.runMenuCmd),
+       ('hcr_s_filtazi', None, 's__filtazi', None, 'Help on s_filtazi', self.runMenuCmd),
+       ('hcr_s_ovs', None, 's__ovs', None, 'Help on s_ovs', self.runMenuCmd),
+       ('hcr_s_porbits', None, 's__porbits', None, 'Help on s_porbits', self.runMenuCmd),
+       ('hcr_s_readfiles', None, 's__readfiles', None, 'Help on s_readfiles', self.runMenuCmd),
+       ('hcr_saveas', None, 'saveas', None, 'Help on saveas', self.runMenuCmd),
+       ('hcr_scenes', None, 'scenes', None, 'Help on scenes', self.runMenuCmd),
+       ('hcr_setPS1', None, 'setPS1', None, 'Help on setPS1', self.runMenuCmd),
+       ('hcr_settings', None, 'settings', None, 'Help on settings', self.runMenuCmd),
+       ('hcr_slant2h', None, 'slant2h', None, 'Help on slant2h', self.runMenuCmd),
+       ('hcr_slant2htrick', None, 'slant2htrick', None, 'Help on slant2htrick', self.runMenuCmd),
+       ('hcr_strcmpi', None, 'strcmpi', None, 'Help on strcmpi', self.runMenuCmd),
+       ('hcr_subtrrefdem', None, 'subtrrefdem', None, 'Help on subtrrefdem', self.runMenuCmd),
+       ('hcr_subtrrefpha', None, 'subtrrefpha', None, 'Help on subtrrefpha', self.runMenuCmd),
+       ('hcr_testFunction', None, 'testFunction', None, 'Help on testFunction', self.runMenuCmd),
+       ('hcr_undo', None, 'undo', None, 'Help on undo', self.runMenuCmd),
+       ('hcr_unwrap', None, 'unwrap', None, 'Help on unwrap', self.runMenuCmd),
+       ('hcr_view', None, 'view', None, 'Help on view', self.runMenuCmd),
+       ('hcr_waitjob', None, 'waitjob', None, 'Help on waitjob', self.runMenuCmd),
+       ('helpOnlineCommandReference', None, '_Online Command Reference', None, 'ADORE Command Reference wiki page.', self.help_commandreference),
        ('ShowAbout', gtk.STOCK_ABOUT, '_About', None, 'Show about information', self.show_about),
        ])
     # the uimanager
@@ -127,10 +287,11 @@ class MyGUI:
     # vte term
     self.v = vte.Terminal()
     self.v.connect("child-exited", lambda term: gtk.main_quit())
+    self.v.connect('button-press-event', self.do_button_press)
     #self.argv="adore -i -u /home/bosmanoglu/tmp/test/settings.set"
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i" ])
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i -u /home/bosmanoglu/tmp/test/settings.set"])
-    self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
+    self.vPid=self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
     #self.v.fork_command("sh", shlex.split(self.argv))
     self.mainbox.pack_start(self.v)
     
@@ -152,6 +313,28 @@ class MyGUI:
   def destroy( self, w):
     gtk.main_quit()
 
+  def demLoad( self, w):
+    chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                                    buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+    response = chooser.run()
+    if response == gtk.RESPONSE_OK:
+      filename=chooser.get_filename();
+      self.runcmd("dem load " + filename);
+#    elif response == gtk.RESPONSE_CANCEL:
+    chooser.destroy()
+    
+  def demMake( self, w):
+    response,param=dialogs.parameter("<b>dem make</b>", "SRTM1/SRTM3 extraBufferPercentage name", "SRTM3 20 dem", "Enter parameters for...");
+    if response == gtk.RESPONSE_OK:
+      self.runcmd("dem make " + param);
+
+  def do_button_press(self, terminal, event):
+    if event.button == 3:
+        self.create_popup(event)
+        return True
+    else:
+        return False
+    
   def file_quit( self, w):
     gtk.main_quit();
 
@@ -201,14 +384,52 @@ class MyGUI:
     #    print self.v.get_text(self.capture_text);
     return True
 
-
   def runMenuCmd(self, w):
-    if w.get_name() == "checkProcess":
-      self.runcmd('check')
-    elif w.get_name() == "checkSetup":
-      self.runcmd('check setup');
+    self.runcmd(self.menuCommands[w.get_name()]);
+#    if w.get_name() == "checkProcess":
+#      self.runcmd('check')
+#    elif w.get_name() == "checkSetup":
+#      self.runcmd('check setup');
+#    elif w.get_name() == "checkSetup":
+#      self.runcmd('check setup');
     #else:
       #do nothing.
+  def create_popup(self, event):
+    menu = gtk.Menu()
+
+    copy_item = gtk.ImageMenuItem('_Copy')
+    copy_icon = gtk.image_new_from_stock(gtk.STOCK_COPY,
+                                         gtk.ICON_SIZE_MENU)
+    copy_item.set_image(copy_icon)
+
+    paste_item = gtk.ImageMenuItem('_Paste')
+    paste_icon = gtk.image_new_from_stock(gtk.STOCK_PASTE,
+                                         gtk.ICON_SIZE_MENU)
+    paste_item.set_image(paste_icon)
+    
+#    open_item = gtk.ImageMenuItem('_Open')
+
+    clipboard = gtk.clipboard_get(gtk.gdk.SELECTION_CLIPBOARD)
+    if not clipboard.wait_is_text_available():
+        paste_item.set_sensitive(False)
+
+    if not self.v.get_has_selection():
+        copy_item.set_sensitive(False)
+#        open_item.set_sensitive(False)
+
+    #menu.append(gtk.SeparatorMenuItem())
+    menu.append(copy_item)
+    menu.append(paste_item)
+#    menu.append(open_item)
+    #menu.append(gtk.SeparatorMenuItem())
+    #menu.append(gtk.SeparatorMenuItem())
+    #menu.append(im_menu)
+
+    copy_item.connect('activate', lambda x: self.v.copy_clipboard())
+    paste_item.connect('activate', lambda x: self.v.paste_clipboard())
+#    open_item.connect('activate', lambda x: self.runcmd('echo ' + str(self.vPid) ))
+    menu.show_all()
+    menu.popup(None, None, None, 3, event.time)
 
 if __name__ == "__main__":
   ADOREGUIFOLDER=os.path.split(os.path.realpath(sys.argv[0]))[0]
