@@ -7,6 +7,9 @@
 #  singleMasterStack.adr is an ADORE script.  
 #  It generates a single master stack interferogram using the ADORE settings. 
 #
+#  If resampling window is not given, it calculates a common area from all images
+#  and sets rs_dbow (resampling window) before creating interferograms.
+#
 # INPUT:
 #  There are no input parameters. 
 #  
@@ -16,6 +19,9 @@
 #    For crops: s_readfiles, s_porbits, s_crop, s_ovs 
 #    For i12s: coarseorb, coarsecorr, fine, coregpm, coregpm, resample, interfero, comprefpha, subtrrefpha
 #
+
+# CHANGES:
+# 20120100 - added calculation of rs_dbow.
 
 function checkAndProcess(){
   if check -p ${1} 
@@ -29,10 +35,6 @@ function checkAndProcess(){
 }
 
 function processCrops(){
-    # DORIS does not allow master and slave to be the same. 
-    # We assign master as dummy ans slave as the current scene.      
-    stackMaster=${master};
-    settings apply -r master="dummy"
 
     for scene in ${scenes_include[*]}
     do   
@@ -63,6 +65,7 @@ function processI12s(){
          settings apply -r master=${stackMaster}
          bold "Processing ${master}_${scene}"
          settings apply -r slave=${scene} outputFolder="${i12sFolder}/${master}_${scene}"
+         settings apply -r rs_dbow="${rs_dbow_stack}"
          mkdir -p "${outputFolder}"
          cd "${outputFolder}"
          settings save
@@ -90,7 +93,37 @@ generateRandomString
 local originalSettingsFile=${CALLDIR}/${randomString}.set
 settings save ${originalSettingsFile}
 
+# DORIS does not allow master and slave to be the same. 
+# We assign master as dummy ans slave as the current scene.      
+stackMaster=${master};
+settings apply -r master="dummy"
+
+#Now do crops
 processCrops
+
+#calculate rs_dbow for stack if not given as rs_dbow
+if [ "${rs_dbow}" == "0 0 0 0" ]; then
+  settings apply -r master=${stackMaster} outputFolder="${cropsFolder}/${stackMaster}"
+  local stat=`readRes.sh $m_resfile process "oversample"`
+  #To-Do: also check for m_resfile:oversample
+  if [[ stat -eq 1 ]]; then
+    cropSource="oversample"
+  else
+    cropSource="crop"
+  fi
+  # get a smaller dbow from master. Otherwise the resampling may fail. 
+  local l0 lN p0 pN lshift pshift
+  l0=`${ADORESCR}/readRes.sh ${m_resfile} ${cropSource} "^First_line"`
+  lN=`${ADORESCR}/readRes.sh ${m_resfile} ${cropSource} "^Last_line"`
+  p0=`${ADORESCR}/readRes.sh ${m_resfile} ${cropSource} "^First_pixel"`
+  pN=`${ADORESCR}/readRes.sh ${m_resfile} ${cropSource} "^Last_pixel"`
+  l0=$((${l0}+${rs_az_buffer}))
+  lN=$((${lN}-${rs_az_buffer}))
+  p0=$((${p0}+${rs_rg_buffer}))
+  pN=$((${pN}-${rs_rg_buffer}))
+  echo "Setting rs_dbow as: $l0 $lN $p0 $pN"
+  rs_dbow_stack="${l0} ${lN} ${p0} ${pN}"
+fi
 ####Now the i12s
 processI12s
 
