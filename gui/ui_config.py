@@ -249,11 +249,11 @@ def menuAction(self, w):
     return
   elif m == "ShowAbout":  
     #os.system("echo ADORE-GUI")#self.answer_label.set_label( "Created by Beda Kosata")
+    self.readSet();
     about = gtk.AboutDialog()
     about.set_program_name("ADORE-GOOEY")
-    about.set_version('0')#open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"version", 'r').read())
-    about.set_copyright("(c) Batuhan Osmanoglu")
-    self.readSet();
+    about.set_version(open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"/version", 'r').read())
+    about.set_copyright("(c) Batuhan Osmanoglu 2009-2012")
     about.set_license(open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"/license.txt", 'r').read())    
     about.set_comments("""
     Automated Doris Environment
