@@ -26,3 +26,9 @@ Frequently asked questions.
 
 *What are internal/external ADORE commands, functions, scripts?*
   Development of ADORE is built on different stages, and also includes different software and scripts developed previously, or for other software. To learn more about the differences, take a look at the wiki page [adoreFunctionsAndScripts ADORE Functions and Scripts].
+
+*Why does DEM make leave the some files (`.hgt,dds.cr.usgs.gov`) in the current folder?*
+  The idea is to have a central DEM folder and keep all your DEM's in that folder. This way, having the `dds.cr.usgs.gov` file speeds up the initial indexing of the HTTP site. Also having the `.hgt files` may speed up your DEM generation if you create multiple DEM's using the same SRTM tiles, as they will not need to be re-downloaded.
+
+*Why do I need to have the interferogram result file (`$i_resfile`) to create a DEM? Why can't it just grab the coordinates from the master result file?*
+  The dem make script also requires to know the orbit incline which is reported by Doris in the coarse_orbits step. Therefore dem make will only run after that step is completed.
