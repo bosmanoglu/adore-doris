@@ -52,6 +52,9 @@ class SettingsEditor:
     def __init__(self,mainWindow):
         #Load settings 
         self.set=ConfigParser.ConfigParser()
+        #Make settings case sensitive
+        self.set.optionxform = str
+        #
         self.setFile=mainWindow.setFile;
         self.runcmd=mainWindow.runcmd;
 #        self.set=ConfigParser.ConfigParser()

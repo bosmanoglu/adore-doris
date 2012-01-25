@@ -251,11 +251,14 @@ def menuAction(self, w):
     #os.system("echo ADORE-GUI")#self.answer_label.set_label( "Created by Beda Kosata")
     about = gtk.AboutDialog()
     about.set_program_name("ADORE-GOOEY")
-    about.set_version("0.0.0")
+    about.set_version('0')#open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"version", 'r').read())
     about.set_copyright("(c) Batuhan Osmanoglu")
     self.readSet();
-    about.set_license(open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"/license.txt", 'r').read())
-    about.set_comments("Automated Doris Environment")
+    about.set_license(open(self.set.get('adore','ADOREFOLDER').strip('\'"')+"/license.txt", 'r').read())    
+    about.set_comments("""
+    Automated Doris Environment
+    SHELL PID: {}
+    """.format(self.vPid))
     about.set_website("http://code.google.com/p/adore-doris/")
     about.set_logo(gtk.gdk.pixbuf_new_from_file(self.set.get('adore','ADOREFOLDER').strip('\'"') +"/man/adoreDoris_tud_um.png"))
     about.run()

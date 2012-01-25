@@ -3,6 +3,15 @@ if [ "${v-notVerbose}" != "notVerbose" ]; then
   set -x
 fi
 
+#When started from AGOOEY, we do not run ADORE. 
+#Therefore ADORESCR is probably not set, and we may have to set it.
+if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
+  ADORESCR=`echo $(cd $(dirname ${BASH_SOURCE[@]}); pwd -P)`
+  if [ -d ${ADORESCR}/fun ]; then 
+    export ADORESCR
+  fi
+fi
+
 ###### LOAD SETTINGS
 #load functions
 source ${ADORESCR}/fun/functions
@@ -33,8 +42,8 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   bind '"\e[B"':history-search-forward  
   ### end ipython style history search 
 
-  PATH=${_ADOREPATH}
-  unset _ADOREPATH
+  PATH=${PATH}:${ADORESCR} #${_ADOREPATH}
+                           #unset _ADOREPATH
   unset i #If this line is omitted, all spawned ADORE jobs
           # will run in interactive mode.
 
@@ -47,5 +56,5 @@ fi
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
   #Gui on
-  declare -r PROMPT_COMMAND="settings list &> /tmp/adore.set"
+  declare -r PROMPT_COMMAND="settings list &> /tmp/adore${PPID}.set"
 fi

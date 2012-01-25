@@ -29,7 +29,6 @@ class MyGUI:
   def __init__( self, title,argv):
     self.argv=argv or "/scr/adore -g -i"
     self.set = ConfigParser.ConfigParser()
-    self.setFile="/tmp/adore.set"
     self.window = gtk.Window()
     self.title = title
     self.window.set_title( title)
@@ -86,7 +85,11 @@ class MyGUI:
     #self.argv="adore -i -u /home/bosmanoglu/tmp/test/settings.set"
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i" ])
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i -u /home/bosmanoglu/tmp/test/settings.set"])
-    self.vPid=self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
+    #THIS WORKS but creates spawns 3 shells instead of two#self.vPid=self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
+    cmd=self.argv.split(" ");
+    self.vPid=self.v.fork_command(cmd[0], cmd);#USAGE:fork_command(args[0], args, None, os.getcwd())
+    self.setFile="/tmp/adore"+str(self.vPid)+".set"
+    #print self.vPid
     #self.v.fork_command("sh", shlex.split(self.argv))
     #self.mainbox.pack_start(self.v)
     self.eventbox.add(self.v)
@@ -174,7 +177,8 @@ if __name__ == "__main__":
   argv=ADOREFOLDER + "/scr/adore -g -i "
   if len(sys.argv[1:]) >0:
     argv+= " ".join(sys.argv[1:]);
-    #print argv
+  #  #print argv
+  #argv=sys.argv[1:];
   m = MyGUI("ADORE GUI",argv)  
   m.main()
 
