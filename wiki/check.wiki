@@ -1,85 +1,78 @@
-#summary CHECK
+#summary check
 #labels Phase-Support,Help
-
 =USAGE:=
 {{{
 	check
 	check setup
 	check resultFile
 	check -p processName
-	check -j jobid 
+	check -j jobid
 }}}
-
 =DESCRIPTION:=
  CHECK is an internal ADORE command. 
  It shows the process control list from the result files.
-
  Using the -p option it can be used to check whether a given step is possible
  to run. 
- "setup" option can be used to check if ADORE can find all the necessary libraries.
-
+ "setup" option can be used to check if ADORE can find all the necessary 
+ libraries.
 =INPUT:=
  No required inputs.
-  
-  Optional:
+  ==OPTIONAL:==
     resultFile: If specified, only displays given files process control list.
-
     -p processName: Check if ADORE can run the given doris process. This 
-    function is currently under development. If no output is shown the it is
-    OK to run the process. Otherwise error messages will hint at the problem.
-
-    -j jobid: Check if the job submitted by quejob is finished. Return 0 if finished.
-{{{
-		Job Status 	Output
-		----------------------
-		Completed	0
-		Running		1
-              Exiting		2
-              Queued		3
-              Waiting		4
-              Transferred	5
-              Held 		6
-}}}
-    setup: Check several executables and returns assistive messages if executables are missing.
-
-=OUTPUT:=
+     function is currently under development. If no output is shown the it is
+     OK to run the process. Otherwise error messages will hint at the problem.
+    -j jobid: Check if the job submitted by quejob is finished. Return 0 if 
+     finished.
+       Output: Job Status
+       ------------------
+       0: Completed
+       1: Running
+       2: Exiting
+       3: Queued
+       4: Waiting
+       5: Transferred
+       6: Held
+    setup: Check several executables and returns assistive messages if executables 
+     are missing.
+=OUTPUT=
  Shows the process control list of given result file.
-
-=Examples:=
+}}}
+=EXAMPLE:=
 {{{
-check -p m_readfiles; echo $?
-check setup
-
+ check
+ check -p m_readfiles; echo $?
+ check setup
 ADORE: check
-INTERFEROGRAM: 			MASTER: 			SLAVE: 		
-coarse_orbits:		1	readfiles:		1	readfiles:		1
-coarse_correl:		1	precise_orbits:		1	precise_orbits:		1
-fine_coreg:		1	crop:			1	crop:			1
-timing_error:		0	sim_amplitude:		0	sim_amplitude:		0
-dem_assist:		0	master_timing:		0	master_timing:		0
-comp_coregpm:		1	oversample:		1	oversample:		1
-interfero:		1	resample:		0	resample:		1
-coherence:		0	filt_azi:		0	filt_azi:		0
-comp_refphase:		1	filt_range:		0	filt_range:		0
-subtr_refphase:		1		
-comp_refdem:		0		
-subtr_refdem:		0		
-filtphase:		0		
-unwrap:			0		
-slant2h:		0		
-geocoding:		0		
-dinsar:			0
-
+INTERFEROGRAM:                  MASTER:                         SLAVE:          
+coarse_orbits:          1       readfiles:              1       readfiles:              1
+coarse_correl:          1       precise_orbits:         1       precise_orbits:         1
+fine_coreg:             1       crop:                   1       crop:                   1
+timing_error:           0       sim_amplitude:          0       sim_amplitude:          0
+dem_assist:             0       master_timing:          0       master_timing:          0
+comp_coregpm:           1       oversample:             1       oversample:             1
+interfero:              1       resample:               0       resample:               1
+coherence:              0       filt_azi:               0       filt_azi:               0
+comp_refphase:          1       filt_range:             0       filt_range:             0
+subtr_refphase:         1               
+comp_refdem:            0               
+subtr_refdem:           0               
+filtphase:              0               
+unwrap:                 0               
+slant2h:                0               
+geocoding:              0               
+dinsar:                 0
 ADORE: check 050507.res
 050507.res:
-readfiles:		1
-precise_orbits:		1
-crop:			1
-sim_amplitude:		0
-master_timing:		0
-oversample:		1
-resample:		1
-filt_azi:		0
-filt_range:		0
-
+readfiles:              1
+precise_orbits:         1
+crop:                   1
+sim_amplitude:          0
+master_timing:          0
+oversample:             1
+resample:               1
+filt_azi:               0
+filt_range:             0
 }}}
+=KNOWN BUGS:=
+ None.

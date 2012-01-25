@@ -1,51 +1,45 @@
-#summary Utility for listing, saving and loading ADORE variables.
+#summary settings
 #labels Phase-Support,Help
-
 =USAGE:=
 {{{
 	settings option [argument]
-	settings
 	settings apply variableName
-	settings apply variableName1=variableValue1 [variableName2 variableName3=...]
-	settings apply -r variableName1=variableValue1 [variableName2 variableName3=...]
+	settings apply [-rq] variableName1=variableValue1 [variableName2 variableName3=...]
 	settings check
-	settings fix
+	settings fix [-q]
+	settings init [-q]
+	settings list
 	settings raw
 	settings save [fileName]
-	settings load fileName
+	settings load [fileName]
 	settings reset
 	settings clear
 }}}
-
 =DESCRIPTION:=
- SETTINGS is an internal ADORE command. <br>
- It aims at providing a smooth interface for modifying ADORE settings.
-
+ SETTINGS is an internal ADORE command. 
+ It aims at providing a smooth interface for modifying ADORE 
+ settings.
 =INPUT:=
- `settings`:
-   will list the current settings as seen by ADORE.
-
- `settings apply [-r] variableName`: 
-  updates settings that depend on variableName. By default this is not done in a recursive way. Use `settings check` for possible mismatches. Recursive checks can be specified using -r option.
-  Settings apply can also assign values usign the variableName=value syntax. 
-
- `settings check`: 
-   looks for differences between ADORE's expectations and current values. Handy for finding errors due to recursive dependancies.
-
- `settings fix`:
-   after `settings check`ing you can accept suggested changes using the variables. `settings check` will display a reference line.
-
- `settings raw`:
-   displays the unprocessed settings with USERS	changes. This can be saved with the save function.
-
- `settings save [fileName]`:
-   saves the settings (raw) to the file. If fileName is not specified `./settings.set` is used.
-
- `settings load fileName`:
-   loads the settings to the environment.
-
- `settings reset`:
-   initializes the environment. User settings file is loaded.
-
- `settings clear`:
-   clears all ADORE settings and resets `${ADORESCR}` and `${ADOREFOLDER}`
+ settings apply [-rq] variableName: updates settings that depend on
+	variableName. By default this is not done in a recursive way. Use 
+      'settings check' for possible mismatches. Settings apply can also assign values 
+      using the variableName=value syntax.  
+      -r: Recursive checks can be specified using -r option. 
+	-q: Quiet. Suppresses the printing of the changed settings.
+ settings check: looks for differences between ADORE's 
+	expectations and current values. Handy for finding 
+	errors due to recursive dependancies.
+ settings fix: after "check"ing you can accept suggested changes 
+	using the variables. Check will display a reference line.
+	-q: Quiet. Suppresses the printing of the changed settings.
+ settings init: will ask the user some questions to create an initial 
+	settings file. Useful when starting a new project. 
+ settings list: will list the current settings as seen by ADORE.
+ settings raw: displays the unprocessed settings with USERS
+	changes. This can be saved with the save function.
+ settings save [fileName]: saves the settings (raw) to the file.
+	if fileName is not specified './settings.set' is used.
+ settings load [fileName]: loads the settings to the environment.
+	if filenName is not specified './settings.set' is used.
+ settings reset: initializes the environment. User settings file is loaded.
+ settings clear: clears all ADORE settings and resets ${ADORESCR} and ${ADOREFOLDER}

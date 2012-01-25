@@ -1,0 +1,26 @@
+#summary comprefdem
+#labels Phase-Support,Help
+=USAGE:=
+{{{
+ comprefdem 
+}}}
+=DESCRIPTION:=
+ COMPREFDEM is an ADORE process which runs the DORIS step with the same name. 
+ DEM is radarcoded at the grid of the interferogram. In step SUBTRREFDEM it can be subtracted from the complex interferogram.
+=INPUT:=
+ There are no required input parameters for this command.
+ ==OPTIONAL:==
+  There are no optional input parameters for this command.
+=OUTPUT=
+  SUCCESS is printed to STDOUT on successful completion of process. 
+=FILES and REFERENCES:=
+{{{
+ ${ADOREFOLDER}/drs/${dorisVersion}/comprefdem.drs
+ http://doris.tudelft.nl/usermanual/node103.html
+}}}
+=EXAMPLE:=
+{{{
+ comprefdem
+}}}
+=KNOWN BUGS:=
+ None.

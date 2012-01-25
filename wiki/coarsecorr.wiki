@@ -1,0 +1,27 @@
+#summary coarsecorr
+#labels Phase-Support,Help
+[B=USAGE:=
+{{{
+ coarsecorr
+}}}
+=DESCRIPTION:=
+ COARSECORR is an ADORE process and it runs the DORIS step with the same name. 
+ The offset in line (azimuth) and pixel (range) direction between master and slave is computed with an accuracy of about 1 pixel (1 offset for whole image).
+=INPUT:=
+ There are no required input parameters for this command.
+ ==OPTIONAL:==
+  There are no optional input parameters for this command.
+=OUTPUT=
+ SUCCESS is printed to STDOUT on successful completion of process. 
+=FILES and REFERENCES:=
+{{{
+ ${ADOREFOLDER}/scr/process/coarsecorr
+ ${ADOREFOLDER}/drs/${dorisVersion}/coarsecorr.drs
+ http://doris.tudelft.nl/usermanual/node49.html
+}}}
+=EXAMPLE:=
+{{{
+ coarsecorr
+}}}
+=KNOWN BUGS:=
+ NONE

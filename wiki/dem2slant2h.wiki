@@ -1,16 +1,25 @@
-#summary Create DORIS slant2h output from comprefdem.
+#summary dem2slant2h
 #labels Phase-Support,Help
-
-USAGE:
+=USAGE:=
 {{{
 	dem2slant2h 
 }}}
-DESCRIPTION:
- DEM2SLANT2H is an internal ADORE command. <br>
+=DESCRIPTION:=
+ DEM2SLANT2H is an internal ADORE command. 
  It creates DORIS slant2h output from comprefdem. 
-
-INPUT:
+=INPUT:=
  There are no required input parameters for this command.
- 
-OUTPUT:
-  Adds slant2h step to `${i_resfile}`.
+  ==OPTIONAL:==
+    There are no optional input parameters for this command.
+=OUTPUT=
+  Adds slant2h step to ${i_resfile}.
+=FILES and REFERENCES:=
+{{{
+ ${ADOREFOLDER}/scr/fun/dem2slant2h
+}}}
+=EXAMPLE:=
+{{{
+ dem2slant2h
+}}}
+=KNOWN BUGS:=
+ None.

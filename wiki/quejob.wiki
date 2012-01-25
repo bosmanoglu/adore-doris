@@ -1,19 +1,16 @@
 #summary quejob
-#labels Phase-Support
-
+#labels Phase-Support,Help
 =USAGE:=
-      quejob adore_command [outputFolder]
-
+{{{
+      quejob adore_command [outputFolder] -- [qsub options]
+}}}
 =DESCRIPTION:=
  quejob is an internal ADORE command.  
  It runs the given adore command in the Torque-PBS system.
  Quejob uses the Torque-PBS system to distribute jobs to other computers.
-
 =INPUT:=
 	adore_command: commands to submit to the PBS. If multiple commands are used, this should be a string in quotations. See examples.
-
-=  OPTIONAL:	=
+  ==OPTIONAL:==	
 	outputFolder: specify output folder for the ADORE command. Default is current folder ("$PWD").
- 
-=OUTPUT:=
- Creates ./{randomFile}.set and  ./{randomFile}.sh 
+=OUTPUT=
+ Creates ${tmpFolder}/{randomFile}.set and  ${tmpFolder}/{randomFile}.sh 

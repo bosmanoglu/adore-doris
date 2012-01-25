@@ -20,3 +20,5 @@ INPUT:
 OUTPUT:
  Undo Successful: if DORIS step was found and removed.
  
+EXAMPLE:
+  undo only s_crop

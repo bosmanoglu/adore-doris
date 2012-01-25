@@ -1,0 +1,60 @@
+#summary s
+#labels Phase-Support,Help
+=USAGE:=
+{{{
+	s dorisProcess
+	s variableName
+}}}
+=DESCRIPTION:=
+ s is a builtin ADORE command.  
+ It can show the input file for the given DORIS processing step. It can 
+ also be used to display ADORE variables.
+=INPUT:=
+ dorisProcess: Name of the DORIS processing step to run. List of available
+     processes can be found at the end of this help message or using lsprocess
+     whenever required.
+ variableName: Name of the DORIS setting (ADORE variable) to display. This
+     can be a partial name. For example if given m_ as variable name ADORE will
+     display all variables and their values starting with m_
+=OUTPUT=
+ Dumps input file for the given step to the stdout. 
+}}}
+=EXAMPLE:=
+{{{
+ADORE: s rs_
+rs_az_buffer=200
+rs_dbow=0 0 0 0
+rs_dbow_geo=19.7023 -101.1955 4000 1000
+rs_method=knab6p
+rs_out_file=/RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/050507.rs
+rs_out_format=cr4
+rs_rg_buffer=200
+rs_shiftazi=on
+ADORE: s resample
+screen info //
+beep off //
+batch on //
+overwrite on //
+preview off // sunraster files with cpxfiddle
+listinput on // copy this file to log
+memory 500 // mb
+logfile /RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/parallel.log //
+m_resfile /RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/050122.res //
+s_resfile /RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/050507.res //
+i_resfile /RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/050122_050507.res //
+orb_interp polyfit //
+dumpbaseline 1 1 // eval baseline on grid
+height 2230 // average height for the crop
+tiepoint 0.0 0.0 0.0 //
+m_rg_t_error 0.0 //
+m_az_t_error 0.0 //
+s_rg_t_error 0.0 //
+s_az_t_error 0.0 //
+process resample //
+rs_method knab6p //
+rs_out_file /RAID1/batu/playGround/fcigna_Morelia/process/parallel/i12s/050122_050507/050507.rs //
+rs_out_format cr4 //
+rs_dbow 0 0 0 0 //
+rs_dbow_geo 19.7023 -101.1955 4000 1000 //
+rs_shiftazi on //
+stop

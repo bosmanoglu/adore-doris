@@ -1,0 +1,18 @@
+#summary addrefpha2s_crop
+#labels Phase-Support,Help
+=USAGE:=
+{{{
+	addrefpha2crop
+}}}
+=DESCRIPTION:=
+ ADDREFPHA2CROP is an internal ADORE command. 
+ It is used in creating interferograms coregistered to a different scene, 
+ as needed in Small Baselines (SBAS) interferometry. The command adds the  
+ reference phase dumped by subtrrefpha (srp_dumprefpha=on) to the result
+ of resampling step and modifies the slave result file accordingly. The 
+ original result file is saved with a .bck extension.
+=INPUT:=
+ There are no required input parameters for this command.
+=OUTPUT=
+  Modifies the result file by moving the resampling step to crop. 
+  Also generates an output file with ".addrefpha" extension.
