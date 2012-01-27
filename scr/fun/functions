@@ -156,7 +156,7 @@ function generateRandomString(){
 
 function canonicalPath(){
   #from http://snipplr.com/view/18026/canonical-absolute-path/  
-  [ "${1:-isEmpty}" == "isEmpty" ] && echo "" || echo $(cd $(dirname "$1"); pwd -P)/$(basename "$1")
+  [ "${1:-isEmpty}" == "isEmpty" ] && echo "" || echo $(cd "$(dirname "$1")"; pwd -P)/$(basename "$1")
 }
 
 function mvDorisFiles(){

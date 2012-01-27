@@ -498,7 +498,7 @@ function settings_init(){
    local variables
    bold "What is the projectFolder? [${projectFolder}]"
    echo "Your current path is: ${PWD}"
-   read userInput
+   read -e userInput
    [ -n "${userInput}" ] && settings apply -r ${q} projectFolder="${userInput}"
 
    bold "What is the runName? [${runName}]"
@@ -509,15 +509,19 @@ function settings_init(){
      if ask "$dataFolder does not exist. Would you like me to run create it?"
      then
        echo "Please specify where your data is currently located:"
-       read userInput
+       read -e userInput
        scenes init "${userInput}"
-     else
-       bold "dataFolder is currently set as: $dataFolder" 
-       if ask "Do you want to change the dataFolder? [${dataFolder}]"
-       then 
-         read userInput
-         [ -n "${userInput}" ] && settings apply -r ${q} dataFolder="${userInput}"
-       fi
+     fi
+   else
+     bold "dataFolder is currently set as: $dataFolder" 
+     if ask "Do you want to create a new dataFolder?"
+     then 
+       echo "Please enter the name of new data folder:"
+       read -e userInput
+       [ -n "${userInput}" ] && settings apply -r ${q} dataFolder="${userInput}"
+       echo "Please specify where your data is currently located:"
+       read -e userInput
+       scenes init "${userInput}"
      fi
    fi
    
