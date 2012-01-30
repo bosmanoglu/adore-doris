@@ -370,14 +370,14 @@ def process2dict(fileDict, processName):
             out[key]=val
 
     #Start process specific extraction... 
-    if processName=="coarse_correl":
+    if processName=="coarse_correl" and out['Number of correlation windows']:
         out['results']=csv2Array(fileDict, lStart+8, int(out['Number of correlation windows'].split("of")[0]), 6, dtype=np.float)
     if processName=="fine_coreg":
         try:
             out['results']=csv2Array(fileDict, lStart+10, int(out['Number_of_correlation_windows']), 6, dtype=np.float)
         except:
             pass
-    if processName=="comp_coregpm":
+    if processName=="comp_coregpm" and out['Degree_cpm']:        
         numCoef=[1,3,6,10]#2*(int(out['Degree_cpm'])+1)
         out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)
         out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+numCoef[int(out['Degree_cpm'])], numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)        

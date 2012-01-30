@@ -18,6 +18,12 @@ source ${ADORESCR}/fun/functions
 #initialize ADORE
 source ${ADORESCR}/fun/initialize
 
+if [ "${i-notInteractive}" == "notInteractive" ]; then
+  #not interactive
+  #turn batch mode on. 
+  batch="on"
+fi 
+
 if [ -n "${dorisProcess}" ]; then
   p ${dorisProcess}
 fi
