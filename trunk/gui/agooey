@@ -34,7 +34,7 @@ class MyGUI:
     self.window.set_title( title)
     self.window.set_size_request( 800, 600)
     try:
-      self.window.set_icon_from_file(ADOREGUIFOLDER+"/adore-doris-icon-256px.png")
+      self.window.set_icon_from_file(ADOREGUIFOLDER+"/adore-doris-gui-icon-256px.png")
     except Exception, e:
       print e.message
       pass
@@ -82,6 +82,7 @@ class MyGUI:
     self.v.connect('button-press-event', self.do_button_press)    
     self.v.connect_object('selection-changed', self.get_stringtarget, self.eventbox)
     self.v.set_word_chars("-0-9A-Za-z,./<>?;':\"[]{}\\|_+=!@#$%^&*()`~");
+    self.v.set_scrollback_lines(-1); #Set to infinite scrollback.
     #self.argv="adore -i -u /home/bosmanoglu/tmp/test/settings.set"
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i" ])
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i -u /home/bosmanoglu/tmp/test/settings.set"])
