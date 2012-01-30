@@ -260,7 +260,7 @@ def menuAction(self, w):
     SHELL PID: {}
     """.format(self.vPid))
     about.set_website("http://code.google.com/p/adore-doris/")
-    about.set_logo(gtk.gdk.pixbuf_new_from_file(self.set.get('adore','ADOREFOLDER').strip('\'"') +"/man/adoreDoris_tud_um.png"))
+    about.set_logo(gtk.gdk.pixbuf_new_from_file(self.set.get('adore','ADOREFOLDER').strip('\'"') +"/gui/adore-doris-gui-icon-256px.png"))
     about.run()
     about.destroy()
 
