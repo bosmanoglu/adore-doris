@@ -376,6 +376,7 @@ function settings_apply(){
           #echo ${setting}=${!setting} #display current settings
           #echo ${setting}=${relativeValue}
           [ -z "${relativeValue}" ] && continue; #if relative value is "" do not change values.
+          [ "${setting}" == "${inputVar}" ] && continue; #Do not overwrite users choice. 
           if [ "${!setting}" != "${relativeValue}" ]; then
             [ "${q}" -eq "1" ] && echo ${setting}=${relativeValue}
             #eval ${setting}=\"${relativeValue}\"
@@ -626,3 +627,4 @@ case ${1} in
     echo "Unknown option. You can get help with: ? settings"
   ;;
 esac
+   
