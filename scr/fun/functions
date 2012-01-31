@@ -329,6 +329,10 @@ function mask(){
 	. ${ADORESCR}/fun/mask "${@}"
 }
 
+function openInIpython(){
+	. ${ADORESCR}/fun/openInIpython
+}
+
 function quejob(){
 	. ${ADORESCR}/fun/quejob "$@"
 }

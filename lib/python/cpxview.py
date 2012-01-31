@@ -146,7 +146,7 @@ def main(argv):
     byteSwapFlag=False;
     if ("-B", "") in opts:
         byteSwapFlag=True;
-    data=getdata(inputfile,cfg["-w"],cfg["-f"],0,byteSwapFlag)
+    data=getdata(inputfile,cfg["-w"],cfg["-f"].lower(),0,byteSwapFlag)
     data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
     #multilook
     data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
@@ -155,17 +155,17 @@ def main(argv):
         data=fliplr(data);
     if "y" in cfg["-m"]:
         data=flipud(data);
-    if "norm" in cfg["-q"]:
+    if "norm" in cfg["-q"].lower():
         mp.matshow(cfg["-s"]*data**cfg["-e"]);
-    elif "mag" in cfg["-q"]:
+    elif "mag" in cfg["-q"].lower():
         fg=mp.matshow(cfg["-s"]*abs(data)**cfg["-e"],picker=5)
-    elif "pha" in cfg["-q"]:
+    elif "pha" in cfg["-q"].lower():
         mp.matshow(cfg["-s"]*np.angle(data)**cfg["-e"])
-    elif "wrap" in cfg["-q"]:
+    elif "wrap" in cfg["-q"].lower():
         mp.matshow(cfg["-s"]*wrapToPi(data)**cfg["-e"])
-    elif "real" in cfg["-q"]:
+    elif "real" in cfg["-q"].lower():
         fg=mp.matshow(cfg["-s"]*data.real**cfg["-e"],picker=5)
-    elif "imag" in cfg["-q"]:
+    elif "imag" in cfg["-q"].lower():
         mp.matshow(cfg["-s"]*data.imag**cfg["-e"])
         
     else:
