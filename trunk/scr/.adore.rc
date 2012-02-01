@@ -3,7 +3,7 @@ if [ "${v-notVerbose}" != "notVerbose" ]; then
   set -x
 fi
 
-#When started from AGOOEY, we do not run ADORE. 
+#When started from AGOOEY, we do not source user bash.rc
 #Therefore ADORESCR is probably not set, and we may have to set it.
 if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
   ADORESCR=`echo $(cd $(dirname ${BASH_SOURCE[@]}); pwd -P)`
@@ -11,6 +11,16 @@ if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
     export ADORESCR
   fi
 fi
+
+if [ "${g-notGui}" != "notGui" ]; then
+  #Gui on
+  #If we run agooey, we do not source the users bashrc. This attempts to
+  #load it
+  if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+  fi 
+fi
+
 
 ###### LOAD SETTINGS
 #load functions
@@ -62,5 +72,5 @@ fi
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
   #Gui on
-  declare -r PROMPT_COMMAND="settings list &> /tmp/adore${PPID}.set"
+  declare -r PROMPT_COMMAND="setPS1 && settings list &> /tmp/adore${PPID}.set"
 fi

@@ -10,12 +10,19 @@ import ConfigParser
 class SettingsEditor:
 
 
+    def advancedChkBtnToggled(self, widget, treestore):
+        #widget.get_active()
+        treestore.clear()
+        self.displayOptions(self.setFile, treestore);
+
     def displayOptions(self, setFile, treestore):
         self.set.read(setFile)
         # we'll add some data now - 4 rows with 3 child rows each
         for section in self.set.sections():
             sectionId = self.treestore.append(None, (False,section, ''))
             for option,value in self.set.items(section):
+                if "_rel_" in option and not self.advancedChkBtn.get_active():
+                    continue;
                 self.treestore.append(sectionId, (False,option,value))
                         
     def chkbx_toggled_cb(self, cell, path, treestore):
@@ -34,6 +41,8 @@ class SettingsEditor:
     # close the window and quit
     def delete_event(self, widget, event, data=None):
         #gtk.main_quit()
+        del self.set
+        del self.treestore
         self.window.destroy()
         return False
 
@@ -43,7 +52,9 @@ class SettingsEditor:
             for row in treestore[(section.path[0])].iterchildren():
                 if row[0] == True:
                     settxt=settxt +" " + row[1]+'="'+ row[2]+'"';
-        self.runcmd(settxt);  
+        self.runcmd(settxt);
+        #Let's see if this will stop the constant crashing
+        #self.window.destroy();  
 
     def refreshButtonClicked(self, widget, treestore):
         treestore.clear()
@@ -72,12 +83,34 @@ class SettingsEditor:
         self.vbox = gtk.VBox(homogeneous=False, spacing=0);
         self.hbox = gtk.HBox(homogeneous=False, spacing=0);
 
+        # create a TreeStore with one string column to use as the model
+        self.treestore = gtk.TreeStore(bool, str, str)
+
+        ##### SET THE HBOX #####
+        self.applyButton=gtk.Button(label='Apply', stock=None, use_underline=True);        
+        self.applyButton.connect("clicked", self.applyButtonClicked, self.treestore)
+        self.applyButton.set_flags(gtk.CAN_DEFAULT);
+        self.applyButton.show();
+
+        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
+        self.refreshButton.connect("clicked", self.refreshButtonClicked, self.treestore)
+        self.refreshButton.set_flags(gtk.CAN_DEFAULT);
+        self.refreshButton.show();
+
+        self.advancedChkBtn=gtk.CheckButton("Advanced");
+        self.advancedChkBtn.connect("toggled", self.advancedChkBtnToggled, self.treestore)
+        self.advancedChkBtn.show();
+
+        self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 10);
+        self.hbox.pack_start(self.applyButton, expand = False, fill = False, padding = 20);
+        self.hbox.pack_start(self.advancedChkBtn, expand = False, fill = False, padding = 20);
+
+        ##### SET THE VBOX #####
+
 #        adj = gtk.Adjustment(0.0, 0.0, 100.0, 1.0, 10.0, 0.0)
 #        scrollbar = gtk.HScale(adj)
 #        self.vbox.pack_start(scrollbar, False, False, 0)
 
-        # create a TreeStore with one string column to use as the model
-        self.treestore = gtk.TreeStore(bool, str, str)
         
         #Add some data now
         self.displayOptions(self.setFile, self.treestore);
@@ -126,19 +159,6 @@ class SettingsEditor:
         # Allow drag and drop reordering of rows
         self.treeview.set_reorderable(True)
         self.treeview.show()
-
-        self.applyButton=gtk.Button(label='Apply', stock=None, use_underline=True);        
-        self.applyButton.connect("clicked", self.applyButtonClicked, self.treestore)
-        self.applyButton.set_flags(gtk.CAN_DEFAULT);
-        self.applyButton.show();
-
-        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
-        self.refreshButton.connect("clicked", self.refreshButtonClicked, self.treestore)
-        self.refreshButton.set_flags(gtk.CAN_DEFAULT);
-        self.refreshButton.show();
-
-        self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 10);
-        self.hbox.pack_start(self.applyButton, expand = False, fill = False, padding = 20);
 
         self.vbox.pack_start(self.hbox);
         self.vbox.pack_end(self.treeview);
