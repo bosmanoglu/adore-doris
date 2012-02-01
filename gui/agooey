@@ -12,7 +12,6 @@ import subprocess
 import shlex
 import ConfigParser
 
-import settingsEditor
 import dialogs
 
 try:
