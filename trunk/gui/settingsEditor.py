@@ -51,7 +51,7 @@ class SettingsEditor:
         for section in treestore:
             for row in treestore[(section.path[0])].iterchildren():
                 if row[0] == True:
-                    settxt=settxt +" " + row[1]+'="'+ row[2]+'"';
+                    settxt=settxt +" " + row[1]+'='+ row[2];
         self.runcmd(settxt);
         #Let's see if this will stop the constant crashing
         #self.window.destroy();  
