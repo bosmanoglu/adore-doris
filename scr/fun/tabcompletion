@@ -6,6 +6,7 @@ complete -F "_h" -o "default" "h"
 complete -F "_mask" -o "default" "mask"
 complete -F "_p" -o "default" "p"
 complete -F "_raster" -o "default" "raster"
+complete -F "_s" -o "default" "s"
 complete -F "_saveas" -o "default" "saveas"
 complete -F "_scenes" -o "default" "scenes"
 complete -F "_settings" -o "default" "settings"
@@ -118,6 +119,27 @@ function _raster(){
 }
 
 
+function _s(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts="result"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		result)
+			local optsX=`lsprocess | tail -n 6`
+			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        local cmd="echo \${!${cur}*}"
+        local optsX=`eval ${cmd} 2> /dev/null`
+	local optsY=`lsprocess | tail -n 6`
+        COMPREPLY=( $(compgen -W "result ${optsX} ${optsY}" -- ${cur}) )
+}
+
 function _saveas(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -127,7 +149,7 @@ function _saveas(){
 	case "${prev}" in
 		envi|arcgis)
 			optsX="m_crop m_simamp m_ovs s_crop s_ovs m_filtazi s_filtazi resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h"
-			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+			COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
 			return 0
 			;;
 		*)
