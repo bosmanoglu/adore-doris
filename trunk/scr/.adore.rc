@@ -12,14 +12,16 @@ if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
   fi
 fi
 
-if [ "${g-notGui}" != "notGui" ]; then
-  #Gui on
-  #If we run agooey, we do not source the users bashrc. This attempts to
-  #load it
-  if [ -f ~/.bashrc ]; then
-    . ~/.bashrc
-  fi 
-fi
+# THE BELOW LINES BREAK ${i} variable
+#if [ "${g-notGui}" != "notGui" ]; then
+#  #Gui on
+#  #If we run agooey, we do not source the users bashrc. This attempts to
+#  #load it
+#  if [ -f ~/.bashrc ]; then
+#    . ~/.bashrc
+#  fi 
+#fi
+#echo "5-i:.${i}. g:.${g}."
 
 
 ###### LOAD SETTINGS
@@ -63,14 +65,18 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
   unset i #If this line is omitted, all spawned ADORE jobs
           # will run in interactive mode.
 
-[ "${g-notGui}" == "notGui" ] && declare -r PROMPT_COMMAND="setPS1" 
-				#setPS1 function will check the 
+  if [ "${g-notGui}" == "notGui" ]; then 
+    declare -r PROMPT_COMMAND="setPS1" 
+        			#setPS1 function will check the 
                                 # settings file folder and if not in
                                 # current folder will change the prompt
                                 # to !ADORE:
+  fi
 fi
+
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
   #Gui on
   declare -r PROMPT_COMMAND="setPS1 && settings list &> /tmp/adore${PPID}.set"
 fi
+
