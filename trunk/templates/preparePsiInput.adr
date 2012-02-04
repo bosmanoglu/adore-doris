@@ -86,7 +86,5 @@ done
 echo ${masterMasterLine} >> ${outputFile}
 } #end function writePsiInputFile
 ########## Main Function
-# We run scripts with p so shift once. 
-shift 
 writePsiInputFile "${@}"
 

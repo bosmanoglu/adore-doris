@@ -6,7 +6,7 @@
 # DESCRIPTION:
 #  multiplePairs_resampled.adr is an ADORE script.  
 #  It generates several interferograms whose master and slave orbits are defined
-#  by the input file. 
+#  by the input file. All interferograms are resampled according to the resample_master.
 #  
 #  The rs_dbow or rs_dbow_geo settings must be set before this script is run.
 #  The implementation is such that:
@@ -22,20 +22,23 @@
 #    masterScene2,slaveScene2
 #    ...
 #  
+#  resample_master: The name of the master scene. 
 # OUTPUT:
 #  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
 #  It runs the following DORIS steps:
 #    For crops (with resamplingMaster): m_readfiles, m_porbits, m_crop, coarseorb, coarsecorr, fine, coregpm, resample
 #    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
-#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+#  It also creates raster images for the final interferogram and coherence.
 #
+# EXAMPLES:
+#  p multiplePairs_resampled_parallel.adr pairs.txt 20061115
 
 # The following steps are processed for each crop
-cropSteps="m_readfiles;m_porbits;m_crop" #;m_simamp;m_timing
+cropSteps="m_readfiles;m_porbits;m_crop" #m_simamp;m_timing
 # The following steps are processed for resampling all crops to resampling Master
-resampleSteps='settings apply -r -q int_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
+resampleSteps='settings apply -r -q int_multilook=\"1 1\" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
 # The following steps are processed for each interferogram
-interferoSteps='settings apply -r -q int_multilook="1 1" srp_dumprefpha=on;coarseorb;s_crop2resample;interfero;coherence;comprefpha;subtrrefpha;raster p interfero;raster p coherence -- -c gray'
+interferoSteps='settings apply -r -q int_multilook=\"1 1\" srp_dumprefpha=on coh_method=refphase_only;coarseorb;s_crop2resample;interfero;coherence;comprefpha;subtrrefpha;raster p interfero;raster p coherence -- -c gray'
 resampleFolder="${runFolder}/resample"
 #######################################################
 ## DO NOT CHANGE ANYTHING BELOW

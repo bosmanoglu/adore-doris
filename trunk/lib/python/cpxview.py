@@ -260,8 +260,8 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
 
 #    if complexFlag:
 #        datatype=np.dtype( [ ("real", datatype), ("imag", datatype) ] );
-#    data=np.memmap(fname, dtype=datatype,mode="r", shape=(length,width))
-    data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+    data=np.memmap(fname, dtype=datatype,mode="r", shape=(length,width))
+    #data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
     if byteSwapFlag:
         #data=data.byteswap()
         data.byteswap(True)
