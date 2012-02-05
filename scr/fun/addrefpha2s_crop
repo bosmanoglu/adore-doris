@@ -100,9 +100,9 @@ function funResample2Ovs(){
 
 
 ###MAIN
-if [ `check -p s_ovs; echo $?` ]; then
+if [ `readRes.sh ${s_resfile} process_control oversample` == "1" ]; then
   funResample2Ovs ${@}
-elif [ `check -p s_crop; echo $?` ]; then
+elif [ `readRes.sh ${s_resfile} process_control crop` == "1" ]; then
   funResample2Crop ${@}
 else
   error "addrefpha2s_crop: s_ovs or s_crop steps are not in s_resfile."
