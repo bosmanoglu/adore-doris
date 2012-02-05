@@ -38,9 +38,9 @@ local mcropOut=`readRes.sh ${m_resfile} oversample Data_output_file`
 sed -i "s<${mcropOut}<${scropOut}<g" ${s_resfile}
 }
 ###MAIN
-if [ `check -p m_ovs; echo $?` ]; then
+if [ `readRes.sh ${m_resfile} process_control oversample` == "1" ]; then
   fun_ovs2resample ${@}
-elif [ `check -p m_crop; echo $?` ]; then
+elif [ `readRes.sh ${m_resfile} process_control crop` == "1" ]; then
   fun_crop2resample ${@}
 else
   error "s_crop2resample: m_ovs or m_crop steps are not in m_resfile."
