@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import os
+os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python'))
+import adore
+
+settings=adore.parseSettings(os.sys.argv[1])
+
+try:
+  ires=adore.res2dict( settings.get('general', 'i_resfile') );
+except:
+  pass
+mres=adore.res2dict( settings.get('general', 'm_resfile') );
+sres=adore.res2dict( settings.get('general', 's_resfile') );
+
+#SOURCE http://duhctaep.blogspot.com/2010/06/redirecting-stdin-stdout-stderr-from.html
+# can be used to duplicate the stdin stderr or stdout to a file.
+#
+#out_log = file('tmpstdout.tmp', 'a+')
+#os.sys.stdout.flush()
+#os.dup2(out_log.fileno(), os.sys.stdout.fileno())
