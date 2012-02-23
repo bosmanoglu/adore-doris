@@ -108,11 +108,12 @@ function trickResample(){
 function dorisResample(){
   unset masterLastProcessingStep firstLine lastLine firstPixel lastPixel
   local cropSource
+  local autoFlag=1; #0=on 1=off
   #check if dbowgeo is set
   if [ "${rs_dbow_geo}" == "0 0 0 0" ]; then
     #if not check for rs_dbow
     if [ "${rs_dbow}" == "0 0 0 0" ]; then
-      local autoFlag=0; #0=on 1=off
+      autoFlag=0; #0=on 1=off
       # if calculating rs_dbow automatically I want the rs_dbow variable to return to 0 0 0 0 after
       # doris run. This is useful when we are doing a batch calculation.      
       rs_dbow=`calculate_rs_dbow`
@@ -135,7 +136,6 @@ function dorisResample(){
     grep -i -v -w "rs_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
     mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
   fi
-
 
   #run doris
   doris ${outputFolder}/${dorisProcess}.drs

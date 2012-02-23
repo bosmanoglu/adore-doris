@@ -217,11 +217,21 @@ local f bname date tsxdir cosfile cosbname
   for f in $(find -L "${DATADIR}" -name "${leaderFile}"); do
     #echo info: $f
     bname=$( basename ${f} )
-    date=`echo $bname | awk -F '_' {'print substr($13,1,8)'}`
+    #date=`echo $bname | awk -F '_' {'print substr($13,1,8)'}` #This line fails for a name like: TDX1_SAR__SSC_BRX2_SM_S_SRA_20110629T105154_20110629T105157.xml
+    date=`echo $bname |cut -c 29-36`
     tsxdir=${f%/*}
     cosfile=`find -L $tsxdir -name "*.cos"` 
     cosbname=$( basename ${cosfile} )
-    
+    if [ -d "${dataFolder}/${date}" ]; then 
+      #switch to full name TSXYYYYMMDDTHHMMSS or TDX...
+      sat=`echo $bname |cut -c 1-3`
+      date=`echo $bname |cut -c 29-43`
+      date="${sat}${date}"
+      if [ -d "${dataFolder}/${date}" ]; then
+        error "Can not add already existing data: ${f}"
+        continue
+      fi
+    fi    
     mkdir -p ${dataFolder}/${date}
     ln -s ${f} ${dataFolder}/${date}                 # xml
     #ln -s ${bname} leader.xml ${dataFolder}/${date}/  # xml
@@ -341,6 +351,31 @@ esac
 batch="${batchOn}"
 }
 
+function scenes_add(){
+local rawDataFolder=`canonicalPath "${1}"`
+detectSatellite "${rawDataFolder}"; #sets m_in_method
+case "${m_in_method}" in
+ERS)
+  linkERS "${rawDataFolder}";
+  ;;
+ASAR)
+  linkASAR "${rawDataFolder}";
+  ;;
+TSX)
+  linkTSX "${rawDataFolder}";  
+  ;;
+ALOS)
+  linkALOS "${rawDataFolder}";
+  ;;
+GAMMA)
+  linkGAMMA "${rawDataFolder}";
+  ;;
+CSK)
+  linkCSK "${rawDataFolder}";
+  ;;
+esac
+}
+
 function scenes_rescan(){
   scenes_include=( `ls -F "${dataFolder}/"  2>/dev/null | grep "/" | tr -d "/"` )  
 }
@@ -363,6 +398,11 @@ case "${1}" in
  ;;
 "rescan")
  shift
+ scenes_rescan
+ ;;
+"add")
+ shift
+ scenes_add "${@}"
  scenes_rescan
  ;;
 esac

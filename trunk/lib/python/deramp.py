@@ -38,22 +38,26 @@ scipy.pkgload('optimize')
 def usage():
     print __doc__
 
-def deramp(inData, estData=None):
-    X,Y = np.meshgrid(np.r_[0:inData.shape[1]],np.r_[0:inData.shape[0]])
+def deramp(inData, estData=None, multilook=[1000,1000], weight=None):
+    X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
     #X=X[inData<0.1];
-    fitX=X.ravel()[0::1000]
+    fitX=X.ravel()[0::multilook[0]]
     #Y=Y[inData<0.1];
-    fitY=Y.ravel()[0::1000]
+    fitY=Y.ravel()[0::multilook[1]]
     if estData is not None:
         inData=inData-estData;
-    fitData=inData.ravel()[0::1000]
+    fitData=inData[fitX,fitY]#.ravel()[0::multilook]
+    if weight is not None:
+        w=weight[fitX,fitY]
+    else:
+        w=np.ones(fitX.shape)
     
     fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y 
-    errfunc = lambda p, x, y, z: fitfunc(p,x,y) - z
-    planefit, success=scipy.optimize.leastsq(errfunc, fitData, args=(fitX,fitY,fitData))
+    errfunc = lambda p, x, y, z, w: w*(fitfunc(p,x,y) - z)
+    planefit, success=scipy.optimize.leastsq(errfunc, fitData, args=(fitX,fitY,fitData,w))
     
     #X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
-    outData=inData-fitfunc(planefit,X,Y)
+    outData=inData-fitfunc(planefit,X.T,Y.T)
     if estData is not None:
         outData=outData+estData
     return outData

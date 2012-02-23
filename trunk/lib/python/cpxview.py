@@ -218,13 +218,15 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
         complexFlag=True;
     ### Handle the short format specifier: i.e. cr4    
     if dataFormat=="cr4":
-        datatype="f4"        
-        complexFlag=True;
+        #datatype="f4"
+        datatype='complex64'
+        complexFlag=False;
     elif dataFormat=="r4":
         datatype="f4"
     if dataFormat=="cr8":
-        datatype="f8"        
-        complexFlag=True;
+        #datatype="f8"
+        datatype='complex128'
+        complexFlag=False;
     elif dataFormat=="r8":
         datatype="f8"
     elif dataFormat=="ci2":
@@ -259,13 +261,17 @@ def getdata(fname, width, dataFormat, length=0, byteSwapFlag=False):
         length=int(length);
 
 #    if complexFlag:
-#        datatype=np.dtype( [ ("real", datatype), ("imag", datatype) ] );
+#                 np.dtype((np.int32,{'real':(np.int16, 0),'imag':(np.int16, 2)})
+#        datatype=np.dtype( ( {"real":(datatype,0), ("imag", datatype) ] );
     data=np.memmap(fname, dtype=datatype,mode="r", shape=(length,width))
     #data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
     if byteSwapFlag:
         #data=data.byteswap()
-        data.byteswap(True)
-    if complexFlag:
+        try:
+            data.byteswap(True)
+        except:
+            data=data.byteswap(); #memmap can not be byteswapped in-place.
+    if complexFlag: 
         data=data[:,0:-1:2]+1j*data[:,1::2]
 #    else:
 #        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
