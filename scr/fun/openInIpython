@@ -1,5 +1,28 @@
-if [ -e "${i_resfile}" ]; then
-  ipython -pylab -i -c "import os; os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python')); import adore; ires=adore.res2dict('${i_resfile}'); mres=adore.res2dict('${m_resfile}');sres=adore.res2dict('${s_resfile}');"
+#!/usr/bin/env bash
+
+function runIpython(){
+
+local cmd="${@}"
+mkdir -p ${tmpFolder}
+settings list &> ${tmpFolder}/settings.set
+
+if [ -z "${cmd}" ]; then 
+  ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"
+elif [ -f "${cmd}" ]; then
+  #echo "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" > tmpfile.tmp
+  #cat "${cmd}" >> tmpfile.tmp
+  #ipython -pylab tmpfile.tmp
+  cat "${cmd}" | ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" 
+  #ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" 
 else
-  ipython -pylab -i -c "import os; os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python')); import adore; mres=adore.res2dict('${m_resfile}');sres=adore.res2dict('${s_resfile}');"
+  (echo "${cmd}" ) | ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"  
 fi
+#if [ -e "${i_resfile}" ]; then
+#  ipython -pylab -i -c "import os; os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python')); import adore; ires=adore.res2dict('${i_resfile}');mres=adore.res2dict('${m_resfile}');sres=adore.res2dict('${s_resfile}');settings=adore.parseSettings('${tmpFolder}/settings.set')"
+#else
+#  ipython -pylab -i -c "import os; os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python')); import adore; mres=adore.res2dict('${m_resfile}');sres=adore.res2dict('${s_resfile}');"
+#fi
+}
+
+####### MAIN
+runIpython ${@}

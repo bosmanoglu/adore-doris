@@ -39,7 +39,8 @@
 #	Calculates and displays the corner coordinates of the DEM based on input values.
 #
 #  dem view:
-#	Display DEM using cpxview and the input values.
+#	Display DEM using cpxview and the input values. Additional options can be passed. See 
+#       "? view"
 #
 # OUTPUT:
 #   dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
@@ -241,6 +242,31 @@ function updateArcGisDemSettings(){
   copySettingsFromSamToDacAndCrd
 }
 
+function updateEsriBilDemSettings(){
+ #reads dem settings from .hdr file and modifies ADORE environment
+  local settings_file demFile nrows ncols lx lly uly xdim ydim
+  settings_file=${1}
+  demFile=${2}
+  
+  [ ! -e ${settings_file} ] && echo "Settings file does not exist: ${settings_file}" && return;
+  echo "Loading settings for sam_, dac_, and crd_"
+  sam_in_dem=${demFile}
+  sam_in_format='r4'
+  #set -x
+  nrows=`grep -i -w "nrows"  ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
+  ncols=`grep -i -w "ncols"  ${settings_file} | awk '{printf "%d", $2};'| tr -d '\n'`
+  xdim=`grep  -i -w "xdim"   ${settings_file} | awk '{printf "%f", $2};'| tr -d '\n'`
+  ydim=`grep  -i -w "ydim"   ${settings_file} | awk '{printf "%f", $2};'| tr -d '\n'`
+  ulx=`grep   -i -w "ulxmap" ${settings_file} | awk '{printf "%f", $2};'| tr -d '\n'` 
+  uly=`grep   -i -w "ulymap" ${settings_file} | awk '{printf "%f", $2};'| tr -d '\n'` 
+  sam_in_size="${nrows} ${ncols}"
+  sam_in_delta="${ydim} ${xdim}"
+  sam_in_ul="${uly} ${ulx}"
+  sam_in_nodata=`grep -i -w "NODATA" ${settings_file} | awk '{printf "%f", $2};'| tr -d '\n'`
+  [ -z "${sam_in_nodata}" ] && sam_in_nodata=-9999 # Set to default
+  #set +x
+  copySettingsFromSamToDacAndCrd
+}
 function checkDem(){
   #check if dem exists and in sync with environment
   everythingOK=0; #0 Yes, others no
@@ -358,6 +384,20 @@ function main(){
         elif [[ "${demFile}" == *.grd* ]]; then
           echo "You are using a GMT grid file as DEM: ${demFile}"
           updateGrdDemSettings `canonicalPath ${demFile}`
+        elif [[ "${demFile}" == *.bil* ]]; then
+          echo "You are using ESRI .hdr labelled *.BIL format as DEM."
+          demPath=`dirname ${demFile}`
+          demBasename=`basename ${demFile}`
+          demBasename=${demBasename%%.bil*}     #chop the last .bil
+          settings_file="${demBasename}.hdr"
+          echo "I expect to find the header file at: ${demPath}/${settings_file}"
+          if [ -e "${demPath}/${settings_file}" ]; then
+            updateEsriBilDemSettings ${demPath}/${settings_file} ${demFile}
+          else
+            echo "I can not find the header file. Can you check?"
+          fi
+          
+        
         else
           error "Unknown file format. I can only process: *.dem, *.flt, *.grd"
         fi        

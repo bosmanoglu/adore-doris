@@ -62,6 +62,7 @@ cd ${curFolder}
 bold "Reloading user settings from temporary backup file."
 settings load ${curSetFile}
 rm -rf ${curSetFile}
+echo "Report is available at: ${rFile}"
 }
 
 function handleStep(){
@@ -162,13 +163,18 @@ function reportPicture(){
    error "Can not find result for step ${step}."
  else
    mv ${imgFile} "${rFolder}"
-   writePicture ${imgFile} 300 300 ${imgFile} >> "${rFile}"
+   writePicture ${imgFile} 300 300 ${step} >> "${rFile}"
  fi
 }
 
 function writePicture(){
 cat << _EOFF
-<img src="${1}" width="${2}" height="${3}" alt="${4}" />
+<table>
+ <tr><td><b>${4}</b></td></tr>
+ <tr><td>
+  <img src="${1}" width="${2}" height="${3}" alt="${4}" />
+ </td></tr>
+</table>
 _EOFF
 }
 

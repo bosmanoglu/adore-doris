@@ -347,6 +347,19 @@ def process2dict(fileDict, processName):
                   'Number of pixels': None,   
                   'Program used for unwrapping': None,
                   }                  
+    elif processName == 'geocoding':
+        reDict = {'Data_output_file_hei': "Data_output_file (slant2h):[\s]+(.*)",
+                  'Data_output_file_phi': None,
+                  'Data_output_file_lamda': None,
+                  'Data_output_format': "Data_output_format:[\s]+(.*)",
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,   
+                  'Multilookfactor_azimuth_direction': None,
+                  'Multilookfactor_range_direction': None,
+                  }                        
+    
 #    elif processName == '':
 #        reDict = {'': None,
 #                  '': None,
@@ -377,10 +390,11 @@ def process2dict(fileDict, processName):
             out['results']=csv2Array(fileDict, lStart+10, int(out['Number_of_correlation_windows']), 6, dtype=np.float)
         except:
             pass
-    if processName=="comp_coregpm" and out['Degree_cpm']:        
-        numCoef=[1,3,6,10]#2*(int(out['Degree_cpm'])+1)
-        out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)
-        out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+numCoef[int(out['Degree_cpm'])], numCoef[int(out['Degree_cpm'])], 3, dtype=np.float)        
+    if processName=="comp_coregpm" and out['Degree_cpm']:       
+        #Below equation is from doris/src/utilities.hh Line:100, 
+        numCoef=int(np.fix(0.5*((out['Degree_cpm']+1)**2+out['Degree_cpm']+1)))#[1,3,6,10]#2*(int(out['Degree_cpm'])+1)
+        out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, numCoef, 3, dtype=np.float) # numCoef[int(out['Degree_cpm'])]
+        out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+numCoef  , numCoef, 3, dtype=np.float)        
     return out
     
 def getval(fileDict, key, lines=None, processName=None, regexp=None):
@@ -558,4 +572,17 @@ def getProduct(rdict, process, filename=None, width=None, dataFormat=None):
     if dataFormat is None:
         dataFormat=rdict[process]['Data_output_format']        
     return getdata(filename, width, dataFormat);
-       
+
+def parseSettings(filename):
+    """
+    s=parseSettings('settings.set')
+    """
+    import ConfigParser
+    class AdoreConfigParser(ConfigParser.RawConfigParser):
+        def get(self, section, option):
+            val = ConfigParser.RawConfigParser.get(self, section, option)
+            return val.lstrip('"').rstrip('"')
+
+    s=AdoreConfigParser();
+    s.read(filename);
+    return s
