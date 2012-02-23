@@ -504,7 +504,7 @@ function subtrrefpha(){
 }
  
 function unwrap(){
-  p unwrap
+  p unwrap ${@}
 }
  
 function baselines(){

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function runSnaphuWithOptions(){
+  local snaphuCmd uw_snaphu_dumponlyconf_orig
+  local opt=${@}
+  # run doris to generate the snaphu.conf  
+  uw_snaphu_dumponlyconf_orig="${uw_snaphu_dumponlyconf}"
+  uw_snaphu_dumponlyconf=on
+  runSnaphu
+  uw_snaphu_dumponlyconf="${uw_snaphu_dumponlyconf_orig}"
+  # read the command from the config file
+  snaphuCmd=`grep "\-f snaphu.conf" snaphu.conf |tr -d "#"`
+  # now add the options and run
+  echo ${snaphuCmd} ${@}
+  eval "${snaphuCmd} ${@}"
+}
+
+function runSnaphu(){
+#Standard processing
+  pp ${dorisProcess}
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+}
+##################################
+## MAIN
+##################################
+if [[ $# -eq 0 ]]; then
+  runSnaphu
+else
+  runSnaphuWithOptions $@
+fi
