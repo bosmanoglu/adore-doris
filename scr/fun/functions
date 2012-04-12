@@ -164,6 +164,10 @@ function canonicalPath(){
   [ "${1:-isEmpty}" == "isEmpty" ] && echo "" || echo $(cd "$(dirname "$1")"; pwd -P)/$(basename "$1")
 }
 
+function cpDorisFiles(){
+  . ${ADORESCR}/fun/cpDorisFiles ${@}
+}
+
 function mvDorisFiles(){
   . ${ADORESCR}/fun/mvDorisFiles ${@}
 }

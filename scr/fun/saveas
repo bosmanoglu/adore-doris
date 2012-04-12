@@ -392,11 +392,21 @@ function saveas_gdal(){
     shift
   fi
 
+  #check if filename is specified with dorisStep
+  if [[ "${dorisStep}" == *:* ]]; then
+    local inputFileName=`eval echo ${dorisStep#*:}`
+    dorisStep=${dorisStep%:*}
+    [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
+  fi
+
   geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
   if [ ${geocodeStatus} -eq "1" ]; then
     call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
     echo "..width..${numpixels}.."
     echo "..format..${format}.."
+    #if specified change fileName to inputFileName
+    [ "${inputFileName:-undefined}" != "undefined" ] && filename=${inputFileName};
+    
     call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
     # get the name of phi(lat) and lambda (lon) files
     phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
@@ -478,7 +488,7 @@ function saveas_gdal(){
     #change grid to the older format (gdal compliant)
     grdreformat ${outName}.grd ${outName}_grdreformat.grd=sf -V || { echo "Error running command: $_"; return 1; }
     #translate the grd to HFA(img) format using gdal
-    gdal_translate ${outName}_grdreformat.grd ${@}
+    gdal_translate -a_nodata 32767 ${outName}_grdreformat.grd ${@}
     if [ $? -ne 0 ]; then
       echo "gdal_translate failed. I was trying to run: gdal_translate ${outName}_grdreformat.grd ${@}";
       echo "I might have left behind temporary files: ${outName}.temporary ${outName}_grdreformat.grd ${outName}.grd ${outName}.dat"
