@@ -196,9 +196,9 @@ def main(argv):
             def onpick(event):
                 ax = mp.gca()
                 inv = ax.transData.inverted()
-                A=inv.transform((event.mouseevent.x,  event.mouseevent.y))
+                A=inv.transform((event.x,  event.y))
                 print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"]))
-            fg.canvas.mpl_connect('pick_event', onpick)
+            fg.canvas.mpl_connect('button_press_event', onpick)
         mp.show()
     
 def wrapToPi(x):

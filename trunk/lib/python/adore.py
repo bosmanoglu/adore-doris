@@ -99,6 +99,18 @@ def process2dict(fileDict, processName):
         reDict = {'Volume file': None,
                   'Volume_ID': None,
                   'Xtrack_f_DC_constant': None,
+                  'Scene_centre_latitude': None,
+                  'Scene_centre_longitude': None,
+                  'Radar_wavelength': "Radar_wavelength.*:[\s]+(.*)",
+                  'First_pixel_azimuth_time': "First_pixel_azimuth_time.*:[\s]+(.*)",
+                  'Pulse_Repetition_Frequency': "Pulse_Repetition_Frequency.*:[\s]+(.*)",
+                  'Total_azimuth_band_width': "Total_azimuth_band_width.*:[\s]+(.*)",
+                  'Xtrack_f_DC_constant': "Xtrack_f_DC_constant.*:[\s]+(.*)",
+                  'Xtrack_f_DC_linear': "Xtrack_f_DC_linear.*:[\s]+(.*)",
+                  'Xtrack_f_DC_quadratic': "Xtrack_f_DC_quadratic.*:[\s]+(.*)",
+                  'Range_time_to_first_pixel': "Range_time_to_first_pixel.*:[\s]+(.*)",
+                  'Range_sampling_rate': "Range_sampling_rate.*:[\s]+(.*)",
+                  'Total_range_band_width': "Total_range_band_width.*:[\s]+(.*)",
                   }
     elif processName == 'crop':
         reDict = {'Data_output_file': None,
@@ -234,6 +246,10 @@ def process2dict(fileDict, processName):
                   'Number of lines': None,
                   'Number of pixels': None,                     
                   }                  
+    elif processName == 'comp_refphase':
+        reDict = {'Degree_flat': None,
+                  'Degree_h2ph': None,
+                  }
     elif processName == 'subtr_refphase':
         reDict = {'Method': None,
                   'Data_output_file': None,
@@ -395,6 +411,11 @@ def process2dict(fileDict, processName):
         numCoef=int(np.fix(0.5*((out['Degree_cpm']+1)**2+out['Degree_cpm']+1)))#[1,3,6,10]#2*(int(out['Degree_cpm'])+1)
         out['Estimated_coefficientsL']=csv2Array(fileDict,lStart+4, numCoef, 3, dtype=np.float) # numCoef[int(out['Degree_cpm'])]
         out['Estimated_coefficientsP']=csv2Array(fileDict,lStart+6+numCoef  , numCoef, 3, dtype=np.float)        
+    if processName=="comp_refphase" and out['Degree_flat']:
+        numCoef=int(np.fix(0.5*((out['Degree_flat']+1)**2+out['Degree_flat']+1)))
+        out['Estimated_coefficients_flatearth']=csv2Array(fileDict,lStart+4          , numCoef, 3, dtype=np.float)
+        out['Estimated_coefficients_h2ph']     =csv2Array(fileDict,lStart+8+numCoef  , numCoef, 3, dtype=np.float)        
+        
     return out
     
 def getval(fileDict, key, lines=None, processName=None, regexp=None):
@@ -586,3 +607,45 @@ def parseSettings(filename):
     s=AdoreConfigParser();
     s.read(filename);
     return s
+
+def polyval(x,y,coeff):
+    """
+    polyval(x,y,coeff)
+    FOR compatibility with DORIS:
+    -2<x<2
+    -2<y<2
+    """ 
+    out=np.zeros(x.shape);   
+    for k in np.arange(0,coeff.shape[1]):
+        out += coeff[k,0]*np.power(x,coeff[k,1])*np.power(y, coeff[k,2]);
+    return out
+
+def h2ph(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None, width=None, dataFormat='r4', bistatic=False):
+    """h2ph(rdict, data, wl=0.0562356, h2ph_process='subtr_refphase', fileName=None, width=None, dataFormat=None, bistatic=False)
+    Multiply the data with the height-to-phase(h2ph) conversion factor.
+    """
+    #data=getProduct(rdict, process, filename=fileName, width=width, dataFormat=dataFormat);
+    if fileName is None:
+        fileName=rdict[h2phProcess]['Data_output_file']+'h2ph'
+    h2ph=getProduct(rdict, h2phProcess, filename=fileName, width=width, dataFormat=dataFormat);
+    if bistatic:
+        multiplier=2*np.pi/wl;
+    else:
+        multiplier=4*np.pi/wl;
+    return data*h2ph*multiplier;
+
+def ph2h(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None, width=None, dataFormat='r4', bistatic=False):
+    """h2ph(rdict, data, wl=0.0562356, h2ph_process='subtr_refphase', fileName=None, width=None, dataFormat=None, bistatic=False)
+    Divide the data with the height-to-phase(h2ph) conversion factor.
+    Convert phase to height.
+    """
+    #data=getProduct(rdict, process, filename=fileName, width=width, dataFormat=dataFormat);
+    if fileName is None:
+        fileName=rdict[h2phProcess]['Data_output_file']+'h2ph'
+    h2ph=getProduct(rdict, h2phProcess, filename=fileName, width=width, dataFormat=dataFormat);
+    if bistatic:
+        h2ph=h2ph*2*np.pi/wl;
+    else:
+        h2ph=h2ph*4*np.pi/wl;
+    return data/h2ph;
+    
