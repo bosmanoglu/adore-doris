@@ -1,0 +1,11 @@
+#!/bin/bash
+
+pp ${dorisProcess}  
+doris ${outputFolder}/${dorisProcess}.drs
+# We do not use the *.srp file but we need the srph2ph and 
+# correct output in the result file. So we run it anyway.
+if [ "${bistatic}" == "on" ]; then
+  openInIpython "${ADOREFOLDER}/lib/python/fun/subtrrefdem_bistatic.py"
+fi
+
+[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"

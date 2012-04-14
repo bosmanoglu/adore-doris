@@ -1,0 +1,40 @@
+#!/bin/bash
+# USAGE:
+#  cpDorisFiles sourceFolder destinationFolder
+# 
+# DESCRIPTION:
+#  This script modifies Doris Result Files (*.res) and Doris Input Files
+#  (*.drs) by changing locations of the output files to their current locations. 
+#  It is a mere string replacement utility. It does not check for errors.
+#  Each modified file is backed up with a .bck suffix (i.e *.res.bck) 
+# 
+# EXAMPLES:
+#  cpDorisFiles '/data/batu/adore_MexicoCity2/process/3DKalman/i12s' '/home/bosmanoglu/des3/kalman/3D/data'
+#
+
+
+#tmpFile="mvDoris.temporary.file"
+#rm -rf ${tmpFile}
+
+sourceFolder=${1}
+destinationFolder=${2}
+echo "Source Folder: ${sourceFolder}"
+echo "Destination F: ${destinationFolder}"
+echo "Copying Files..."
+cp -r ${sourceFolder} ${destinationFolder}
+
+#find ${destinationFolder} -name *.{res,drs,md5} > ${tmpFile}
+#find ${destinationFolder} -name *.drs >> temporary.file
+#find ${destinationFolder} -name *.md5 >> temporary.file
+#for file in `ls ${destinationFolder}/*{res,drs}`
+for file in `find ${destinationFolder} \( -name "*.res" -o -name "*.drs" -o -name "*.set" \) `
+do
+#	sed "s@${sourceFolder}@${destinationFolder}@g" ${file} > ${file}.new
+#	mv ${file} ${file}.bck
+#	mv ${file}.new ${file}
+	sed -i "s@${sourceFolder}@${destinationFolder}@g" ${file}
+done	
+
+#rm -rf ${tmpFile}
+echo "All done"
+#exit 0	

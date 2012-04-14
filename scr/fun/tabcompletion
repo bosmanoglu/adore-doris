@@ -57,7 +57,7 @@ function _check(){
 function _dem(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
-        local opts="make load unload check"
+        local opts="make load unload check extent view convert"
 	local prev="${COMP_WORDS[COMP_CWORD-1]}"
 	
 	case "${prev}" in
