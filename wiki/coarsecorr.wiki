@@ -1,6 +1,6 @@
 #summary coarsecorr
 #labels Phase-Support,Help
-[B=USAGE:=
+=USAGE:=
 {{{
  coarsecorr
 }}}
