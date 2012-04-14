@@ -4,6 +4,7 @@
 #	scenes exclude orbitFolder1 orbitFolder2 ...
 #	scenes include orbitFolder1 orbitFolder2 ...
 #	scenes init /path/to/data [/path/to/output/data/folder/]
+#       scenes add /path/to/data 
 #	scenes rescan
 #
 # DESCRIPTION:
@@ -353,7 +354,7 @@ batch="${batchOn}"
 
 function scenes_add(){
 local rawDataFolder=`canonicalPath "${1}"`
-detectSatellite "${rawDataFolder}"; #sets m_in_method
+#detectSatellite "${rawDataFolder}"; #sets m_in_method
 case "${m_in_method}" in
 ERS)
   linkERS "${rawDataFolder}";

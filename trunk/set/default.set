@@ -53,6 +53,8 @@
 [ -z "${slc_az_res}"		] && slc_az_res="" #default is not set
 ####### for raster
 [ -z "${raster_format}"		] && raster_format="ras" #default is not set
+####### for tandemx-bistatic
+[ -z "${bistatic}"		] && bistatic="off" #default is off
 #######################################
 ###     Default Doris Settings      ###
 #######################################
