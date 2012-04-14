@@ -1,0 +1,3 @@
+#summary Doris Steps Implemented in ADORE.
+
+ADORE uses a set of template files and the user environment settings to create DORIS input files and run DORIS. DORIS steps that can be called within ADORE are shown here. Please select a process step from the list to read more. 
