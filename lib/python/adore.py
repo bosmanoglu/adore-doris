@@ -629,9 +629,9 @@ def h2ph(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None,
         fileName=rdict[h2phProcess]['Data_output_file']+'h2ph'
     h2ph=getProduct(rdict, h2phProcess, filename=fileName, width=width, dataFormat=dataFormat);
     if bistatic:
-        multiplier=2*np.pi/wl;
+        multiplier=-2*np.pi/wl;
     else:
-        multiplier=4*np.pi/wl;
+        multiplier=-4*np.pi/wl;
     return data*h2ph*multiplier;
 
 def ph2h(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None, width=None, dataFormat='r4', bistatic=False):
@@ -644,8 +644,8 @@ def ph2h(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None,
         fileName=rdict[h2phProcess]['Data_output_file']+'h2ph'
     h2ph=getProduct(rdict, h2phProcess, filename=fileName, width=width, dataFormat=dataFormat);
     if bistatic:
-        h2ph=h2ph*2*np.pi/wl;
+        h2ph=h2ph*-2*np.pi/wl;
     else:
-        h2ph=h2ph*4*np.pi/wl;
+        h2ph=h2ph*-4*np.pi/wl;
     return data/h2ph;
     

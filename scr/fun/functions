@@ -314,6 +314,10 @@ function check(){
 	. ${ADORESCR}/fun/check "${@}"
 }
 
+function deramp(){
+	. ${ADORESCR}/fun/deramp "${@}"
+}
+
 function dem(){
 	. ${ADORESCR}/fun/dem "${@}"
 }

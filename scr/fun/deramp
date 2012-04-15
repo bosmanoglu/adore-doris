@@ -1,0 +1,116 @@
+#!/bin/bash
+# ADORE
+# Automatic Doris Environment
+#
+# USAGE:
+#	deramp dorisStep  
+#	deramp dorisStep:filename [-o ORDER -e ESTIMATEFILE]
+#
+# DESCRIPTION:
+#  DERAMP is an internal ADORE command.  
+#  It removes a first or second order plane from DORIS results using python, numpy, scipy. 
+# 
+#  The deramp module is located in $ADOREFOLDER/lib/python and has more 
+#  adjustable parameters compared to this ADORE function.
+#
+# INPUT:
+#  dorisStep[:filename]
+#       The step for the output file. Optionally a different file can be 
+#	specified separated by a colon (:).
+#
+#  Optional:
+#	-o ORDER: The order of the polynomial defining the plane. 
+#           Can be 1 or 2. Default is 1.
+#       -e ESTIMATEFILE: When specified this file is subtracted before calculating
+#           the best fitting plane. It has to be the same format as the input.
+#
+# OUTPUT:
+#   Writes the plane removed result with a deramp suffix. 
+#
+# EXAMPLES:
+# deramp unwrap -o 2 
+# deramp unwrap -e ${master}_${slave}.crd
+
+#echo $@
+#echo $#
+#Clear Script Variables
+local generate dorisStep remainder #format grepM grepS grepI
+local generateCheck #resultFile firstPixel lastPixel width
+local fileName resFile format width numlines inputFileName
+local w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
+local cmd passOn lenRemainder
+###### GET INPUT OPTIONS
+if [ $# -gt 0 ];then
+  dorisStep=${1};shift
+  remainder=$@
+else
+  error "Please check usage by: ? raster"
+  return
+fi
+passOn=()
+while [ -n "${remainder}" ]; 
+do
+  inArg="${remainder##*-}"
+  if [ -z "${inArg}" ]; then
+    inArg=${remainder};
+    remainder=""
+  else
+    inArg="-${inArg}"
+  fi
+  lenRemainder=$(( ${#remainder} - ${#inArg} ))
+  remainder="${remainder:0:${lenRemainder}}"
+  unset OPTIND
+  while getopts ":w:f:" flag ${inArg};
+  do
+    case $flag in
+      w|f)
+        eval ${flag}=${OPTARG};;
+      *)
+        passOn+=($inArg)
+        break
+      ;;
+    esac
+  done
+done
+# make generate lowercase to accommadate user entries in caps from APM
+remainder="${passOn[@]}" #set remainder to passed on variables for cpxfiddle
+if [ "${remainder:-undef}" != "undef" ]; then
+  error "I'll pass these options to cpxview: ..${remainder}.."
+fi
+
+#check if filename is specified with dorisStep
+if [[ "${dorisStep}" == *:* ]]; then
+  inputFileName=`eval echo ${dorisStep#*:}`
+  dorisStep=${dorisStep%:*}
+  [ ! -e "${inputFileName}" ] && { error "Can not find specified file: ${inputFileName}"; return 1; }
+fi
+
+call "(fileName resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
+# if not empty and different from read value. 
+if [ -n "${w}" ] && [ "${w}" != "${width}" ]; then
+  error "Overwriting width(${width}) with user specified value: ${w}"
+  width=${w};
+fi  
+if [ -n "${f}" ] && [ "${f}" != "${format}" ]; then
+    error "Overwriting format(${format}) with user specified value: ${f}"
+    format=${f};
+fi
+
+#if specified change fileName to inputFileName
+[ "${inputFileName:-undefined}" != "undefined" ] && fileName=${inputFileName};
+
+if [ -z ${fileName} ]; then
+  error "No data file for the step ${dorisStep} in ${resFile}"
+  return;
+fi
+
+error Image Width  ..${width}..
+error Image Format ..${format}..
+outName=`basename ${fileName}| tr '.' '_'`
+[ $? -ne 0 ] && { error "I have problems finding filename: ${fileName}"; return 1; }
+cmd=`echo "${ADOREFOLDER}/lib/python/deramp.py -w ${width} -f ${format} ${remainder} ${fileName} &"`
+echo "${cmd}"
+
+#go back to adore
+return 0;
+
