@@ -108,8 +108,8 @@ error Image Width  ..${width}..
 error Image Format ..${format}..
 outName=`basename ${fileName}| tr '.' '_'`
 [ $? -ne 0 ] && { error "I have problems finding filename: ${fileName}"; return 1; }
-cmd=`echo "${ADOREFOLDER}/lib/python/deramp.py -w ${width} -f ${format} ${remainder} ${fileName} &"`
-echo "${cmd}"
+cmd=`echo "${ADOREFOLDER}/lib/python/deramp.py -w ${width} -f ${format} ${remainder} ${fileName}"`
+eval "${cmd}"
 
 #go back to adore
 return 0;
