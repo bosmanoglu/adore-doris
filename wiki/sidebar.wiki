@@ -1,3 +1,4 @@
+#labels Phase-Support
 #sidebar TableOfContents
   * [Installation HOWTO Install]
   * [Roadmap List of upcoming features]
@@ -85,3 +86,4 @@
     * [preparePsiInput preparePsiInput.adr]
     * [singleMasterStack singleMasterStack.adr]
     * [singleMasterStack_Parallel singleMasterStack_Parallel.adr]
+    * [multiplePairs multiplePairs.adr]
