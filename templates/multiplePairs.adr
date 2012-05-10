@@ -4,10 +4,9 @@
 #       p multiplePairs.adr inputFile
 #
 # DESCRIPTION:
-#  multiplePairs_Parallel.adr is an ADORE script.  
+#  multiplePairs.adr is an ADORE script.  
 #  It generates several interferograms whose master and slave orbits are defined
 #  by the input file. 
-#  This script uses the Torque-PBS system to distribute jobs to other computers.
 #
 # INPUT:
 #  inputFile: A comma-separated-value file where each line indicates an
@@ -20,9 +19,8 @@
 # OUTPUT:
 #  Creates ${projectFolder}/process/${runName}/ and processes crops & interferograms
 #  It runs the following DORIS steps:
-#    For crops: s_readfiles, s_porbits, s_crop
-#    For i12s: coarseorb, coarsecorr, fine, coregpm, resample, interfero, comprefpha, subtrrefpha, coherence
-#  It also creates an amplitude raster for resample and a phase raster for subtrrefpha.
+#    For crops: m_readfiles;m_porbits;m_crop
+#    For i12s: coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence
 #
 
 # The following steps are processed for each crop
