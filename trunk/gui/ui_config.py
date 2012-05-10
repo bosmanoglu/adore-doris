@@ -1,6 +1,7 @@
 # ui_config.py
 import gtk
 import settingsEditor
+import processSelector
 import dialogs
 
 def menuActions(self):
@@ -55,6 +56,7 @@ def menuActions(self):
     ('slant2htrick', None, 'slant2htrick', None, '', lambda w: runMenuName(self, w)),
     ('slant2h', None, 'slant2h', None, '', lambda w: runMenuName(self, w)),
     ('geocode', None, 'geocode', None, '', lambda w: runMenuName(self, w)),
+    ('processSelector', None, 'Process__Selector', None, 'Graphical interface for processes.', lambda x: processSelector.ProcessSelector(self)),
     ('Settings', None, '_Settings'),
     ('settingsEditor', None, '_Editor', None, 'Graphical Editor for settings.', lambda x: settingsEditor.SettingsEditor(self)),
     ('settingsCheck', None, '_Check', None, 'Check settings against default values.', lambda x: self.runcmd('settings check')),

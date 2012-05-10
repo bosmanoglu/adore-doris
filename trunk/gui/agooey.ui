@@ -58,6 +58,7 @@
       <menuitem action="slant2h"/>
       <menuitem action="geocode"/>
     </menu>
+    <menuitem action="processSelector"/>
   </menu>
   <menu action="Settings">
     <menuitem action="settingsEditor"/>
