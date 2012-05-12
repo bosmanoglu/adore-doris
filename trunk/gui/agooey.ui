@@ -18,6 +18,7 @@
     <menuitem action="demUnload"/>
   </menu>
   <menu action="Process">
+    <menuitem action="processSelector"/>
     <menu action="Master">
       <menuitem action="m_readfiles"/>
       <menuitem action="m_porbits"/>
@@ -58,7 +59,6 @@
       <menuitem action="slant2h"/>
       <menuitem action="geocode"/>
     </menu>
-    <menuitem action="processSelector"/>
   </menu>
   <menu action="Settings">
     <menuitem action="settingsEditor"/>
