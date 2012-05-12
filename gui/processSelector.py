@@ -8,44 +8,26 @@ import ConfigParser
 
 class ProcessSelector:
 
-    def advancedChkBtnToggled(self, widget, treestore):
-        pass
-    def displayOptions(self, setFile, treestore):
-        pass                        
-    def chkbx_toggled_cb(self, cell, path, treestore):
-        pass
-    # Handle edited value
-    def edited_cb(self, cell, path, new_text, treestore):
-        pass        
+    def advancedChkBtnToggled(self, widget):
+        self.processEntry.set_editable(self.advancedChkBtn.get_active())
+        
     # close the window and quit
     def delete_event(self, widget, event, data=None):
         #gtk.main_quit()
-        del self.set
         self.window.destroy()
         return False
 
     def processButtonClicked(self, widget):
         self.processEntry.set_text(self.processEntry.get_text() + widget.get_label().replace('__','_') +';')
         
-    def applyButtonClicked(self, widget, treestore):
-        #self.runcmd(settxt);
-        pass
-        #Let's see if this will stop the constant crashing
-        #self.window.destroy();  
+    def applyButtonClicked(self, widget):
+        self.runcmd(self.processEntry.get_text());
 
-    def refreshButtonClicked(self, widget, treestore):
-        pass
+    def refreshButtonClicked(self, widget):
+        self.processEntry.set_text('');
         
     def __init__(self,mainWindow):
-        #Load settings 
-        self.set=ConfigParser.ConfigParser()
-        #Make settings case sensitive
-        self.set.optionxform = str
-        #
-        self.setFile=mainWindow.setFile;
         self.runcmd=mainWindow.runcmd;
-#        self.set=ConfigParser.ConfigParser()
-#        self.set.read(setFile)
         # Create a new window
         
         self.window = gtk.Window()#hadjustment=None, vadjustment=None)
@@ -72,24 +54,25 @@ class ProcessSelector:
 
         ##### SET THE HBOX #####
         self.processEntry=gtk.Entry();
+        self.processEntry.set_editable(False);
         self.processEntry.show();
         
         self.applyButton=gtk.Button(label='Apply', stock=None, use_underline=True);        
-        self.applyButton.connect("clicked", self.applyButtonClicked, rows)
+        self.applyButton.connect("clicked", self.applyButtonClicked)
         self.applyButton.set_flags(gtk.CAN_DEFAULT);
         self.applyButton.show();
 
-        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
-        self.refreshButton.connect("clicked", self.refreshButtonClicked, rows)
+        self.refreshButton=gtk.Button(label='Clear', stock=None, use_underline=True);        
+        self.refreshButton.connect("clicked", self.refreshButtonClicked)
         self.refreshButton.set_flags(gtk.CAN_DEFAULT);
         self.refreshButton.show();
 
         self.advancedChkBtn=gtk.CheckButton("Advanced");
-        self.advancedChkBtn.connect("toggled", self.advancedChkBtnToggled, rows)
+        self.advancedChkBtn.connect("toggled", self.advancedChkBtnToggled)
         self.advancedChkBtn.show();
 
         self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 10);
-        self.hbox.pack_start(self.applyButton, expand = False, fill = False, padding = 20);
+        self.hbox.pack_start(self.applyButton, expand = False, fill = False, padding = 10);
         self.hbox.pack_end(self.advancedChkBtn, expand = False, fill = False, padding = 20);
 
         #### SET THE TABLE ####
