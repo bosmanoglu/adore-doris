@@ -39,29 +39,55 @@ scipy.pkgload('optimize')
 def usage():
     print __doc__
 
-def deramp(inData, estData=None, multilook=[1000,1000], weight=None, order=1):
-    X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
-    #X=X[inData<0.1];
-    fitX=X.ravel()[0::multilook[0]]
-    #Y=Y[inData<0.1];
-    fitY=Y.ravel()[0::multilook[1]]
-    if estData is not None:
-        inData=inData-estData;
-    fitData=inData[fitX,fitY]#.ravel()[0::multilook]
+def fitSurface(x,y,z, weight=None, order=1):
     if weight is not None:
-        w=weight[fitX,fitY]
+        w=weight;
     else:
-        w=np.ones(fitX.shape)
+        w=np.ones(len(x))
     if order==1:
-        fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y 
+        fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y
+        p0=[0,0.1,0.1] 
     elif order==2:
         fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y+p[3]*x**2+p[4]*y**2+p[5]*x*y
+        p0=[0,0.1,0.1,0.1,0.1] 
     else:
         print "order has to be 1 or 2."
         return -1
     errfunc = lambda p, x, y, z, w: w*(fitfunc(p,x,y) - z)
-    planefit, success=scipy.optimize.leastsq(errfunc, fitData, args=(fitX,fitY,fitData,w))
+    planefit, success=scipy.optimize.leastsq(errfunc, p0, args=(x,y,z,w))
+    return planefit, fitfunc
+
+def derampxyz(x,y,z,weight=None, order=1):
+    """derampxyz(x,y,z,weight=None, order=1):
+    """
+    p,func=fitSurface(x,y,z,weight, order)    
+    return z-func(p,x,y);
     
+def deramp(inData, estData=None, multilook=[1000,1000], weight=None, order=1):
+    X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
+    fitX,fitY=np.meshgrid(np.r_[0:inData.shape[0]:multilook[0]],np.r_[0:inData.shape[1]:multilook[1]])
+    #X=X[inData<0.1];
+    fitX=fitX.ravel()#[0::multilook[0]]
+    #Y=Y[inData<0.1];
+    fitY=fitY.ravel()#[0::multilook[1]]
+    if estData is not None:
+        inData=inData-estData;
+    fitData=inData[fitX,fitY]#.ravel()[0::multilook]
+    #remove nan values
+    ma=np.isnan(fitData)
+    if all(ma):
+        print "Too many nans. Reduce multilook or remove nans."
+        return -1
+    if any(ma):
+        notNan=~ma
+        fitData=fitData[notNan];
+        fitX=fitX[notNan];
+        fitY=fitY[notNan];
+    if weight is not None:
+        w=weight[fitX,fitY]
+    else:
+        w=np.ones(fitX.shape)
+    planefit,fitfunc=fitSurface(fitX,fitY,fitData, weight=w, order=order);
     #X,Y = np.meshgrid(np.r_[0:inData.shape[0]],np.r_[0:inData.shape[1]])
     outData=inData-fitfunc(planefit,X.T,Y.T)
     if estData is not None:

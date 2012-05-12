@@ -72,6 +72,11 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
                                 # current folder will change the prompt
                                 # to !ADORE:
   fi
+  #pretty LS
+  if [ "$TERM" != "dumb" ]; then
+    [ -e "${ADORESCR}/.dircolors" ] && eval "`dircolors -b ${ADORESCR}/.dircolors`"
+    alias ls='ls --color=auto'
+  fi
 fi
 
 #Only if gui mode

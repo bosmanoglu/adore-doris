@@ -126,6 +126,10 @@
 [ -z "${_rel_sam_out_file}" 	] && _rel_sam_out_file='echo ${outputFolder}/${master}.sam'
 [ -z "${sam_out_dem}" 		] && sam_out_dem="${outputFolder}/${master}.samdem"
 [ -z "${_rel_sam_out_dem}" 	] && _rel_sam_out_dem='echo ${outputFolder}/${master}.samdem'
+[ -z "${sam_out_dem_lp}" 	] && sam_out_dem_lp="${outputFolder}/${master}.samdemlp"
+[ -z "${_rel_sam_out_dem_lp}" 	] && _rel_sam_out_dem_lp='echo ${outputFolder}/${master}.samdemlp'
+[ -z "${sam_out_theta_lp}" 	] && sam_out_theta_lp="${outputFolder}/${master}.samthetalp"
+[ -z "${_rel_sam_theta_lp}" 	] && _rel_sam_out_theta_lp='echo ${outputFolder}/${master}.samthetalp'
 ################### m_timing
 ### SECTION=m_timing
 [ -z "${mte_method}" 		] && mte_method="magspace"
