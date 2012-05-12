@@ -58,7 +58,7 @@ def menuActions(self):
     ('slant2h', None, 'slant2h', None, '', lambda w: runMenuName(self, w)),
     ('geocode', None, 'geocode', None, '', lambda w: runMenuName(self, w)),
     ('Settings', None, '_Settings'),
-    ('settingsEditor', None, '_Editor', None, 'Graphical Editor for settings.', lambda x: settingsEditor.SettingsEditor(self)),
+    ('settingsEditor', None, '_Editor...', None, 'Graphical Editor for settings.', lambda x: settingsEditor.SettingsEditor(self)),
     ('settingsCheck', None, '_Check', None, 'Check settings against default values.', lambda x: self.runcmd('settings check')),
     ('settingsFix', None, '_Fix', None, 'Fix settings using default relations.', lambda x: self.runcmd('settings check')),
     ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', lambda x: self.runcmd('settings load')),
