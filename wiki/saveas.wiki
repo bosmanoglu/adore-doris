@@ -10,6 +10,7 @@
  Currently ENVI and ArcGIS are supported. 
 =INPUT:=
  exportFormat: envi, arcgis, gdal, grd. 
+
  processName: Doris step to be exported.
  ==OPTIONAL:==
    `saveas arcgis [a|p|m] processName`
