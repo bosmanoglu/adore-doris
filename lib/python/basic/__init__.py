@@ -127,13 +127,19 @@ def nancorr2(x,y,w):
 def cdiff(A, axis=0):
     """cdiff, returns the center difference for Array A in given axis
     """
+    if len(A.shape)==1:
+        A=atleast_2d(A).T
+        singleDim=True
     A=rollaxis(A, axis)
     out=zeros(A.shape);    
     out[0,:]=A[0,:]-A[1,:]
     for i in range(1,A.shape[0]-1):
         out[i,:] = (A[i+1,:] - A[i-1,:])/2
     out[-1,:] = A[-1,:]-A[-2,:]
-    return rollaxis(out, -axis)
+    if singleDim==True:
+        return squeeze(rollaxis(out, -axis))
+    else:
+        return rollaxis(out, -axis)
 
 def div(U,V,spacing=[1.,1.]):
     """div(U,V,spacing=[1.,1.])
@@ -328,11 +334,28 @@ def progresstime(t0=0,timeSpan=30):
     else:
         return False;
         
-def rescale(arr, lim):
-    """rescale(array, limits)
+def rescale(arr, lim, trim=False, arrlim=None):
+    """rescale(array, limits, trim=False, arrlim=None)
     scale the values of the array to new limits ([min, max])
+    Trim:
+      With this option set to a number, the limits are stretced between [mean-TRIM*stdev:mean+TRIM*stdev]
     """
-    return (arr-arr.min())/(arr.max()-arr.min())*(lim[1]-lim[0])+lim[0];
+    if arrlim is not None:
+        minarr=arrlim[0];
+        maxarr=arrlim[1];
+    if trim:
+        m=arr.mean()
+        s=arr.std()
+        minarr=m-trim*s;
+        maxarr=m+trim*s;
+    elif (trim==False) & (arrlim is None):
+        minarr=arr.min()
+        maxarr=arr.max()
+    print [minarr, maxarr]        
+    newarr=(arr-minarr)/(maxarr-minarr)*(lim[1]-lim[0])+lim[0]
+    newarr[newarr<lim[0]]=lim[0]
+    newarr[newarr>lim[1]]=lim[1]
+    return newarr
     
 def shallIStop(t0,timeSpan=120):
     ''' t1=shallIStop(t0,timeSpan)
@@ -373,7 +396,7 @@ def tic():
     '''
     return time.time()
 
-def transect(x,y,z,x0,y0,x1,y1,plot=0):
+def transect(x,y,z,x0,y0,x1,y1,plots=0):
     #convert coord to pixel coord
     d0=sqrt( (x-x0)**2+ (y-y0)**2 );
     i0=d0.argmin();
@@ -391,7 +414,7 @@ def transect(x,y,z,x0,y0,x1,y1,plot=0):
     #y is the first dimension and x is the second, row,col
     zi = z[xi.astype(plt.np.int), yi.astype(plt.np.int)]
 
-    if plot==1:
+    if plots==1:
         plt.matshow(z);plt.colorbar();plt.clim([0,200]);plt.title('transect: (' + str(x0) + ',' + str(y0) + ') (' +str(x1) + ',' +str(y1) + ')' );
         plt.scatter(yi,xi,5,c='r',edgecolors='none')
         plt.figure();plt.scatter(sqrt( (xi-xi[0])**2 + (yi-yi[0])**2 ) , zi)
