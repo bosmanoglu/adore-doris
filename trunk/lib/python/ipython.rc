@@ -10,14 +10,17 @@ except:
 
 try:
   ires=adore.res2dict( settings.get('general', 'i_resfile') );
+  iobj=adore.dict2obj(ires);
 except:
   pass
 try:
   mres=adore.res2dict( settings.get('general', 'm_resfile') );
+  mobj=adore.dict2obj(mres);
 except:
   pass
 try:
   sres=adore.res2dict( settings.get('general', 's_resfile') );
+  sobj=adore.dict2obj(sres);
 except:
   pass
 

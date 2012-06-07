@@ -83,7 +83,7 @@ def usageLong():
    -B                Swap bytes.
    -b                Add a scalebar.
    -t		     Print file name as figure title. 
-   -k 		     Print pixel coordinates to stdout on left-click.
+   -k [value]        Print pixel coordinates (and value) to stdout on left-click.
    -h                This help.
     """
     
@@ -94,7 +94,7 @@ def main(argv):
     #inputfile=argv[-1];
     #argv=argv[0:-1];
     try:
-        opts, args = getopt.getopt(argv, "w:f:q:o:e:s:l:L:p:P:S:M:m:c:r:BH:Vbhtk", )
+        opts, args = getopt.getopt(argv, "w:f:q:o:e:s:l:L:p:P:S:M:m:c:r:BH:Vbhtk:v", )
     except getopt.GetoptError:
         print "Unknown option."
         usage()
@@ -129,6 +129,7 @@ def main(argv):
     cfg.setdefault("-H", "")
     cfg.setdefault("-b", "")
     cfg.setdefault("-o", "")
+    cfg.setdefault("-k", "")
     cfg["-w"]=int(cfg["-w"]) 
     cfg["-l"]=int(cfg["-l"]) 
     cfg["-L"]=int(cfg["-L"]) 
@@ -156,21 +157,22 @@ def main(argv):
     if "y" in cfg["-m"]:
         data=flipud(data);
     if "norm" in cfg["-q"].lower():
-        mp.matshow(cfg["-s"]*data**cfg["-e"]);
+        data=(cfg["-s"]*data**cfg["-e"]);
     elif "mag" in cfg["-q"].lower():
-        fg=mp.matshow(cfg["-s"]*abs(data)**cfg["-e"],picker=5)
+        data=(cfg["-s"]*abs(data)**cfg["-e"])
     elif "pha" in cfg["-q"].lower():
-        mp.matshow(cfg["-s"]*np.angle(data)**cfg["-e"])
+        data=(cfg["-s"]*np.angle(data)**cfg["-e"])
     elif "wrap" in cfg["-q"].lower():
-        mp.matshow(cfg["-s"]*wrapToPi(data)**cfg["-e"])
+        data=(cfg["-s"]*wrapToPi(data)**cfg["-e"])
     elif "real" in cfg["-q"].lower():
-        fg=mp.matshow(cfg["-s"]*data.real**cfg["-e"],picker=5)
+        data=(cfg["-s"]*data.real**cfg["-e"])
     elif "imag" in cfg["-q"].lower():
-        mp.matshow(cfg["-s"]*data.imag**cfg["-e"])
+        data=(cfg["-s"]*data.imag**cfg["-e"])
         
     else:
         print "Unknown output type."
         return
+    fg=mp.matshow(data, picker=5);
     # set colormap
     mp.set_cmap(cfg["-c"])        
     #rescale?
@@ -191,7 +193,19 @@ def main(argv):
         #delete tempfile.
         '''
     else:
-        if ("-k", "") in opts:
+        if ("-k", "value") in opts:
+            fg=mp.gcf()
+            def onpick(event):
+                ax = mp.gca()
+                inv = ax.transData.inverted()
+                A=inv.transform((event.x,  event.y))
+                try:  
+                    v=data[A[1],A[0]]              
+                except:
+                    v=np.nan
+                print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"])), v
+            fg.canvas.mpl_connect('button_press_event', onpick)
+        elif ("-k", "") in opts:
             fg=mp.gcf()
             def onpick(event):
                 ax = mp.gca()

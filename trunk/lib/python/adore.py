@@ -28,11 +28,16 @@ import basic
 #    do = DictObj(d)
 #    return do
 
-def dictobj(d):
+def dict2obj(d):
     #Ygor Lemos: parand.com/say/index.php/2008/10/13/access-python-dictionary-keys-as-properties/
     class DictObj:
         def __init__(self, **entries):
-            self.__dict__.update(entries)
+            for e in entries:
+                if isinstance(d[e], dict):
+                    self.__dict__[e]=dict2obj(d[e])
+                else:
+                    self.__dict__[e]=d[e]
+                
     return DictObj(**d)
   
 def res2dict(resfile):
