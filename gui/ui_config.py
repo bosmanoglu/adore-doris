@@ -21,7 +21,7 @@ def menuActions(self):
     ('demMake', None, 'Make...', None, '', lambda w :menuAction(self,w)),
     ('demUnload', None, 'Unload', None, '', lambda w: runMenuCmd(self, w)),
     ('Process', None, '_Process'),
-    ('processSelector', None, 'Process Selector...', None, 'Graphical interface for processes.', lambda x: processSelector.ProcessSelector(self)),
+    ('processSelector', None, 'Selector...', None, 'Graphical interface for processes.', lambda x: processSelector.ProcessSelector(self)),
     ('Master', None, '_Master'),
     ('m_readfiles', None, 'm__readfiles', None, '', lambda w: runMenuName(self, w)),
     ('m_porbits', None, 'm__porbits', None, '', lambda w: runMenuName(self, w)),
