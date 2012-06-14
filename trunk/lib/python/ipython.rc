@@ -3,6 +3,11 @@ import os
 os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python'))
 import adore
 
+#try:
+#  settingsFile=os.sys.argv[1]
+#except:
+#  pass
+
 try:
   settings=adore.parseSettings(os.sys.argv[1])
 except:
