@@ -518,6 +518,28 @@ else
 fi
 }
 
+function checkUpdates(){ 
+#Download current version
+function checkUpdates(){
+wget http://adore-doris.googlecode.com/svn/trunk/version -O ${tmpFolder}/version
+svn_version=`cat ${tmpFolder}/version | tr -d ".r"`  
+cur_version=`cat ${ADOREFOLDER}/version | tr -d ".r"`
+#compare versions
+if [ ${svn_version} -gt ${cur_version} ]; then
+ echo "A new version is available."
+ if ask "Would you like to upgrade?"; then
+  touch ${ADOREFOLDER}/version
+  if [ $? -eq 0 ]; then
+    svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+  else
+    sudo svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+  fi
+  echo "Please restart ADORE to make sure all changes are in effect."
+ fi 
+else
+ echo "Latest version is already installed."
+fi
+
 function test1(){
 wget http://adore-doris.googlecode.com/files/test1-r2.tar.gz
 gunzip test1-r*.tar.gz
@@ -539,6 +561,9 @@ elif [ "${1}" == "-j" ]; then
 elif [ "${1}" == "setup" ];then
  shift 
  checkSetup "${@}"
+elif [ "${1}" == "updates" ]; then
+ shift 
+ checkUpdates 
 else
  listProcessFlagsFromResultFiles "$@"
 fi 
