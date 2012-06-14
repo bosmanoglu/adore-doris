@@ -520,7 +520,7 @@ fi
 
 function checkUpdates(){ 
 #Download current version
-function checkUpdates(){
+mkdir -p ${tmpFolder}
 wget http://adore-doris.googlecode.com/svn/trunk/version -O ${tmpFolder}/version
 svn_version=`cat ${tmpFolder}/version | tr -d ".r"`  
 cur_version=`cat ${ADOREFOLDER}/version | tr -d ".r"`
@@ -539,6 +539,7 @@ if [ ${svn_version} -gt ${cur_version} ]; then
 else
  echo "Latest version is already installed."
 fi
+}
 
 function test1(){
 wget http://adore-doris.googlecode.com/files/test1-r2.tar.gz
