@@ -12,6 +12,11 @@ function dorisProcess2OutputFile(){
   local grepM grepS grepI resfile firstPixel lastPixel numpixels multilookfactorPixels
   local firstLine lastLine numlines multilookfactorLines inputfile section notify grepStart grepEnd grepLength
   local numHits matchingLine result format filename c
+  if [[ "${dorisStep}" == *:* ]]; then
+    local inputFileName=`eval echo ${dorisStep#*:}`
+    dorisStep=${dorisStep%:*}
+    [ ! -e "${inputFileName}" ] && { echo "Can not find specified file: ${inputFileName}"; return 1; }
+  fi  
   #find which resfile to read.
   if [[ ${dorisStep} == m_* ]]; then
     dorisStep=`pn2rs ${dorisStep}`
@@ -72,6 +77,7 @@ function dorisProcess2OutputFile(){
   grepEnd=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
 
   grepLength=$((${grepEnd}-${grepStart}));
+
   if [[ "${batch}" == "off" ]]; then
     #get number of hits
     numHits=`grep -A ${grepLength} Start_${section} ${inputfile} | grep ${parameter}|wc -l`    
@@ -120,6 +126,8 @@ function dorisProcess2OutputFile(){
   #echo $result
 
   filename=${result//[[:space:]]}
+  #if specified change fileName to inputFileName
+  [ "${inputFileName:-undefined}" != "undefined" ] && filename=${inputFileName};
   ########################## END OF READRES.
   [ "${format//[[:space:]]}" == "complex_real4" ] && format="cr4";
   [ "${format//[[:space:]]}" == "complex_short" ] && format="ci2";

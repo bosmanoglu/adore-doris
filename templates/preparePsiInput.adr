@@ -39,13 +39,29 @@ local scene
 for scene in ${scenes_include[*]}
 do
    if [ "${master}" == "${scene}" ]; then
-     if [ ! -e ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 ]; then 
-       echo "Creating master_master folder: ${i12sFolder}/${master}_${scene}"
-       mkdir -p ${i12sFolder}/${master}_${scene}
-       cp ${cropsFolder}/${master}/${master}.res ${i12sFolder}/${master}_${scene}
-       #convert from complex short to complex real. 
-       bkconvert ${cropsFolder}/${master}/${master}.ovs ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 2 4
-     fi  
+     echo "Creating master_master folder: ${i12sFolder}/${master}_${scene}"
+     mkdir -p ${i12sFolder}/${master}_${scene}
+     cp ${cropsFolder}/${master}/${master}.res ${i12sFolder}/${master}_${scene}
+     local oversample=`readRes.sh ${cropsFolder}/${master}/${master}.res process_control oversample`
+     if [ ${oversample} -eq 1 ]; then
+       l0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "First_line (w.r.t. ovs_image)"`
+       lN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "Last_line (w.r.t. ovs_image)"`
+       p0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "First_pixel (w.r.t. ovs_image)"`
+       pN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "Last_pixel (w.r.t. ovs_image)"`
+       if [ ! -e ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 ]; then 
+         #convert from complex short to complex real. 
+         bkconvert ${cropsFolder}/${master}/${master}.ovs ${i12sFolder}/${master}_${scene}/${master}.ovs.cr4 2 4
+       fi  
+     else
+       l0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res crop "First_line (w.r.t. original_image)"`
+       lN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res crop "Last_line (w.r.t. original_image)"`
+       p0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res crop "First_pixel (w.r.t. original_image)"`
+       pN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res crop "Last_pixel (w.r.t. original_image)"`
+       if [ ! -e ${i12sFolder}/${master}_${scene}/${master}.crop.cr4 ]; then 
+         #convert from complex short to complex real. 
+         bkconvert ${cropsFolder}/${master}/${master}.crop ${i12sFolder}/${master}_${scene}/${master}.crop.cr4 2 4
+       fi  
+     fi     
      date_master=`readRes.sh ${cropsFolder}/${master}/${master}.res readfiles "First_pixel_azimuth_time (UTC):" | awk '{printf($1)}'`
      Bperp=0
      Btemp=0
@@ -54,10 +70,6 @@ do
      h2ph=dummy
      atmo=dummy
      doppler_master=0
-     l0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "First_line (w.r.t. ovs_image)"`
-     lN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "Last_line (w.r.t. ovs_image)"`
-     p0=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "First_pixel (w.r.t. ovs_image)"`
-     pN=`readRes.sh ${i12sFolder}/${master}_${scene}/${scene}.res oversample "Last_pixel (w.r.t. ovs_image)"`
      masterMasterLine="${master} ${date_master} ${slcrsmp} ${interf} ${h2ph} ${atmo} ${Bperp} ${Btemp} ${doppler_master} ${l0} ${lN} ${p0} ${pN}"
      bold " ${master}_${scene}: OK"
      continue
