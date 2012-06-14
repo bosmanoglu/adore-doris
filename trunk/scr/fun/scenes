@@ -33,6 +33,9 @@
 #       $dataFolder variable. Keep in mind that the dataFolder will be set
 #       to the newly created output data folder.  
 #
+# scenes rename [date,datetime,orbit,trackframe]:
+#	rename scenes in the data folder given the naming convention.
+#
 # scenes rescan: 
 #	rescan the $dataFolder and reset the included scenes
 #
@@ -377,6 +380,26 @@ CSK)
 esac
 }
 
+function scenes_rename(){
+ local newname bname
+ for f in `scenes include`
+ do 
+   case "${1}" in
+   datetime)
+     if [ "${m_in_method}" == "CSK" ]; then
+       bname=$( basename ${dataFolder}/${f}/${dataFile} )
+       newname=`echo "$bname" | awk -F '_' {'print substr($9,1,16)'}`
+       if [ "${newname}" != "${f}" ]; then 
+         echo "Renaming: ${f}  as ${newname}"
+         mv ${dataFolder}/${f} ${dataFolder}/${newname}
+       fi
+     fi
+   ;;
+   esac
+ done
+ scenes rescan
+}
+
 function scenes_rescan(){
   scenes_include=( `ls -F "${dataFolder}/"  2>/dev/null | grep "/" | tr -d "/"` )  
 }
@@ -396,6 +419,10 @@ case "${1}" in
  shift
  scenes_init "$@"
  scenes_rescan
+ ;;
+"rename")
+ shift
+ scenes_rename "$@"
  ;;
 "rescan")
  shift
