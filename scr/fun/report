@@ -159,8 +159,9 @@ echo '</textarea>' >>${rFile}
 function reportPicture(){
  local step m1 m2
  step="${1}"
+ echo ${coh_multilook}
  m1=$(( 20 / ${coh_multilook% *} ))
- m2=$(( ${m1} * ${coh_multilook#* } ))
+ m2=$(( ${m1} * ${coh_multilook#* } / ${coh_multilook% *} ))
  [ "${m1}" == "" ] && m1="20" && m2="20"
  imgFile=`raster auto ${step} -M${m1}/${m2} | tail -n1| cut -d":" -f2 | tr -d " "`
  if [ ! -f "${imgFile}" ]; then

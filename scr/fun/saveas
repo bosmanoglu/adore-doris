@@ -363,12 +363,12 @@ function saveas_grd(){
     region=`minmax -I${slc_res_deg} -bis3 ${outName}.dat` 
     [ $? -ne 0 ] && echo "Error running command: minmax -I${slc_res_deg} -bis3 ${outName}.dat" && return 1
     #generate grd file
-    xyz2grd ${outName}.dat -bis3 -G${outName}.grd ${region} -I${slc_res_deg} -N32767 -V
-    #change grid to the older format (gdal complienat)
-    #grdreformat ${outName}.grd ${outName}_grdreformat.grd=sf -V || { echo "Error running command: $_"; return 1; }
+    xyz2grd ${outName}.dat -bis3 -G${outName}_default.grd ${region} -I${slc_res_deg} -V || { echo "Error running command: $_"; return 1; } #-N32767 
+    #change grid to the older format (gdal compliant)
+    grdreformat ${outName}_default.grd ${outName}.grd=sf -V || { echo "Error running command: $_"; return 1; }
     if [ $? -ne 0 ]; then
-      echo "xyz2grd failed. I was trying to run: xyz2grd ${outName}.dat -bis3 -G${outName}.grd ${region} -I${slc_res_deg} -N32767 -V";
-      echo "I might have left behind temporary files: ${outName}.temporary ${outName}.dat"
+      echo "saveas_grd failed."
+      echo "I might have left behind temporary files: ${outName}.temporary ${outName}.dat ${outName}_default.grd"
       return
     else
       #cleanup

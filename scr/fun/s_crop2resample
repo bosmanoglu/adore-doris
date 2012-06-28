@@ -27,15 +27,21 @@ function fun_crop2resample(){
 copyRes.sh ${m_resfile} crop ${s_resfile} resample
 local scropOut=`readRes.sh ${s_resfile} crop Data_output_file`
 local mcropOut=`readRes.sh ${m_resfile} crop Data_output_file`
+local scropOut_format=`readRes.sh ${s_resfile} crop Data_output_format`
+local mcropOut_format=`readRes.sh ${m_resfile} crop Data_output_format`
 #modifyRes.sh ${s_resfile} resample "Data_output_file" ${scropOut}
 sed -i "s<${mcropOut}<${scropOut}<g" ${s_resfile}
+[ "${scropOut_format}" != "${mcropOut_format}"  ] && modifyRes.sh ${s_resfile} resample "Data_output_format" ${scropOut_format} 
 }
 function fun_ovs2resample(){
 copyRes.sh ${m_resfile} oversample ${s_resfile} resample
 local scropOut=`readRes.sh ${s_resfile} oversample Data_output_file`
 local mcropOut=`readRes.sh ${m_resfile} oversample Data_output_file`
+local scropOut_format=`readRes.sh ${s_resfile} oversample Data_output_format`
+local mcropOut_format=`readRes.sh ${m_resfile} oversample Data_output_format`
 #modifyRes.sh ${s_resfile} resample "Data_output_file" ${scropOut}
 sed -i "s<${mcropOut}<${scropOut}<g" ${s_resfile}
+[ "${scropOut_format}" != "${mcropOut_format}"  ] && modifyRes.sh ${s_resfile} resample "Data_output_format" ${scropOut_format} 
 }
 ###MAIN
 if [ `readRes.sh ${m_resfile} process_control oversample` == "1" ]; then
