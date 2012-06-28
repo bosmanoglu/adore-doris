@@ -83,6 +83,37 @@ def res2dict(resfile):
         out[key]=process2dict(res,key);
     return out
 
+def drs2dict(resfile):
+    '''dict=drs2dict(resfile)
+    Converts a doris input file into a python dict.    
+    '''
+
+    res=file2dict(resfile);    
+    out={}
+    out['drsfile']=os.path.abspath(resfile);
+    #read process flags
+    out['process']=[]
+    out['process'].append('general')
+    cntr=1 # start from line 3. 
+    while str(cntr) in res:
+        if res[str(cntr)].find('stop')>-1: #if found
+            break
+        #split left and right 
+        if res[str(cntr)].find('process')==0:
+            out['process'].append(res[str(cntr)].split()[1] )
+            cntr=cntr+1;
+            continue
+        else:
+            cntr=cntr+1;
+            continue                   
+        cntr=cntr+1;
+    
+    #loop over process control and read each output
+    for key in out['process']:
+        out[key]=process_input2dict(res,key);
+    return out
+
+
 def mres2dicts(resfiles):
     ''' [dct0, dct1...]=adore.mres2dicts([res0, res1,...]);
     '''
@@ -112,6 +143,45 @@ def file2dict(filename):
     else:
         print "Can not open file: ", filename;
         return {} #an empty dict
+    return out
+
+def process_input2dict(fileDict, processName):
+    '''dict=process2dict(filedict, processName)
+    '''
+    if processName == 'general':
+        reDict = {'screen': None,
+                  'beep': None,
+                  'batch': None,
+                  'overwrite': None, 
+                  'preview': None,
+                  'listinput': None,
+                  'memory': None,
+                  'logfile': None,
+                  'm_resfile': None,
+                  's_resfile': None,
+                  'i_resfile': None,
+                  'orb_interp': None,
+                  'orb_prm': None,
+                  'dumpbaseline': None,
+                  'height': None,
+                  'tiepoint': None,
+                  'm_rg_t_error': None, 
+                  'm_az_t_error': None,
+                  's_rg_t_error': None,
+                  's_az_t_error': None
+                  }
+    else:
+        return {}
+
+    out={}    
+    for key in reDict:
+        if reDict[key] is None:
+            reDict[key]=key + '[\s]+(.*)//.*\n'
+        val=getval(fileDict,key, None, None, reDict[key])
+        if val is None:
+            continue
+        else:
+            out[key]=val
     return out
     
 def process2dict(fileDict, processName):
@@ -550,7 +620,12 @@ def dataFormat2dataType(dataFormat):
     if "complex" in dataFormat:
         complexFlag=True;
     ### Handle the short format specifier: i.e. cr4    
-    if dataFormat=="cr4":
+    if dataFormat=="cr2":
+        datatype=np.half        
+        complexFlag=True;
+    elif dataFormat=="r2":
+        datatype=np.half
+    elif dataFormat=="cr4":
         datatype="f4"        
         complexFlag=True;
     elif dataFormat=="r4":

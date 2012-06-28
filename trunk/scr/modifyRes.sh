@@ -39,16 +39,17 @@ endline=`grep -n End_${section} ${inputFile} | cut -f1 -d":"`
 
 length=`echo ${endline} - ${startline} |bc`
 resultPos=`grep -n -A ${length} "_Start_${section}" ${inputFile} | grep "${parameter}" | cut -f1 -d"-"`
-#echo $resultPos
-count=1 #counting lines from 1
-cat ${inputFile} | while read line; do
-	if [[ $count -eq $resultPos ]]; then
-		echo "${parameter}: ${newValue}"
-	else
-		echo "${line}"
-	fi
-	let count=${count}+1
-done
+sed -i ${resultPos}c\ "${parameter}: ${newValue}" ${inputFile}
+##echo $resultPos
+#count=1 #counting lines from 1
+#cat ${inputFile} | while read line; do
+#	if [[ $count -eq $resultPos ]]; then
+#		echo "${parameter}: ${newValue}"
+#	else
+#		echo "${line}"
+#	fi
+#	let count=${count}+1
+#done
 exit 0
 
 #echo "$startline $endline $length $parameter_length"

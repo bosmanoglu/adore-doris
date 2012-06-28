@@ -93,10 +93,13 @@ function calculate_coh_multilook(){
 }
 
 function calculate_coh_winsize(){
-  if [ $(( ${srp_multilook% *} * ${int_multilook% *} * ${srp_multilook#* } * ${int_multilook#* } )) -lt 6 ]; then
+  if [ $(( ${srp_multilook% *} * ${int_multilook% *} * ${srp_multilook#* } * ${int_multilook#* } )) -lt 7 ]; then
     echo "5 5" #if single look interferometry set the coherence to 5 5. We need to have some number of pixels for coherence. 
+  elif [ $(( ${srp_multilook% *} * ${int_multilook% *} * ${srp_multilook#* } * ${int_multilook#* } )) -gt 24 ]; then
+    # If the window is >=25 large then go with it. Do not multiply by 2x2.
+    echo "$(( ${srp_multilook% *} * ${int_multilook% *} )) $(( ${srp_multilook#* } * ${int_multilook#* } ))"
   else
-    # If the window is large enough go with it. The minimum number of pixels will be 24.
+    # If the window is in the middle, multiply by 2. The minimum number of pixels will be 24.
     echo "$(( 2 * ${srp_multilook% *} * ${int_multilook% *} )) $(( 2 * ${srp_multilook#* } * ${int_multilook#* } ))"
   fi
 }

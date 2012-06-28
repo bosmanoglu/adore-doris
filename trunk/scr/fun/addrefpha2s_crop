@@ -25,6 +25,7 @@ function funResample2Tmpfile(){
 
   bold "Adding reference phase to resampled slave..."
   cpxmult ${rs_out_file} ${srp_out_refpha} ${rs_out_file}.addrefpha 1
+  [ $? -ne 0 ] && error "cpxmult can not multiply." && return 1
   cp ${s_resfile} ${s_resfile}.bck
 
   # Below line copies the information from the requested step and copies it to a temporary file
