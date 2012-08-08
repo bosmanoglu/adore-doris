@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# USAGE:
+# 	i12s dorisProcesses
+#
+# DESCRIPTION:
+#  i12s is an ADORE function.  
+#
+# INPUT:
+#
+# OUTPUT:
+#
+# EXAMPLES:
+#  i12s "coarseorb;coarsecorr"
+
+#######################################################
+function processInterferoSteps(){
+   local scenes=${1}
+   # load original settings in case some settings were changed during process
+   settings load ${originalSettingsFile} 
+   bold "Processing ${scenes}"
+   master=${scenes%%,*}
+   slave=${scenes#*,}   
+   settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
+   mkdir -p "${outputFolder}"
+   cd "${outputFolder}"    
+   cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+   cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+   if [ "${parallel}" == "on" ]; then
+     jobId=`quejob "${interferoSteps}" "${outputFolder}"`
+     jobIds=( ${jobIds[@]} ${jobId} )
+   else
+     eval "${interferoSteps}" #run interfero
+   fi
+   settings save
+}
+#######################################################
+####  MAIN ####
+#######################################################
+parallel="off"
+
+# we will be changing directories
+# save the current dir.
+local CALLDIR="$PWD";
+
+generateRandomString
+local originalSettingsFile="${CALLDIR}/${randomString}.set"
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+local interferoSteps="${@}"
+####Now the i12s
+if [ -n "${interferoSteps}" ]; then
+  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+  jobIds=( ); #start empty list
+  for scenes in `scenes include| tr " " "\n" | sort --unique`
+  do
+    processInterferoSteps "${master},${scenes}"
+  done
+fi
+
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+echo "You can cancel the wait loop by CTRL+C."
+bold "However, processes may still be running. Please check with: qstat"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}
+waitjob ${jobIds[@]}

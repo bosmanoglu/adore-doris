@@ -83,7 +83,7 @@ def usageLong():
    -B                Swap bytes.
    -b                Add a scalebar.
    -t		     Print file name as figure title. 
-   -k [value]        Print pixel coordinates (and value) to stdout on left-click.
+   -k [xy|xyz]       Print pixel coordinates(xy) or value (xyz) to stdout on left-click.
    -h                This help.
     """
     
@@ -107,113 +107,114 @@ def main(argv):
     except:
         print "Input file not specified."
         sys.exit(2)
-        
-    if not os.path.exists(inputfile):
-        print "File not found:", inputfile
-        sys.exit(2)
-    cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
-    cfg.setdefault("-f", "cr4")
-    cfg.setdefault("-q", "mag")
-    cfg.setdefault("-e", 1.)
-    cfg.setdefault("-s", 1.)
-    cfg.setdefault("-l", 0)
-    cfg.setdefault("-L", -1)
-    cfg.setdefault("-p", 0)
-    cfg.setdefault("-P", -1)
-    cfg.setdefault("-S", "1/1")
-    cfg.setdefault("-M", "1/1")
-    cfg.setdefault("-m", "")
-    cfg.setdefault("-c", "gray")
-    cfg.setdefault("-r", "0/0")
-    cfg.setdefault("-B", "")
-    cfg.setdefault("-H", "")
-    cfg.setdefault("-b", "")
-    cfg.setdefault("-o", "")
-    cfg.setdefault("-k", "")
-    cfg["-w"]=int(cfg["-w"]) 
-    cfg["-l"]=int(cfg["-l"]) 
-    cfg["-L"]=int(cfg["-L"]) 
-    cfg["-p"]=int(cfg["-p"]) 
-    cfg["-P"]=int(cfg["-P"])
-    cfg["Sl"]=int(cfg["-S"].split("/")[1])
-    cfg["Sp"]=int(cfg["-S"].split("/")[0])
-    cfg["Ml"]=int(cfg["-M"].split("/")[1])
-    cfg["Mp"]=int(cfg["-M"].split("/")[0])    
-    cfg["-s"]=float(cfg["-s"]) 
-    cfg["-e"]=float(cfg["-e"]) 
-    cfg["rmin"]=int(cfg["-r"].split("/")[0])
-    cfg["rmax"]=int(cfg["-r"].split("/")[1])    
-    #byteswap on?
-    byteSwapFlag=False;
-    if ("-B", "") in opts:
-        byteSwapFlag=True;
-    data=getdata(inputfile,cfg["-w"],cfg["-f"].lower(),0,byteSwapFlag)
-    data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
-    #multilook
-    data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
-    # mirror ?
-    if "x" in cfg["-m"]:
-        data=fliplr(data);
-    if "y" in cfg["-m"]:
-        data=flipud(data);
-    if "norm" in cfg["-q"].lower():
-        data=(cfg["-s"]*data**cfg["-e"]);
-    elif "mag" in cfg["-q"].lower():
-        data=(cfg["-s"]*abs(data)**cfg["-e"])
-    elif "pha" in cfg["-q"].lower():
-        data=(cfg["-s"]*np.angle(data)**cfg["-e"])
-    elif "wrap" in cfg["-q"].lower():
-        data=(cfg["-s"]*wrapToPi(data)**cfg["-e"])
-    elif "real" in cfg["-q"].lower():
-        data=(cfg["-s"]*data.real**cfg["-e"])
-    elif "imag" in cfg["-q"].lower():
-        data=(cfg["-s"]*data.imag**cfg["-e"])
-        
-    else:
-        print "Unknown output type."
-        return
-    fg=mp.matshow(data, picker=5);
-    # set colormap
-    mp.set_cmap(cfg["-c"])        
-    #rescale?
-    if cfg["-r"]!="0/0":
-        mp.clim([ cfg["rmin"], cfg["rmax"] ]);
-    #Place colorbar
-    if ("-b", "") in opts:
-        mp.colorbar()
-    #display file name as title.
-    if ("-t", "") in opts:
-        mp.title(os.path.basename(inputfile))
-    if cfg["-o"]: #if not empty
-        mp.savefig( sys.stdout, format=cfg["-o"])
-        ''' if above does not work: http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
-        pylab.savefig( "tempfile.png", format='png' )
-        import shutil
-        shutil.copyfileobj(open("tempfile.png",'rb'), sys.stdout)
-        #delete tempfile.
-        '''
-    else:
-        if ("-k", "value") in opts:
-            fg=mp.gcf()
-            def onpick(event):
-                ax = mp.gca()
-                inv = ax.transData.inverted()
-                A=inv.transform((event.x,  event.y))
-                try:  
-                    v=data[A[1],A[0]]              
-                except:
-                    v=np.nan
-                print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"])), v
-            fg.canvas.mpl_connect('button_press_event', onpick)
-        elif ("-k", "") in opts:
-            fg=mp.gcf()
-            def onpick(event):
-                ax = mp.gca()
-                inv = ax.transData.inverted()
-                A=inv.transform((event.x,  event.y))
-                print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"]))
-            fg.canvas.mpl_connect('button_press_event', onpick)
-        mp.show()
+
+    for inputfile in args:        
+        if not os.path.exists(inputfile):
+            print "File not found:", inputfile
+            sys.exit(2)
+        cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
+        cfg.setdefault("-f", "cr4")
+        cfg.setdefault("-q", "mag")
+        cfg.setdefault("-e", 1.)
+        cfg.setdefault("-s", 1.)
+        cfg.setdefault("-l", 0)
+        cfg.setdefault("-L", -1)
+        cfg.setdefault("-p", 0)
+        cfg.setdefault("-P", -1)
+        cfg.setdefault("-S", "1/1")
+        cfg.setdefault("-M", "1/1")
+        cfg.setdefault("-m", "")
+        cfg.setdefault("-c", "gray")
+        cfg.setdefault("-r", "0/0")
+        cfg.setdefault("-B", "")
+        cfg.setdefault("-H", "")
+        cfg.setdefault("-b", "")
+        cfg.setdefault("-o", "")
+        cfg.setdefault("-k", "xy")
+        cfg["-w"]=int(cfg["-w"]) 
+        cfg["-l"]=int(cfg["-l"]) 
+        cfg["-L"]=int(cfg["-L"]) 
+        cfg["-p"]=int(cfg["-p"]) 
+        cfg["-P"]=int(cfg["-P"])
+        cfg["Sl"]=int(cfg["-S"].split("/")[1])
+        cfg["Sp"]=int(cfg["-S"].split("/")[0])
+        cfg["Ml"]=int(cfg["-M"].split("/")[1])
+        cfg["Mp"]=int(cfg["-M"].split("/")[0])    
+        cfg["-s"]=float(cfg["-s"]) 
+        cfg["-e"]=float(cfg["-e"]) 
+        cfg["rmin"]=int(cfg["-r"].split("/")[0])
+        cfg["rmax"]=int(cfg["-r"].split("/")[1])    
+        #byteswap on?
+        byteSwapFlag=False;
+        if ("-B", "") in opts:
+            byteSwapFlag=True;
+        data=getdata(inputfile,cfg["-w"],cfg["-f"].lower(),0,byteSwapFlag)
+        data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
+        #multilook
+        data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
+        # mirror ?
+        if "x" in cfg["-m"]:
+            data=fliplr(data);
+        if "y" in cfg["-m"]:
+            data=flipud(data);
+        if "norm" in cfg["-q"].lower():
+            data=(cfg["-s"]*data**cfg["-e"]);
+        elif "mag" in cfg["-q"].lower():
+            data=(cfg["-s"]*abs(data)**cfg["-e"])
+        elif "pha" in cfg["-q"].lower():
+            data=(cfg["-s"]*np.angle(data)**cfg["-e"])
+        elif "wrap" in cfg["-q"].lower():
+            data=(cfg["-s"]*wrapToPi(data)**cfg["-e"])
+        elif "real" in cfg["-q"].lower():
+            data=(cfg["-s"]*data.real**cfg["-e"])
+        elif "imag" in cfg["-q"].lower():
+            data=(cfg["-s"]*data.imag**cfg["-e"])
+            
+        else:
+            print "Unknown output type."
+            return
+        fg=mp.matshow(data, picker=5);
+        # set colormap
+        mp.set_cmap(cfg["-c"])        
+        #rescale?
+        if cfg["-r"]!="0/0":
+            mp.clim([ cfg["rmin"], cfg["rmax"] ]);
+        #Place colorbar
+        if ("-b", "") in opts:
+            mp.colorbar()
+        #display file name as title.
+        if ("-t", "") in opts:
+            mp.title(os.path.basename(inputfile))
+        if cfg["-o"]: #if not empty
+            mp.savefig( sys.stdout, format=cfg["-o"])
+            ''' if above does not work: http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
+            pylab.savefig( "tempfile.png", format='png' )
+            import shutil
+            shutil.copyfileobj(open("tempfile.png",'rb'), sys.stdout)
+            #delete tempfile.
+            '''
+        else:
+            if ("-k", "xyz") in opts:
+                fg=mp.gcf()
+                def onpick(event):
+                    ax = mp.gca()
+                    inv = ax.transData.inverted()
+                    A=inv.transform((event.x,  event.y))
+                    try:  
+                        v=data[A[1],A[0]]              
+                    except:
+                        v=np.nan
+                    print np.int(np.round(cfg["-l"]+A[1]*cfg["Sl"]*cfg["Ml"])), cfg["-p"]+np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"])), v
+                fg.canvas.mpl_connect('button_press_event', onpick)
+            elif ("-k", "xy") in opts:
+                fg=mp.gcf()
+                def onpick(event):
+                    ax = mp.gca()
+                    inv = ax.transData.inverted()
+                    A=inv.transform((event.x,  event.y))
+                    print np.int(np.round(A[1]*cfg["Sl"]*cfg["Ml"])), np.int(np.round(A[0]*cfg["Sp"]*cfg["Mp"]))
+                fg.canvas.mpl_connect('button_press_event', onpick)
+            mp.show()
     
 def wrapToPi(x):
     return np.mod(x+np.pi,2*np.pi)-np.pi

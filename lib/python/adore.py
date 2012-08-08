@@ -33,11 +33,13 @@ def dict2obj(d):
     class DictObj:
         def __init__(self, **entries):
             for e in entries:
+                #No space and dot for attribute name
+                et="_".join(e.split())
+                et=et.replace('.','')
                 if isinstance(d[e], dict):
-                    self.__dict__[e]=dict2obj(d[e])
+                    self.__dict__[et]=dict2obj(d[e])
                 else:
-                    self.__dict__[e]=d[e]
-                
+                    self.__dict__[et]=d[e]                
     return DictObj(**d)
   
 def res2dict(resfile):
@@ -681,18 +683,36 @@ def writedata(fname, data, dataFormat):
     else:
         data.astype(np.dtype(datatype)).tofile(fname) 
 
-def getProduct(rdict, process, filename=None, width=None, dataFormat=None):
-    """getProduct(rdict, process, filename=None, width=None, dataFormat=None)
+def getProduct(rdict, process=None, filename=None, width=None, dataFormat=None):
+    """getProduct(rdict, process=None, filename=None, width=None, dataFormat=None)
+    ex:
+    A=getProduct(iobj.geocoding)
+    A=getProduct(ires, 'geocoding')
     """
-    if filename is None:
-        filename=rdict[process]['Data_output_file']
-    if width is None:
-        if rdict[process].has_key('Number of pixels'):
-            width=int(rdict[process]['Number of pixels'])
-        else:
-            width=int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1
-    if dataFormat is None:
-        dataFormat=rdict[process]['Data_output_format']        
+    #check if idict or iobj
+    if (process is None) & (isinstance(rdict, dict)):
+        print "Please provide either result object or resdict and process name."
+        return -1
+    if process==None:
+        if filename is None:
+            filename=rdict.Data_output_file
+        if width is None:
+            if hasattr(rdict,'Number of pixels'):
+                width=int(rdict.Number_of_pixels)
+            else:
+                width=int( (int(rdict.Last_pixel)-int(rdict.First_pixel)+1)/rdict.Multilookfactor_range_direction )
+        if dataFormat is None:
+            dataFormat=rdict.Data_output_format       
+    else:
+        if filename is None:
+            filename=rdict[process]['Data_output_file']
+        if width is None:
+            if rdict[process].has_key('Number of pixels'):
+                width=int(rdict[process]['Number of pixels'])
+            else:
+                width=int( (int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1) /rdict.Multilookfactor_range_direction )
+        if dataFormat is None:
+            dataFormat=rdict[process]['Data_output_format']        
     return getdata(filename, width, dataFormat);
 
 def parseSettings(filename):
@@ -749,4 +769,16 @@ def ph2h(rdict, data, wl=0.0562356, h2phProcess='subtr_refphase', fileName=None,
     else:
         h2ph=h2ph*-4*np.pi/wl;
     return data/h2ph;
+    
+def latlon2lp(iobj, lat, lon):
+    """latlon2lp(iobj, lat, lon)
+    """
+    LAT=getProduct(iobj.geocoding, filename=iobj.geocoding.Data_output_file_phi)
+    LON=getProduct(iobj.geocoding, filename=iobj.geocoding.Data_output_file_lamda)
+    #calculate shortest distance
+    LAT=abs(LAT-lat)
+    LON=abs(LON-lon)
+    d=LAT+LON
+    return basic.ind2sub(LAT.shape,d.argmin())
+
     

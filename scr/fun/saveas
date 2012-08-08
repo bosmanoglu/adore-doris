@@ -372,7 +372,7 @@ function saveas_grd(){
       return
     else
       #cleanup
-      rm -rf ${outName}.temporary ${outName}.dat
+      rm -rf ${outName}.temporary ${outName}.dat ${outName}_default.grd
       echo "GRD filename: ${outName}.grd"
       echo "SUCCESS: saveas_grd"
     fi

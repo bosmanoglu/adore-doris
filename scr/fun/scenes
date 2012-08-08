@@ -45,6 +45,26 @@ function all_scenes(){
   ls -F ${dataFolder}/ 2>/dev/null| grep "/"| tr -d "/"
 }
 
+function find_scenes(){
+  scene=${1}
+  shift
+  array=( ${@} )
+  for (( k=0; k<${#array[@]}; k++ ))
+  do 
+    if [ "${array[k]}" == "${scene}" ]; then
+      echo ${k}
+      return
+    else
+      continue
+    fi
+  done
+  echo -1  
+}
+
+function sort_scenes(){
+  echo ${@}|tr ' ' "\n"|uniq|sort
+}
+
 function scenes_exclude(){
   if [ "${1:-undefined}" == "undefined" ];then
     if [ ${#scenes_exclude[@]} -gt 0 ]; then
@@ -52,25 +72,28 @@ function scenes_exclude(){
       #echo ${scenes_exclude}
       echo ${scenes_exclude[@]}
     else 
-      echo "Currently, no scenes are excluded."
+      error "Currently, no scenes are excluded."
     fi
   else
-    local scene
+    local scene scene_location
     for scene in "$@"
     do
       if [ -d "${dataFolder}/${scene}" ]; then
-        echo "Excluding ${scene}"
+        #echo "Excluding ${scene}"
         #echo "${orbit}" >> ${excludesFile}
 #        scenes_exclude=`echo ${scenes_exclude} ${scene} | tr " " "\n"|sort|tr "\n" " "`;
 #        scenes_include="${scenes_include//${scene}/}"; # Remove the given string from includes, add it to the excludes.
  	scenes_exclude=( ${scenes_exclude[@]} ${scene} );
- 	scenes_include=( ${scenes_include[@]//${scene}/} );
+ 	#scenes_include=( ${scenes_include[@]//${scene}/} );
+ 	scene_location=`find_scenes ${scene} "${scenes_include[@]}"`
+ 	[ ${scene_location} -gt -1 ] && scenes_include=( ${scenes_include[@]:0:$scene_location} ${scenes_include[@]:$(($scene_location + 1))} )
       else
-        echo "Can not find ${scene} in data folder: ${dataFolder}"
+        error "Can not find ${scene} in data folder: ${dataFolder}"
         return;
       fi
     done
   fi
+  scenes_exclude=( $(sort_scenes ${scenes_exclude[@]}))
 }
 
 function scenes_include(){
@@ -80,16 +103,20 @@ function scenes_include(){
 #      echo ${scenes_include}
       echo ${scenes_include[@]}
     else
-      echo "Currently, there are no scenes included. Check if you have your dataFolder set correctly."  
+      error "Currently, there are no scenes included. Check if you have your dataFolder set correctly."  
     fi
   else    
-    local scene
+    local scene scene_location
     for scene in "$@"  
     do
 #      scenes_exclude="${scenes_exclude[@]//${scene}/}"; # Remove the given string from excludes, add it to the includes.
 #      scenes_include=`echo ${scenes_include[@]} ${scene} |tr " " "\n"|sort|tr "\n" " "`;
-     scenes_exclude=( ${scenes_exclude[@]//${scene}/} );
-     scenes_include=( ${scenes_include[@]} ${scene} );
+      if [ -d "${dataFolder}/${scene}" ]; then
+#        scenes_exclude=( ${scenes_exclude[@]//${scene}/} );
+  	scene_location=`find_scenes ${scene} "${scenes_exclude[@]}"`
+  	[ ${scene_location} -gt -1 ] && scenes_include=( ${scenes_exclude[@]:0:$scene_location} ${scenes_exclude[@]:$(($scene_location + 1))} )
+        scenes_include=( ${scenes_include[@]} ${scene} );
+      fi
     done
   fi
 }
@@ -304,10 +331,17 @@ local f bname date
     date=`echo "$bname" | awk -F '_' {'print substr($9,1,8)'}`
 
     if [ -d "${dataFolder}/${date}" ]; then 
-      date=`echo "$bname" | awk -F '_' {'print substr($9,1,16)'}`
-      if [ -d "${dataFolder}/${date}" ]; then 
-        error "Can not add already existing data: ${f}"
+      #is the file already in dataFolder (is it the same file?)
+      diff ${dataFolder}/${date}/${bname} ${f} 
+      if [ $? -eq 0 ]; then
+        error "Skipping existing data: ${f}"
         continue
+      else      
+        date=`echo "$bname" | awk -F '_' {'print substr($9,1,16)'}`
+        if [ -d "${dataFolder}/${date}" ]; then 
+          error "Can not add already existing data: ${f}"
+          continue
+        fi
       fi
     fi
     mkdir -p "${dataFolder}/${date}"
@@ -356,28 +390,32 @@ batch="${batchOn}"
 }
 
 function scenes_add(){
-local rawDataFolder=`canonicalPath "${1}"`
-#detectSatellite "${rawDataFolder}"; #sets m_in_method
-case "${m_in_method}" in
-ERS)
-  linkERS "${rawDataFolder}";
-  ;;
-ASAR)
-  linkASAR "${rawDataFolder}";
-  ;;
-TSX)
-  linkTSX "${rawDataFolder}";  
-  ;;
-ALOS)
-  linkALOS "${rawDataFolder}";
-  ;;
-GAMMA)
-  linkGAMMA "${rawDataFolder}";
-  ;;
-CSK)
-  linkCSK "${rawDataFolder}";
-  ;;
-esac
+local f
+for f in "${@}"
+do 
+  local rawDataFolder=`canonicalPath "${f}"`
+  #detectSatellite "${rawDataFolder}"; #sets m_in_method
+  case "${m_in_method}" in
+  ERS)
+    linkERS "${rawDataFolder}";
+    ;;
+  ASAR)
+    linkASAR "${rawDataFolder}";
+    ;;
+  TSX)
+    linkTSX "${rawDataFolder}";  
+    ;;
+  ALOS)
+    linkALOS "${rawDataFolder}";
+    ;;
+  GAMMA)
+    linkGAMMA "${rawDataFolder}";
+    ;;
+  CSK)    
+    linkCSK "${rawDataFolder}";
+    ;;
+  esac
+done
 }
 
 function scenes_rename(){
@@ -402,6 +440,12 @@ function scenes_rename(){
 
 function scenes_rescan(){
   scenes_include=( `ls -F "${dataFolder}/"  2>/dev/null | grep "/" | tr -d "/"` )  
+  local se=(${scenes_exclude[@]})
+  scenes_exclude=( )
+  scenes exclude ${se[@]}
+  scenes_exclude=( $(sort_scenes ${scenes_exclude[@]}))
+  scenes_include=( $(sort_scenes ${scenes_include[@]}))
+  
 }
 case "${1}" in 
 "")

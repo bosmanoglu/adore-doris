@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# USAGE:
+# 	crops dorisProcesses
+#
+# DESCRIPTION:
+#  crops is an ADORE function.  
+#
+# INPUT:
+#
+# OUTPUT:
+#
+# EXAMPLES:
+#  crops "m_readfiles;m_crop_m_ovs"
+
+#######################################################
+
+function processCropSteps(){
+  # reload original settings
+  settings load ${originalSettingsFile}
+  local scene=${1}     
+  bold "Processing ${scene}"
+  settings apply -r -q master=${scene} slave="dummy" outputFolder="${cropsFolder}/${scene}"
+  [ "${scene}" == "${resampleMaster}" ] && settings apply -r -q m_dbow="${rs_dbow}" m_dbow_geo="${rs_dbow_geo}"
+  mkdir -p "${outputFolder}"
+  cd "${outputFolder}"    
+
+  #parallelProcess "${outputFolder}" "${cropSteps}"
+  echo "running ${cropSteps} in ${outputFolder}"
+  if [ "${parallel}" == "on" ]; then
+    jobId=`quejob "${cropSteps}" "${outputFolder}"`
+    jobIds=( ${jobIds[@]} ${jobId} )
+  else
+    eval "${cropSteps}" #run cropsteps
+  fi
+  settings save
+}
+
+#######################################################
+####  MAIN ####
+#######################################################
+#for now no parallel
+local parallel="off"
+# we will be changing directories
+# save the current dir.
+local CALLDIR="$PWD";
+
+generateRandomString
+local originalSettingsFile="${CALLDIR}/${randomString}.set"
+#save current settings so that we can recall them at the end.
+settings save ${originalSettingsFile}
+
+#### crop
+cropSteps="${@}"
+#<<ENDCOMMENT>/dev/null
+#ENDCOMMENT
+#for scene in ${scenes_include[*]}
+if [ -n "${cropSteps}" ]; then
+  jobIds=( ); #start empty list
+  for scene in `scenes include| tr " " "\n" | sort --unique`
+  do
+    processCropSteps ${scene}
+  done
+  waitjob ${jobIds[@]}
+fi
+
+cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+#go back to where we started
+cd ${CALLDIR}
+echo "Replacing user settings"
+echo "You can cancel the wait loop by CTRL+C."
+bold "However, processes may still be running. Please check with: qstat"
+settings load ${originalSettingsFile}
+rm ${originalSettingsFile}
+waitjob ${jobIds[@]}

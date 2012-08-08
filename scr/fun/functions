@@ -139,6 +139,11 @@ function calculate_rs_dbow(){
   echo "${l0} ${lN} ${p0} ${pN}"
 }
 
+function crops()
+{
+  . ${ADORESCR}/fun/crops ${@} 
+}
+
 function error() 	#echo text to stderr.
 {
   echo -e "${@}" >&2
@@ -169,6 +174,11 @@ function canonicalPath(){
 
 function cpDorisFiles(){
   . ${ADORESCR}/fun/cpDorisFiles ${@}
+}
+
+function i12s()
+{
+  . ${ADORESCR}/fun/i12s ${@} 
 }
 
 function mvDorisFiles(){

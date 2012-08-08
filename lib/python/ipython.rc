@@ -10,6 +10,7 @@ import adore
 
 try:
   settings=adore.parseSettings(os.sys.argv[1])
+  setobj=adore.dict2obj(settings._sections);
 except:
   pass
 
