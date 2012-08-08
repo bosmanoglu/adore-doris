@@ -304,3 +304,43 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
                 break #inner for
     return z0
 
+def sensitivity_plot(lvar, lnames):
+    """fg=sensitivity_plot(lvar, lnames)
+    Creates a plot for parameter correlation. The design of the plot is after the InSAR group at Oxford (Parsons)
+    """
+    #Now the hard part... Plotting 
+    fg=P.figure()    
+    #First we need to know how many variables (nvar)
+    #nvel, nf, nalpha, A, B, E, and result(H)
+    nvar=len(lvar)
+    #now put all variables in a list
+    lvar=[nvel,nf,nalpha,nA,nB,nE,nH]
+    #list of names
+    lnvar=['vel','f','slope','A','B','E','H']
+    #now we create subplot (nvar-1 x nvar-1)    
+#    for k in xrange(nvar-1):
+#        for l in xrange(nvar-1-k):
+#            ax = P.subplot(nvar-1, nvar-1, l*(nvar-1)+k+1, ) # aspect='equal',autoscale_on=False, xlim=[1,3], ylim=[1,3])
+#            P.scatter(lvar[k], lvar[l+k+1], 5, c='k', marker='.');
+#            P.axis('tight')
+#            P.gca().xaxis.get_major_locator()._nbins=4 
+#            P.gca().yaxis.get_major_locator()._nbins=4 
+#            P.xlabel(lnvar[k]);
+#            P.ylabel(lnvar[l+k+1]);
+    for k in xrange(nvar-1):
+        for l in xrange(k+1):
+            plnum=k*(nvar-1)+l+1 #plotnumber
+            if plnum == (nvar-1)**2:
+                kk=nvar -2
+            else:
+                kk=plnum % (nvar-1) -1
+            ll=N.int(N.ceil(plnum/float(nvar-1)))
+            ax = P.subplot(nvar-1, nvar-1, plnum, ) # aspect='equal',autoscale_on=False, xlim=[1,3], ylim=[1,3])
+            P.scatter(lvar[kk], lvar[ll], 5, c='k', marker='.');
+            P.axis('tight')
+            P.gca().xaxis.get_major_locator()._nbins=4 
+            P.gca().yaxis.get_major_locator()._nbins=4 
+            P.xlabel(lnvar[kk]);
+            P.ylabel(lnvar[ll]);
+    P.tight_layout(pad=0.005, w_pad=0.005, h_pad=0.005)    
+    return fg

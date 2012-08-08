@@ -127,6 +127,7 @@ def nancorr2(x,y,w):
 def cdiff(A, axis=0):
     """cdiff, returns the center difference for Array A in given axis
     """
+    singleDim=False
     if len(A.shape)==1:
         A=atleast_2d(A).T
         singleDim=True
