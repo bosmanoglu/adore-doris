@@ -7,7 +7,7 @@
 #	dem check
 #       dem convert path/to/demfile.dem "gdalOptions"
 #	dem extent 
-#       dem merge path/to/small.dem path/to/big.dem [merged.dem]
+#       dem expand path/to/big.dem [merged.bil]
 #	dem view
 #
 # DESCRIPTION:
@@ -45,7 +45,7 @@
 #  dem extent:
 #	Calculates and displays the corner coordinates of the DEM based on input values.
 #
-#  dem merge path/to/small.dem path/to/big.dem
+#  dem expand path/to/big.dem [merged.bil]
 #       Merge a small dem with a big dem. The small dem overwrites the big one. 
 #
 #  dem view:
@@ -293,6 +293,70 @@ function updateEsriBilDemSettings(){
   #set +x
   copySettingsFromSamToDacAndCrd
 }
+
+function demLoad(){
+  if [ ${1:-undefined} == "undefined" ]; then
+    echo "No DEM specified. Using sam_in_dem"
+    demFile=${sam_in_dem};
+  else
+    demFile=${1};
+  fi
+  #read input settings 	
+  if [ -e "${demFile}" ]; then
+    if [[ "${demFile}" == *.dem* ]]; then
+      echo "You are using this SRTM DEM: ${demFile}"
+      #get input settings file.
+      demPath=`dirname ${demFile}`
+      demBasename=`basename ${demFile}`
+      demBasename=${demBasename%%.dem*}	#chop the last .dem
+      demBasename=${demBasename##*final_} #chop the initial final
+      settings_file="input.doris_${demBasename}"        
+      echo "I expect to find settings file at: ${demPath}/${settings_file}"
+      if [ -e "${demPath}/${settings_file}" ]; then
+        updateSrtmDemsettings ${demPath}/${settings_file} ${demFile}
+      else 
+        echo "I can not find the settings file. Can you check?"
+      fi
+    elif [[ "${demFile}" == *.flt* ]]; then
+      echo "You are using an ArcGIS binary file as DEM: ${demFile}"        
+      #get header file.
+      demPath=`dirname ${demFile}`
+      demBasename=`basename ${demFile}`
+      demBasename=${demBasename%%.flt*}     #chop the last .flt
+      settings_file="${demBasename}.hdr"
+      echo "I expect to find the header file at: ${demPath}/${settings_file}"
+      if [ -e "${demPath}/${settings_file}" ]; then
+        updateArcGisDemSettings ${demPath}/${settings_file} ${demFile}
+      else
+        echo "I can not find the header file. Can you check?"
+      fi
+    elif [[ "${demFile}" == *.grd* ]]; then
+      echo "You are using a GMT grid file as DEM: ${demFile}"
+      updateGrdDemSettings `canonicalPath ${demFile}`
+    elif [[ "${demFile}" == *.bil* ]]; then
+      echo "You are using ESRI .hdr labelled *.BIL format as DEM."
+      demPath=`dirname ${demFile}`
+      demBasename=`basename ${demFile}`
+      demBasename=${demBasename%%.bil*}     #chop the last .bil
+      settings_file="${demBasename}.hdr"
+      echo "I expect to find the header file at: ${demPath}/${settings_file}"
+      if [ -e "${demPath}/${settings_file}" ]; then
+        updateEsriBilDemSettings ${demPath}/${settings_file} ${demFile}
+      else
+        echo "I can not find the header file. Can you check?"
+      fi
+      
+    
+    else
+      error "I can only read the following formats: *.dem, *.flt, *.grd, *.bil"
+      echo "Please try converting the given data with gdal."
+    fi        
+  else
+    echo "The DEM file does not exist: ${sam_in_dem}"  
+  fi
+
+}
+
 function checkDem(){
   #check if dem exists and in sync with environment
   everythingOK=0; #0 Yes, others no
@@ -356,26 +420,34 @@ function demView(){
   cpxview -w${sam_in_size##* } -f${sam_in_format} -qnormal ${@} ${sam_in_dem} 
 }
 
-function demMerge(){
-#       dem merge path/to/small.dem path/to/big.dem [merged.dem]
+function demExpand(){
+#       dem expand path/to/big.dem [merged.bil]
   #check to see if gdal can read the dem files.
   #if it is a doris dem, create an hdr file.
   #then run gdal_merge  
-  local smallDem=${1}
-  local bigDem=${2}
-  local mergedDem=${3:-merged.dem}
+  set -x
+  [ ! -f "${sam_in_dem}" ] && echo "Please load the dem to expand first." && return 
+  local smallDem=${sam_in_dem} #already loaded
+  local bigDem=${1}
+  local mergedDem=${2:-merged.bil}
   
   gdalinfo ${smallDem} &> /dev/null
   [ $? -ne 0 ] && createHeader ${smallDem}
   gdalinfo ${bigDem} &> /dev/null
   [ $? -ne 0 ] && createHeader ${bigDem}
-  
-#  gdal_merge.py -o 
+  gdal_merge.py -init 0 -o ${mergedDem} -of EHdr -ps ${sam_in_delta} ${bigDem} ${smallDem} 
+  set +x
 }
 
 function createHeader(){
   local demname=${1}
-  local hdrname=${demname%%.*}.hdr
+  local curDem=${sam_in_dem}  
+  if [ "${curDem}" != "${demname}" ]; then
+    demLoad ${demname}
+  fi
+  local fldr=`dirname ${1}`
+  local hdrname=`basename ${1}`
+  hdrname="${fldr}/${hdrname%%.*}.hdr"  
   echo "BYTEORDER      I" > ${hdrname}
   echo "LAYOUT         BIL" >>${hdrname}
   echo "NROWS          ${sam_in_size%% *}" >>${hdrname}
@@ -389,6 +461,9 @@ function createHeader(){
   echo "ULYMAP         ${sam_in_ul%% *}" >>${hdrname}
   echo "XDIM           ${sam_in_delta##* }" >>${hdrname}
   echo "YDIM           ${sam_in_delta%% *}" >>${hdrname}
+  if [ "${curDem}" != "${demname}" ]; then
+    demLoad ${curDem}
+  fi
 }
 
 function main(){
@@ -407,65 +482,8 @@ function main(){
       fi
     ;;  
     load)
-      if [ ${2:-undefined} == "undefined" ]; then
-        echo "No DEM specified. Using sam_in_dem"
-        demFile=${sam_in_dem};
-      else
-        demFile=${2};
-      fi
-      #read input settings 	
-      if [ -e "${demFile}" ]; then
-        if [[ "${demFile}" == *.dem* ]]; then
-          echo "You are using this SRTM DEM: ${demFile}"
-          #get input settings file.
-          demPath=`dirname ${demFile}`
-          demBasename=`basename ${demFile}`
-          demBasename=${demBasename%%.dem*}	#chop the last .dem
-          demBasename=${demBasename##*final_} #chop the initial final
-          settings_file="input.doris_${demBasename}"        
-          echo "I expect to find settings file at: ${demPath}/${settings_file}"
-          if [ -e "${demPath}/${settings_file}" ]; then
-            updateSrtmDemsettings ${demPath}/${settings_file} ${demFile}
-          else 
-            echo "I can not find the settings file. Can you check?"
-          fi
-        elif [[ "${demFile}" == *.flt* ]]; then
-          echo "You are using an ArcGIS binary file as DEM: ${demFile}"        
-          #get header file.
-          demPath=`dirname ${demFile}`
-          demBasename=`basename ${demFile}`
-          demBasename=${demBasename%%.flt*}     #chop the last .flt
-          settings_file="${demBasename}.hdr"
-          echo "I expect to find the header file at: ${demPath}/${settings_file}"
-          if [ -e "${demPath}/${settings_file}" ]; then
-            updateArcGisDemSettings ${demPath}/${settings_file} ${demFile}
-          else
-            echo "I can not find the header file. Can you check?"
-          fi
-        elif [[ "${demFile}" == *.grd* ]]; then
-          echo "You are using a GMT grid file as DEM: ${demFile}"
-          updateGrdDemSettings `canonicalPath ${demFile}`
-        elif [[ "${demFile}" == *.bil* ]]; then
-          echo "You are using ESRI .hdr labelled *.BIL format as DEM."
-          demPath=`dirname ${demFile}`
-          demBasename=`basename ${demFile}`
-          demBasename=${demBasename%%.bil*}     #chop the last .bil
-          settings_file="${demBasename}.hdr"
-          echo "I expect to find the header file at: ${demPath}/${settings_file}"
-          if [ -e "${demPath}/${settings_file}" ]; then
-            updateEsriBilDemSettings ${demPath}/${settings_file} ${demFile}
-          else
-            echo "I can not find the header file. Can you check?"
-          fi
-          
-        
-        else
-          error "I can only read the following formats: *.dem, *.flt, *.grd, *.bil"
-          echo "Please try converting the given data with gdal."
-        fi        
-      else
-        echo "The DEM file does not exist: ${sam_in_dem}"  
-      fi
+      shift
+      demLoad "${@}"
     ;;
     convert)
       shift
@@ -481,9 +499,9 @@ function main(){
       shift 
       demView "${@}"
     ;;
-    merge)
+    expand)
       shift
-      demMerge "${@}"      
+      demExpand "${@}"      
     ;;
     *)
       #check to see if dem exists and it is loaded.
