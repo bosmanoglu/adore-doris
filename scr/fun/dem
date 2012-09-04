@@ -7,6 +7,7 @@
 #	dem check
 #       dem convert path/to/demfile.dem "gdalOptions"
 #	dem extent 
+#       dem merge path/to/small.dem path/to/big.dem [merged.dem]
 #	dem view
 #
 # DESCRIPTION:
@@ -43,6 +44,9 @@
 #  
 #  dem extent:
 #	Calculates and displays the corner coordinates of the DEM based on input values.
+#
+#  dem merge path/to/small.dem path/to/big.dem
+#       Merge a small dem with a big dem. The small dem overwrites the big one. 
 #
 #  dem view:
 #	Display DEM using cpxview and the input values. Additional options can be passed. See 
@@ -352,6 +356,41 @@ function demView(){
   cpxview -w${sam_in_size##* } -f${sam_in_format} -qnormal ${@} ${sam_in_dem} 
 }
 
+function demMerge(){
+#       dem merge path/to/small.dem path/to/big.dem [merged.dem]
+  #check to see if gdal can read the dem files.
+  #if it is a doris dem, create an hdr file.
+  #then run gdal_merge  
+  local smallDem=${1}
+  local bigDem=${2}
+  local mergedDem=${3:-merged.dem}
+  
+  gdalinfo ${smallDem} &> /dev/null
+  [ $? -ne 0 ] && createHeader ${smallDem}
+  gdalinfo ${bigDem} &> /dev/null
+  [ $? -ne 0 ] && createHeader ${bigDem}
+  
+#  gdal_merge.py -o 
+}
+
+function createHeader(){
+  local demname=${1}
+  local hdrname=${demname%%.*}.hdr
+  echo "BYTEORDER      I" > ${hdrname}
+  echo "LAYOUT         BIL" >>${hdrname}
+  echo "NROWS          ${sam_in_size%% *}" >>${hdrname}
+  echo "NCOLS          ${sam_in_size##* }" >>${hdrname}
+  echo "NBANDS         1" >>${hdrname}
+  echo "NBITS          32" >>${hdrname}
+  echo "BANDROWBYTES   $(( ${sam_in_size%% *} * 4 ))" >>${hdrname}
+  echo "TOTALROWBYTES  $(( ${sam_in_size%% *} * 4 ))" >>${hdrname}
+  echo "PIXELTYPE      FLOAT" >>${hdrname}
+  echo "ULXMAP         ${sam_in_ul##* }" >>${hdrname}
+  echo "ULYMAP         ${sam_in_ul%% *}" >>${hdrname}
+  echo "XDIM           ${sam_in_delta##* }" >>${hdrname}
+  echo "YDIM           ${sam_in_delta%% *}" >>${hdrname}
+}
+
 function main(){
   local srtm buffer name demFile demPath demBasename settings_file
   case ${1} in
@@ -441,6 +480,10 @@ function main(){
     view)
       shift 
       demView "${@}"
+    ;;
+    merge)
+      shift
+      demMerge "${@}"      
     ;;
     *)
       #check to see if dem exists and it is loaded.
