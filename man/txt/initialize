@@ -1,4 +1,5 @@
 USAGE:
+
 	. initialize
 
 DESCRIPTION:
@@ -9,7 +10,6 @@ DESCRIPTION:
 INPUT:
  No input parameters are required.
 
-OUTPUT:
+OUTPUT
  Output's user settings file path.
- 
 Check settings and make suggestions

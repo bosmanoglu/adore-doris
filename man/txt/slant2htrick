@@ -1,29 +1,29 @@
 USAGE:
+
  slant2htrick
 
 DESCRIPTION:
  SLANT2HTRICK is an internal ADORE function.
-
  It creates DORIS slant2h output from comprefdem. This function calls the
 ADORE function dem2slant2h.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Adds slant2h step to ${i_resfile} and creates a symbolic link from the
 ${crd_out_dem_lp} to ${s2h_out_hei}.  
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/dem2slant2h
 
 EXAMPLE:
+
  slant2htrick
 
 KNOWN BUGS:
  None.
-
-

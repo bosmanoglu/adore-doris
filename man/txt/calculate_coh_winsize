@@ -1,4 +1,5 @@
 USAGE:
+
  calculate_coh_winsize
 
 DESCRIPTION:
@@ -8,19 +9,19 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Prints out two times the multiplication of srp_multilook and int_multilook 
  parameters. 
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:
+
  ADORE: calculate_coh_winsize 
  10 2
-
-

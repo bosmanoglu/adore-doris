@@ -1,5 +1,14 @@
 {{{,
 }}},
-^=,
-=\n,
-==,
+===\(.*\)===,\n\1
+==\(.*\)==,\n\1
+=USAGE:=,USAGE:
+=DESCRIPTION:=,DESCRIPTION:
+=INPUT:=,\nINPUT:
+==OPTIONAL:==,OPTIONAL:
+=OUTPUT:=,\nOUTPUT:
+=OUTPUT=,\nOUTPUT
+=FILES and REFERENCES:=,\nFILES and REFERENCES:
+=EXAMPLE:=,EXAMPLE:
+=KNOWN BUGS:=,KNOWN BUGS:
+<br>,

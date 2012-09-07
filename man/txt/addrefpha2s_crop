@@ -1,4 +1,5 @@
 USAGE:
+
 	addrefpha2crop
 
 DESCRIPTION:
@@ -11,8 +12,7 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
- 
-OUTPUT:
+
+OUTPUT
   Modifies the result file by moving the resampling step to crop. 
   Also generates an output file with ".addrefpha" extension.
-

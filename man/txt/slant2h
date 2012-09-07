@@ -1,30 +1,30 @@
 USAGE:
+
  slant2h
 
 DESCRIPTION:
  SLANT2H is an ADORE process and it runs the DORIS step with the same name.  
-
   In this step in principle the heights in the radar coded system are
  computed. However with the exact method, the geocoding can be done in the
  same step.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  ${master}_${slave}.s2hhei file is generated.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/slant2h.drs
  http://doris.tudelft.nl/usermanual/node129.html
 
 EXAMPLE:
+
  slant2h
 
 KNOWN BUGS:
  None. 
-
-

@@ -1,4 +1,5 @@
 USAGE:
+
  getSystemEndianness
 
 DESCRIPTION:
@@ -8,17 +9,19 @@ is printed for little-endian systems.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Prints "big", "little" or "unknown" depending on the system endianness.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:
+
  getSystemEndianness
 
 KNOWN BUGS:

@@ -1,9 +1,9 @@
 USAGE:
+
  s_crop
 
 DESCRIPTION:
  S_CROP is an ADORE process and it runs the DORIS step with the same name.  
-
  In this step the SLC datafile is put on disk in a raw (pixel interleaved,
 2x2byte signed (short) integer complex) format. A few checks are performed
 regarding the number of lines, which is written in the header of the SLC
@@ -14,21 +14,21 @@ from big endian (which is the CEOS format).
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  ${slave}.crop file is generated.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/s_crop.drs
  http://doris.tudelft.nl/usermanual/node41.html
 
 EXAMPLE:
+
  s_crop
 
 KNOWN BUGS:
  None.
-
-

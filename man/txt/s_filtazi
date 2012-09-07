@@ -1,9 +1,9 @@
 USAGE:
+
  s_filtazi
 
 DESCRIPTION:
  S_FILTAZI is an ADORE process runs the DORIS step with the same name.  
-
  Normally the step S_FILTAZI is performed at the same time as M_FILTAZI.
  (PROCESS M_FILTAZI card in input file.) However, we kept this two seperate
  steps to be able to only filter the slave images in a large stack (all
@@ -15,20 +15,21 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  ${slave}.af file is created.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/s_filtazi.drs
  http://doris.tudelft.nl/usermanual/node59.html
 
 EXAMPLE:
+
  s_filtazi
 
 KNOWN BUGS:
  None. 
-

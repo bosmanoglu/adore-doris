@@ -1,0 +1,44 @@
+
+= multiplePairs.adr =
+
+USAGE:
+      `p multiplePairs.adr inputFile`
+
+
+DESCRIPTION:
+ multiplePairs.adr is an ADORE script.  
+ It generates several interferograms whose master and slave orbits are defined by the input file. 
+
+INPUT:
+ inputFile: A comma-separated-value file where each line indicates an
+   interferometric pair. First value defines the master and the second value defines the slave.
+   As an example file should have this format:
+
+   masterScene1,slaveScene1
+   masterScene2,slaveScene2
+   ...
+ 
+OUTPUT:
+ Creates `${projectFolder}/process/${runName}/` and processes crops & interferograms
+ It runs the following DORIS steps:
+   For crops: `m_readfiles;m_porbits;m_crop`
+   For i12s: `coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;coherence`
+
+= HOW-TO =
+Guidelines for using multiplePairs.adr. 
+Contributed by: Jiun-Yee Yen 
+http://groups.google.com/group/adore-doris/msg/121321d4fe04bdd9 
+
+
+  * copy multiplePairs.adr from your ADORE directory (mine is at: `/opt/adore/templates/multiplePairs.adr`) to your current working directory.
+
+  * create a new file with dates of image pairs you want to process. Use `master_date01,slave_date01` without space before slave_date01. It’s essential that there’s no space before and after comma.
+
+  * edit multiplePairs.adr for the steps you want to execute. Specifically, you need to edit the lines begin with `cropSteps` and `interferoSteps`.
+
+
+  * If you have created a setting file already, then use `adore -u settings.set -i`. Otherwise, go into ADORE interactive environment with `adore -i`. Within the ADORE environment,  use `settings apply -r some_setting=some_value`
+
+  * issue: `p multiplePairs.adr pairs.txt`  in the ADORE environment.
+
+That should create a directory named 'process'.  All the results will be in the respective directories within it.  If you want to see the results afterward, you can go into each individual image pair directory, load the setting file, and issue `raster p doris_step`.

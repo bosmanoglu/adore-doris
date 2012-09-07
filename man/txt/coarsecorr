@@ -1,4 +1,5 @@
-[BUSAGE:
+USAGE:
+
  coarsecorr
 
 DESCRIPTION:
@@ -7,23 +8,22 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  SUCCESS is printed to STDOUT on successful completion of process. 
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/process/coarsecorr
  ${ADOREFOLDER}/drs/${dorisVersion}/coarsecorr.drs
  http://doris.tudelft.nl/usermanual/node49.html
 
 EXAMPLE:
+
  coarsecorr
 
 KNOWN BUGS:
  NONE
- 
-
-
