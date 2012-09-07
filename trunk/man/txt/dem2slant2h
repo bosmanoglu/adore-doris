@@ -1,4 +1,5 @@
 USAGE:
+
 	dem2slant2h 
 
 DESCRIPTION:
@@ -7,21 +8,20 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
- 
-  OPTIONAL:
+  
+OPTIONAL:
     There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
   Adds slant2h step to ${i_resfile}.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/dem2slant2h
 
 EXAMPLE:
+
  dem2slant2h
 
 KNOWN BUGS:
  None.
- 
-
-

@@ -1,9 +1,9 @@
 USAGE:
+
  fine
 
 DESCRIPTION:
  FINE is an ADORE process and it runs the DORIS step with the same name.
-
  The offset vectors to align the slave image to the master are computed with
 sub pixel accuracy for a number of locations in the master. Over the total
 image, for a large number of windows (e.g., 500, distributed by Doris or
@@ -13,21 +13,21 @@ magnitude images for shifts at pixel level.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Results are written in the interferogram result file.  
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/fine.drs
  http://doris.tudelft.nl/usermanual/node60.html
 
 EXAMPLE:
+
  fine
 
 KNOWN BUGS:
  None. 
-
-

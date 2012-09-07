@@ -1,4 +1,5 @@
 USAGE:
+
 	mask processName
 
 DESCRIPTION:
@@ -10,8 +11,7 @@ INPUT:
 	name of doris step to be masked. (i.e. interfero, subtrrefpha,
       subtrrefdem, filtphase)
 
-OUTPUT:
+OUTPUT
   MASK will automatically rename the original DORIS output to
   filename.notmasked
   The masked file will be named as the original output. 
-  

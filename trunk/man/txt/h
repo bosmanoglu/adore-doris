@@ -1,21 +1,19 @@
 USAGE:
+
 	? commandName
 
 DESCRIPTION:
  ? is a builtin ADORE command.  
  It displays the help for given adore command.   
-
  HTML version of the ADORE help can be accessed by browsing to:
  file:///${ADOREFOLDER}/man/html/links.html
 
 INPUT:
  commandName: ADORE command name to get help. A list of commands 
  can be found at the end of this help message.
- 
-OUTPUT:
+
+OUTPUT
  Help message for the specified command, or this message if no command is given.
-
-
 ******ADORE Commands******
 ?
 addrefpha2s_crop

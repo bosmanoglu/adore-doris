@@ -16,6 +16,6 @@ do
   search=${pair%,*}
   replace=${pair##*,}
   #echo search:$search replace:${replace}
-  sed -i "s@${search}@${replace}@g" ${txtf}
+  sed -i ":begin;$!N;s@${search}@${replace}@g;tbegin" ${txtf}
 done
 IFS=${OIFS}

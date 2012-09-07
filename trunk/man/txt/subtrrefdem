@@ -1,30 +1,30 @@
 USAGE:
+
  subtrrefdem 
 
 DESCRIPTION:
  SUBTRREFDEM is an ADORE function and it runs the DORIS step with the same name.  
-
  In this step the reference phase of a digital elevation model is subtracted
  from the complex interferogram. This is done by complex multiplication with
  the conjugated, as explained in step subtrrefpha (chapter 25).
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
   ${master}_${slave}.srd file is generated. 
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/subtrrefdem.drs
  http://doris.tudelft.nl/usermanual/node107.html
 
 EXAMPLE:
+
  subtrrefdem
 
 KNOWN BUGS:
  None. 
-
-

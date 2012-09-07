@@ -1,4 +1,5 @@
 USAGE:
+
 	pn2rs processName 
 	pnr2rs -f processName
 
@@ -11,6 +12,6 @@ INPUT:
  -f: Flag for filename. If present corresponding filename
 	is returned. 
  processName: Doris step to lookup.
- 
-OUTPUT:
+
+OUTPUT
  Name of the section in doris result file.

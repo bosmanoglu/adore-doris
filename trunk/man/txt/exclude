@@ -1,4 +1,5 @@
 USAGE:
+
 	exclude 
 	exclude orbitFolder1 orbitFolder2 ...
 
@@ -8,12 +9,10 @@ DESCRIPTION:
 
 INPUT:
  exclude: with no input parameters, currently excluded files are shown.
- 
  exclude orbitFolder1 orbitFolder2 ...:
    orbit folders (folders inside data folder) can be specified to be excluded from
    batch processing.
 
-OUTPUT:
+OUTPUT
  exclude: list of excluded orbits.
  exclude orbitFolder1: will display "Excluding orbitFolder1".
-

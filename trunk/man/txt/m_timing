@@ -1,9 +1,9 @@
 USAGE:
+
  m_timing
 
 DESCRIPTION:
  M_TIMING is an ADORE process and runs the DORIS step with the same name.  
-
  The absolute timing error between DEM and the master is computed using the
 simulated amplitude and the result of the coarse coregistration. Therefore,
 this step can only be run after the steps M_CROP and M_SIMAMP. The timing
@@ -11,22 +11,22 @@ error in azimuth as well as in range direction is estimated.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Azimuth and range timing errors are written under the master_timing step in
 the result file.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/m_timing.drs
  http://doris.tudelft.nl/usermanual/node29.html
 
 EXAMPLE:
+
  m_timing
 
 KNOWN BUGS:
  None.
-
-

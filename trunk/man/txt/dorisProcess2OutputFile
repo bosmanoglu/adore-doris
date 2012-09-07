@@ -1,4 +1,5 @@
 USAGE:
+
   call (filename resfile format numpixels numlines)=dorisProcess2OutputFile dorisStep [searchparameter]
 
 DESCRIPTION:
@@ -7,12 +8,12 @@ it finds the output filename and relavant information.
 
 INPUT:
  dorisStep: Name of the DORIS step. 
-  
- OPTIONAL:
+ 
+OPTIONAL:
   searchparameter: The name of the field in the result file containing the
 output file. This is useful when the dorisStep has multiple output files. 
 
-OUTPUT:
+OUTPUT
  Output is split into five variables.
  filename: The name of the DORIS output file for the Doris process.
  resfile: Name of the result file. 
@@ -22,13 +23,13 @@ OUTPUT:
  numlines: Number of lines of the output file.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/resfile.fun 
 
 EXAMPLE:
+
   call (filename resfile format numpixels numlines)=dorisProcess2OutputFile subttrefpha 
   call (filename resfile format numpixels numlines)=dorisProcess2OutputFile geocode Data_output_file_hei
 
 KNOWN BUGS:
  None.
-
-

@@ -1,4 +1,5 @@
 USAGE:
+
  canonicalPath file
 
 DESCRIPTION:
@@ -7,25 +8,26 @@ DESCRIPTION:
 
 INPUT:
  file: valid path to file.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Absolute path to a given file.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
  http://snipplr.com/view/18026/canonical-absolute-path/
 
 EXAMPLE:
+
  regular file...
  ADORE: canonicalPath resample.kml
  /home/bosmanoglu/tmp/resample.kml
  linked file...
  ADORE: canonicalPath '/home/bosmanoglu/Examples/Ubuntu_Free_Culture_Showcase/How\ fast.ogg'
  /usr/share/example-content/Ubuntu_Free_Culture_Showcase/How\ fast.ogg
- 
+
 KNOWN BUGS:
  Links of links (multiple levels of links) can not be resolved. 
-

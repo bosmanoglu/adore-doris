@@ -1,4 +1,5 @@
 USAGE:
+
  bold "string"
 
 DESCRIPTION:
@@ -6,17 +7,17 @@ DESCRIPTION:
 
 INPUT:
  string: Text in quotes to be displayed in bold.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Prints the input string in bold characters to STDOUT.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:
+
  ADORE: bold "This is displayed bold." 
-
-

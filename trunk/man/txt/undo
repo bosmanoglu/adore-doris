@@ -1,4 +1,5 @@
 USAGE:
+
 	undo processName [fileName]
 	undo processName
 	undo only processName
@@ -12,13 +13,14 @@ INPUT:
    the information for the following steps. Use with caution.
  processName: Doris step to be deleted from the resultfile.
  
- OPTIONAL:
+OPTIONAL:
    fileName: If omitted undo will try to remove the given doris
      step from master, slave and interferograms result files.    
      If specified undo will only remove steps from the given file.
 
-OUTPUT:
+OUTPUT
  Undo Successful: if DORIS step was found and removed.
- 
+
 EXAMPLE:
+
   undo only s_crop

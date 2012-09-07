@@ -1,23 +1,26 @@
 USAGE:
+
  checkInitialSettings
 
 DESCRIPTION:
  CHECKINITIALSETTINGS is an internal ADORE function. 
  It runs a set of simple tests on the ADORE settings at initialization, and output some suggestions/warnings to the STDOUT. 
-  
+
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  Outputs several warning messages depending on the values of the following variables: projectFolder, master, m_in_dat, s_in_dat, runName, dataFolder.
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:
+
  ADORE: checkInitialSettings
  projectFolder is set to ".". Use with caution. In general your data should be located at projectFolder/data
  It seems like dataFolder and/or projectFolder is not set correctly.
@@ -27,6 +30,3 @@ EXAMPLE:
  Any batch processing results (baselines, singleMasterStack) will be under ./process/default
 
 KNOWN BUGS:
- 
-
-

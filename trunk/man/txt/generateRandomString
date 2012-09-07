@@ -1,4 +1,5 @@
 USAGE:
+
  generateRandomString
 
 DESCRIPTION:
@@ -8,22 +9,22 @@ randomString variable.
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
  The variable "randomString" contains a random string that are eight
 characters long. 
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/scr/fun/functions
 
 EXAMPLE:
+
  generateRandomString
  echo ${randomString}.
 
 KNOWN BUGS:
  None.
-
-

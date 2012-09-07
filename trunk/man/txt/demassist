@@ -1,4 +1,5 @@
 USAGE:
+
  demassist 
 
 DESCRIPTION:
@@ -7,22 +8,21 @@ DESCRIPTION:
 
 INPUT:
  There are no required input parameters for this command.
-  
- OPTIONAL:
+ 
+OPTIONAL:
   There are no optional input parameters for this command.
 
-OUTPUT:
+OUTPUT
   SUCCESS is printed to STDOUT on successful completion of process. 
 
 FILES and REFERENCES:
+
  ${ADOREFOLDER}/drs/${dorisVersion}/demassist.drs
  http://doris.tudelft.nl/usermanual/node71.html
 
 EXAMPLE:
+
   demassist 
 
 KNOWN BUGS:
   None.
- 
-
-
