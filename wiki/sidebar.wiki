@@ -50,6 +50,7 @@
     * [h h]
     * [lsprocess lsprocess]
     * [mask mask]
+    * [openInIpython openInIpython]
     * [p p]
     * [quejob quejob]
     * [raster raster]
