@@ -5,6 +5,7 @@
 	check
 	check setup
 	check resultFile
+        check updates
 	check -p processName
 	check -j jobid
 }}}
@@ -15,6 +16,7 @@
  to run. 
  "setup" option can be used to check if ADORE can find all the necessary 
  libraries.
+ "updates" option can be used to check for and download updates.
 =INPUT:=
  No required inputs.
   ==OPTIONAL:==
@@ -37,12 +39,16 @@
      are missing.
 =OUTPUT=
  Shows the process control list of given result file.
+=FILES and REFERENCES:=
+{{{
+ None.
 }}}
 =EXAMPLE:=
 {{{
  check
  check -p m_readfiles; echo $?
  check setup
+ check updates
 ADORE: check
 INTERFEROGRAM:                  MASTER:                         SLAVE:          
 coarse_orbits:          1       readfiles:              1       readfiles:              1
@@ -62,7 +68,7 @@ unwrap:                 0
 slant2h:                0               
 geocoding:              0               
 dinsar:                 0
-ADORE: check 050507.res
+ADORE: check 050507.res 
 050507.res:
 readfiles:              1
 precise_orbits:         1
