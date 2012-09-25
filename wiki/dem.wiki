@@ -53,6 +53,17 @@
 
 =OUTPUT=
   `dem make`: Generates a folder with the dem. Leaves the hgt files in the current folder.<br>
-  `dem load`: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.<br>
+  `dem load`: No outputs if success. Updates DORIS settings starting with `sam_`, `dac_`, and `crd_`.<br>
   `dem unload`: Displays a text message indicating cleared variables.<br>
   `dem check`: Checks and displays possible problems fixes on stdout.<br>
+=FILES and REFERENCES:=
+{{{
+ None.
+}}}
+=EXAMPLE:=
+{{{
+dem convert merapi_15m.asc "-s_srs '+proj=utm +zone=49M +ellps=WGS84 +datum=WGS84 +units=m +no_defs' "
+dem load merapi_15m.bil
+}}}
+=KNOWN BUGS:=
+ None.
