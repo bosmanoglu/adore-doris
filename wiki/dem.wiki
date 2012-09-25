@@ -12,26 +12,30 @@
  DEM is an internal ADORE command.  
  It can generate and load DEM settings to the environment.   
 =INPUT:=
- dem: 
+ `dem`:<br> 
 	defaults to "dem check"
- dem make SRTM1/SRTM3 extraBufferPercentage name
-	Calculates the master scene coverage and issues a call to construct_dem.sh 
+
+ `dem make SRTM1/SRTM3 extraBufferPercentage name`<br>
+	Calculates the master scene coverage and issues a call to `construct_dem.sh` 
 	Area if padded (enlarged) in all directions with the extraBufferPercentage.
-	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
- dem load path/to/demfile.dem
+	You can call this function with no/some arguments. Defaults are: `SRTM3 20 dem`
+
+ `dem load path/to/demfile.dem`<br>
 	Load's the specified dem file. 
 	Currently supported DEM formats:
 	  -output of "dem make"
 	  -construct_dem.sh (from TU-DELFT).
 	  -ArcGIS .flt files (with .flt and .hdr files should be in the same folder and have the same name.)
 	  -GMT .grd files. (Creates .dem and input_doris files in the current directory.)
- dem unload
+
+ `dem unload`:<br>
 	Clears sam_in_dem, dac_in_dem and crd_in_dem. If you want to re-run dem make 
       this can be used.
- dem check:
+
+ `dem check`:<br>
 	Checks the environment DEM settings and suggests fixes to problems.
 =OUTPUT=
-  dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
-  dem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.
-  dem unload: Displays a text message indicating cleared variables.
-  dem check: Checks and displays possible problems fixes on stdout.
+  `dem make`: Generates a folder with the dem. Leaves the hgt files in the current folder.<br>
+  `dem load`: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.<br>
+  `dem unload`: Displays a text message indicating cleared variables.<br>
+  `dem check`: Checks and displays possible problems fixes on stdout.<br>
