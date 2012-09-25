@@ -64,6 +64,7 @@
     * [undo undo]
     * [view view]
     * [waitjob waitjob]
+  * [adoreVariables ADORE Variables]
   * [Functions ADORE Functions]
     * [ask ask]
     * [bold bold]
