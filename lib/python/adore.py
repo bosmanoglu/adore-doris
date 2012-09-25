@@ -18,7 +18,121 @@ import os, re
 import numpy as np
 import basic 
 
+class Object:
+    """ADORE Object
+    """
+    def __init__(self, settingsFile=None):
+        self.settingsFile=settingsFile
+        if settingsFile is None:
+            #Initialize barebones
+            pass
+        else:
+            try:
+                settings=parseSettings(self.settingsFile);
+                self.settings=settings
+                self.setobj=dict2obj(settings._sections);
+            except:
+                self.settings=None
+                self.setobj=None                        
+            try:
+                self.ires=res2dict( settings.get('general', 'i_resfile') );
+                self.iobj=dict2obj(self.ires);
+            except:
+                self.ires=None
+                self.iobj=None
+            try:
+                self.mres=res2dict( settings.get('general', 'm_resfile') );
+                self.mobj=dict2obj(self.mres);
+            except:
+                self.mres=None
+                self.mobj=None
+            try:
+                self.sres=res2dict( settings.get('general', 's_resfile') );
+                self.sobj=dict2obj(self.sres);
+            except:
+                self.sres=None
+                self.sobj=None
+        self.pn2rs={
+          'm_readfiles'  :'readfiles',   
+          's_readfiles'  :'readfiles',
+          'coarseorb'    :'coarse_orbits',
+          'demassist'    :'dem_assist',      
+          'subtrrefpha'  :'subtr_refphase',  
+          'dinsar'       :'dinsar'        ,  
+          'm_porbits'    :'precise_orbits',  
+          's_porbits'    :'precise_orbits',  
+          'coarsecorr'   :'coarse_correl' ,  
+          'coregpm'      :'comp_coregpm'  ,  
+          'comprefdem'   :'comp_refdem'   ,  
+          'slant2h'      :'slant2h'       ,  
+          'm_crop'       :'crop'          ,  
+          's_crop'       :'crop'          ,  
+          'm_filtazi'    :'filt_azi'      ,  
+          'resample'     :'resample'      , 
+          'subtrrefdem'  :'subtr_refdem'  ,  
+          'geocode'      :'geocoding'     , 
+          'm_simamp'     :'sim_amplitude' , 
+          's_filtazi'    :'filt_azi'      , 
+          'filtrange'    :'filt_range'    , 
+          'coherence'    :'coherence'     , 
+          'm_timing'     :'master_timing' , 
+          'fine'         :'fine_coreg'    , 
+          'interfero'    :'interfero'     , 
+          'filtphase'    :'filtphase'     , 
+          'm_ovs'        :'oversample'    , 
+          's_ovs'        :'oversample'    , 
+          'reltiming'    :'timing_error'  , 
+          'comprefpha'   :'comp_refphase' , 
+          'unwrap'       :'unwrap'        , 
+          'ci2'          :'complex_short' , 
+          'cr4'          :'complex_real4' , 
+          'i2'           :'short'         , 
+          'r4'           :'real4'}          
 
+    def addResults(self,process,d):
+        """addResults(process, data_object)
+          Add process results to the end of result file. 
+          data_object is the subsection of mobj, sobj or iobj.
+        """
+        stars="*******************************************************************"
+        if "m_" in process:
+            filename=self.setobj.general.m_resfile.strip('"')
+        elif "s_" in process:
+            filename=self.setobj.general.s_resfile.strip('"')
+        else:
+            filename=self.setobj.general.i_resfile.strip('"')
+
+        resname=self.pn2rs[process];
+        f=open(filename, 'a');
+        fwrite=lambda x: f.write(x+'\n');
+        if resname == "master_timing":
+            fwrite(stars)
+            fwrite('*_Start_master_timing: ')
+            fwrite(stars)
+            fwrite('Correlation method                      :       %s' % d.Correlation_method)
+            fwrite('Number of correlation windows used      :       %s' % d.Number_of_correlation_windows_used)
+            fwrite('Estimated translation master w.r.t. synthetic amplitude (master-dem):')
+            if d.Coarse_correlation_translation_lines >= 0:
+                fwrite('  Positive offsetL: master image is to the bottom')
+            else:
+                fwrite('  Negative offsetL: master image is to the top')                
+            if d.Coarse_correlation_translation_pixels >= 0:
+                fwrite('  Positive offsetP: master image is to the right')
+            else:
+                fwrite('  Negative offsetP: master image is to the left')                
+            fwrite('Coarse_correlation_translation_lines    :       %f' % d.Coarse_correlation_translation_lines)
+            fwrite('Coarse_correlation_translation_pixels   :       %f' % d.Coarse_correlation_translation_pixels)
+            fwrite('Master_azimuth_timing_error             :       %.9f sec.' % d.Master_azimuth_timing_error)
+            fwrite('Master_range_timing_error               :       %e sec.' % d.Master_range_timing_error)
+            fwrite(stars)
+            fwrite('* End_master_timing:_NORMAL');
+            fwrite(stars);
+            
+        fwrite('');
+        f.close();
+        basic.findAndReplace(filename, resname+':\t\t0', resname+':\t\t1')
+        #basic.findAndReplace(filename, 'master_timing', process+':\t\t1')                      
+                        
 #def dict2obj(d):
 #    class DictObj(object):
 #        def __init__(self,d):
@@ -29,6 +143,7 @@ import basic
 #    return do
 
 def dict2obj(d):
+    #Modified from
     #Ygor Lemos: parand.com/say/index.php/2008/10/13/access-python-dictionary-keys-as-properties/
     class DictObj:
         def __init__(self, **entries):
@@ -781,4 +896,4 @@ def latlon2lp(iobj, lat, lon):
     d=LAT+LON
     return basic.ind2sub(LAT.shape,d.argmin())
 
-    
+

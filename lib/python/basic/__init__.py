@@ -502,3 +502,13 @@ def colorbarFigure(cmap,norm,label=""):
     cb1.set_label(label)
     return fig
     
+def findAndReplace(fileList,searchExp,replaceExp):
+    """findAndReplace(fileList,searchExp,replaceExp):
+    """
+    import fileinput
+    if not isinstance(fileList, list):
+        fileList=[fileList];
+    for line in fileinput.input(fileList, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,replaceExp)
+        sys.stdout.write(line)         
