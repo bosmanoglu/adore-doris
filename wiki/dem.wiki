@@ -51,7 +51,7 @@
   `dem view`:<br>
 	Display DEM using `cpxview` and the input values. Additional options can be passed. See `? view`
 
-=OUTPUT=
+=OUTPUT:=
   `dem make`: Generates a folder with the dem. Leaves the hgt files in the current folder.<br>
   `dem load`: No outputs if success. Updates DORIS settings starting with `sam_`, `dac_`, and `crd_`.<br>
   `dem unload`: Displays a text message indicating cleared variables.<br>
@@ -66,4 +66,4 @@ dem convert merapi_15m.asc "-s_srs '+proj=utm +zone=49M +ellps=WGS84 +datum=WGS8
 dem load merapi_15m.bil
 }}}
 =KNOWN BUGS:=
- None.
+ If the merged DEM size is over 2GB the DEM expand command fails.
