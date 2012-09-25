@@ -1,0 +1,39 @@
+#summary Variables specific for ADORE
+#labels Phase-Support
+
+There are a few environment variables that ADORE uses to keep track of the settings, processes and folders. 
+
+= Variables: =
+
+  * ADOREFOLDER
+  This variable points to the ADORE installation folder. This variable is set during the initialization of ADORE.
+  * projectFolder
+  This variable points to the current project folder. It is best to set this variable to the full path. This variable is set using `settings init` command. Default:'.'
+  * outputFolder
+  This variable points to the current output folder. In interactive process it is suggested to use this as the current folder. ADORE scripts change this variable to make sure the outputs of multiple interferograms end up in the correct place. Default:'.'
+  * processFolder
+  This variable points to the current processing folder. Processing folder is the main directory for all radar processing and is the mother directory for runFolders. Default:'$projectFolder/process'
+  * dataFolder
+  This variable points to the current data folder. Data folder contains the data (or links to the data). Inside data folder each scene has its own folder. This folder is generated using `settings init` or `scenes init` commands. Default:'$projectFolder/data'
+  * runName
+  This variable holds the name for the current processing run. This allows for different processing attempts to be kept in the same project. Default: 'default'
+  * runFolder
+  This variable points to the current run folder. This is the mother directory for crop and interferogram (i12s) folders. Default:'$processFolder/$runName'
+  * cropsFolder
+  This variable points to the current crops folder. ADORE scripts places all scenes (crops) to this folder. Default:'$runFolder/crops'
+  * i12sFolder
+  * baselinesFolder
+  * adoreHistoryFile
+  * dorisVersion
+  * master
+  * slave
+  * dataFile
+  * leaderFile
+  * volumeFile
+  * nullFile
+  * rs_az_buffer
+  * rs_rg_buffer
+  * slc_rg_res
+  * slc_az_res
+  * raster_format
+  * bistatic
