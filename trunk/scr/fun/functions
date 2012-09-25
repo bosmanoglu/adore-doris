@@ -472,7 +472,7 @@ function m_simamp(){
 }
  
 function m_timing(){
-  p m_timing
+  p m_timing "$@"
 }
  
 function reltiming(){

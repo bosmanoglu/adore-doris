@@ -23,8 +23,8 @@ elif [ -f "${cmd}" ]; then
   #echo "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" > tmpfile.tmp
   #cat "${cmd}" >> tmpfile.tmp
   #ipython -pylab tmpfile.tmp
-  [ "${ipv}" == "0.10" ] && cat "${cmd}" | ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" 
-  [ "${ipv}" != "0.10" ] && cat "${cmd}" | ipython --pylab -i -c "\"%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set' \""   
+  [ "${ipv}" == "0.10" ] && cat "${cmd}" | ipython -pylab -pi1 " " -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" 
+  [ "${ipv}" != "0.10" ] && cat "${cmd}" | ipython --pylab -pi1 " " -i -c "\"%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set' \""   
   #ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" 
 else
   [ "${ipv}" == "0.10" ] && (echo "${cmd}" ) | ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"  

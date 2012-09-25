@@ -300,23 +300,26 @@ function linkGAMMA(){
 local DATADIR=${1}
 local date
   #for f in $(ls -1d ${DATADIR}/*); do
-  for f in $(find -L "${DATADIR}" -name "${dataFile}"); do
+  for fl in $(find -L "${DATADIR}" -name "${dataFile}"); do
     #echo info: $f
     #date=$( awk '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
-    if [ -d "${f}" ]; then 
-      date=`awk '/date:/{printf "%4d%02d%02d",$2, $3, $4}' ${f}/${leaderFile}`
-      if [ $? -eq 0 ]; then 
-        if [ -d "${dataFolder}/${date}" ]; then 
-          error "Can not add already existing data: ${f}"
-          continue
-        fi
-        mkdir -p ${dataFolder}/${date}
-        ln -s ${f}/${leaderFile} ${dataFolder}/${date}/
-        ln -s ${f}/${dataFile} ${dataFolder}/${date}/
-        ln -s ${f}/${volumeFile} ${dataFolder}/${date}/
-        ln -s ${f}/${nullFile} ${dataFolder}/${date}/
+    local f=`dirname ${fl}`
+    #if [ -d "${f}" ]; then 
+    date=`awk '/date:/{printf "%4d%02d%02d",$2, $3, $4}' ${f}/${leaderFile}`
+    if [ $? -eq 0 ]; then 
+      if [ -d "${dataFolder}/${date}" ]; then 
+        error "Can not add already existing data: ${f}"
+        continue
       fi
+      mkdir -p ${dataFolder}/${date}
+      ln -s ${f}/${leaderFile} ${dataFolder}/${date}/
+      ln -s ${f}/${dataFile} ${dataFolder}/${date}/
+      ln -s ${f}/${volumeFile} ${dataFolder}/${date}/
+      ln -s ${f}/${nullFile} ${dataFolder}/${date}/
+    else
+      error "Can not add ${fd}. Not a GAMMA focused SLC?"
     fi
+    #fi
   done
 }
 

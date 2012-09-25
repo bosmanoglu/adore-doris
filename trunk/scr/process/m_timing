@@ -1,13 +1,21 @@
 #!/bin/bash
-#preprocess the drs file
-pp ${dorisProcess}
+if [ ${mte_method} == "manual" ]; then
+  #get width of simamp  
+  width=`readRes.sh $m_resfile $(pn2rs m_simamp) "Number of pixels (multilooked)"`
+  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${width} -f r4/cr4 -q normal/mag -e1/0.3 ${@} ${master}.sam ${master}.crop | tee ${outputFolder}/manual_offsets.txt
+  openInIpython ${ADOREFOLDER}/lib/python/fun/manual_offsets_timing_error.py 
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+  unset width
+else
+  #preprocess the drs file
+  pp ${dorisProcess}
 
-if [ -z ${mte_in_pos} ]; then
-  #if the input file is not defined remove the line
-  grep -v -i -w "mte_in_pos" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  if [ -z ${mte_in_pos} ]; then
+    #if the input file is not defined remove the line
+    grep -v -i -w "mte_in_pos" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
+
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
 fi
-
-doris ${outputFolder}/${dorisProcess}.drs
-[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
-

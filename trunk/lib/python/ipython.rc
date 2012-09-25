@@ -1,34 +1,51 @@
 #!/usr/bin/env python
-import os
-os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python'))
-import adore
+import os;
+os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python'));
+import adore;
 
 #try:
 #  settingsFile=os.sys.argv[1]
 #except:
 #  pass
 
-try:
-  settings=adore.parseSettings(os.sys.argv[1])
-  setobj=adore.dict2obj(settings._sections);
-except:
-  pass
+A=adore.Object(os.sys.argv[1]);
+setobj=A.setobj
+if A.mobj:
+  mobj=A.mobj
+  mres=A.mres #Might deprecate in the future
 
-try:
-  ires=adore.res2dict( settings.get('general', 'i_resfile') );
-  iobj=adore.dict2obj(ires);
-except:
-  pass
-try:
-  mres=adore.res2dict( settings.get('general', 'm_resfile') );
-  mobj=adore.dict2obj(mres);
-except:
-  pass
-try:
-  sres=adore.res2dict( settings.get('general', 's_resfile') );
-  sobj=adore.dict2obj(sres);
-except:
-  pass
+if A.sobj:
+  sobj=A.sobj
+  sres=A.sres #Might deprecate in the future
+
+if A.iobj:
+  iobj=A.iobj
+  ires=A.ires #Might deprecate in the future
+
+#Might deprecate in the future
+settings=A.settings
+
+#try:
+#  settings=adore.parseSettings(os.sys.argv[1]);
+#  setobj=adore.dict2obj(settings._sections);
+#except:
+#  pass;
+
+#try:
+#  ires=adore.res2dict( settings.get('general', 'i_resfile') );
+#  iobj=adore.dict2obj(ires);
+#except:
+#  pass
+#try:
+#  mres=adore.res2dict( settings.get('general', 'm_resfile') );
+#  mobj=adore.dict2obj(mres);
+#except:
+#  pass;
+#try:
+#  sres=adore.res2dict( settings.get('general', 's_resfile') );
+#  sobj=adore.dict2obj(sres);
+#except:
+#  pass;
 
 #SOURCE http://duhctaep.blogspot.com/2010/06/redirecting-stdin-stdout-stderr-from.html
 # can be used to duplicate the stdin stderr or stdout to a file.
