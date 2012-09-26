@@ -1,7 +1,7 @@
 #summary Variables specific for ADORE
 #labels Phase-Support
 
-There are a few environment variables that ADORE uses to keep track of the settings, processes and folders. 
+There are a few environment variables that ADORE uses to keep track of the settings, processes and folders. These variables are accessible with the `$variableName` format at the ADORE prompt.
 
 = Variables: =
 
@@ -20,20 +20,36 @@ There are a few environment variables that ADORE uses to keep track of the setti
   * runFolder
   This variable points to the current run folder. This is the mother directory for crop and interferogram (i12s) folders. Default:'$processFolder/$runName'
   * cropsFolder
-  This variable points to the current crops folder. ADORE scripts places all scenes (crops) to this folder. Default:'$runFolder/crops'
+  This variable points to the current crops folder. ADORE scripts place all scenes (crops) to this folder. Default:'$runFolder/crops'
   * i12sFolder
+  This variable points to the current interferogram (i12s) folder. ADORE scripts place all interferograms inside this folder. Default:'$runFolder/i12s'
   * baselinesFolder
+  This variable points to the baselines folder for the current run. The `baselines` command outputs all the files to this folder. Default:'$runFolder/baselines'
   * adoreHistoryFile
+  This variable holds the location for the ADORE's history file. This file keeps the command history for ADORE. Default:'${projectFolder}/.history'
   * dorisVersion
+  This variable holds the version of the DORIS, which determines the default input files (`*.drs`). This is determined during initialization.
   * master
+  This variable holds the current master scene. Default is the first scene inside the data folder.
   * slave
+  This variable holds the current slave scene. Default is the second scene inside the data folder.
   * dataFile
+  This variable holds the pattern for the data file. This pattern is used to select the correct file inside the master and slave data folders. This setting is initialized using `settings init` or `scenes init`.
   * leaderFile
+  This variable holds the pattern for the leader file. This pattern is used to select the correct file inside the master and slave data folders. This setting is initialized using `settings init` or `scenes init`.
   * volumeFile
+  This variable holds the pattern for the volume file. This pattern is used to select the correct file inside the master and slave data folders. This setting is initialized using `settings init` or `scenes init`.
   * nullFile
+  This variable holds the pattern for the null file. This pattern is used to select the correct file inside the master and slave data folders. This setting is initialized using `settings init` or `scenes init`.
   * rs_az_buffer
+  This variable sets the default resampling azimuth buffer in pixels. If `rs_dbow` and `rs_dbow_geo` parameters are not set, slave is cropped a little smaller than the overlapping area estimated by orbits. Default:'200'
   * rs_rg_buffer
+  This variable sets the default resampling range buffer in pixels. If `rs_dbow` and `rs_dbow_geo` parameters are not set, slave is cropped a little smaller than the overlapping area estimated by orbits. Default:'200'
   * slc_rg_res
+  This variable holds the range resolution for the current processing. If not defined by the user it is estimated during `dem make` command to estimate the size of the image.
   * slc_az_res
+  This variable holds the azimuth resolution for the current processing. If not defined by the user it is estimated during `dem make` command to estimate the size of the image. Automatic estimation of this parameter might be wrong for satellites other than Envisat, ERS-1, and ERS-2.
   * raster_format
+  This variable defines the output format for the `raster` command. If this is set to something other than `ras` (sunraster), imagemagick's `convert` utility is used to convert the image to the right format. Default:'ras'
   * bistatic
+  This variable sets the environment for bistatic Tandem-X processing. It is checked at m_crop, s_crop and subtrrefpha steps to run the necessary processing for this product. When DORIS starts internally supporting this format, this variable will be deprecated. Default:'off'
