@@ -5,10 +5,9 @@
  subtrrefpha
 }}}
 =DESCRIPTION:=
- SUBTRREFPHA is an ADORE function and it runs the DORIS step with the same name.  
-  In this step the reference phase of a mathematical body (ellipsoid) is
-subtracted from the complex interferogram. This is done by complex
-multiplication with the conjugated.
+SUBTRREFPHA is an ADORE function and it runs the DORIS step with the same name.  
+
+In this step the reference phase of a mathematical body (ellipsoid) is subtracted from the complex interferogram. This is done by complex multiplication with the conjugated.
 =INPUT:=
  There are no required input parameters for this command.
  ==OPTIONAL:==
