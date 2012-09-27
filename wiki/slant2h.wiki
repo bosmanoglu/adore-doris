@@ -5,10 +5,9 @@
  slant2h
 }}}
 =DESCRIPTION:=
- SLANT2H is an ADORE process and it runs the DORIS step with the same name.  
-  In this step in principle the heights in the radar coded system are
- computed. However with the exact method, the geocoding can be done in the
- same step.
+SLANT2H is an ADORE process and it runs the DORIS step with the same name.  
+  
+In this step in principle the heights in the radar coded system are computed. However with the exact method, the geocoding can be done in the same step.
 =INPUT:=
  There are no required input parameters for this command.
  ==OPTIONAL:==
