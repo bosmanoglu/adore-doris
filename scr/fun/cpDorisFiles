@@ -16,6 +16,13 @@
 #tmpFile="mvDoris.temporary.file"
 #rm -rf ${tmpFile}
 
+if [ $# -lt 2 ]; then
+  error "Not enough input parameters."
+  error "Please check usage with: ? cpDorisFiles"
+  return 
+fi
+
+
 sourceFolder=${1}
 destinationFolder=${2}
 echo "Source Folder: ${sourceFolder}"

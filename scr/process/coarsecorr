@@ -1,13 +1,31 @@
 #!/bin/bash
+if [ ${cc_method} == "manual" ]; then
+  #get width of m_crop
+  mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels (non-multilooked)"`
+  swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels (non-multilooked)"`
+  mcrop=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_file"`
+  scrop=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_file"`
+  #mfmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
+  
+  echo ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ci2/ci2 -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop}  
+  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ci2/ci2 -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop} | tee ${outputFolder}/manual_offsets_cc.txt
+  openInIpython ${ADOREFOLDER}/lib/python/fun/manual_offsets_coarsecorr.py 
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+  unset mwidth
+  unset swidth
+  unset mcrop
+  unset scrop
+else
 
-pp ${dorisProcess}
+  pp ${dorisProcess}
 
-if [ -z ${cc_in_pos} ]; then
-  #if the input file is not defined remove the line
-  grep -v -i -w "cc_in_pos" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  if [ -z ${cc_in_pos} ]; then
+    #if the input file is not defined remove the line
+    grep -v -i -w "cc_in_pos" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
+
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+
 fi
-
-doris ${outputFolder}/${dorisProcess}.drs
-[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
-

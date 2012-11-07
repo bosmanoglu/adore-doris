@@ -181,6 +181,16 @@ function i12s()
   . ${ADORESCR}/fun/i12s ${@} 
 }
 
+function max()
+{
+  echo ${@} | tr " " "\n"| awk 'NR==1 { max=$1 } { if ($1>max) max=$1;} END {printf "%f", max}'
+}
+
+function min()
+{
+  echo ${@} | tr " " "\n"| awk 'NR==1 { min=$1 } { if ($1<min) min=$1;} END {printf "%f", min}'
+}
+
 function mvDorisFiles(){
   . ${ADORESCR}/fun/mvDorisFiles ${@}
 }
@@ -396,7 +406,7 @@ function waitjob(){
 ################### DORIS FUNCTIONS ################
 ####################################################
 function coarsecorr(){
-  p coarsecorr
+  p coarsecorr ${@}
 }
  
 function coarseorb(){

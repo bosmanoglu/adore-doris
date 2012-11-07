@@ -28,6 +28,7 @@ import pylab as mp;
 import numpy as np;
 import scipy as sc;
 import scipy.ndimage
+import basic
 
 def usage():
     print __doc__
@@ -134,7 +135,7 @@ def main(argv):
         cfg.setdefault("-b", "")
         cfg.setdefault("-o", "")
         cfg.setdefault("-k", "xy")
-        cfg["-w"]=int(cfg["-w"]) 
+        #cfg["-w"]=int(cfg["-w"]) 
         cfg["-l"]=int(cfg["-l"]) 
         cfg["-L"]=int(cfg["-L"]) 
         cfg["-p"]=int(cfg["-p"]) 
@@ -159,12 +160,16 @@ def main(argv):
             cfgs=float(cfg["-s"].split("/")[counter])
         else:
             cfgs=float(cfg["-s"])
+        if "/" in cfg["-w"]:
+            cfgw=int(cfg["-w"].split("/")[counter])
+        else:
+            cfgw=int(cfg["-w"])
         
         #byteswap on?
         byteSwapFlag=False;
         if ("-B", "") in opts:
             byteSwapFlag=True;
-        data=getdata(inputfile,cfg["-w"],cfgf.lower(),0,byteSwapFlag)
+        data=getdata(inputfile,cfgw,cfgf.lower(),0,byteSwapFlag)
         data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
         #multilook
         data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
@@ -229,7 +234,18 @@ def main(argv):
         ax = mp.gca()
         global zoomxy1,zoomxy2,vl1,hl1
         if event.button==3:
-            print zoomxy1[0]*cfg["Ml"],zoomxy1[1]*cfg["Mp"],zoomxy2[0]*cfg["Ml"],zoomxy2[1]*cfg["Mp"]
+            #correlate
+            lw=64 #*cfg["Ml"]
+            pw=64 #*cfg["Mp"]
+            w=[8,8]
+            #coh=crosscorrelate(data1[zoomxy1[0]-lw:zoomxy1[0]+lw, zoomxy1[1]-pw:zoomxy1[1]+pw], \
+            #                   data2[zoomxy2[0]-lw:zoomxy2[0]+lw, zoomxy2[1]-pw:zoomxy2[1]+pw]) 
+            cohm=correlate(data1[zoomxy1[0]-lw:zoomxy1[0]+lw, zoomxy1[1]-pw:zoomxy1[1]+pw], \
+                           data2[zoomxy2[0]-lw:zoomxy2[0]+lw, zoomxy2[1]-pw:zoomxy2[1]+pw], w)
+            coh=cohm.max()            
+            carg=basic.ind2sub(cohm.shape, cohm.argmax())
+            print zoomxy1[0]*cfg["Ml"],zoomxy1[1]*cfg["Mp"],zoomxy2[0]*cfg["Ml"]+carg[0]-lw/2,zoomxy2[1]*cfg["Mp"]+carg[1]-pw/2,coh
+            sys.stdout.flush()
         else:
           inv = ax.transData.inverted()
           A=inv.transform((event.x,  event.y))
@@ -248,7 +264,18 @@ def main(argv):
         ax = mp.gca()
         global zoomxy1,zoomxy2,vl2,hl2
         if event.button==3:
-            print zoomxy1[0]*cfg["Ml"],zoomxy1[1]*cfg["Mp"],zoomxy2[0]*cfg["Ml"],zoomxy2[1]*cfg["Mp"]
+            #correlate
+            lw=64 #*cfg["Ml"]
+            pw=64 #*cfg["Mp"]
+            w=[8,8]
+            #coh=crosscorrelate(data1[zoomxy1[0]-lw:zoomxy1[0]+lw, zoomxy1[1]-pw:zoomxy1[1]+pw], \
+            #                   data2[zoomxy2[0]-lw:zoomxy2[0]+lw, zoomxy2[1]-pw:zoomxy2[1]+pw]) 
+            cohm=correlate(data1[zoomxy1[0]-lw:zoomxy1[0]+lw, zoomxy1[1]-pw:zoomxy1[1]+pw], \
+                           data2[zoomxy2[0]-lw:zoomxy2[0]+lw, zoomxy2[1]-pw:zoomxy2[1]+pw], w)
+            coh=cohm.max()            
+            carg=basic.ind2sub(cohm.shape, cohm.argmax())
+            print zoomxy1[0]*cfg["Ml"],zoomxy1[1]*cfg["Mp"],zoomxy2[0]*cfg["Ml"]+carg[0]-lw/2,zoomxy2[1]*cfg["Mp"]+carg[1]-pw/2,coh
+            sys.stdout.flush()
         else:
             inv = ax.transData.inverted()
             A=inv.transform((event.x,  event.y))
@@ -388,6 +415,40 @@ def rescale(arr, lim, trim=False, arrlim=None):
     newarr[newarr<lim[0]]=lim[0]
     newarr[newarr>lim[1]]=lim[1]
     return newarr
+
+def crosscorrelate(m,s):
+    """crosscorrelation(m,s):
+    """
+    m=m-m.mean()    
+    s=s-s.mean()
+    Em=(m**2.).sum()
+    Es=(s**2.).sum()
+    Ems=(m*s).sum()
+    coh=abs(Ems / np.sqrt(Em*Es))#1.4142135623730949#(2./sqrt(2.))
+    return coh    
     
+def correlate(m,s,w):
+    coh=np.zeros(m.shape)
+    w0=int(w[0]/2.)
+    w1=int(w[1]/2.)
+    for k in xrange(m.shape[0]):
+        for l in xrange(m.shape[1]):
+            if k<w0:                
+                kk=np.r_[0:k+w0];
+            elif k>m.shape[0]-w0:
+                kk=np.r_[k-w0:m.shape[0]]
+            else:
+                kk=np.r_[k-w0:k+w0]
+            if l<w1:                
+                ll=np.r_[0:l+w1];
+            elif l>m.shape[1]-w1:
+                ll=np.r_[l-w1:m.shape[1]]
+            else:
+                ll=np.r_[l-w1:l+w1]
+            K,L=np.meshgrid(kk,ll)
+            coh[k,l]=crosscorrelate(m[K,L],s[K,L])
+            #coh[k,l]=abs(scipy.stats.pearsonr(m[K,L].ravel(),s[K,L].ravel())[0]);
+    return coh
+        
 if __name__ == "__main__":
     main(sys.argv[1:]);

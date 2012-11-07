@@ -1,26 +1,42 @@
 #!/bin/bash
+function mcrop_regular()
+{
+  #preprocess the drs file
+  pp ${dorisProcess}
+  #rm -f ${outputFolder}/${dorisProcess}.drs
+  #cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
+  #  newline=`eval echo -E ${line}`
+  #  echo $newline >> ${outputFolder}/${dorisProcess}.drs
+  #done
 
-#preprocess the drs file
-pp ${dorisProcess}
-#rm -f ${outputFolder}/${dorisProcess}.drs
-#cat "${ADOREFOLDER}/drs/${dorisProcess}.drs" | while read line; do
-#  newline=`eval echo -E ${line}`
-#  echo $newline >> ${outputFolder}/${dorisProcess}.drs
-#done
+  # remove undefined settings from .drs file so that doris handles it
+  # automatically
+  #check if dbow or dbowgeo is set
+  if [ "${m_dbow}" == "0 0 0 0" ]; then
+    grep -i -v -w "m_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
 
-# remove undefined settings from .drs file so that doris handles it
-# automatically
-#check if dbow or dbowgeo is set
-if [ "${m_dbow}" == "0 0 0 0" ]; then
-  grep -i -v -w "m_dbow" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  if [ "${m_dbow_geo}" == "0 0 0 0" ]; then
+    grep -i -v -w "m_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
+    mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
+  fi
+
+  #run doris
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+}
+
+function mcrop_bistatic()
+{
+  #first get the regular m_crop
+  mcrop_regular
+  #Now convert to cr4
+  openInIpython ${ADOREFOLDER}/lib/python/fun/mcrop_cr2_to_cr4.py  
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+}
+if [ "${bistatic}" == "on" ]; then
+  mcrop_bistatic
+else
+  mcrop_regular
 fi
-
-if [ "${m_dbow_geo}" == "0 0 0 0" ]; then
-  grep -i -v -w "m_dbow_geo" ${outputFolder}/${dorisProcess}.drs > ${outputFolder}/${dorisProcess}.drs.new
-  mv ${outputFolder}/${dorisProcess}.drs.new ${outputFolder}/${dorisProcess}.drs
-fi
-
-#run doris
-doris ${outputFolder}/${dorisProcess}.drs
-[ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"

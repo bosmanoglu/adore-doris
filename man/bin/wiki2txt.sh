@@ -9,3 +9,9 @@ do
  tail -n +3 ${wikif}/${file} >> ${txtf}/${file%%.wiki}
  ./replaceText.sh ${txtf}/${file%%.wiki} wiki2txt.filter
 done
+
+#rm unnecessary pages
+for f in "PageName TipsAndTricks Scripts Polls FAQ adoreFunctionsAndScripts Roadmap Reference Other_SAR_Software Functions sidebar"
+do 
+  rm ${txtf}/${f}
+done

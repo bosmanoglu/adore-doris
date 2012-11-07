@@ -20,19 +20,23 @@ function processInterferoSteps(){
    settings load ${originalSettingsFile} 
    bold "Processing ${scenes}"
    master=${scenes%%,*}
-   slave=${scenes#*,}   
-   settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
-   mkdir -p "${outputFolder}"
-   cd "${outputFolder}"    
-   cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
-   cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
-   if [ "${parallel}" == "on" ]; then
-     jobId=`quejob "${interferoSteps}" "${outputFolder}"`
-     jobIds=( ${jobIds[@]} ${jobId} )
+   slave=${scenes#*,}
+   if [ "${master}"!="${slave}" ]; then
+     settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"    
+     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+     if [ "${parallel}" == "on" ]; then
+       jobId=`quejob "${interferoSteps}" "${outputFolder}"`
+       jobIds=( ${jobIds[@]} ${jobId} )
+     else
+       eval "${interferoSteps}" #run interfero
+     fi
+     settings save
    else
-     eval "${interferoSteps}" #run interfero
+     error "Skipping master_master interferogram."
    fi
-   settings save
 }
 #######################################################
 ####  MAIN ####
