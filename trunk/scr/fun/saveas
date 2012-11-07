@@ -355,10 +355,14 @@ function saveas_grd(){
     slc_az_res_km=`echo "${slc_az_res} ${az_multilooking}" | awk '{printf "%f", $1*$2/1000};'`	
     ## get center coordinates
     center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude | tr -d '\n'`
-    center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude | tr -d '\n'`
-    slc_res_deg=`${ADORESCR}/km2deg.sh ${center_lat} ${center_lon} ${slc_az_res_km} ${slc_rg_res_km}`
-    [ $? -ne 0 ] && echo "Error running command: ${ADORESCR}/km2deg.sh ${center_lat} ${center_lon} ${slc_az_res_km} ${slc_rg_res_km}" && return 1
-    slc_res_deg=${slc_res_deg/ /\/}
+    #center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude | tr -d '\n'` 
+    slc_az_res_deg=`${ADORESCR}/km2deg.sh ${center_lat} 0 ${slc_az_res_km}`
+    slc_az_res_deg=${slc_az_res_deg/ */}
+    slc_rg_res_deg=`${ADORESCR}/km2deg.sh ${center_lat} 0 ${slc_rg_res_km}`    
+    slc_rg_res_deg=${slc_rg_res_deg/ */}        
+    #[ $? -ne 0 ] && echo "Error running command: ${ADORESCR}/km2deg.sh ${center_lat} ${center_lon} ${slc_az_res_km} ${slc_rg_res_km}" && return 1
+    #slc_res_deg=${slc_res_deg/ /\/}
+    slc_res_deg="${slc_az_res_deg}\\${slc_rg_res_deg}"
     #need to get the region for gmt 
     region=`minmax -I${slc_res_deg} -bis3 ${outName}.dat` 
     [ $? -ne 0 ] && echo "Error running command: minmax -I${slc_res_deg} -bis3 ${outName}.dat" && return 1

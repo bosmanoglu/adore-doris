@@ -21,6 +21,12 @@
 #tmpFile="mvDoris.temporary.file"
 #rm -rf ${tmpFile}
 
+if [ $# -lt 2 ]; then
+  error "Not enough input parameters."
+  error "Please check usage with: ? mvDorisFiles"
+  return 
+fi
+
 if [[ ${1} == "-s" ]];then
 	sourceFolder=${2}
 	destinationFolder=${3}

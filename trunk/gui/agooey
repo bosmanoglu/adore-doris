@@ -166,7 +166,7 @@ class MyGUI:
 
     copy_item.connect('activate', lambda x: self.v.copy_clipboard())
     paste_item.connect('activate', lambda x: self.v.paste_clipboard())
-    open_item.connect('activate', lambda x: self.runcmd('xdg-open ' + self.selectionText) )
+    open_item.connect('activate', lambda x: self.runcmd('xdg-open ' + self.selectionText + ' &') )
     menu.show_all()
     menu.popup(None, None, None, 3, event.time)
 

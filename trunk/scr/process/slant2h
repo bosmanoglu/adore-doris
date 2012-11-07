@@ -13,4 +13,7 @@ else
   pp ${dorisProcess}
   doris ${outputFolder}/${dorisProcess}.drs
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+  if [ "${bistatic}" == "on" ]; then
+    openInIpython ${ADOREFOLDER}/lib/python/fun/slant2h_bistatic.py
+  fi
 fi

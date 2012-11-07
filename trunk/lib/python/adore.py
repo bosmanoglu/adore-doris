@@ -12,7 +12,6 @@ getval(fileDict, key, lines=None, processName=None, regexp=None)
 process2dict(fileDict, processName)
 file2dict(filename)
 mres2dicts(resfiles)
-
 """
 import os, re
 import numpy as np
@@ -20,7 +19,9 @@ import basic
 
 class Object:
     """ADORE Object
+    cmd("adore command", mobj=A.mobj, sobj=A.sobj, iobj=A.iobj, setobj=A.setobj)
     """
+                
     def __init__(self, settingsFile=None):
         self.settingsFile=settingsFile
         if settingsFile is None:
@@ -52,7 +53,7 @@ class Object:
             except:
                 self.sres=None
                 self.sobj=None
-        self.pn2rs={
+        self.pn2rs=basic.rkdict({
           'm_readfiles'  :'readfiles',   
           's_readfiles'  :'readfiles',
           'coarseorb'    :'coarse_orbits',
@@ -87,7 +88,7 @@ class Object:
           'ci2'          :'complex_short' , 
           'cr4'          :'complex_real4' , 
           'i2'           :'short'         , 
-          'r4'           :'real4'}          
+          'r4'           :'real4'})          
 
     def addResults(self,process,d):
         """addResults(process, data_object)
@@ -127,11 +128,97 @@ class Object:
             fwrite(stars)
             fwrite('* End_master_timing:_NORMAL');
             fwrite(stars);
-            
+        elif resname=='coarse_correl':
+            fwrite(stars);
+            fwrite('*_Start_coarse_correl: ')
+            fwrite(stars)
+            fwrite('Estimated translation slave w.r.t. master:')
+            fwrite('Coarse_correlation_translation_lines:   %d' %d.Coarse_correlation_translation_lines)
+            fwrite('Coarse_correlation_translation_pixels:  %d' %d.Coarse_correlation_translation_pixels)
+            fwrite('Number of correlation windows:          %s' %d.Number_of_correlation_windows)
+            fwrite('')
+            fwrite('#     center(l,p)   coherence   offsetL   offsetP')
+            for k in xrange(d.results.shape[0]):
+                fwrite('%d	%d	%d	%f	%d	%d' %(d.results[k,0], d.results[k,1], d.results[k,2], d.results[k,3], d.results[k,4], d.results[k,5]))
+            fwrite('')
+            fwrite(stars)
+            fwrite('* End_coarse_correl:_NORMAL');                         
+            fwrite(stars)
         fwrite('');
         f.close();
         basic.findAndReplace(filename, resname+':\t\t0', resname+':\t\t1')
-        #basic.findAndReplace(filename, 'master_timing', process+':\t\t1')                      
+        #basic.findAndReplace(filename, 'master_timing', process+':\t\t1')
+#    def updateResults(self, process,d):
+#        stars="*******************************************************************"
+#        if "m_" in process:
+#            filename=self.setobj.general.m_resfile.strip('"')
+#        elif "s_" in process:
+#            filename=self.setobj.general.s_resfile.strip('"')
+#        else:
+#            filename=self.setobj.general.i_resfile.strip('"')
+
+#        resname=self.pn2rs[process];
+#        if resname == "crop":
+#            basic.findAndReplace(filename, resname+':\t\t0', resname+':\t\t1')
+    def cmd(self, c, mobj=None, sobj=None, iobj=None, setobj=None):
+        from subprocess import call
+        call(['adore', '-u', self.settingsFile, c]) 
+        self.__init__(self.settingsFile)    
+    
+    def modifyResults(self, process, parameter, value):
+        from subprocess import call
+        if "m_" in process:
+            filename=self.setobj.general.m_resfile.strip('"')
+        elif "s_" in process:
+            filename=self.setobj.general.s_resfile.strip('"')
+        else:
+            filename=self.setobj.general.i_resfile.strip('"')
+
+        resname=self.pn2rs[process];
+        call(['modifyRes.sh',filename, resname, parameter, value]) 
+
+    def modifyResultRe(self, process, searchPattern, replacePattern):
+        import fileinput
+        import re
+        if "m_" in process:
+            filename=self.setobj.general.m_resfile.strip('"')
+        elif "s_" in process:
+            filename=self.setobj.general.s_resfile.strip('"')
+        else:
+            filename=self.setobj.general.i_resfile.strip('"')
+
+        resname=self.pn2rs[process];
+        
+        pflag=False #process Flag
+        for line in fileinput.input([filename], inplace=1):
+            if 'Start_'+resname in line:
+                pflag=True
+            elif 'End_'+resname in line:
+                pflag=False
+            if pflag==True:
+                line=re.sub(searchPattern, replacePattern, line);
+            sys.stdout.write(line)
+
+    def modifyResult(self, process, parameter, value):
+        import fileinput
+        if "m_" in process:
+            filename=self.setobj.general.m_resfile.strip('"')
+        elif "s_" in process:
+            filename=self.setobj.general.s_resfile.strip('"')
+        else:
+            filename=self.setobj.general.i_resfile.strip('"')
+
+        resname=self.pn2rs[process];
+        
+        pflag=False #process Flag
+        for line in fileinput.input([filename], inplace=1):
+            if 'Start_'+resname in line:
+                pflag=True
+            elif 'End_'+resname in line:
+                pflag=False
+            if (pflag==True) & (parameter in line):
+                line=line.replace(line.split(':')[-1], value); #replace the last value after : with the new value.
+            sys.stdout.write(line)
                         
 #def dict2obj(d):
 #    class DictObj(object):

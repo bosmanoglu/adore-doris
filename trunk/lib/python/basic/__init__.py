@@ -35,6 +35,10 @@ import pylab as plt
 import time
 import graphics
 
+class rkdict(dict): #return (missing) key dict
+    def __missing__(self, key):
+            return key
+            
 def confirm(prompt=None, resp=False):
     """prompts for yes or no response from the user. Returns True for yes and
     False for no.
@@ -512,3 +516,122 @@ def findAndReplace(fileList,searchExp,replaceExp):
         if searchExp in line:
             line = line.replace(searchExp,replaceExp)
         sys.stdout.write(line)         
+
+def gridSearch(fun, bounds,tol=1.):
+    """gridSearch(fun, args, bounds):
+    #for now bounds are actual sampling points (i.e. r_[xmin:xmax])
+    Divide and conquer brute-force grid search
+    """
+    #Main idea is that we want to do only a handful of operations at each time on the multidimensional grid. 
+    #Slowly zone in on the lowest score. 
+    fun_min=+inf
+    s=[(max(b)-min(b))/10. for b in bounds ]
+    b0=[]
+    d=[False, False]
+    while True:
+        for k in xrange(2):
+            b0.append(bounds[k][:-1:s[k]]);
+        
+        if (len(b0[0])<=1) or (max(diff(b0[0])) < tol):
+            d[0]=True
+        if (len(b0[1])<=1) or (max(diff(b0[1])) < tol) :
+            d[1]=True
+        if all(d)==True:
+            break
+        else:
+            print s
+        for x in b0[0]:
+            for y in b0[1]:
+                y0=fun([x,y]);
+                if y0 < fun_min:
+                    x0=[x,y]
+                    fun_min=y0
+                    print [x, y, fun_min]
+        #set new bounds
+        for k in xrange(2):
+            bounds[k]=linspace(x0[k]-s[k],x0[k]+s[k],10).astype(int)
+        s=[(max(b)-min(b))/10. for b in bounds ]
+        if any([sk<tol for sk in s]):
+            break
+        b0=[]
+    return x0  
+    
+def gridSearch2(fun, bounds,tol=1., goal='min'):
+    """gridSearch(fun, args, bounds):
+    #for now bounds are actual sampling points (i.e. r_[xmin:xmax])
+    Divide and conquer brute-force grid search
+    """
+    #Main idea is that we want to do only a handful of operations at each time on the multidimensional grid.     
+    #Slowly zone in on the lowest score. 
+    if goal == 'min':
+        fun_z=+inf
+        goalfun= lambda x: x<fun_z
+    elif goal == 'max':    
+        fun_z=-inf
+        goalfun= lambda x: x>fun_z
+    else:
+        fun_z=0
+        goalfun=goal
+        
+    #select spacing
+    s=[int(round((max(b)-min(b)))/10.) for b in bounds ]
+    for k in xrange(len(s)):
+        if s[k]<1:
+            s[k]=1
+    print s
+    #create solution lists
+    x=[]
+    y=[]
+    z=[]
+    #start infinite loop
+    breakLoop=False
+    b0=[]
+    while True:
+        #create sampling grid
+        for k in xrange(len(bounds)):
+            b0.append(bounds[k][::s[k]])
+        X,Y=meshgrid(b0[0], b0[1])
+        print X
+        print Y        
+        for xy in zip(X.ravel(),Y.ravel()):
+            #if (xy[0] in x) and (xy[1] in y):
+            if any( (x==xy[0]) & (y==xy[1]) ):
+                print [xy[0], xy[1], 0]
+                #raise NameError("LogicError")
+                continue
+            x.append(xy[0])
+            y.append(xy[1])            
+            z.append(fun(xy))
+            if goalfun(z[-1]): # z[-1] < fun_z:
+                fun_z=z[-1]
+                x0=x[-1];
+                y0=y[-1];
+                print [99999, x[-1], y[-1], z[-1]]
+            else:
+                print [x[-1], y[-1], z[-1]]
+        #Z=griddata(x,y,z,X,Y); # The first one is actually not necessary
+        #set new bounds
+        #xy0=Z.argmin()
+        #set new bounds
+        if breakLoop:
+            print "Reached lowest grid resolution."
+            break
+        if all([sk==1 for sk in s]):
+            #Do one more loop then break.
+            print "BreakLoop is ON"
+            breakLoop=True
+        if all(bounds[0]==r_[x0-s[0]:x0+s[0]]) and all(bounds[1]==r_[y0-s[1]:y0+s[1]] ):
+            print "Breaking to avoid infinite loop."
+            break#if the bounds are the same then break
+        bounds[0]=r_[x0-s[0]:x0+s[0]] 
+        bounds[1]=r_[y0-s[1]:y0+s[1]] 
+        b0=[] #re-initialize              
+        #select spacing        
+        #s=[max(1,int(round(sk/5.))) for sk in s]
+        s=[int(round((max(b)-min(b)))/10.) for b in bounds ]
+        for k in xrange(len(s)):
+            if s[k]<1:
+                s[k]=1
+    return [x0,y0,x,y,z]
+    
+             
