@@ -9,15 +9,17 @@
  It prepares DORIS results so that they can be opened by other programs. 
  Currently ENVI and ArcGIS are supported. 
 =INPUT:=
- exportFormat: envi, arcgis, gdal, grd. 
+ exportFormat: ascii, envi, arcgis, gdal, grd. 
 
  processName: Doris step to be exported.
  ==OPTIONAL:==
-   `saveas arcgis [a|p|m] processName`
+  `saveas ascii [a|p] processName` 
+      Generates an ascii file, outputting each pixel in lon,lat,data format. 
+  `saveas arcgis [a|p] processName`
       arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed). If not specified p(phase) is assumed. This can be used to export amplitude data as well if you do not want to rescale the amplitude values. 
    `saveas envi processName`
       Generates an ENVI header (`*.hdr`) file for the given input file. If file is complex, both real and imaginary channels can be opened in ENVI. Only corner coordinates are used for geocoding. ArcGIS (`*.img`)files can also be opened in ENVI if, geocoding of full image is required.
-   `saveas gdal a|p|m processName [options for gdal] outputFileName`
+   `saveas gdal a|p processName [options for gdal] outputFileName`
       Generates a interim file and passes it to gdal_translate. The output
       filename and all other parameters has to be input by the user. 
 =OUTPUT=
@@ -26,6 +28,7 @@
  ArcGIS: Generates an IMG file.
 EXAMPLES:
 {{{
+ saveas ascii p unwrap
  saveas grd p unwrap
  saveas arcgis p unwrap
  saveas envi unwrap 
