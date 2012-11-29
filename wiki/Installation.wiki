@@ -1,5 +1,5 @@
 #summary How to install ADORE on Ubuntu.
-#labels Phase-Deploy
+#labels Phase-Deploy,Featured
 
 = From EO-Tools Repository =
 You can add the EO-Tools repository to your apt-sources and get the following packages: `adore-doris, doris, getorb, snaphu`<br>
