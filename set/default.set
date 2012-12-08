@@ -371,6 +371,26 @@
 [ -z "${uw_snaphu_init}" 	] && uw_snaphu_init="mst"
 [ -z "${uw_snaphu_verbose}" 	] && uw_snaphu_verbose="on"
 [ -z "${uw_snaphu_dumponlyconf}" ] && uw_snaphu_dumponlyconf="off"
+################### estorbits
+### SECTION=estorbits
+
+[ -z "${eo_method}"             ] && eo_method="lsq"
+[ -z "${eo_in_dem_lp}"          ] && eo_in_dem_lp="${outputFolder}/${master}_${slave}.crddemlp"
+[ -z "${eo_out_res}"            ] && eo_out_res="${outputFolder}/${master}_${slave}.eores"
+[ -z "${eo_weighting}"          ] && eo_weighting="none"
+[ -z "${eo_npoints}"            ] && eo_npoints="1000"
+[ -z "${eo_in_pos}"             ] && eo_in_pos="${unspecified}"
+[ -z "${eo_threshold}"          ] && eo_threshold="0"
+[ -z "${eo_maxiter}"            ] && eo_maxiter="0"
+[ -z "${eo_k_alpha}"            ] && eo_k_alpha="3.29"
+[ -z "${eo_searchspace}"        ] && eo_searchspace="15 15"
+[ -z "${eo_reforbit}"           ] && eo_reforbit="${outputFolder}/${master}.res"
+[ -z "${eo_out_data}"           ] && eo_out_data="${outputFolder}/${master}_${slave}.eodata"
+[ -z "${eo_degree}"             ] && eo_degree="1"
+[ -z "${eo_constrain}"          ] && eo_constrain="0"
+[ -z "${eo_nobs}"               ] && eo_nobs="1000"
+
+
 ################### dinsar
 ### SECTION=dinsar
 [ -z "${di_out_file}" 		] && di_out_file="${outputFolder}/${master}_${slave}.di"

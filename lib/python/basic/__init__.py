@@ -418,9 +418,10 @@ def transect(x,y,z,x0,y0,x1,y1,plots=0):
     # Extract the values along the line
     #y is the first dimension and x is the second, row,col
     zi = z[xi.astype(plt.np.int), yi.astype(plt.np.int)]
-
+    mz=nonaninf(z.ravel()).mean()
+    sz=nonaninf(z.ravel()).std()
     if plots==1:
-        plt.matshow(z);plt.colorbar();plt.clim([0,200]);plt.title('transect: (' + str(x0) + ',' + str(y0) + ') (' +str(x1) + ',' +str(y1) + ')' );
+        plt.matshow(z);plt.clim([mz-2*sz,mz+2*sz]);plt.colorbar();plt.title('transect: (' + str(x0) + ',' + str(y0) + ') (' +str(x1) + ',' +str(y1) + ')' );
         plt.scatter(yi,xi,5,c='r',edgecolors='none')
         plt.figure();plt.scatter(sqrt( (xi-xi[0])**2 + (yi-yi[0])**2 ) , zi)
         #plt.figure();plt.scatter(xi, zi)

@@ -45,11 +45,11 @@ def fitSurface(x,y,z, weight=None, order=1):
     else:
         w=np.ones(len(x))
     if order==1:
-        fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y
         p0=[0,0.1,0.1] 
+        fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y
     elif order==2:
+        p0=[0,0.1,0.1,0.1,0.1,0.1] 
         fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y+p[3]*x**2+p[4]*y**2+p[5]*x*y
-        p0=[0,0.1,0.1,0.1,0.1] 
     else:
         print "order has to be 1 or 2."
         return -1

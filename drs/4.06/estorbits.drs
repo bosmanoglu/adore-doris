@@ -1,0 +1,42 @@
+screen		${screen}		//
+beep   		${beep}			//
+batch  		${batch}		//
+overwrite	${overwrite}		//
+preview         ${preview}              // sunraster files with cpxfiddle
+listinput       ${listinput}            // copy this file to log
+memory          ${memory}               // mb
+
+logfile		${logfile}		//
+m_resfile	${m_resfile}		//
+s_resfile	${s_resfile}		//
+i_resfile	${i_resfile}		//
+
+orb_interp	${orb_interp}		//
+orb_prm         ${orb_prm}              // position or posvel
+dumpbaseline    ${dumpbaseline}         // eval baseline on grid
+height		${height}		// average height for the crop
+tiepoint	${tiepoint}		//
+m_rg_t_error	${m_rg_t_error}		//
+m_az_t_error	${m_az_t_error}		//
+s_rg_t_error	${s_rg_t_error}		//
+s_az_t_error	${s_az_t_error}		//
+
+process         estorbits               // 
+
+eo_method       ${eo_method}
+eo_in_dem_lp    ${eo_in_dem_lp}
+eo_out_res      ${eo_out_res}
+eo_weighting    ${eo_weighting}
+eo_npoints      ${eo_npoints}
+eo_in_pos       ${eo_in_pos}
+eo_threshold    ${eo_threshold}
+eo_maxiter      ${eo_maxiter}
+eo_k_alpha      ${eo_k_alpha}
+eo_searchspace  ${eo_searchspace}
+eo_reforbit     ${eo_reforbit}
+eo_out_data     ${eo_out_data}
+eo_degree       ${eo_degree}
+eo_constrain    ${eo_constrain}
+eo_nobs         ${eo_nobs}
+
+stop

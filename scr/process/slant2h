@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #check if dinsar
-if [ -e "${sam_in_dem}" ] && [ -e "${srd_out_cint}" ]; then
-  echo "I guess you are using external DEM for geocoding."
+if [ "${s2h_method}" == "trick"  ]; then
+  #echo "I guess you are using external DEM for geocoding."
   echo "I'll run the dem2slant2h (slant2hTrick)."
   dem2slant2h
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"   
