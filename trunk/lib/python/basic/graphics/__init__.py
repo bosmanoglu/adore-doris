@@ -43,6 +43,7 @@ def imshowsc(A,n=2):
     ax=fig.add_subplot(111);ax.matshow(A);
     fig.canvas.mpl_connect('button_press_event', onclick);
     return fig
+
 def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
     """
     figureHandles=clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
@@ -256,7 +257,7 @@ def frankotchellappaiter2(dzdx,dzdy):
     return z
     
 def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=None):
-    """histogram_matching(inputArr, histogramArr=None, bins=100; zpdf=None, zbins=None)
+    """histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=None)
     """
     if (histogramArr is None) and (zpdf is None):
         print('Error: histogramArr or zpdf has to be specified')
@@ -283,6 +284,10 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
         zs=z.std()
         zbins=P.np.linspace(zm-3*zs,zm+3*zs,bins+1);            
         zpdf, zbins=P.np.histogram(z, zbins)
+    else:
+      #make zpdf match the length of bins
+      zpdf=np.interp(sbins, np.linspace(zbins[0], zbins[-1], zpdf.shape[0]), zpdf);
+      zbins=sbins #zbins no longer needed?.
     zpdf=zpdf/P.np.double(sum(zpdf))
     zk= P.np.cumsum(zpdf) #G(z), CDF
     
@@ -295,6 +300,7 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
             if zk[p] >= sk[q]:
                 #print ['replacing from ', sbins[q], ' to ', sbins[q+1] , ' with ', zbins[p]]
                 p_prev=p+1
+                q_last=q
                 #z0[ P.np.ma.mask_or(inputArr>sbins[q], inputArr<sbins[q+1]) ] = zbins[p];
                 if q==0:
                     z0[ inputArr<sbins[q+1] ] = zbins[p];
@@ -302,6 +308,9 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
                     z0[ ((inputArr>=sbins[q]).astype(P.np.int) * (inputArr<sbins[q+1]).astype(P.np.int)).astype(P.np.bool) ] = zbins[p];
                 #print ['replacing ', ((inputArr>sbins[q]).astype(P.np.int) * (inputArr<sbins[q+1]).astype(P.np.int)).sum(), ' pixels'];
                 break #inner for
+    #print('q %f p %f zk %f sk %f' %(q,p,zk[p], sk[q]))
+    z0[inputArr>=sbins[q_last]]=zbins[p]
+    
     return z0
 
 def sensitivity_plot(lvar, lnames):
@@ -344,3 +353,4 @@ def sensitivity_plot(lvar, lnames):
             P.ylabel(lnvar[ll]);
     P.tight_layout(pad=0.005, w_pad=0.005, h_pad=0.005)    
     return fg
+    

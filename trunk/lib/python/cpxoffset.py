@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """ cpxoffset
-Shows multiplication of two complex files (either phase or amplitude) allowing
-the user to translate the second image over the first one with num-keys (4,8,6,2).
+Shows two complex files (either phase or amplitude) allowing
+the user calculate translation of the second image over the first one.
+
+Select points by left click, record your selections by right click. 
 
 It is based on cpxview.
 Usage: cpxoffset -w width [-f informat1/informat2] [-q output1/output2] 

@@ -436,6 +436,10 @@ function demassist(){
 function dinsar(){
   p dinsar
 }
+
+function estorbits(){
+  p estorbits
+}
  
 function filtphase(){
   p filtphase
@@ -500,7 +504,6 @@ function s_crop(){
 function s_crop2resample(){
 	. ${ADORESCR}/fun/s_crop2resample "${@}"
 }
-
  
 function s_filtazi(){
   p s_filtazi

@@ -41,8 +41,6 @@ function processInterferoSteps(){
 #######################################################
 ####  MAIN ####
 #######################################################
-parallel="off"
-
 # we will be changing directories
 # save the current dir.
 local CALLDIR="$PWD";
@@ -54,11 +52,20 @@ settings save ${originalSettingsFile}
 local interferoSteps="${@}"
 ####Now the i12s
 if [ -n "${interferoSteps}" ]; then
+  if [ -d ${i12sFolder} ]; then
+    scenesInclude=`ls -F $i12sFolder | grep '/' | tr -d '/'| tr '_' ','`
+  else
+    scenesInclude=`scenes include| tr " " "\n" | sort --unique`
+  fi
   cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
   jobIds=( ); #start empty list
-  for scenes in `scenes include| tr " " "\n" | sort --unique`
+  for scene in ${scenesInclude}
   do
-    processInterferoSteps "${master},${scenes}"
+    if [[ ${scene} == *,* ]]; then
+      processInterferoSteps "${scene%%,*},${scene##*,}"
+    else
+      processInterferoSteps "${master},${scene}"
+    fi
   done
 fi
 

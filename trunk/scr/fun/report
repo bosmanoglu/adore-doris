@@ -50,11 +50,19 @@ do
   settings load
   raster_format=png
   echo "<H1>${folder}</H1>" >> ${rFile}
+  echo " <table><tr>" >> ${rFile}
+  c=0
   for step in `echo ${rSteps} | tr ';' '\n'`
   do
+    echo "  <td align=\"center\">" >> ${rFile}
     handleStep "${step}"
+    echo "  </td>" >> ${rFile}
+    if [ $(( c % 3 )) -eq 2 ]; then
+      echo "  </tr><tr>" >> ${rFile}
+    fi
+    c=$(( c + 1 ))
   done
-  
+  echo "</tr></table>" >> ${rFile}
 done
 writeHTMLFooter >> ${rFile}
 cd ${curFolder}
@@ -151,7 +159,7 @@ function handleStep(){
 
 function reportText(){
 step="${1}"
-echo '<textarea readonly="readonly" rows="6" cols="80">' >> "${rFile}"
+echo '<textarea readonly="readonly" rows="24" cols="80">' >> "${rFile}"
 s result ${step} >> ${rFile}
 echo '</textarea>' >>${rFile}
 }
@@ -166,6 +174,8 @@ function reportPicture(){
  imgFile=`raster auto ${step} -M${m1}/${m2} | tail -n1| cut -d":" -f2 | tr -d " "`
  if [ ! -f "${imgFile}" ]; then
    error "Can not find result for step ${step}."
+   [ ! -e "${rFolder}/report_result_not_found.png" ] && cp ${ADOREFOLDER}/gui/graphics/report_result_not_found.png "${rFolder}"
+   writePicture report_result_not_found.png 300 300 ${step} >> "${rFile}"
  else
    mv ${imgFile} "${rFolder}"
    writePicture ${imgFile} 300 300 ${step} >> "${rFile}"
