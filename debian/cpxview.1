@@ -1,0 +1,134 @@
+.TH CPXVIEW 1 "August 27, 2011"
+.SH NAME
+cpxview \- Interferogram viewer
+.SH SYNOPSIS
+.B cpxview
+\-w width
+.RI [-f " informat"]
+.RI [-q " output"]
+.RI [-o " outformat"]
+.RI [-e " exp"]
+.RI [-s " scale"]
+.RI [-l " line"]
+.RI [-L " line"]
+.RI [-p " pixel"]
+.RI [-P " pixel"]
+.RI [-S " x/y"]
+.RI [-M " x/y"]
+.RI [-m " mirror"]
+.RI [-c " file"]
+.RI [-r " rmin/rmax"]
+.RI [-B]
+.RI [-b]
+.RI [-t]
+.RI [-h]
+inputfile
+.SH DESCRIPTION
+.B cpxview
+Opens complex files using numpy and matplotlib. Functionality and parameters
+are similar to cpxfiddle-part of TU-DELFT DORIS software.
+.PP
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+.B \-w
+Line length (width, rangepixels, X direction)
+.TP
+.B \-e [1.0]
+Exponent: out=scale*output^exp
+.TP
+.B \-s [1.0]
+Scale: out=scale*output^exp
+.TP
+.B \-l [1]
+First (azimuth Y) line
+.TP
+.B \-L
+Last (azimuth Y) line (default, all lines)
+.TP
+.B \-p [1]
+First (range X) pixel
+.TP
+.B \-P
+Last (range X) pixel (default, all pixels)
+.TP
+.B \-M [1/1]
+Multilook factor in X/Y direction (range/azimuth)
+
+No subsampling can be used combined with this option.
+(Multilooking takes complex sum over window(X,Y), divides by number of looks)
+Output size: [floor(P-p+1)/mlX; floor(L-l+1)/mlY].
+.TP
+.B \-S [1/1]
+Subsample factor in X/Y (range/azimuth)
+
+Output dimensionY = ceil((L-l+1)/Y).
+The last line does not have to equal \-L.
+Output dimensionX = ceil((P-p+1)/X).
+The last pixel does not have to equal \-P.
+.TP
+.B \-q [mag]
+What to output: normal | mag | phase | wrap | real | imag
+  normal    = (real, imag),
+  magnitude = sqrt(real^2 + imag^2),
+  phase     = atan2(imag,real),
+  wrap      = plot wrapped the phase (of unwrapped file)
+  real      = line[2*j],
+  imag      = line[2*j+1].
+
+Normal option can be (mis)used to fiddle with, e.g.,
+float files (though even linelength required?).
+.TP
+.B \-f [cr4]
+Input format identifier: CC1 | CUC1 | CI2 | CI4 | CR4 | CR8
+for complex 2x1B char, unsigned char, short integer, integer, float,
+double (major row order pixel interleaved complex data.)
+.TP
+.B \-o
+Output format identifier (to stdout): png, pdf, ps, eps and svg.
+write binary to stdout!
+.TP
+.B \-c [gray]
+Colormap option.
+  gray | jet | hot | cool | hsv
+  autumn | bone | copper | flag | pink
+  prism | spring | summer | winter | spectral
+.TP
+.B \-m code
+Flag to mirror file content in X or Y direction: x | y | xy
+.TP
+.B \-r [rmin/rmax]
+uses given minimum and maximum range on data as scalling parameters.
+Basically, it skips data sampling step for statistics (min,max,mean)
+computation and defines (min,max,mean) values from given parameters.
+It only effects magnitude, normal and mixed mode outputs.
+For example, use it to scale coherence maps to  0-1 range.
+Tip: no need to use \--ignorenan when you are using \-r option.
+.TP
+.B \-B
+Swap bytes.
+.TP
+.B \-b
+Add a scalebar.
+.TP
+.B \-t
+Print file name as figure title.
+.TP
+.B \-k [xy|xyz]
+Print pixel coordinates(xy) or value (xyz) to stdout on left-click.
+.TP
+.B \-h
+This help.
+.SH SEE ALSO
+.BR adore (1),
+.BR doris (1),
+.BR snaphu (1).
+.BR getorb (1).
+.br
+.SH AUTHOR
+cpxview was written by Batuhan Osmanoglu.
+.PP
+This manual page was written by Antonio Valentino <antonio.valentino@tiscali.it>,
+for the Debian project (and may be used by others).
