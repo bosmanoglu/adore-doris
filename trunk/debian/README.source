@@ -1,7 +1,7 @@
 adore-doris for Debian
 ----------------------
 
-The riginal source tarball can be retrieved using the get-orig-source
+The original source tarball can be retrieved using the get-orig-source
 target in the rules makefile.
 
  -- Antonio Valentino <antonio.valentino@tiscali.it>  Sat, 27 Aug 2011 17:51:49 +0200

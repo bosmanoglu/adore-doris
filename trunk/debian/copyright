@@ -3,12 +3,12 @@ Upstream-Name: adore-doris
 Source: http://code.google.com/p/adore-doris
 
 Files: *
-Copyright: 2009-2011 Batuhan Osmanoglu <batuhan.osmanoglu@gmail.com>
+Copyright: 2009-2012 Batuhan Osmanoglu <batuhan.osmanoglu@gmail.com>
 License: GPL-2.0+
 
 Files: debian/*
-Copyright: 2011 Batuhan Osmanoglu
-           2011 Antonio Valentino <antonio.valentino@tiscali.it>
+Copyright: 2011-2012 Batuhan Osmanoglu
+           2011-2012 Antonio Valentino <antonio.valentino@tiscali.it>
 License: GPL-2.0+
 
 License: GPL-2.0+

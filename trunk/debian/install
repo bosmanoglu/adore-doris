@@ -1,4 +1,5 @@
 drs/* usr/share/adore-doris/drs
+gui/* usr/share/adore-doris/gui
 lib/* usr/share/adore-doris/lib
 scr/* usr/share/adore-doris/scr
 scr/.adore.rc usr/share/adore-doris/scr
@@ -7,3 +8,5 @@ set/* usr/share/adore-doris/set
 templates/* usr/share/adore-doris/templates
 man/bin usr/share/adore-doris/man
 version usr/share/adore-doris
+debian/agooey usr/bin
+debian/cpxview usr/bin
