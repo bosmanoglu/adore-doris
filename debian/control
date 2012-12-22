@@ -13,7 +13,7 @@ Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, doris, getorb, snaphu, gmt,
          gdal-bin, gnuplot, imagemagick,
          python-numpy, python-scipy, python-matplotlib, ipython,
-         python-gtk2, pythpn-vte, python-pyproj
+         python-gtk2, python-vte, python-pyproj
 Recommends: www-browser
 Description: Automated DORIS Environment
  ADORE is a shell environment designed to simplify and streamline
