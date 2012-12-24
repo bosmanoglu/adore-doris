@@ -30,3 +30,94 @@ EXAMPLE:
 
 KNOWN BUGS:
  None. 
+USAGE:
+
+ subtrrefpha
+
+DESCRIPTION:
+SUBTRREFPHA is an ADORE function and it runs the DORIS step with the same name.  
+
+In this step the reference phase of a mathematical body (ellipsoid) is subtracted from the complex interferogram. This is done by complex multiplication with the conjugated.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Two output files are generated:
+ *.srp: Reference phase subtracted complex interferogram.
+ *.srph2ph: Reference phase output of height-to-phase factors.  
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/subtrrefpha.drs
+ http://doris.tudelft.nl/usermanual/node100.html
+
+EXAMPLE:
+
+ subtrrefpha
+
+KNOWN BUGS:
+ None. USAGE:
+
+ subtrrefpha
+
+DESCRIPTION:
+SUBTRREFPHA is an ADORE function and it runs the DORIS step with the same name.  
+
+In this step the reference phase of a mathematical body (ellipsoid) is subtracted from the complex interferogram. This is done by complex multiplication with the conjugated.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Two output files are generated:
+ *.srp: Reference phase subtracted complex interferogram.
+ *.srph2ph: Reference phase output of height-to-phase factors.  
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/subtrrefpha.drs
+ http://doris.tudelft.nl/usermanual/node100.html
+
+EXAMPLE:
+
+ subtrrefpha
+
+KNOWN BUGS:
+ None. USAGE:
+
+ subtrrefpha
+
+DESCRIPTION:
+SUBTRREFPHA is an ADORE function and it runs the DORIS step with the same name.  
+
+In this step the reference phase of a mathematical body (ellipsoid) is subtracted from the complex interferogram. This is done by complex multiplication with the conjugated.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Two output files are generated:
+ *.srp: Reference phase subtracted complex interferogram.
+ *.srph2ph: Reference phase output of height-to-phase factors.  
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/subtrrefpha.drs
+ http://doris.tudelft.nl/usermanual/node100.html
+
+EXAMPLE:
+
+ subtrrefpha
+
+KNOWN BUGS:
+ None. 

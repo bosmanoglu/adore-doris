@@ -53,6 +53,7 @@ class Object:
             except:
                 self.sres=None
                 self.sobj=None
+        
         self.pn2rs=basic.rkdict({
           'm_readfiles'  :'readfiles',   
           's_readfiles'  :'readfiles',

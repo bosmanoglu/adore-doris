@@ -21,3 +21,72 @@ FILES and REFERENCES:
 EXAMPLE:
 
  ADORE: bold "This is displayed bold." 
+USAGE:
+
+ bold "string"
+
+DESCRIPTION:
+ BOLD is an ADORE function to display bold text in supported terminals. 
+
+INPUT:
+ string: Text in quotes to be displayed in bold.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints the input string in bold characters to STDOUT.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: bold "This is displayed bold." 
+USAGE:
+
+ bold "string"
+
+DESCRIPTION:
+ BOLD is an ADORE function to display bold text in supported terminals. 
+
+INPUT:
+ string: Text in quotes to be displayed in bold.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints the input string in bold characters to STDOUT.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: bold "This is displayed bold." 
+USAGE:
+
+ bold "string"
+
+DESCRIPTION:
+ BOLD is an ADORE function to display bold text in supported terminals. 
+
+INPUT:
+ string: Text in quotes to be displayed in bold.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints the input string in bold characters to STDOUT.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: bold "This is displayed bold." 

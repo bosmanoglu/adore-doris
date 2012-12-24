@@ -2,6 +2,12 @@
 import os;
 os.sys.path.append(os.path.join(os.path.dirname(os.environ['ADORESCR']), 'lib/python'));
 import adore;
+import giant
+try:
+  import tsinsar as ts
+except:
+  ts=None
+  pass
 
 #try:
 #  settingsFile=os.sys.argv[1]
@@ -25,6 +31,11 @@ if A.iobj:
 #Might deprecate in the future
 settings=A.settings
 
+if ts:
+  #todo: read filenames from sbas.xml?
+  giantFolder=os.path.join(setobj.adore.runfolder.strip('"'), 'giant')
+  G=giant.Object(giantFolder);
+    
 #try:
 #  settings=adore.parseSettings(os.sys.argv[1]);
 #  setobj=adore.dict2obj(settings._sections);

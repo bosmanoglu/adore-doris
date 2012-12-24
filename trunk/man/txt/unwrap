@@ -28,3 +28,91 @@ EXAMPLE:
 
 KNOWN BUGS:
  None.
+USAGE:
+
+ unwrap
+
+DESCRIPTION:
+UNWRAP is an ADORE process and it runs the DORIS step with the same name.  
+
+SNAPHU software is called by DORIS. SNAPHU input file (snaphu.conf) is written and a system call to the snaphu executable made. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Unwrapped output file is generated: ${master}_${slave}.uw
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/unwrap.drs
+ http://doris.tudelft.nl/usermanual/node121.html
+ http://www-star.stanford.edu/sar_group/snaphu/
+
+EXAMPLE:
+
+ unwrap
+
+KNOWN BUGS:
+ None.USAGE:
+
+ unwrap
+
+DESCRIPTION:
+UNWRAP is an ADORE process and it runs the DORIS step with the same name.  
+
+SNAPHU software is called by DORIS. SNAPHU input file (snaphu.conf) is written and a system call to the snaphu executable made. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Unwrapped output file is generated: ${master}_${slave}.uw
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/unwrap.drs
+ http://doris.tudelft.nl/usermanual/node121.html
+ http://www-star.stanford.edu/sar_group/snaphu/
+
+EXAMPLE:
+
+ unwrap
+
+KNOWN BUGS:
+ None.USAGE:
+
+ unwrap
+
+DESCRIPTION:
+UNWRAP is an ADORE process and it runs the DORIS step with the same name.  
+
+SNAPHU software is called by DORIS. SNAPHU input file (snaphu.conf) is written and a system call to the snaphu executable made. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Unwrapped output file is generated: ${master}_${slave}.uw
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/unwrap.drs
+ http://doris.tudelft.nl/usermanual/node121.html
+ http://www-star.stanford.edu/sar_group/snaphu/
+
+EXAMPLE:
+
+ unwrap
+
+KNOWN BUGS:
+ None.

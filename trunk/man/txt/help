@@ -319,4 +319,966 @@ OUTPUT:
   dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
   dem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.
   dem check: Checks and displays possible problems fixes on stdout.
-}}}
+
+= Introduction =
+
+Help can be accessed with ? command inside ADORE.
+
+
+= adore =
+
+
+ADORE: ? adore
+USAGE:
+	adore adoreCommand
+	adore -u user.set adoreCommand
+	adore -u user.set -p dorisProcess
+	adore -u user.set -p dorisProcess adoreCommand
+	adore -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+
+DESCRIPTION:
+	ADORE is an attempt to simplify processing of different interferometric stacks
+ like, single-master-stack, or short-baselines.
+default options are loaded from ${ADOREFOLDER}/set/default.set
+each doris step can be run. They should have a corresponding *.drs file in the drs folder.
+
+INPUT:
+ adoreCommand: see the manual for available adoreCommands
+ -u: user settings file. 
+ -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ -d: define variable (has priority over user settings file.)
+ -i: interactive mode
+
+if both adoreCommand and dorisProcess is used, first the dorisProcess
+is run, and then the adoreCommand.
+
+OUTPUT:
+ nothing for adoreCommands.
+ dorisStep: SUCCESS for successful doris processing steps.
+
+
+= ? =
+
+ADORE: ?
+USAGE:
+	? commandName
+
+DESCRIPTION:
+ ? is a builtin ADORE command.  
+ It displays the help for given adore command.   
+
+INPUT:
+ commandName: ADORE command name to get help. A list of commands 
+ can be found at the end of this help message.
+ 
+OUTPUT:
+ Help message for the specified command, or this message if no command is given.
+
+
+******ADORE Commands******
+?		: Help
+check		: Check completed steps in result file.
+initialize	: Initialize default settings.
+lsprocess	: list DORIS processes
+pn2rs		: convert Process Name to Result file Section title.
+p		: Process DORIS step.
+s		: Show the input file for the DORIS step.
+raster		: Create raster image from doris result.
+settings	: Utility for listing, saving and loading ADORE variables.
+undo		: Undo all processing after a given step.
+
+******ADORE Batch Processes******
+singleMasterStack	: Script to process multiple interferograms with a single master.
+
+
+= check =
+
+ADORE: ? check
+USAGE:
+	check
+	check resultFile
+
+DESCRIPTION:
+ CHECK is an internal ADORE command. 
+ It shows the process control list from the result files.
+
+INPUT:
+ No required inputs.
+  
+  Optional:
+    resultFile: If specified, only displays given files process control list.
+ 
+OUTPUT:
+ Shows the process control list of given result file.
+
+
+ example 
+
+ADORE: check
+INTERFEROGRAM: 			MASTER: 			SLAVE: 		
+coarse_orbits:		1	readfiles:		1	readfiles:		1
+coarse_correl:		1	precise_orbits:		1	precise_orbits:		1
+fine_coreg:		1	crop:			1	crop:			1
+timing_error:		1	sim_amplitude:		1	sim_amplitude:		0
+dem_assist:		1	master_timing:		1	master_timing:		0
+comp_coregpm:		1	oversample:		0	oversample:		0
+interfero:		0	resample:		0	resample:		0
+coherence:		0	filt_azi:		0	filt_azi:		0
+comp_refphase:		0	filt_range:		0	filt_range:		0
+subtr_refphase:		0		
+comp_refdem:		0		
+subtr_refdem:		0		
+filtphase:		0		
+unwrap:			0		
+slant2h:		0		
+geocoding:		0		
+dinsar:			0		
+
+
+=lsprocess=
+
+ADORE: ? lsprocess
+USAGE:
+	lsprocess
+
+DESCRIPTION:
+ lsprocess is an internal/external ADORE command. It shows the  
+ list of doris steps to run. List is in column order (read down then right).
+
+INPUT:
+ No input option.
+ 
+OUTPUT:
+ List of doris steps as recognized by adore.
+
+
+example
+
+ADORE: lsprocess
+Available doris processes:
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+
+
+=s=
+Shows the DORIS input parameters given steps.
+
+example
+
+ADORE: s m_readfiles
+screen info //
+beep off //
+batch on //
+overwrite on //
+preview off // sunraster files with cpxfiddle
+listinput on // copy this file to log
+memory 500 // mb
+
+logfile ./test2.log //
+m_resfile ./17844.res //
+s_resfile ./14337.res //
+i_resfile ./17844_14337.res //
+
+orb_interp spline //
+dumpbaseline 1 1 // eval baseline on grid
+height 2250 // average height for the crop
+tiepoint 0.0 0.0 0.0 //
+m_rg_t_error 0.0 //
+m_az_t_error 0.0 //
+s_rg_t_error 0.0 //
+s_az_t_error 0.0 //
+
+process m_readfiles //
+
+m_in_method ASAR //
+m_in_vol dummy // slc volume file
+m_in_lea dummy // slc leaderfile
+m_in_dat /home/bosmanoglu/playGround/adore/data/17844/dat.050729_ENVISAT1_163636.001_SLC // slc data file
+m_in_null dummy //
+
+stop
+
+=raster=
+
+ADORE: ? raster
+USAGE:
+	raster a|p|m dorisStep cpxfiddleOptions
+
+DESCRIPTION:
+ RASTER is an internal ADORE command.  
+ It creates sunraster images of the DORIS products using 
+ cpxfiddle.   
+
+INPUT:
+ a|p|m: 
+	a: creates amplitude image.
+ 	p: creates phase image.
+	m: creates amplitude/phase mixed image.
+
+ dorisStep: The step for the output. lsprocess can be used to 
+    get a list of doris processes.
+    The step can be in the master, slave or interferogram result file.
+
+ Optional:
+	cpxfiddleOptions: This is passed to cpxfiddle. 
+	    -w, -f, -q, -o, -e are fixed. They can not be specified.
+	    available options: 
+		-M: multilook factor. default is 1/1
+		-s: scale. default is 1
+		-l, -L
+		-p, -P
+		-S, -m, -c, -r, -B, -H, ...
+
+OUTPUT:
+  Raster image in the following naming convention:
+	a: A_filename.ras
+	p: P_filename.ras
+	m: M_filename.ras
+  *'.' (dot) character in the filename will be converted to '_'(underscore).
+
+=settings=
+
+ADORE: ? settings
+USAGE:
+	settings option [argument]
+	settings
+	settings apply variableName
+	settings check
+	settings fix
+	settings raw
+	settings save [fileName]
+	settings load fileName
+	settings reset
+	settings clear
+
+DESCRIPTION:
+ SETTINGS is an internal ADORE command. 
+ It aims at providing a smooth interface for modifying ADORE 
+ settings.
+
+INPUT:
+ settings: will list the current settings as seen by ADORE.
+
+ settings apply variableName: updates settings that depend on
+	variableName. This is not done in a recursive way. Use check
+	for possible mismatches.
+
+ settings check: looks for differences between ADORE's 
+	expectations and current values. Handy for finding 
+	errors due to recursive dependancies.
+
+ settings fix: after "check"ing you can accept suggested changes 
+	using the variables. Check will display a reference line.
+
+ settings raw: displays the unprocessed settings with USERS
+	changes. This can be saved with the save function.
+
+ settings save [fileName]: saves the settings (raw) to the file.
+	if fileName is not specified './settings.set' is used.
+
+ settings load fileName: loads the settings to the environment.
+
+ settings reset: initializes the environment. User settings file is loaded.
+
+ settings clear: clears all ADORE settings and resets ${ADORESCR} and ${ADOREFOLDER}
+
+=undo=
+
+ADORE: ? undo
+USAGE:
+	undo processName [fileName]
+	undo processName
+
+DESCRIPTION:
+ UNDO is an internal ADORE command. It removes the 
+ given processName from the result files.   
+
+INPUT:
+ processName: Doris step to be deleted from the resultfile.
+ 
+ Optional:
+   fileName: If omitted undo will try to remove the given doris
+     step from master, slave and interferograms result files.    
+
+OUTPUT:
+ Undo Successful: if doris step was found and removed.
+
+=dem=
+
+ADORE: ? dem
+USAGE:
+	dem operation parameters
+	dem make [SRTM1/SRTM3] [extraBufferPercentage] [name]
+	dem load [path/to/demfile.dem]
+	dem check 
+
+DESCRIPTION:
+ DEM is an internal ADORE command.  
+ It can generate and load DEM settings to the environment.   
+
+INPUT:
+ dem: 
+	defaults to "dem check"
+ dem make SRTM1/SRTM3 extraBufferPercentage name
+	Calculates the master scene coverage and issues a call to construct_dem.sh 
+	Area if padded (enlarged) in all directions with the extraBufferPercentage.
+	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
+
+ dem load path/to/demfile.dem
+	Load's the specified dem file. The DEM must be created with "dem make" or
+	construct_dem.sh (from TU-DELFT).
+
+ dem check:
+	Checks the environment DEM settings and suggests fixes to problems.
+ 
+OUTPUT:
+  dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
+  dem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.
+  dem check: Checks and displays possible problems fixes on stdout.
+
+= Introduction =
+
+Help can be accessed with ? command inside ADORE.
+
+
+= adore =
+
+
+ADORE: ? adore
+USAGE:
+	adore adoreCommand
+	adore -u user.set adoreCommand
+	adore -u user.set -p dorisProcess
+	adore -u user.set -p dorisProcess adoreCommand
+	adore -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+
+DESCRIPTION:
+	ADORE is an attempt to simplify processing of different interferometric stacks
+ like, single-master-stack, or short-baselines.
+default options are loaded from ${ADOREFOLDER}/set/default.set
+each doris step can be run. They should have a corresponding *.drs file in the drs folder.
+
+INPUT:
+ adoreCommand: see the manual for available adoreCommands
+ -u: user settings file. 
+ -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ -d: define variable (has priority over user settings file.)
+ -i: interactive mode
+
+if both adoreCommand and dorisProcess is used, first the dorisProcess
+is run, and then the adoreCommand.
+
+OUTPUT:
+ nothing for adoreCommands.
+ dorisStep: SUCCESS for successful doris processing steps.
+
+
+= ? =
+
+ADORE: ?
+USAGE:
+	? commandName
+
+DESCRIPTION:
+ ? is a builtin ADORE command.  
+ It displays the help for given adore command.   
+
+INPUT:
+ commandName: ADORE command name to get help. A list of commands 
+ can be found at the end of this help message.
+ 
+OUTPUT:
+ Help message for the specified command, or this message if no command is given.
+
+
+******ADORE Commands******
+?		: Help
+check		: Check completed steps in result file.
+initialize	: Initialize default settings.
+lsprocess	: list DORIS processes
+pn2rs		: convert Process Name to Result file Section title.
+p		: Process DORIS step.
+s		: Show the input file for the DORIS step.
+raster		: Create raster image from doris result.
+settings	: Utility for listing, saving and loading ADORE variables.
+undo		: Undo all processing after a given step.
+
+******ADORE Batch Processes******
+singleMasterStack	: Script to process multiple interferograms with a single master.
+
+
+= check =
+
+ADORE: ? check
+USAGE:
+	check
+	check resultFile
+
+DESCRIPTION:
+ CHECK is an internal ADORE command. 
+ It shows the process control list from the result files.
+
+INPUT:
+ No required inputs.
+  
+  Optional:
+    resultFile: If specified, only displays given files process control list.
+ 
+OUTPUT:
+ Shows the process control list of given result file.
+
+
+ example 
+
+ADORE: check
+INTERFEROGRAM: 			MASTER: 			SLAVE: 		
+coarse_orbits:		1	readfiles:		1	readfiles:		1
+coarse_correl:		1	precise_orbits:		1	precise_orbits:		1
+fine_coreg:		1	crop:			1	crop:			1
+timing_error:		1	sim_amplitude:		1	sim_amplitude:		0
+dem_assist:		1	master_timing:		1	master_timing:		0
+comp_coregpm:		1	oversample:		0	oversample:		0
+interfero:		0	resample:		0	resample:		0
+coherence:		0	filt_azi:		0	filt_azi:		0
+comp_refphase:		0	filt_range:		0	filt_range:		0
+subtr_refphase:		0		
+comp_refdem:		0		
+subtr_refdem:		0		
+filtphase:		0		
+unwrap:			0		
+slant2h:		0		
+geocoding:		0		
+dinsar:			0		
+
+
+=lsprocess=
+
+ADORE: ? lsprocess
+USAGE:
+	lsprocess
+
+DESCRIPTION:
+ lsprocess is an internal/external ADORE command. It shows the  
+ list of doris steps to run. List is in column order (read down then right).
+
+INPUT:
+ No input option.
+ 
+OUTPUT:
+ List of doris steps as recognized by adore.
+
+
+example
+
+ADORE: lsprocess
+Available doris processes:
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+
+
+=s=
+Shows the DORIS input parameters given steps.
+
+example
+
+ADORE: s m_readfiles
+screen info //
+beep off //
+batch on //
+overwrite on //
+preview off // sunraster files with cpxfiddle
+listinput on // copy this file to log
+memory 500 // mb
+
+logfile ./test2.log //
+m_resfile ./17844.res //
+s_resfile ./14337.res //
+i_resfile ./17844_14337.res //
+
+orb_interp spline //
+dumpbaseline 1 1 // eval baseline on grid
+height 2250 // average height for the crop
+tiepoint 0.0 0.0 0.0 //
+m_rg_t_error 0.0 //
+m_az_t_error 0.0 //
+s_rg_t_error 0.0 //
+s_az_t_error 0.0 //
+
+process m_readfiles //
+
+m_in_method ASAR //
+m_in_vol dummy // slc volume file
+m_in_lea dummy // slc leaderfile
+m_in_dat /home/bosmanoglu/playGround/adore/data/17844/dat.050729_ENVISAT1_163636.001_SLC // slc data file
+m_in_null dummy //
+
+stop
+
+=raster=
+
+ADORE: ? raster
+USAGE:
+	raster a|p|m dorisStep cpxfiddleOptions
+
+DESCRIPTION:
+ RASTER is an internal ADORE command.  
+ It creates sunraster images of the DORIS products using 
+ cpxfiddle.   
+
+INPUT:
+ a|p|m: 
+	a: creates amplitude image.
+ 	p: creates phase image.
+	m: creates amplitude/phase mixed image.
+
+ dorisStep: The step for the output. lsprocess can be used to 
+    get a list of doris processes.
+    The step can be in the master, slave or interferogram result file.
+
+ Optional:
+	cpxfiddleOptions: This is passed to cpxfiddle. 
+	    -w, -f, -q, -o, -e are fixed. They can not be specified.
+	    available options: 
+		-M: multilook factor. default is 1/1
+		-s: scale. default is 1
+		-l, -L
+		-p, -P
+		-S, -m, -c, -r, -B, -H, ...
+
+OUTPUT:
+  Raster image in the following naming convention:
+	a: A_filename.ras
+	p: P_filename.ras
+	m: M_filename.ras
+  *'.' (dot) character in the filename will be converted to '_'(underscore).
+
+=settings=
+
+ADORE: ? settings
+USAGE:
+	settings option [argument]
+	settings
+	settings apply variableName
+	settings check
+	settings fix
+	settings raw
+	settings save [fileName]
+	settings load fileName
+	settings reset
+	settings clear
+
+DESCRIPTION:
+ SETTINGS is an internal ADORE command. 
+ It aims at providing a smooth interface for modifying ADORE 
+ settings.
+
+INPUT:
+ settings: will list the current settings as seen by ADORE.
+
+ settings apply variableName: updates settings that depend on
+	variableName. This is not done in a recursive way. Use check
+	for possible mismatches.
+
+ settings check: looks for differences between ADORE's 
+	expectations and current values. Handy for finding 
+	errors due to recursive dependancies.
+
+ settings fix: after "check"ing you can accept suggested changes 
+	using the variables. Check will display a reference line.
+
+ settings raw: displays the unprocessed settings with USERS
+	changes. This can be saved with the save function.
+
+ settings save [fileName]: saves the settings (raw) to the file.
+	if fileName is not specified './settings.set' is used.
+
+ settings load fileName: loads the settings to the environment.
+
+ settings reset: initializes the environment. User settings file is loaded.
+
+ settings clear: clears all ADORE settings and resets ${ADORESCR} and ${ADOREFOLDER}
+
+=undo=
+
+ADORE: ? undo
+USAGE:
+	undo processName [fileName]
+	undo processName
+
+DESCRIPTION:
+ UNDO is an internal ADORE command. It removes the 
+ given processName from the result files.   
+
+INPUT:
+ processName: Doris step to be deleted from the resultfile.
+ 
+ Optional:
+   fileName: If omitted undo will try to remove the given doris
+     step from master, slave and interferograms result files.    
+
+OUTPUT:
+ Undo Successful: if doris step was found and removed.
+
+=dem=
+
+ADORE: ? dem
+USAGE:
+	dem operation parameters
+	dem make [SRTM1/SRTM3] [extraBufferPercentage] [name]
+	dem load [path/to/demfile.dem]
+	dem check 
+
+DESCRIPTION:
+ DEM is an internal ADORE command.  
+ It can generate and load DEM settings to the environment.   
+
+INPUT:
+ dem: 
+	defaults to "dem check"
+ dem make SRTM1/SRTM3 extraBufferPercentage name
+	Calculates the master scene coverage and issues a call to construct_dem.sh 
+	Area if padded (enlarged) in all directions with the extraBufferPercentage.
+	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
+
+ dem load path/to/demfile.dem
+	Load's the specified dem file. The DEM must be created with "dem make" or
+	construct_dem.sh (from TU-DELFT).
+
+ dem check:
+	Checks the environment DEM settings and suggests fixes to problems.
+ 
+OUTPUT:
+  dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
+  dem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.
+  dem check: Checks and displays possible problems fixes on stdout.
+
+= Introduction =
+
+Help can be accessed with ? command inside ADORE.
+
+
+= adore =
+
+
+ADORE: ? adore
+USAGE:
+	adore adoreCommand
+	adore -u user.set adoreCommand
+	adore -u user.set -p dorisProcess
+	adore -u user.set -p dorisProcess adoreCommand
+	adore -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+
+DESCRIPTION:
+	ADORE is an attempt to simplify processing of different interferometric stacks
+ like, single-master-stack, or short-baselines.
+default options are loaded from ${ADOREFOLDER}/set/default.set
+each doris step can be run. They should have a corresponding *.drs file in the drs folder.
+
+INPUT:
+ adoreCommand: see the manual for available adoreCommands
+ -u: user settings file. 
+ -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ -d: define variable (has priority over user settings file.)
+ -i: interactive mode
+
+if both adoreCommand and dorisProcess is used, first the dorisProcess
+is run, and then the adoreCommand.
+
+OUTPUT:
+ nothing for adoreCommands.
+ dorisStep: SUCCESS for successful doris processing steps.
+
+
+= ? =
+
+ADORE: ?
+USAGE:
+	? commandName
+
+DESCRIPTION:
+ ? is a builtin ADORE command.  
+ It displays the help for given adore command.   
+
+INPUT:
+ commandName: ADORE command name to get help. A list of commands 
+ can be found at the end of this help message.
+ 
+OUTPUT:
+ Help message for the specified command, or this message if no command is given.
+
+
+******ADORE Commands******
+?		: Help
+check		: Check completed steps in result file.
+initialize	: Initialize default settings.
+lsprocess	: list DORIS processes
+pn2rs		: convert Process Name to Result file Section title.
+p		: Process DORIS step.
+s		: Show the input file for the DORIS step.
+raster		: Create raster image from doris result.
+settings	: Utility for listing, saving and loading ADORE variables.
+undo		: Undo all processing after a given step.
+
+******ADORE Batch Processes******
+singleMasterStack	: Script to process multiple interferograms with a single master.
+
+
+= check =
+
+ADORE: ? check
+USAGE:
+	check
+	check resultFile
+
+DESCRIPTION:
+ CHECK is an internal ADORE command. 
+ It shows the process control list from the result files.
+
+INPUT:
+ No required inputs.
+  
+  Optional:
+    resultFile: If specified, only displays given files process control list.
+ 
+OUTPUT:
+ Shows the process control list of given result file.
+
+
+ example 
+
+ADORE: check
+INTERFEROGRAM: 			MASTER: 			SLAVE: 		
+coarse_orbits:		1	readfiles:		1	readfiles:		1
+coarse_correl:		1	precise_orbits:		1	precise_orbits:		1
+fine_coreg:		1	crop:			1	crop:			1
+timing_error:		1	sim_amplitude:		1	sim_amplitude:		0
+dem_assist:		1	master_timing:		1	master_timing:		0
+comp_coregpm:		1	oversample:		0	oversample:		0
+interfero:		0	resample:		0	resample:		0
+coherence:		0	filt_azi:		0	filt_azi:		0
+comp_refphase:		0	filt_range:		0	filt_range:		0
+subtr_refphase:		0		
+comp_refdem:		0		
+subtr_refdem:		0		
+filtphase:		0		
+unwrap:			0		
+slant2h:		0		
+geocoding:		0		
+dinsar:			0		
+
+
+=lsprocess=
+
+ADORE: ? lsprocess
+USAGE:
+	lsprocess
+
+DESCRIPTION:
+ lsprocess is an internal/external ADORE command. It shows the  
+ list of doris steps to run. List is in column order (read down then right).
+
+INPUT:
+ No input option.
+ 
+OUTPUT:
+ List of doris steps as recognized by adore.
+
+
+example
+
+ADORE: lsprocess
+Available doris processes:
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+
+
+=s=
+Shows the DORIS input parameters given steps.
+
+example
+
+ADORE: s m_readfiles
+screen info //
+beep off //
+batch on //
+overwrite on //
+preview off // sunraster files with cpxfiddle
+listinput on // copy this file to log
+memory 500 // mb
+
+logfile ./test2.log //
+m_resfile ./17844.res //
+s_resfile ./14337.res //
+i_resfile ./17844_14337.res //
+
+orb_interp spline //
+dumpbaseline 1 1 // eval baseline on grid
+height 2250 // average height for the crop
+tiepoint 0.0 0.0 0.0 //
+m_rg_t_error 0.0 //
+m_az_t_error 0.0 //
+s_rg_t_error 0.0 //
+s_az_t_error 0.0 //
+
+process m_readfiles //
+
+m_in_method ASAR //
+m_in_vol dummy // slc volume file
+m_in_lea dummy // slc leaderfile
+m_in_dat /home/bosmanoglu/playGround/adore/data/17844/dat.050729_ENVISAT1_163636.001_SLC // slc data file
+m_in_null dummy //
+
+stop
+
+=raster=
+
+ADORE: ? raster
+USAGE:
+	raster a|p|m dorisStep cpxfiddleOptions
+
+DESCRIPTION:
+ RASTER is an internal ADORE command.  
+ It creates sunraster images of the DORIS products using 
+ cpxfiddle.   
+
+INPUT:
+ a|p|m: 
+	a: creates amplitude image.
+ 	p: creates phase image.
+	m: creates amplitude/phase mixed image.
+
+ dorisStep: The step for the output. lsprocess can be used to 
+    get a list of doris processes.
+    The step can be in the master, slave or interferogram result file.
+
+ Optional:
+	cpxfiddleOptions: This is passed to cpxfiddle. 
+	    -w, -f, -q, -o, -e are fixed. They can not be specified.
+	    available options: 
+		-M: multilook factor. default is 1/1
+		-s: scale. default is 1
+		-l, -L
+		-p, -P
+		-S, -m, -c, -r, -B, -H, ...
+
+OUTPUT:
+  Raster image in the following naming convention:
+	a: A_filename.ras
+	p: P_filename.ras
+	m: M_filename.ras
+  *'.' (dot) character in the filename will be converted to '_'(underscore).
+
+=settings=
+
+ADORE: ? settings
+USAGE:
+	settings option [argument]
+	settings
+	settings apply variableName
+	settings check
+	settings fix
+	settings raw
+	settings save [fileName]
+	settings load fileName
+	settings reset
+	settings clear
+
+DESCRIPTION:
+ SETTINGS is an internal ADORE command. 
+ It aims at providing a smooth interface for modifying ADORE 
+ settings.
+
+INPUT:
+ settings: will list the current settings as seen by ADORE.
+
+ settings apply variableName: updates settings that depend on
+	variableName. This is not done in a recursive way. Use check
+	for possible mismatches.
+
+ settings check: looks for differences between ADORE's 
+	expectations and current values. Handy for finding 
+	errors due to recursive dependancies.
+
+ settings fix: after "check"ing you can accept suggested changes 
+	using the variables. Check will display a reference line.
+
+ settings raw: displays the unprocessed settings with USERS
+	changes. This can be saved with the save function.
+
+ settings save [fileName]: saves the settings (raw) to the file.
+	if fileName is not specified './settings.set' is used.
+
+ settings load fileName: loads the settings to the environment.
+
+ settings reset: initializes the environment. User settings file is loaded.
+
+ settings clear: clears all ADORE settings and resets ${ADORESCR} and ${ADOREFOLDER}
+
+=undo=
+
+ADORE: ? undo
+USAGE:
+	undo processName [fileName]
+	undo processName
+
+DESCRIPTION:
+ UNDO is an internal ADORE command. It removes the 
+ given processName from the result files.   
+
+INPUT:
+ processName: Doris step to be deleted from the resultfile.
+ 
+ Optional:
+   fileName: If omitted undo will try to remove the given doris
+     step from master, slave and interferograms result files.    
+
+OUTPUT:
+ Undo Successful: if doris step was found and removed.
+
+=dem=
+
+ADORE: ? dem
+USAGE:
+	dem operation parameters
+	dem make [SRTM1/SRTM3] [extraBufferPercentage] [name]
+	dem load [path/to/demfile.dem]
+	dem check 
+
+DESCRIPTION:
+ DEM is an internal ADORE command.  
+ It can generate and load DEM settings to the environment.   
+
+INPUT:
+ dem: 
+	defaults to "dem check"
+ dem make SRTM1/SRTM3 extraBufferPercentage name
+	Calculates the master scene coverage and issues a call to construct_dem.sh 
+	Area if padded (enlarged) in all directions with the extraBufferPercentage.
+	You can call this function with no/some arguments. Defaults are: SRTM3 20 dem
+
+ dem load path/to/demfile.dem
+	Load's the specified dem file. The DEM must be created with "dem make" or
+	construct_dem.sh (from TU-DELFT).
+
+ dem check:
+	Checks the environment DEM settings and suggests fixes to problems.
+ 
+OUTPUT:
+  dem make: Generates a folder with the dem. Leaves the hgt files in the current folder.
+  dem load: No outputs if success. Updates DORIS settings starting with sam_,dac_, and crd_.
+  dem check: Checks and displays possible problems fixes on stdout.
