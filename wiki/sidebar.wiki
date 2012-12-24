@@ -47,6 +47,7 @@
     * [dem2slant2h dem2slant2h]
     * [dem dem]
     * [exclude exclude]
+    * [giant giant]
     * [h h]
     * [lsprocess lsprocess]
     * [mask mask]
