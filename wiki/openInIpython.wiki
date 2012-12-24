@@ -12,18 +12,23 @@ openInIpython is an ADORE function which exports the settings from ADORE and imp
 =INPUT:=
  There are no required input parameters for this command.
  ==OPTIONAL:==
-  python_script: This argument can be a python script utilizing the objects created. 
-  python_command: If the argument is not a file, then it is interpreted as a python command.
+  * python_script: This argument can be a python script utilizing the objects created. 
+  * python_command: If the argument is not a file, then it is interpreted as a python command.
 =OUTPUT=
   The below variables are set within ipython. The lists and settings contain the same information. The objects provide an easier method to browse through this information, because they allow tab completion.
-  * settings: List of settings for the current processing.
-  * setobj: Settings object. 
-  * mres: List generated from master result file.
-  * mobj: Master result object.
-  * sres: List generated from slave result file.
-  * sobj: Slave result object.
-  * ires: List generated from interferogram result file.
-  * iobj: Interferogram result object.
+  * `A`: Adore object. Provides access to methods and other objects. The followings objects are also available in the user namespace for backwards compatibility: `settings, setobj, mres, mobj, sres, sobj, ires, iobj`.
+  * `A.settings`: List of settings for the current processing.
+  * `A.setobj`: Settings object. 
+  * `A.mres`: List generated from master result file.
+  * `A.mobj`: Master result object.
+  * `A.sres`: List generated from slave result file.
+  * `A.sobj`: Slave result object.
+  * `A.ires`: List generated from interferogram result file.
+  * `A.iobj`: Interferogram result object.
+  If GIAnT is properly installed and available in the `${PYTHONPATH}`, the following is also initiated.
+  * `G.RAW_STACK`:
+  * `G.PROC_STACK`:
+  * `G.LS`:
 =FILES and REFERENCES:=
 {{{
  ${ADOREFOLDER}/lib/python/ipython.rc
