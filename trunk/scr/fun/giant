@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# USAGE:
+# 	giant step
+#
+# DESCRIPTION:
+#  GIANT is an ADORE function which calls GIAnT package for 
+#  timeseries analysis. 
+#
+# INPUT:
+#  step: prepxml_SBAS, PrepIgramStack, ProcessStack, SBASInvert
+# OUTPUT:
+#
+# EXAMPLES:
+#  
+
+#######################################################
+
+function prepxml_SBAS(){
+  bold "Changing directory to:"
+  mkdir -p ${runFolder}/giant  #${giantFolder}
+  echo ${runFolder}/giant
+  cd ${runFolder}/giant
+  openInIpython "${ADOREFOLDER}/lib/python/giant/prepxml_SBAS.py"    
+}
+
+function PrepIgramStack(){
+  ls ${i12sFolder}/*/coarseorb.drs > ifg.list
+  PrepIgramStack.py -u ${GIANT}/SCR/userfn_adore.py -i ifg.list ${@} 
+}
+
+function ProcessStack(){
+  ProcessStack.py ${@}
+}
+
+function SBASInvert(){
+  SBASInvert.py ${@}
+}
+
+#####################
+## MAIN ##
+#####################
+case ${1} in
+  "prepxml_SBAS")
+    shift
+    prepxml_SBAS
+  ;;
+  "PrepIgramStack")
+    shift
+    PrepIgramStack ${@}
+  ;;
+  "ProcessStack")
+    shift
+    ProcessStack ${@}
+  ;;
+  "SBASInvert")
+    shift
+    SBASInvert ${@}
+  ;;
+  *)
+    h giant
+  ;;
+esac
+

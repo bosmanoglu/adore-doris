@@ -23,8 +23,8 @@
 #  
 
 # Updates:
-# Modifed 2010-03-10 Added ONLY option to remove a single process.
-# 
+# Modified 2010-03-10 Added ONLY option to remove a single process.
+# Modified 2012-12-21 Added support for multiple process names with only. 
 
 dorisProcessReset()
 {
@@ -56,14 +56,14 @@ dorisProcessReset()
        [ $? -eq 0 ] && echo "  Undo Successful."
      fi
    else
-     echo "  ${1} not found in ${2}. This might not be important."
+     error "  ${1} not found in ${2}. This might not be important."
    fi
  else
-   echo "  ${2} does not exist. This might not be important."
+   error "  ${2} does not exist. This might not be important."
  fi
 }
 
-local dorisStep only resfile
+local dorisStep only resfile user_resfile process
 if [ "${1}" == "only" ];then
   shift
   only="only"
@@ -71,22 +71,46 @@ else
   only=""
 fi
 
-dorisStep=`pn2rs ${1}`
+[ -e "${@: -1}" ] && user_resfile="${@: -1}" || user_resfile=""
 
-if [ "${2-undefined}" != "undefined" ]; then
-  dorisProcessReset ${dorisStep} ${2} ${only}
-elif [[ "${1}" == m_* ]]; then
-  dorisProcessReset ${dorisStep} ${m_resfile} ${only};
-elif [[ "${1}" == s_* ]]; then
-  dorisProcessReset ${dorisStep} ${s_resfile} ${only}; 
-else
-  resfile=`pn2rs -f ${1}`
-  if [ -e "${resfile}" ]; then 
-    dorisProcessReset ${dorisStep} "${resfile}" ${only}
-  else
-    dorisProcessReset ${dorisStep} ${m_resfile} ${only}
-    dorisProcessReset ${dorisStep} ${s_resfile} ${only}
-    dorisProcessReset ${dorisStep} ${i_resfile} ${only}
+for process in ${@}
+do 
+  [ "${process}" == "${user_resfile}" ] && continue # if last parameter, skip.
+  # dorisStep=`pn2rs ${1}`
+  
+  # addrefpha2s_crop is different. 
+  if [ "${process}" == "addrefpha2s_crop" ]; then
+    # Check if the s_resfile is in the current folder
+    if [ -e "${s_resfile}.bck" ]; then
+      cp ${s_resfile}.bck ${s_resfile} # replace with backup (original) slave result file.
+    #if not check if it may be in the cropFolder (batch processing)
+    elif [ -e "${cropFolder}/${slave}/$(basename ${s_resfile}).bck" ]; then
+      cp ${cropFolder}/${slave}/$(basename ${s_resfile}).bck ${cropFolder}/${slave}/$(basename ${s_resfile}) # replace with backup (original) slave result file.
+    else
+      # if no backup file skip.
+      error "File not found: ${s_resfile}.bck"
+      continue
+    fi
   fi
-fi
+  # standard undo
+  dorisStep=`pn2rs ${process}` # convert process name to result file step
+  if [ "${user_resfile:-undefined}" != "undefined" ]; then
+    dorisProcessReset ${dorisStep} ${user_resfile} ${only};
+  elif [[ "${process}" == m_* ]]; then
+    dorisProcessReset ${dorisStep} ${m_resfile} ${only};
+  elif [[ "${process}" == s_* ]]; then
+    dorisProcessReset ${dorisStep} ${s_resfile} ${only}; 
+  else # Lets see if pn2rs knows which result file.
+    resfile=`pn2rs -f ${process}`
+    if [ -e "${resfile}" ]; then 
+      dorisProcessReset ${dorisStep} "${resfile}" ${only}
+    else # I don't know what file so I will try all
+      dorisProcessReset ${dorisStep} ${m_resfile} ${only}
+      dorisProcessReset ${dorisStep} ${s_resfile} ${only}
+      dorisProcessReset ${dorisStep} ${i_resfile} ${only}
+    fi
+  fi
+done
+# cleanup
+unset user_resfile dorisStep only resfile dorisProcessReset process
 

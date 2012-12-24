@@ -176,6 +176,11 @@ function cpDorisFiles(){
   . ${ADORESCR}/fun/cpDorisFiles ${@}
 }
 
+function giant()
+{
+  . ${ADORESCR}/fun/giant ${@} 
+}
+
 function i12s()
 {
   . ${ADORESCR}/fun/i12s ${@} 
