@@ -28,3 +28,93 @@ EXAMPLE:
 
 KNOWN BUGS:
  None.
+USAGE:
+
+ generateRandomString
+
+DESCRIPTION:
+ GENERATERANDOMSTRING is an internal ADORE function. It generates a random
+string that is eight characters long. The string is stored in the variable
+randomString variable. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ The variable "randomString" contains a random string that are eight
+characters long. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ generateRandomString
+ echo ${randomString}.
+
+KNOWN BUGS:
+ None.
+USAGE:
+
+ generateRandomString
+
+DESCRIPTION:
+ GENERATERANDOMSTRING is an internal ADORE function. It generates a random
+string that is eight characters long. The string is stored in the variable
+randomString variable. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ The variable "randomString" contains a random string that are eight
+characters long. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ generateRandomString
+ echo ${randomString}.
+
+KNOWN BUGS:
+ None.
+USAGE:
+
+ generateRandomString
+
+DESCRIPTION:
+ GENERATERANDOMSTRING is an internal ADORE function. It generates a random
+string that is eight characters long. The string is stored in the variable
+randomString variable. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ The variable "randomString" contains a random string that are eight
+characters long. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ generateRandomString
+ echo ${randomString}.
+
+KNOWN BUGS:
+ None.

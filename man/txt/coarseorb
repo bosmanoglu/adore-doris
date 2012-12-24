@@ -26,3 +26,87 @@ EXAMPLE:
 
 KNOWN BUGS:
  None
+USAGE:
+
+  coarseorb 
+
+DESCRIPTION:
+  COARSEORB is an ADORE process and it runs the DORIS step with the same name. 
+  The coregistration based on the orbits of slave and master is computed with an accuracy of about 30 pixels (precise orbits). This is a fast way to get the coarse offsets. Before the FINE coregistration however the step COARSECORR has to be run, in order to get the coarse offsets within a few pixels. (FINE requires the initial estimated offset within a few pixels.)
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ SUCCESS is printed to STDOUT on successful completion of process. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/coarseorb.drs
+ http://doris.tudelft.nl/usermanual/node45.html
+
+EXAMPLE:
+
+ coarseorb
+
+KNOWN BUGS:
+ None
+USAGE:
+
+  coarseorb 
+
+DESCRIPTION:
+  COARSEORB is an ADORE process and it runs the DORIS step with the same name. 
+  The coregistration based on the orbits of slave and master is computed with an accuracy of about 30 pixels (precise orbits). This is a fast way to get the coarse offsets. Before the FINE coregistration however the step COARSECORR has to be run, in order to get the coarse offsets within a few pixels. (FINE requires the initial estimated offset within a few pixels.)
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ SUCCESS is printed to STDOUT on successful completion of process. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/coarseorb.drs
+ http://doris.tudelft.nl/usermanual/node45.html
+
+EXAMPLE:
+
+ coarseorb
+
+KNOWN BUGS:
+ None
+USAGE:
+
+  coarseorb 
+
+DESCRIPTION:
+  COARSEORB is an ADORE process and it runs the DORIS step with the same name. 
+  The coregistration based on the orbits of slave and master is computed with an accuracy of about 30 pixels (precise orbits). This is a fast way to get the coarse offsets. Before the FINE coregistration however the step COARSECORR has to be run, in order to get the coarse offsets within a few pixels. (FINE requires the initial estimated offset within a few pixels.)
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ SUCCESS is printed to STDOUT on successful completion of process. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/coarseorb.drs
+ http://doris.tudelft.nl/usermanual/node45.html
+
+EXAMPLE:
+
+ coarseorb
+
+KNOWN BUGS:
+ None

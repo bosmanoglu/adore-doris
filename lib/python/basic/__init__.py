@@ -38,6 +38,22 @@ import graphics
 class rkdict(dict): #return (missing) key dict
     def __missing__(self, key):
             return key
+
+class DictObj(object):
+    def __init__(self, **entries):
+        if entries:
+            for e in entries:
+                #No space and dot for attribute name
+                et="_".join(e.split())
+                et=et.replace('.','')
+                if isinstance(d[e], dict):
+                    self.__dict__[et]=DictObj(d[e])
+                else:
+                    self.__dict__[et]=d[e]              
+    def _add_property(self, name, func):
+        setattr(self.__class__, name, property(func))        
+    def __missing__(self, key):
+        return None
             
 def confirm(prompt=None, resp=False):
     """prompts for yes or no response from the user. Returns True for yes and

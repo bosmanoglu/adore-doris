@@ -32,3 +32,85 @@ is run, and then the adoreCommand.
 OUTPUT
  nothing for adoreCommands.
  dorisStep: SUCCESS for successful doris processing steps.
+USAGE:
+
+        adore adoreCommand
+        adore -u user.set adoreCommand 
+        adore -u user.set -p dorisProcess
+        adore -u user.set -p dorisProcess adoreCommand
+        adore -v -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+        adore -i 
+        adore -g
+        adore -V
+
+DESCRIPTION:
+        ADORE is an attempt to simplify processing of different interferometric stacks like, single-master-stack, or short-baselines. Default options are loaded from ${ADOREFOLDER}/set/default.set each doris step can be run. They should have a corresponding `*.drs` file in the drs folder.
+
+INPUT:
+ * adoreCommand: see the manual for available adore commands
+ * -u: user settings file. 
+ * -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ * -d: define variable (has priority over user settings file.)
+ * -i: open interactive session. 
+ * -g: flag for AGOOEY. This is useless if you are not using the GUI.
+ * -v: verbose. For troubleshooting. Equivalent to: set -x
+ * -V: Version. Print ADORE version and exit.
+if both adoreCommand and dorisProcess is used, first the dorisProcess is run, and then the adoreCommand.
+
+OUTPUT
+ nothing for adore commands.
+ dorisStep: SUCCESS for successful doris processing steps.USAGE:
+
+        adore adoreCommand
+        adore -u user.set adoreCommand 
+        adore -u user.set -p dorisProcess
+        adore -u user.set -p dorisProcess adoreCommand
+        adore -v -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+        adore -i 
+        adore -g
+        adore -V
+
+DESCRIPTION:
+        ADORE is an attempt to simplify processing of different interferometric stacks like, single-master-stack, or short-baselines. Default options are loaded from ${ADOREFOLDER}/set/default.set each doris step can be run. They should have a corresponding `*.drs` file in the drs folder.
+
+INPUT:
+ * adoreCommand: see the manual for available adore commands
+ * -u: user settings file. 
+ * -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ * -d: define variable (has priority over user settings file.)
+ * -i: open interactive session. 
+ * -g: flag for AGOOEY. This is useless if you are not using the GUI.
+ * -v: verbose. For troubleshooting. Equivalent to: set -x
+ * -V: Version. Print ADORE version and exit.
+if both adoreCommand and dorisProcess is used, first the dorisProcess is run, and then the adoreCommand.
+
+OUTPUT
+ nothing for adore commands.
+ dorisStep: SUCCESS for successful doris processing steps.USAGE:
+
+        adore adoreCommand
+        adore -u user.set adoreCommand 
+        adore -u user.set -p dorisProcess
+        adore -u user.set -p dorisProcess adoreCommand
+        adore -v -p dorisProcess -d "adoreVariable1=Value1;adoreVariable2=Value2"
+        adore -i 
+        adore -g
+        adore -V
+
+DESCRIPTION:
+        ADORE is an attempt to simplify processing of different interferometric stacks like, single-master-stack, or short-baselines. Default options are loaded from ${ADOREFOLDER}/set/default.set each doris step can be run. They should have a corresponding `*.drs` file in the drs folder.
+
+INPUT:
+ * adoreCommand: see the manual for available adore commands
+ * -u: user settings file. 
+ * -p: process Doris step. (m_readfiles, s_readfiles, interfero...)
+ * -d: define variable (has priority over user settings file.)
+ * -i: open interactive session. 
+ * -g: flag for AGOOEY. This is useless if you are not using the GUI.
+ * -v: verbose. For troubleshooting. Equivalent to: set -x
+ * -V: Version. Print ADORE version and exit.
+if both adoreCommand and dorisProcess is used, first the dorisProcess is run, and then the adoreCommand.
+
+OUTPUT
+ nothing for adore commands.
+ dorisStep: SUCCESS for successful doris processing steps.

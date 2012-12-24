@@ -31,3 +31,102 @@ EXAMPLE:
 
 KNOWN BUGS:
  None. 
+USAGE:
+
+ m_filtazi
+
+DESCRIPTION:
+ M_FILTAZI is an ADORE process and it runs the DORIS step with the same name. 
+ This optional step filters the spectrum of the master in azimuth direction.
+The part of the spectrum that does not overlap with the spectrum of the
+slave is filtered out. This non overlap is due to the selection of a Doppler
+centroid frequency in the SAR processing, which normally is not equal for
+master and slave image. This step can in general best be performed after the 
+COARSE coregistration and before the FINE.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ ${master}.af file is created.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_filtazi.drs
+ http://doris.tudelft.nl/usermanual/node55.html
+
+EXAMPLE:
+
+ m_filtazi
+
+KNOWN BUGS:
+ None. 
+USAGE:
+
+ m_filtazi
+
+DESCRIPTION:
+ M_FILTAZI is an ADORE process and it runs the DORIS step with the same name. 
+ This optional step filters the spectrum of the master in azimuth direction.
+The part of the spectrum that does not overlap with the spectrum of the
+slave is filtered out. This non overlap is due to the selection of a Doppler
+centroid frequency in the SAR processing, which normally is not equal for
+master and slave image. This step can in general best be performed after the 
+COARSE coregistration and before the FINE.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ ${master}.af file is created.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_filtazi.drs
+ http://doris.tudelft.nl/usermanual/node55.html
+
+EXAMPLE:
+
+ m_filtazi
+
+KNOWN BUGS:
+ None. 
+USAGE:
+
+ m_filtazi
+
+DESCRIPTION:
+ M_FILTAZI is an ADORE process and it runs the DORIS step with the same name. 
+ This optional step filters the spectrum of the master in azimuth direction.
+The part of the spectrum that does not overlap with the spectrum of the
+slave is filtered out. This non overlap is due to the selection of a Doppler
+centroid frequency in the SAR processing, which normally is not equal for
+master and slave image. This step can in general best be performed after the 
+COARSE coregistration and before the FINE.
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ ${master}.af file is created.
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_filtazi.drs
+ http://doris.tudelft.nl/usermanual/node55.html
+
+EXAMPLE:
+
+ m_filtazi
+
+KNOWN BUGS:
+ None. 

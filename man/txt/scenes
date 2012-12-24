@@ -57,3 +57,199 @@ ADORE: scenes include
 ADORE: scenes include 030503
 ADORE: scenes include
 050820 050122 050507 030503
+USAGE:
+
+	scenes 
+        scenes add /path/to/data
+	scenes exclude orbitFolder1 orbitFolder2 ...
+	scenes include orbitFolder1 orbitFolder2 ...
+	scenes init /path/to/data [path/to/output/data/folder]
+	scenes rescan
+
+DESCRIPTION:
+ SCENES is an internal ADORE command. 
+ It has the following usages: 
+`scenes`: 
+  	With no input parameters all available scenes are shown.
+`scenes add /path/to/data`:
+        Will add data files from the given path recursively. Only data files compatible with `m_in_method` will be added. 
+`scenes exclude`:
+	With no inputs this command lists currently excluded scenes.
+`scenes exclude orbitFolder1 orbitFolder2 ...`:
+      listed orbit folders (folders inside data folder) are excluded from
+      batch processing.
+`scenes include`:
+ 	With no inputs this command lists currently included scenes. 
+`scenes include orbitFolder1 orbitFolder2 ...`:
+ 	given orbit folders will be removed from the exclude list. 
+`scenes init [/path/to/data/folder]`:
+	Initializes the $dataFolder and creates links to data files stored in the path to data folder. 
+`scenes rescan`: 
+	rescan the $dataFolder and reset the included scenes
+
+FILES and REFERENCES:
+
+None.
+
+EXAMPLE:
+
+ADORE: scenes
+030503
+030712
+030816
+040207
+040313
+040417
+040731
+041113
+041218
+050122
+050507
+050611
+050716
+050820
+051203
+060211
+060527
+061223
+070127
+081227
+091003
+backup
+ADORE: scenes exclude
+030503 030712 030816 040207 040313 040417 040731 041113 041218 050611 050716 051203 060211 060527 061223 070127 081227 091003 backup
+ADORE: scenes include
+050820 050122 050507
+ADORE: scenes include 030503
+ADORE: scenes include
+050820 050122 050507 030503USAGE:
+
+	scenes 
+        scenes add /path/to/data
+	scenes exclude orbitFolder1 orbitFolder2 ...
+	scenes include orbitFolder1 orbitFolder2 ...
+	scenes init /path/to/data [path/to/output/data/folder]
+	scenes rescan
+
+DESCRIPTION:
+ SCENES is an internal ADORE command. 
+ It has the following usages: 
+`scenes`: 
+  	With no input parameters all available scenes are shown.
+`scenes add /path/to/data`:
+        Will add data files from the given path recursively. Only data files compatible with `m_in_method` will be added. 
+`scenes exclude`:
+	With no inputs this command lists currently excluded scenes.
+`scenes exclude orbitFolder1 orbitFolder2 ...`:
+      listed orbit folders (folders inside data folder) are excluded from
+      batch processing.
+`scenes include`:
+ 	With no inputs this command lists currently included scenes. 
+`scenes include orbitFolder1 orbitFolder2 ...`:
+ 	given orbit folders will be removed from the exclude list. 
+`scenes init [/path/to/data/folder]`:
+	Initializes the $dataFolder and creates links to data files stored in the path to data folder. 
+`scenes rescan`: 
+	rescan the $dataFolder and reset the included scenes
+
+FILES and REFERENCES:
+
+None.
+
+EXAMPLE:
+
+ADORE: scenes
+030503
+030712
+030816
+040207
+040313
+040417
+040731
+041113
+041218
+050122
+050507
+050611
+050716
+050820
+051203
+060211
+060527
+061223
+070127
+081227
+091003
+backup
+ADORE: scenes exclude
+030503 030712 030816 040207 040313 040417 040731 041113 041218 050611 050716 051203 060211 060527 061223 070127 081227 091003 backup
+ADORE: scenes include
+050820 050122 050507
+ADORE: scenes include 030503
+ADORE: scenes include
+050820 050122 050507 030503USAGE:
+
+	scenes 
+        scenes add /path/to/data
+	scenes exclude orbitFolder1 orbitFolder2 ...
+	scenes include orbitFolder1 orbitFolder2 ...
+	scenes init /path/to/data [path/to/output/data/folder]
+	scenes rescan
+
+DESCRIPTION:
+ SCENES is an internal ADORE command. 
+ It has the following usages: 
+`scenes`: 
+  	With no input parameters all available scenes are shown.
+`scenes add /path/to/data`:
+        Will add data files from the given path recursively. Only data files compatible with `m_in_method` will be added. 
+`scenes exclude`:
+	With no inputs this command lists currently excluded scenes.
+`scenes exclude orbitFolder1 orbitFolder2 ...`:
+      listed orbit folders (folders inside data folder) are excluded from
+      batch processing.
+`scenes include`:
+ 	With no inputs this command lists currently included scenes. 
+`scenes include orbitFolder1 orbitFolder2 ...`:
+ 	given orbit folders will be removed from the exclude list. 
+`scenes init [/path/to/data/folder]`:
+	Initializes the $dataFolder and creates links to data files stored in the path to data folder. 
+`scenes rescan`: 
+	rescan the $dataFolder and reset the included scenes
+
+FILES and REFERENCES:
+
+None.
+
+EXAMPLE:
+
+ADORE: scenes
+030503
+030712
+030816
+040207
+040313
+040417
+040731
+041113
+041218
+050122
+050507
+050611
+050716
+050820
+051203
+060211
+060527
+061223
+070127
+081227
+091003
+backup
+ADORE: scenes exclude
+030503 030712 030816 040207 040313 040417 040731 041113 041218 050611 050716 051203 060211 060527 061223 070127 081227 091003 backup
+ADORE: scenes include
+050820 050122 050507
+ADORE: scenes include 030503
+ADORE: scenes include
+050820 050122 050507 030503

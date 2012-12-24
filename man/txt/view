@@ -34,4 +34,112 @@ OPTIONAL:
 
 
 OUTPUT
+ Displays raster images on screen. USAGE:
+
+	view a|p dorisStep cpxviewOptions
+	view a|p dorisStep:filename -- cpxviewOptions
+
+DESCRIPTION:
+ VIEW is an internal ADORE command.  
+ It displays raster images of the DORIS products using cpxview.   
+ Raster images are displayed on screen using python-matplotlib library. 
+ 
+INPUT:
+ `a|p`
+  * a: creates amplitude image.
+  * p: creates phase image.
+
+`dorisStep`
+      The step for the output. lsprocess can be used to 
+      get a list of doris processes. 
+      The step can be in the master, slave or interferogram result file.
+`dorisStep:filename`
+	Can be used to specify a filename that is not in the resultfile.
+	This is useful for generating rasters for `*.demlp, *.notmasked` files.
+ 
+OPTIONAL:
+	cpxviewOptions
+          These options are passed to cpxview.
+	    User options supersede default options (see below).
+	    Default values for `w,f` are read from result file. 
+	    Default value for `q` is defined by output type (amplitude, phase).
+	    Other default options are shown in paranthesis. 
+		for complex amplitude images: `-w -f -e (0.5) -q -c (gray)`
+		for real amplitude images:    `-w -f -q -c (gray)`
+		for phase images:             `-w -f -q -c (jet)`
+
+
+OUTPUT
+ Displays raster images on screen. USAGE:
+
+	view a|p dorisStep cpxviewOptions
+	view a|p dorisStep:filename -- cpxviewOptions
+
+DESCRIPTION:
+ VIEW is an internal ADORE command.  
+ It displays raster images of the DORIS products using cpxview.   
+ Raster images are displayed on screen using python-matplotlib library. 
+ 
+INPUT:
+ `a|p`
+  * a: creates amplitude image.
+  * p: creates phase image.
+
+`dorisStep`
+      The step for the output. lsprocess can be used to 
+      get a list of doris processes. 
+      The step can be in the master, slave or interferogram result file.
+`dorisStep:filename`
+	Can be used to specify a filename that is not in the resultfile.
+	This is useful for generating rasters for `*.demlp, *.notmasked` files.
+ 
+OPTIONAL:
+	cpxviewOptions
+          These options are passed to cpxview.
+	    User options supersede default options (see below).
+	    Default values for `w,f` are read from result file. 
+	    Default value for `q` is defined by output type (amplitude, phase).
+	    Other default options are shown in paranthesis. 
+		for complex amplitude images: `-w -f -e (0.5) -q -c (gray)`
+		for real amplitude images:    `-w -f -q -c (gray)`
+		for phase images:             `-w -f -q -c (jet)`
+
+
+OUTPUT
+ Displays raster images on screen. USAGE:
+
+	view a|p dorisStep cpxviewOptions
+	view a|p dorisStep:filename -- cpxviewOptions
+
+DESCRIPTION:
+ VIEW is an internal ADORE command.  
+ It displays raster images of the DORIS products using cpxview.   
+ Raster images are displayed on screen using python-matplotlib library. 
+ 
+INPUT:
+ `a|p`
+  * a: creates amplitude image.
+  * p: creates phase image.
+
+`dorisStep`
+      The step for the output. lsprocess can be used to 
+      get a list of doris processes. 
+      The step can be in the master, slave or interferogram result file.
+`dorisStep:filename`
+	Can be used to specify a filename that is not in the resultfile.
+	This is useful for generating rasters for `*.demlp, *.notmasked` files.
+ 
+OPTIONAL:
+	cpxviewOptions
+          These options are passed to cpxview.
+	    User options supersede default options (see below).
+	    Default values for `w,f` are read from result file. 
+	    Default value for `q` is defined by output type (amplitude, phase).
+	    Other default options are shown in paranthesis. 
+		for complex amplitude images: `-w -f -e (0.5) -q -c (gray)`
+		for real amplitude images:    `-w -f -q -c (gray)`
+		for phase images:             `-w -f -q -c (jet)`
+
+
+OUTPUT
  Displays raster images on screen. 

@@ -25,3 +25,84 @@ EXAMPLE:
 
  ADORE: calculate_coh_winsize 
  10 2
+USAGE:
+
+ calculate_coh_winsize
+
+DESCRIPTION:
+ CALCULATE_COH_WINSIZE is an ADORE function to calculate the coherence window 
+ size based on doubling the multiplication of subtrrefpha and interfero 
+ multilooking parameters. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints out two times the multiplication of srp_multilook and int_multilook 
+ parameters. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: calculate_coh_winsize 
+ 10 2
+USAGE:
+
+ calculate_coh_winsize
+
+DESCRIPTION:
+ CALCULATE_COH_WINSIZE is an ADORE function to calculate the coherence window 
+ size based on doubling the multiplication of subtrrefpha and interfero 
+ multilooking parameters. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints out two times the multiplication of srp_multilook and int_multilook 
+ parameters. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: calculate_coh_winsize 
+ 10 2
+USAGE:
+
+ calculate_coh_winsize
+
+DESCRIPTION:
+ CALCULATE_COH_WINSIZE is an ADORE function to calculate the coherence window 
+ size based on doubling the multiplication of subtrrefpha and interfero 
+ multilooking parameters. 
+
+INPUT:
+ There are no required input parameters for this command.
+ 
+OPTIONAL:
+  There are no optional input parameters for this command.
+
+OUTPUT
+ Prints out two times the multiplication of srp_multilook and int_multilook 
+ parameters. 
+
+FILES and REFERENCES:
+
+ ${ADOREFOLDER}/scr/fun/functions
+
+EXAMPLE:
+
+ ADORE: calculate_coh_winsize 
+ 10 2
