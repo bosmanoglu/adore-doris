@@ -1,0 +1,34 @@
+#summary i12s
+#labels Phase-Support,Help
+
+=USAGE:=
+{{{
+	i12s "dorisProcess(es)"
+        i12s init psi|sbas [-t btemp] [-p bperp] [-m master]
+	i12s include [master,slave]
+        i12s exclude master,slave
+        i12s load [filename]
+}}}
+=DESCRIPTION:=
+ I12S is an internal ADORE command. 
+ It can be used to specify the interferomeric pairs, and apply the same DORIS processes on all pairs. 
+=INPUT:=
+ * `"dorisProcess(es)"`: A single or multiple doris processes (see [lsprocess]) can be run on all the interferograms. If multiple processes are given, they must be in quotes and separated with semi-colon.
+ * `init psi|sbas [-t btemp] [-p bperp] [-m master]`: Initializes a single master (psi) or multiple master (sbas) pair list. Optional parameters can be used to set temporal and perpendicular baseline, as well as the master image. Defaults: `-t 400 -p 400 -m ${master}`
+ * `include [master,slave]`: Without the optional argument displays the included interferograms. If a `master,slave` pair is given, it is added to the list. 
+ * `exclude master,slave`: Can be used to remove a `master,slave` pair from the list. 
+ * `load filename`: Loads the list of pairs from the given filename. Default filename: `$runFolder/$runName_pairs.csv`
+
+=FILES and REFERENCES:=
+{{{
+$runFolder/$runName_pairs.csv
+$ADOREFOLDER/lib/python/fun/select_single_master_from_baselines.py
+$ADOREFOLDER/lib/python/fun/select_pairs_from_baselines.py
+}}}
+=EXAMPLE:=
+{{{
+ADORE: i12s include
+20111029,20111109 20111029,20111120 20111029,20111212 20111029,20120103 20111029,20120114
+ADORE: i12s "filtphase;unwrap"
+ADORE: i12s include 20120114,20120125
+}}}
