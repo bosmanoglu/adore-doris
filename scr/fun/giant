@@ -24,6 +24,14 @@ function prepxml_SBAS(){
   openInIpython "${ADOREFOLDER}/lib/python/giant/prepxml_SBAS.py"    
 }
 
+function prepxml_MINTS(){
+  bold "Changing directory to:"
+  mkdir -p ${runFolder}/giant  #${giantFolder}
+  echo ${runFolder}/giant
+  cd ${runFolder}/giant
+  openInIpython "${ADOREFOLDER}/lib/python/giant/prepxml_MINTS.py"    
+}
+
 function PrepIgramStack(){
   ls ${i12sFolder}/*/coarseorb.drs > ifg.list
   PrepIgramStack.py -u ${GIANT}/SCR/userfn_adore.py -i ifg.list ${@} 
@@ -35,6 +43,26 @@ function ProcessStack(){
 
 function SBASInvert(){
   SBASInvert.py ${@}
+}
+
+function giant_default(){
+  local cmd=${1}
+  shift
+  eval "${cmd}.py ${@}"
+}
+
+function giant_list(){
+cat << _EOF
+Available GIAnT commands:
+
+prepxml_SBAS   PrepIgramStack  SBASInvert    DatatoWavelet              plotts
+prepxml_MINTS  ProcessStack    NSBASInvert   InvertWaveletCoeffs        make_movie
+                               TimefnInvert  InvertWaveletCoeffs_folds  make_kml
+                                             WavelettoData               
+                               SBASxval      InvertWaveletCoeffs_xval
+                               Timefnxval    WavelettoData_xval
+_EOF
+
 }
 
 #####################
@@ -57,8 +85,16 @@ case ${1} in
     shift
     SBASInvert ${@}
   ;;
+  "list")
+    shift
+    giant_list
+  ;;
+  "prepxml_MINTS")
+    shift
+    prepxml_MINTS
+  ;;
   *)
-    h giant
+    giant_default ${@}
   ;;
 esac
 
