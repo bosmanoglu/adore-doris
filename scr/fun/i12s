@@ -38,42 +38,186 @@ function processInterferoSteps(){
      error "Skipping master_master interferogram."
    fi
 }
+function processInterfero(){
+  local interferoSteps="${@}"
+  if [ -z ${interferoSteps} ]; then
+    error "Please specify processing steps to execute."
+    error "See usage: ? i12s"
+    return 
+  fi
+  # we will be changing directories
+  # save the current dir.
+  local CALLDIR="$PWD";
+
+  generateRandomString
+  local originalSettingsFile="${CALLDIR}/${randomString}.set"
+  #save current settings so that we can recall them at the end.
+  settings save ${originalSettingsFile}
+  ####Now the i12s
+  if [ -n "${interferoSteps}" ]; then
+    cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+    jobIds=( ); #start empty list
+    for pair in ${pairs[@]}
+    do
+      processInterferoSteps "${pair%%,*},${pair##*,}"
+    done
+  fi
+
+  #go back to where we started
+  cd ${CALLDIR}
+  echo "Replacing user settings"
+  echo "You can cancel the wait loop by CTRL+C."
+  bold "However, processes may still be running. Please check with: qstat"
+  settings load ${originalSettingsFile}
+  rm ${originalSettingsFile}
+  waitjob ${jobIds[@]}
+}
+
+function find_pairs(){
+  pair=${1}
+  shift
+  array=( ${@} )
+  for (( k=0; k<${#array[@]}; k++ ))
+  do 
+    if [ "${array[k]}" == "${pair}" ]; then
+      echo ${k}
+      return
+    else
+      continue
+    fi
+  done
+  echo -1  
+}
+
+function sort_pairs(){
+  echo ${@}|tr ' ' "\n"|uniq|sort
+}
+
+function i12s_init(){
+  local method t p m pairsFile
+  local _ipy_t _ipy_p _ipy_f
+  method=${1}
+  shift
+  pairsFile="${runFolder}/${runName}_pairs.csv"
+  if [ -e "${pairsFile}" ]; then 
+    if [ "${overwrite}"=="on" ]; then
+      rm -rf ${pairsFile}
+    else
+      error "Can not overwrite existing file: ${pairsFile}"
+      return
+    fi
+  fi
+    
+  if [ "${method}"=="sbas" ]; then  
+    parseargs "t:p:" ${@}
+    #echo "t: ${t}"
+    #echo "p: ${p}"
+    [ -z ${t} ] && t=400
+    [ -z ${p} ] && p=400
+    _ipy_t=${t}
+    _ipy_p=${p}    
+    _ipy_f="${pairsFile}"
+    if [ ! -e "${baselinesFolder}/baselines" ]; then
+      error "Baselines file is not generated."
+      bold "Running baselines..."
+      baselines
+    fi
+    openInIpython "${ADOREFOLDER}/lib/python/fun/select_pairs_from_baselines.py"
+  elif [ "${method}"=="psi" ]; then
+    parseargs "m:" ${@}
+    mkdir -p "${tmpFolder}"
+    _ipy_pipe="${tmpFolder}/ipy.pipe"
+    if [ -z ${m} ]; then 
+      openInIpython "${ADOREFOLDER}/lib/python/fun/select_single_master_from_baselines.py"
+      m=`cat ${_ipy_pipe}`
+    fi
+      
+    for scene in `scenes include`
+    do
+      if [ "${scene}"=="${m}" ]; then
+        continue
+      else
+        echo "${m},${scene}" >> ${pairsFile}
+      fi
+    done 
+  fi
+  echo "Pairs file: ${pairsFile}"
+  i12s_load ${pairsFile}
+}
+
+function i12s_load(){
+  #Load pairs file as pairs
+  pairsFile=${1}
+  [ -z ${pairsFile} ] && pairsFile="${runFolder}/${runName}_pairs.csv"
+  pairs=()
+  for pair in `cat ${1}`
+  do
+    pairs=( ${pairs[@]} ${pair} )
+  done
+  pairs=( $(sort_pairs ${pairs[@]}))  
+}
+
+function i12s_include(){
+  if [ "${1:-undefined}" == "undefined" ]; then
+    if [ ${#pairs[@]} -gt 0 ]; then
+      echo ${pairs[@]}
+    else
+      error "Currently, there are no pairs available. Please use: i12s init"
+    fi
+  else    
+    local pair pair_location
+    for pair in "$@"  
+    do
+      pair_location=`find_pairs ${pair} "${pairs[@]}"`
+      if [ ${pair_location} -gt -1 ]; then
+        error "${pair} is already included."
+      else
+        pairs=( ${pairs[@]} ${pair} );
+        pairs=( $(sort_pairs ${pairs[@]}))        
+      fi
+    done
+  fi
+}
+
+function i12s_exclude(){
+  if [ "${1:-undefined}" != "undefined" ];then
+    local pair pair_location
+    for pair in "$@"
+    do
+      pair_location=`find_pairs ${pair} "${pairs[@]}"`
+      if [ ${pair_location} -gt -1 ]; then
+        echo "Removing: ${pair}"
+        pairs=( ${pairs[@]:0:$pair_location} ${pairs[@]:$(($pair_location + 1))} );
+        pairs=( $(sort_pairs ${pairs[@]}))        
+      else
+        error "${pair} is not included."
+      fi
+    done
+  fi
+}
+
 #######################################################
 ####  MAIN ####
 #######################################################
-# we will be changing directories
-# save the current dir.
-local CALLDIR="$PWD";
-
-generateRandomString
-local originalSettingsFile="${CALLDIR}/${randomString}.set"
-#save current settings so that we can recall them at the end.
-settings save ${originalSettingsFile}
-local interferoSteps="${@}"
-####Now the i12s
-if [ -n "${interferoSteps}" ]; then
-  if [ -d ${i12sFolder} ]; then
-    scenesInclude=`ls -F $i12sFolder | grep '/' | tr -d '/'| tr '_' ','`
-  else
-    scenesInclude=`scenes include| tr " " "\n" | sort --unique`
-  fi
-  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
-  jobIds=( ); #start empty list
-  for scene in ${scenesInclude}
-  do
-    if [[ ${scene} == *,* ]]; then
-      processInterferoSteps "${scene%%,*},${scene##*,}"
-    else
-      processInterferoSteps "${master},${scene}"
-    fi
-  done
-fi
-
-#go back to where we started
-cd ${CALLDIR}
-echo "Replacing user settings"
-echo "You can cancel the wait loop by CTRL+C."
-bold "However, processes may still be running. Please check with: qstat"
-settings load ${originalSettingsFile}
-rm ${originalSettingsFile}
-waitjob ${jobIds[@]}
+case "${1}" in 
+"exclude")
+ shift
+ i12s_exclude "$@"
+ ;;
+"include")
+ shift
+ i12s_include "$@"
+ ;;
+"init")
+ shift 
+ i12s_init "$@"
+ #i12s_rescan   
+ ;;
+"load")
+ shift   
+ i12s_load "$@"
+ ;;
+*)
+ processInterfero "${@}"
+ ;;
+esac

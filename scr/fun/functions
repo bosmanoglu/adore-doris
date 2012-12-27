@@ -88,6 +88,21 @@ function testFunction(){
 #echo "$a $b $c"
 #unset a b c
 
+function parseargs(){
+  local options
+  options="${1}"
+  shift  
+  while getopts "${options}" flag
+  do
+    eval export ${flag}=${OPTARG}
+  done
+  for ((k=1; k<$OPTIND; k++))
+  do
+    shift
+  done
+  unset flag OPTARG OPTIND
+}  
+
 function calculate_coh_multilook(){
   echo "$(( ${srp_multilook% *} * ${int_multilook% *} )) $(( ${srp_multilook#* } * ${int_multilook#* } ))"
 }
