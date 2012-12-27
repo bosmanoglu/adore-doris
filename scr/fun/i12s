@@ -157,6 +157,18 @@ function i12s_load(){
   pairs=( $(sort_pairs ${pairs[@]}))  
 }
 
+function i12s_save(){
+  #Load pairs file as pairs
+  pairsFile=${1}
+  [ -z ${pairsFile} ] && pairsFile="${runFolder}/${runName}_pairs.csv"
+  rm -rf ${pairsFile}
+  for pair in ${pairs[@]}
+  do
+    echo ${pair} >> ${pairsFile}
+  done
+  echo "Pairs saved to: ${pairsFile}"
+}
+
 function i12s_include(){
   if [ "${1:-undefined}" == "undefined" ]; then
     if [ ${#pairs[@]} -gt 0 ]; then
@@ -216,6 +228,10 @@ case "${1}" in
 "load")
  shift   
  i12s_load "$@"
+ ;;
+"save")
+ shift   
+ i12s_save "$@"
  ;;
 *)
  processInterfero "${@}"

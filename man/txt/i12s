@@ -6,6 +6,7 @@ USAGE:
 	i12s include [master,slave]
         i12s exclude master,slave
         i12s load [filename]
+        i12s save [filename]
 
 DESCRIPTION:
  I12S is an internal ADORE command. 
@@ -17,6 +18,7 @@ INPUT:
  * `include [master,slave]`: Without the optional argument displays the included interferograms. If a `master,slave` pair is given, it is added to the list. 
  * `exclude master,slave`: Can be used to remove a `master,slave` pair from the list. 
  * `load filename`: Loads the list of pairs from the given filename. Default filename: `$runFolder/$runName_pairs.csv`
+ * `save filename`: Saves the list of pairs to the given filename. Default filename: `$runFolder/$runName_pairs.csv`
 
 
 FILES and REFERENCES:

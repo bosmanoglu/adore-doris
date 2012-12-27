@@ -11,6 +11,7 @@ complete -F "_saveas" -o "default" "saveas"
 complete -F "_scenes" -o "default" "scenes"
 complete -F "_settings" -o "default" "settings"
 complete -F "_undo" -o "default" "undo"
+complete -F "_giant" -o "default" "giant"
 
 function _archive(){
 	COMPREPLY=()
@@ -76,12 +77,63 @@ function _dem(){
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
 }
 
+function _giant(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local opts="prepxml_SBAS PrepIgramStack ProcessStack SBASInvert plotts"
+	# local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	# case "${prev}" in
+	# 	make)
+	#		local srtm="SRTM1 SRTM3"
+	#		COMPREPLY=( $(compgen -W "${srtm}" -- ${cur}) )
+	#		return 0
+	#		;;
+	#	load)
+	#		COMPREPLY=( $(compgen -f ${cur}) )
+	#		return 0
+	#		;;
+	#	*)
+	#	;;
+	# esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
 function _h(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
         local opts=`typeset -F | cut -d" " -f3`	
 	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
+
+function _i12s(){
+	COMPREPLY=()
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts=`lsprocess | tail -n 6`
+        opts="${opts} psi sbas include exclude load save"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	
+	case "${prev}" in
+		psi|sbas)
+			local args="-t -p -m"
+			COMPREPLY=( $(compgen -W "${args}" -- ${cur}) )
+			return 0
+			;;
+		include|exclude)
+                        local args=`scenes include`
+			COMPREPLY=( $(compgen -W "${args}" -- ${cur}) )
+			return 0
+			;;
+		load)
+			COMPREPLY=( $(compgen -f ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
 
 function _mask(){
 	COMPREPLY=()

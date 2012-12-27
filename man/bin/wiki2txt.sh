@@ -2,6 +2,9 @@
 
 wikif=${1}
 txtf=${2}
+#clear old txtf 
+rm -rf ${txtf}
+mkdir -p ${txtf}
 
 for file in `ls ${1} | grep -v "~"`;
 do 
@@ -11,7 +14,11 @@ do
 done
 
 #rm unnecessary pages
-for f in "PageName TipsAndTricks Scripts Polls FAQ adoreFunctionsAndScripts Roadmap Reference Other_SAR_Software Functions sidebar"
-do 
-  rm ${txtf}/${f}
+set -x
+for f in {PageName,TipsAndTricks,Scripts,Polls,FAQ,adoreFunctionsAndScripts,Roadmap,Reference,Other_SAR_Software,Functions,sidebar,adoreVariables,MailingList}
+do
+  find ${txtf} -name ${f} -exec rm {} \;
+  #rm ${txtf}/${f}
+  
 done
+set +x
