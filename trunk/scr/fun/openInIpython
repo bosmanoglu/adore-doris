@@ -5,6 +5,8 @@ function runIpython(){
 local cmd="${@}"
 mkdir -p ${tmpFolder}
 settings list &> ${tmpFolder}/settings.set
+echo "[_ipy_]" &>> ${tmpFolder}/settings.set
+s _ipy_ |sed 's/_ipy_//g' &>> ${tmpFolder}/settings.set
 
 #check ipython version
 local ipv parameters

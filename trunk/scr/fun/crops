@@ -21,7 +21,6 @@ function processCropSteps(){
   local scene=${1}     
   bold "Processing ${scene}"
   settings apply -r -q master=${scene} slave="dummy" outputFolder="${cropsFolder}/${scene}"
-  [ "${scene}" == "${resampleMaster}" ] && settings apply -r -q m_dbow="${rs_dbow}" m_dbow_geo="${rs_dbow_geo}"
   mkdir -p "${outputFolder}"
   cd "${outputFolder}"    
 
@@ -39,38 +38,77 @@ function processCropSteps(){
 #######################################################
 ####  MAIN ####
 #######################################################
-#for now no parallel
-local parallel="off"
-# we will be changing directories
-# save the current dir.
-local CALLDIR="$PWD";
+function processCrops(){
+  local cropSteps="${@}"
+  if [ -z ${cropSteps} ]; then
+    error "Please specify processing steps to execute."
+    error "See usage: ? crops"
+    return 
+  fi
+  # we will be changing directories
+  # save the current dir.
+  local CALLDIR="$PWD";
 
-generateRandomString
-local originalSettingsFile="${CALLDIR}/${randomString}.set"
-#save current settings so that we can recall them at the end.
-settings save ${originalSettingsFile}
+  generateRandomString
+  local originalSettingsFile="${CALLDIR}/${randomString}.set"
+  #save current settings so that we can recall them at the end.
+  settings save ${originalSettingsFile}
 
-#### crop
-cropSteps="${@}"
-#<<ENDCOMMENT>/dev/null
-#ENDCOMMENT
-#for scene in ${scenes_include[*]}
-if [ -n "${cropSteps}" ]; then
-  jobIds=( ); #start empty list
-  for scene in `scenes include| tr " " "\n" | sort --unique`
-  do
-    processCropSteps ${scene}
-  done
+  #<<ENDCOMMENT>/dev/null
+  #ENDCOMMENT
+  #for scene in ${scenes_include[*]}
+  if [ -n "${cropSteps}" ]; then
+    jobIds=( ); #start empty list
+    for scene in `scenes include| tr " " "\n" | sort --unique`
+    do
+      processCropSteps ${scene}
+    done
+    waitjob ${jobIds[@]}
+  fi
+
+  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+  #go back to where we started
+  cd ${CALLDIR}
+  echo "Replacing user settings"
+  echo "You can cancel the wait loop by CTRL+C."
+  bold "However, processes may still be running. Please check with: qstat"
+  settings load ${originalSettingsFile}
+  rm ${originalSettingsFile}
   waitjob ${jobIds[@]}
-fi
+}
 
-cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
-
-#go back to where we started
-cd ${CALLDIR}
-echo "Replacing user settings"
-echo "You can cancel the wait loop by CTRL+C."
-bold "However, processes may still be running. Please check with: qstat"
-settings load ${originalSettingsFile}
-rm ${originalSettingsFile}
-waitjob ${jobIds[@]}
+###############
+### MAIN
+###############
+case "${1}" in 
+"exclude")
+ shift
+ scenes exclude "$@"
+ ;;
+"include")
+ shift
+ scenes include "$@"
+ ;;
+"init")
+ shift
+ scenes init "$@"
+ scenes rescan
+ ;;
+"rename")
+ shift
+ scenes rename "$@"
+ ;;
+"rescan")
+ shift
+ scenes rescan
+ ;;
+"add")
+ shift
+ scenes add "${@}"
+ scenes rescan
+ ;;
+*)
+ processCrops "${@}"
+ ;;
+esac
