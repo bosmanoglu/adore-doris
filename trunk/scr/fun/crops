@@ -90,24 +90,6 @@ case "${1}" in
  shift
  scenes include "$@"
  ;;
-"init")
- shift
- scenes init "$@"
- scenes rescan
- ;;
-"rename")
- shift
- scenes rename "$@"
- ;;
-"rescan")
- shift
- scenes rescan
- ;;
-"add")
- shift
- scenes add "${@}"
- scenes rescan
- ;;
 *)
  processCrops "${@}"
  ;;
