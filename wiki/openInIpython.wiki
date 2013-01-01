@@ -32,7 +32,8 @@ openInIpython is an ADORE function which exports the settings from ADORE and imp
   * `G.ppars` : TSXML instance for processing parameters. (see GIAnT documentation.)
   * `G.RAW_STACK`: Dictionary object for the raw data stack.
   * `G.PROC_STACK`: Dictionary object for the processed (e.g. deramped) data stack.
-  * `G.LS_PARAMS`: Dictionary object for the Least Squares inversion Parameters.
+  * `G.LS_PARAMS`: Dictionary object for the Least Squares inversion results.
+  * `G.NSBAS_PARAMS`: Dictionary object for the NSBAS inversion results.
 =FILES and REFERENCES:=
 {{{
  ${ADOREFOLDER}/lib/python/ipython.rc
