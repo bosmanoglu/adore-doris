@@ -38,7 +38,17 @@
 }}}
 =EXAMPLE:=
 {{{
- giant prepxml_SBAS
+ ADORE: giant prepxml_SBAS
+ ADORE: giant list
+Available GIAnT commands:
+
+prepxml_SBAS   PrepIgramStack  SBASInvert    DatatoWavelet              plotts
+prepxml_MINTS  ProcessStack    NSBASInvert   InvertWaveletCoeffs        make_movie
+                               TimefnInvert  InvertWaveletCoeffs_folds  make_kml
+                                             WavelettoData               
+                               SBASxval      InvertWaveletCoeffs_xval
+                               Timefnxval    WavelettoData_xval
+
 }}}
 =KNOWN BUGS:=
  Currently ADORE generated DEMs can not be read directly into GIAnT.
