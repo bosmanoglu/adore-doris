@@ -2,8 +2,7 @@
 #labels Phase-Support,Help
 =USAGE:=
 {{{
-	raster a|p|m dorisStep -- cpxfiddleOptions
-	raster a|p|m dorisStep:filename -- cpxfiddleOptions
+	raster a|p|m dorisStep[:filename] [cpxfiddleOptions]
 }}}
 =DESCRIPTION:=
  RASTER is an internal ADORE command.  
