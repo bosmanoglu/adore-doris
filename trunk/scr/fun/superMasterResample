@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# USAGE:
+# 	superMasterResample
+#
+# DESCRIPTION:
+#  superMasterResample is an ADORE function.  
+#
+# INPUT:
+#
+# OUTPUT:
+#
+# EXAMPLES:
+#  superMasterResample
+
+
+function processResampleSteps(){
+   # reload original settings
+   settings load ${originalSettingsFile}
+   master=${resampleMaster}
+   local scene=${1}
+   if [ -d "${resampleFolder}/${master}_${scene}" ]; then
+     continue #already processed... Shouldn't happen but who knows.
+   fi
+   if [ "${master}" == "${scene}" ]; then
+     #re-crop master
+     bold "Processing resample/${master}_${scene}"
+     settings apply -r -q master=${master} slave=dummy outputFolder="${resampleFolder}/${master}_${scene}" m_dbow="${rs_dbow}" m_dbow_geo="${rs_dbow_geo}"
+     mkdir -p "${outputFolder}"
+     local cropSteps=`previousSteps ${cropsFolder}/${master}/${master}.res`
+     if [ "${parallel}" == "on" ]; then
+       jobId=`quejob "${cropSteps}" "${outputFolder}"`
+       jobIds=( ${jobIds[@]} ${jobId} )
+     else
+       eval "${cropSteps}"
+     fi
+   else
+     bold "Processing resample/${master}_${scene}"
+     settings apply -r -q master=${master} slave=${scene} outputFolder="${resampleFolder}/${master}_${scene}"
+     mkdir -p "${outputFolder}"
+     cd "${outputFolder}"
+     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+     
+     if [ "${parallel}" == "on" ]; then
+       jobId=`quejob "${resampleSteps}" "${outputFolder}"`
+       jobIds=( ${jobIds[@]} ${jobId} )
+     else
+       eval "${resampleSteps}"
+     fi
+   fi
+   settings save
+}
+function processResample(){
+  local resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
+  # we will be changing directories
+  # save the current dir.
+  local CALLDIR="$PWD";
+
+  generateRandomString
+  local originalSettingsFile="${CALLDIR}/${randomString}.set"
+  #save current settings so that we can recall them at the end.
+  settings save ${originalSettingsFile}
+  ####Now resample
+  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+  jobIds=( ); #start empty list
+  for scene in `scenes include| tr " " "\n" | sort --unique`
+  do
+    processResampleSteps "${scene}"
+  done
+}
+
+##MAIN
+resampleFolder="${runFolder}/resample"
+resampleMaster="${1}"
+[ ! -d "${cropsFolder}/${resampleMaster}" ] && error "Bad super master." && return 
+[ "${rs_dbow}" == "0 0 0 0" ] && [ "${rs_dbow_geo}" == "0 0 0 0" ] && error "Please specify rs_dbow or rs_dbow_geo." && return
+processResample

@@ -167,7 +167,7 @@ echo '</textarea>' >>${rFile}
 function reportPicture(){
  local step m1 m2
  step="${1}"
- echo ${coh_multilook}
+ #echo ${coh_multilook}
  m1=$(( 20 / ${coh_multilook% *} ))
  m2=$(( ${m1} * ${coh_multilook#* } / ${coh_multilook% *} ))
  [ "${m1}" == "" ] && m1="20" && m2="20"

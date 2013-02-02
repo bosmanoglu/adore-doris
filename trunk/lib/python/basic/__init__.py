@@ -534,45 +534,6 @@ def findAndReplace(fileList,searchExp,replaceExp):
             line = line.replace(searchExp,replaceExp)
         sys.stdout.write(line)         
 
-def gridSearch(fun, bounds,tol=1.):
-    """gridSearch(fun, args, bounds):
-    #for now bounds are actual sampling points (i.e. r_[xmin:xmax])
-    Divide and conquer brute-force grid search
-    """
-    #Main idea is that we want to do only a handful of operations at each time on the multidimensional grid. 
-    #Slowly zone in on the lowest score. 
-    fun_min=+inf
-    s=[(max(b)-min(b))/10. for b in bounds ]
-    b0=[]
-    d=[False, False]
-    while True:
-        for k in xrange(2):
-            b0.append(bounds[k][:-1:s[k]]);
-        
-        if (len(b0[0])<=1) or (max(diff(b0[0])) < tol):
-            d[0]=True
-        if (len(b0[1])<=1) or (max(diff(b0[1])) < tol) :
-            d[1]=True
-        if all(d)==True:
-            break
-        else:
-            print s
-        for x in b0[0]:
-            for y in b0[1]:
-                y0=fun([x,y]);
-                if y0 < fun_min:
-                    x0=[x,y]
-                    fun_min=y0
-                    print [x, y, fun_min]
-        #set new bounds
-        for k in xrange(2):
-            bounds[k]=linspace(x0[k]-s[k],x0[k]+s[k],10).astype(int)
-        s=[(max(b)-min(b))/10. for b in bounds ]
-        if any([sk<tol for sk in s]):
-            break
-        b0=[]
-    return x0  
-    
 def gridSearch2(fun, bounds,tol=1., goal='min'):
     """gridSearch(fun, args, bounds):
     #for now bounds are actual sampling points (i.e. r_[xmin:xmax])
