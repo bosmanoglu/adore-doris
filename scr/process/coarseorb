@@ -1,0 +1,39 @@
+#!/bin/bash
+function coarseorb_alos_check(){
+  if [ "${m_in_method}" == "ALOS" ]; then
+    m_bandwidth=`readRes.sh ${m_resfile} readfiles "Total_range_band_width (MHz)"`
+    s_bandwidth=`readRes.sh ${s_resfile} readfiles "Total_range_band_width (MHz)"`
+    if [ "${m_bandwidth}" != "${s_bandwidth}" ]; then
+      bold "FBD-FBS interferometry."
+      if [ "${m_bandwidth}" == "14" ]; then 
+        if [ `readRes.sh $m_resfile process "oversample"` == "0" ]; then 
+          echo "Oversampling master."
+          sfrmt=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_format"`
+          mfrmt=`rs2pn $sfrmt`
+          settings apply m_ovs_fact_rng=2 m_ovs_fact_azi=1 m_ovs_out_format=$mfrmt
+          m_ovs
+        fi
+      fi
+      if [ "${s_bandwidth}" == "14" ]; then
+        if [ `readRes.sh $s_resfile process "oversample"` == "0" ]; then 
+          echo "Oversampling slave."
+          mfrmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
+          sfrmt=`rs2pn $mfrmt`
+          settings apply s_ovs_fact_rng=2 s_ovs_fact_azi=1 s_ovs_out_format=$sfrmt
+          s_ovs
+        fi
+      fi
+    fi  
+  fi
+}
+function coarseorb_default(){
+  pp ${dorisProcess}
+
+  doris ${outputFolder}/${dorisProcess}.drs
+  [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+}
+
+
+## MAIN##
+#coarseorb_alos_check
+coarseorb_default

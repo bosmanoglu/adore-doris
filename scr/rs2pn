@@ -46,3 +46,9 @@
 [ "$1" == "timing_error"  ] && echo reltiming
 [ "$1" == "comp_refphase"  ] && echo comprefpha
 [ "$1" == "unwrap"  ] && echo unwrap
+[ "$1" == "complex_real4"  ] && echo cr4
+[ "$1" == "complex_integer"  ] && echo ci2
+[ "$1" == "real4"  ] && echo r4
+[ "$1" == "integer"  ] && echo i2
+
+

@@ -207,11 +207,18 @@ function i12s_exclude(){
     done
   fi
 }
+function i12s_clear(){
+  pairs=();
+}
 
 #######################################################
 ####  MAIN ####
 #######################################################
 case "${1}" in 
+"clear")
+ shift
+ i12s_clear "$@"
+ ;;
 "exclude")
  shift
  i12s_exclude "$@"

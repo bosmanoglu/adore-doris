@@ -12,6 +12,7 @@ complete -F "_scenes" -o "default" "scenes"
 complete -F "_settings" -o "default" "settings"
 complete -F "_undo" -o "default" "undo"
 complete -F "_giant" -o "default" "giant"
+complete -F "_i12s" -o "default" "i12s"
 
 function _archive(){
 	COMPREPLY=()
@@ -80,7 +81,7 @@ function _dem(){
 function _giant(){
 	COMPREPLY=()
         local cur="${COMP_WORDS[COMP_CWORD]}"
-        local opts="prepxml_SBAS PrepIgramStack ProcessStack SBASInvert plotts"
+        local opts="prepxml_SBAS prepxml_MINTS PrepIgramStack ProcessStack SBASInvert NSBASInvert plotts"
 	# local prev="${COMP_WORDS[COMP_CWORD-1]}"
 	
 	# case "${prev}" in

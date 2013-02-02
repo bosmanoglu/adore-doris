@@ -33,6 +33,10 @@ function prepxml_MINTS(){
 }
 
 function PrepIgramStack(){
+  bold "Changing directory to:"
+  mkdir -p ${runFolder}/giant  #${giantFolder}
+  echo ${runFolder}/giant
+  cd ${runFolder}/giant
   ls ${i12sFolder}/*/coarseorb.drs > ifg.list
   PrepIgramStack.py -u ${GIANT}/SCR/userfn_adore.py -i ifg.list ${@} 
 }

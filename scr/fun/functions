@@ -385,12 +385,20 @@ function mask(){
 	. ${ADORESCR}/fun/mask "${@}"
 }
 
+function m_fbd2fbs(){
+	. ${ADORESCR}/fun/m_fbd2fbs "${@}"
+}
+
 function openInIpython(){
 	. ${ADORESCR}/fun/openInIpython
 }
 
 function quejob(){
 	. ${ADORESCR}/fun/quejob "$@"
+}
+
+function previousSteps(){
+	. ${ADORESCR}/fun/previousSteps "$@"
 }
 
 function raster(){
@@ -408,6 +416,14 @@ function saveas(){
 
 function scenes(){
 	. ${ADORESCR}/fun/scenes "${@}"
+}
+
+function s_fbd2fbs(){
+	. ${ADORESCR}/fun/s_fbd2fbs "${@}"
+}
+
+function superMasterResample(){
+        . ${ADORESCR}/fun/superMasterResample "${@}"
 }
 
 function undo(){

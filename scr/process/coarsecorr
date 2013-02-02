@@ -1,22 +1,39 @@
 #!/bin/bash
-if [ ${cc_method} == "manual" ]; then
+function coarsecorr_manual(){
   #get width of m_crop
-  mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels (non-multilooked)"`
-  swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels (non-multilooked)"`
-  mcrop=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_file"`
-  scrop=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_file"`
+  ##check if reading ovs or crop
+  if [ `readRes.sh $m_resfile process "oversample"` == "1" ]; then 
+    mwidth=`readRes.sh $m_resfile $(pn2rs m_ovs) "Number of pixels (oversampled)"`
+    mcrop=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_file"`
+    mfrmt=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_format"`
+  else
+    mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels (non-multilooked)"`
+    mcrop=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_file"`
+    mfrmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
+  fi
+  if [ `readRes.sh $s_resfile process "oversample"` == "1" ]; then 
+    swidth=`readRes.sh $s_resfile $(pn2rs s_ovs) "Number of pixels (oversampled)"`
+    scrop=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_file"`
+    sfrmt=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_format"`
+  else
+    swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels (non-multilooked)"`
+    scrop=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_file"`
+    sfrmt=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_format"`
+  fi
+  mfrmt=`rs2pn ${mfrmt}`
+  sfrmt=`rs2pn ${sfrmt}`
   #mfmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
   
-  echo ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ci2/ci2 -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop}  
-  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ci2/ci2 -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop} | tee ${outputFolder}/manual_offsets_cc.txt
+  echo ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop}  
+  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop} | tee ${outputFolder}/manual_offsets_cc.txt
   openInIpython ${ADOREFOLDER}/lib/python/fun/manual_offsets_coarsecorr.py 
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
   unset mwidth
   unset swidth
   unset mcrop
   unset scrop
-else
-
+}
+function coarsecorr_default(){
   pp ${dorisProcess}
 
   if [ -z ${cc_in_pos} ]; then
@@ -27,5 +44,11 @@ else
 
   doris ${outputFolder}/${dorisProcess}.drs
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+}
 
+## MAIN##
+if [ "${cc_method}" == "manual" ]; then
+  coarsecorr_manual "${@}"
+else
+  coarsecorr_default
 fi

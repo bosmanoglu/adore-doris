@@ -1,0 +1,57 @@
+#!/bin/bash
+function previousMasterSteps(){
+  local steps=""
+  for p in m_readfiles m_porbits m_crop m_simamp m_timing m_ovs
+  do
+    check -p ${p} ${1} &>> /dev/null
+    [ $? -eq 1 ] && steps="${steps};${p}"
+  done
+  echo "${steps/;/}"
+}
+function previousSlaveSteps(){
+  local steps=""
+  for p in s_readfiles s_porbits s_crop s_ovs
+  do
+    check -p ${p} ${1} &>> /dev/null
+    [ $? -eq 1 ] && steps="${steps};${p}"
+  done
+  echo "${steps/;/}"
+}
+function previousInterferoSteps(){
+  local steps=""
+  for p in coarseorb coarsecorr fine reltiming demassist coregpm resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h geocode
+  do
+    check -p ${p} ${1} &>> /dev/null
+    [ $? -eq 1 ] && steps="${steps};${p}"
+  done
+  echo "${steps/;/}"
+}
+function getResType(){
+ local restype=`grep ${1} ${1} | cut -f 2 -d " "`
+ if [ ${restype} == "MASTER" ]; then 
+   echo m
+ elif [ ${restype} == "SLAVE" ]; then
+   echo s
+ elif [ ${restype} == "INTERFEROGRAM" ]; then
+   echo i
+ else
+   error "Can not determine result file type."
+   return
+ fi
+}
+#MAIN
+if [ -f "${1}" ]; then 
+  rt=`getResType "${1}"`
+  [ "${rt}" == "m" ] && previousMasterSteps "${1}"
+  [ "${rt}" == "s" ] && previousSlaveSteps "${1}"
+  [ "${rt}" == "i" ] && previousInterferoSteps "${1}"
+else
+  m_steps=`previousMasterSteps ${m_resfile}`
+  s_steps=`previousSlaveSteps ${s_resfile}`
+  i_steps=`previousInterferoSteps ${i_resfile}`
+  steps=`echo ${m_steps};${s_steps};${i_steps} | tr -s ';'`
+  echo ${steps/;/}
+  unset m_steps s_steps i_steps steps 
+fi
+unset previousInterferoSteps previousMasterSteps previousSlaveSteps
+

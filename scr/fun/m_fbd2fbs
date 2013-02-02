@@ -1,0 +1,17 @@
+#!/bin/bash
+if [ "${m_in_method}" == "ALOS" ]; then
+  m_bandwidth=`readRes.sh ${m_resfile} readfiles "Total_range_band_width (MHz)"`
+  if [ "${m_bandwidth}" == "14" ]; then
+    if [ `readRes.sh $m_resfile process "oversample"` == "0" ]; then 
+      echo "Range oversampling master."
+      mfrmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
+      mfrmt=`rs2pn $mfrmt`
+      settings apply m_ovs_fact_rng=2 m_ovs_fact_azi=1 m_ovs_out_format=$mfrmt
+      m_ovs
+      cp ${m_resfile} ${m_resfile}.bck
+      undo only m_crop
+      copyRes.sh ${m_resfile} oversample crop
+      undo only m_ovs
+    fi
+  fi
+fi
