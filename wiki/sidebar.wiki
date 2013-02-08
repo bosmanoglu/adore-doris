@@ -95,7 +95,7 @@
     * [singleMasterStack_Parallel singleMasterStack_Parallel.adr]
     * [multiplePairs multiplePairs.adr]
   * [Tools ADORE Tools]
-    * [deramp deramp.py]
+    * [deramp_py deramp.py]
     * [real2cpx real2cpx.py]
     * [plot_fine plot_fine.py]
     * [plot_coarsecorr plot_coarsecorr.py]
