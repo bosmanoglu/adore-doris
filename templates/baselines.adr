@@ -30,6 +30,7 @@ settings save ${tmpSetFile}
 # We assign slave as dummy and master as the current scene.      
 stackMaster=${master};
 baselinesFolder=${runFolder}/baselines
+[ -d "${baselinesFolder}" ] && rm -rf "${baselinesFolder}"
 settings apply -r -q slave="dummy" outputFolder="${baselinesFolder}"
 mkdir -p "${outputFolder}"
 cd "${outputFolder}"  

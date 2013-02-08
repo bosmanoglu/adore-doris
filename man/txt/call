@@ -34,3 +34,4 @@ EXAMPLE:
  ADORE: call "(a b c)=testFunction ONE Two Three ;"
  ADORE: echo "$a $b $c"
  Two ONE Three
+

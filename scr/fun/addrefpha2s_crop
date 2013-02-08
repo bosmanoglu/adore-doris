@@ -20,12 +20,26 @@
 
 function funResample2Tmpfile(){
   tmpFile=${1}
-  [ ! -e "${rs_out_file}" ] && error "Resample file not found. Please run resample step" && return 1
-  [ ! -e "${srp_out_refpha}" ] && error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return 1
-
-  bold "Adding reference phase to resampled slave..."
-  cpxmult ${rs_out_file} ${srp_out_refpha} ${rs_out_file}.addrefpha 1
-  [ $? -ne 0 ] && error "cpxmult can not multiply." && return 1
+  [ ! -e "${rs_out_file}" ] && error "Resample file not found. Please run resample step" && return 
+  #[ ! -e "${srp_out_refpha}" ] && error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return 
+  if [ ! -e "${srp_out_refpha}" ] && [ ! -e "${crd_out_file}" ] ; then
+    error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on or comprefdem with crd_include_fe=on"
+    return 
+  fi
+  
+  if [ -e "${crd_out_file}" ]; then 
+    bold "Adding reference phase and topographic phase to resampled slave..."
+    local fileName resFile format width numlines
+    call "(fileName resFile format width numlines)=dorisProcess2OutputFile comprefdem"
+    ${ADOREFOLDER}/lib/python/real2cpx.py -w ${width} -f ${format} -m 1 -p ${crd_out_file} ${crd_out_file}.cpx
+    [ $? -ne 0 ] && error "real2cpx failed." && return 1
+    cpxmult ${rs_out_file} ${crd_out_file}.cpx ${rs_out_file}.addrefpha 1
+    [ $? -ne 0 ] && error "cpxmult can not multiply." && return 1
+  else
+    bold "Adding reference phase to resampled slave..."
+    cpxmult ${rs_out_file} ${srp_out_refpha} ${rs_out_file}.addrefpha 1
+    [ $? -ne 0 ] && error "cpxmult can not multiply." && return 1
+  fi    
   cp ${s_resfile} ${s_resfile}.bck
 
   # Below line copies the information from the requested step and copies it to a temporary file
@@ -66,7 +80,8 @@ function funResample2Crop(){
   funResample2Tmpfile ${tmpFile}
   [ $? -ne 0 ] && return 1 
   
-  undo crop ${s_resfile}
+  undo only crop ${s_resfile}
+  undo only resample ${s_resfile}
 
   # Re-write crop for resampling.
   sed -i -e '/^crop/s/0/1/g' ${s_resfile}
@@ -86,7 +101,8 @@ function funResample2Ovs(){
   funResample2Tmpfile ${tmpFile}
   [ $? -ne 0 ] && return 1 
   
-  undo oversample ${s_resfile}
+  undo only oversample ${s_resfile}
+  undo only resample ${s_resfile}
 
   # Re-write crop for resampling.
   sed -i -e '/^oversample/s/0/1/g' ${s_resfile}

@@ -47,8 +47,8 @@
 [ "$1" == "comp_refphase"  ] && echo comprefpha
 [ "$1" == "unwrap"  ] && echo unwrap
 [ "$1" == "complex_real4"  ] && echo cr4
-[ "$1" == "complex_integer"  ] && echo ci2
+[ "$1" == "complex_short"  ] && echo ci2
 [ "$1" == "real4"  ] && echo r4
-[ "$1" == "integer"  ] && echo i2
+[ "$1" == "short"  ] && echo i2
 
 

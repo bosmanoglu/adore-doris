@@ -28,3 +28,4 @@ EXAMPLE:
 
  ask "Shall I continue?" && echo yes || echo no
  if ask "Shall I delete the old ${saveFileName}?"
+

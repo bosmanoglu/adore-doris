@@ -3,16 +3,16 @@
 #	check
 # 	check setup
 #	check resultFile
-# 	check -p processName
+# 	check -p processName [filename]
 #	check -j jobid
 #
 # DESCRIPTION:
 #  CHECK is an internal ADORE command. 
 #  It shows the process control list from the result files.
 #
-#  Using the -p option it can be used to check whether a given step is possible
-#  to run. 
-#  "setup" option can be used to check if ADORE can find all the necessary libraries.
+#  Using the -p option it can be used to check whether a given step is
+#  possible to run.  "setup" option can be used to check if ADORE can find
+#  all the necessary libraries.
 #
 # INPUT:
 #  No required inputs.
@@ -103,10 +103,11 @@ function checkProcessFlag(){
 # 3: input error
 
 local alreadyProcessed prevProcStatus processName resFile
+[ -n "${2}" ] && resFile="${2}"
 case "${1}" in 
   "m_readfiles")
     processName=`pn2rs ${1}`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && return 0;
     alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
     return ${alreadyProcessed}
@@ -114,7 +115,7 @@ case "${1}" in
   "m_porbits")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs m_readfiles`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3
@@ -126,7 +127,7 @@ case "${1}" in
   "m_crop")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs m_readfiles`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
@@ -136,7 +137,7 @@ case "${1}" in
   "m_simamp")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs m_crop`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
@@ -148,7 +149,7 @@ case "${1}" in
   "m_timing")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs m_simamp`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3    
@@ -158,7 +159,7 @@ case "${1}" in
   "m_ovs")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs m_crop`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3
@@ -170,7 +171,7 @@ case "${1}" in
   ;;
   "s_readfiles")
     processName=`pn2rs ${1}`
-    resFile=${s_resfile}
+    [ -z "${resFile}" ] && resFile=${s_resfile}
     [ ! -e ${resFile} ] && return 0;
     alreadyProcessed=`${ADORESCR}/readRes.sh ${resFile} process_control ${processName}`  
     return ${alreadyProcessed}
@@ -178,7 +179,7 @@ case "${1}" in
   "s_porbits")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs s_readfiles`
-    resFile=${s_resfile}
+    [ -z "${resFile}" ] && resFile=${s_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
@@ -190,7 +191,7 @@ case "${1}" in
   "s_crop")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs s_readfiles`
-    resFile=${s_resfile}
+    [ -z "${resFile}" ] && resFile=${s_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
@@ -200,7 +201,7 @@ case "${1}" in
   "s_ovs")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs s_crop`
-    resFile=${s_resfile}
+    [ -z "${resFile}" ] && resFile=${s_resfile}
     [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
     prevProcStatus=`${ADORESCR}/readRes.sh ${resFile} process_control ${prevProcessName}`
     [ "${prevProcStatus}" -ne 1 ] && echo "Error 3: Input error... ${processName} requires ${prevProcessName}" && return 3            
@@ -212,7 +213,7 @@ case "${1}" in
   ;;
   "coarseorb")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && return 0;
@@ -221,7 +222,7 @@ case "${1}" in
   ;;
   "coarsecorr")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -230,7 +231,7 @@ case "${1}" in
   ;;
   "m_filtazi")
     processName=`pn2rs ${1}`
-    resFile=${m_resfile}
+    [ -z "${resFile}" ] && resFile=${m_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... m_resfile" && return 2;
@@ -239,7 +240,7 @@ case "${1}" in
   ;;
   "s_filtazi")
     processName=`pn2rs ${1}`
-    resFile=${s_resfile}
+    [ -z "${resFile}" ] && resFile=${s_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... s_resfile" && return 2;
@@ -248,7 +249,7 @@ case "${1}" in
   ;;
   "fine")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -257,7 +258,7 @@ case "${1}" in
   ;;
   "reltiming")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -266,7 +267,7 @@ case "${1}" in
   ;;
   "demassist")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -278,7 +279,7 @@ case "${1}" in
   "coregpm")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs fine`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -290,7 +291,7 @@ case "${1}" in
   "resample")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs coregpm`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -302,7 +303,7 @@ case "${1}" in
   "filtrange")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs resample`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -314,7 +315,7 @@ case "${1}" in
   "interfero")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs resample`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -326,7 +327,7 @@ case "${1}" in
   "comprefpha")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -338,7 +339,7 @@ case "${1}" in
   "subtrrefpha")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs comprefpha`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -350,7 +351,7 @@ case "${1}" in
   "comprefdem")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -362,7 +363,7 @@ case "${1}" in
   "subtrrefdem")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs comprefdem`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -374,7 +375,7 @@ case "${1}" in
   "coherence")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -386,7 +387,7 @@ case "${1}" in
   "filtphase")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -398,7 +399,7 @@ case "${1}" in
   "unwrap")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -410,7 +411,7 @@ case "${1}" in
   "dinsar")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs interfero`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -423,7 +424,7 @@ case "${1}" in
   ;;
   "slant2h")
     processName=`pn2rs ${1}`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -433,7 +434,7 @@ case "${1}" in
   "geocode")
     processName=`pn2rs ${1}`
     prevProcessName=`pn2rs slant2h`
-    resFile=${i_resfile}
+    [ -z "${resFile}" ] && resFile=${i_resfile}
     [ ! -e ${m_resfile} ] && echo "Error 2: File error... m_resfile" && return 2;
     [ ! -e ${s_resfile} ] && echo "Error 2: File error... s_resfile" && return 2;
     [ ! -e ${resFile} ] && echo "Error 2: File error... i_resfile" && return 2;
@@ -554,7 +555,7 @@ md5sum -c 1393_21066.md5
 #MAIN FUNCTION
 if [ "${1}" == "-p" ]; then
  shift 
- checkProcessFlag "${1}"
+ checkProcessFlag "${@}"
 elif [ "${1}" == "-j" ]; then
  shift
  checkJobStatus "${1}"

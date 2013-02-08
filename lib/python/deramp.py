@@ -95,6 +95,44 @@ def deramp(inData, estData=None, multilook=[1000,1000], weight=None, order=1):
     return outData
     #np.save(fldr+'snaphuDEMdetrended.npy', snaphuDEMdetrended)
 
+def derampcpx(inData, estData=None, order=None):
+    if estData is not None:
+        if np.any(np.iscomplex(estData)):
+            estData=estData.conj()        
+            inData=inData*estData
+        else:
+            estData=np.exp(-1.j*estData)
+            inData=inData*estData
+    indx=np.log10(abs(np.fft.fftshift(np.fft.fft2(np.angle(inData))))).argmax() #to display fft you may want to take log10 of the value here
+    subi=np.unravel_index(indx, inData.shape)
+    X,Y=np.meshgrid(np.r_[0:inData.shape[1]], np.r_[0:inData.shape[0]])
+    fxmax=inData.shape[1]/2.
+    fymax=inData.shape[0]/2.
+    if order is None:
+      surface=np.pi*( (subi[0]-fymax)*Y/fymax + (subi[1]-fxmax)*X/fxmax )
+    elif order=="a":
+      surface=np.pi*( (subi[0]-fymax)*Y/fymax )
+    elif order=="r":
+      surface=np.pi*( (subi[1]-fxmax)*X/fxmax )
+    else:
+      print "Order for complex files can only be a or r."
+      return -1
+    #print [ subi, fxmax, fymax ]
+    outData=inData*np.exp(-1.j*surface)
+    #test if we get the direction right.
+    indx2=np.log10(abs(np.fft.fftshift(np.fft.fft2(np.angle(outData))))).argmax() 
+    subi2=np.unravel_index(indx2, inData.shape)
+    dist1=np.sqrt( (subi[0]-fymax)**2. + (subi[1]-fxmax)**2.)
+    dist2=np.sqrt( (subi2[0]-fymax)**2. + (subi2[1]-fxmax)**2.)
+    print [dist1, dist2]
+    if dist1<dist2:
+        #we got the direction wrong
+        outData=inData*np.exp(1.j*surface)
+    #outData=np.exp(-1.j*surface)
+    if estData is not None:
+        outData=outData*estData.conj() #re-add the estimated Data.
+    return outData
+
 def dataFormat2dataType(dataFormat):
     complexFlag=False;
     #### Handle the long format specifier: i.e. complex_real4
@@ -146,7 +184,13 @@ def getdata(fname, width, dataFormat, length=0):
 
 def writedata(fname, data, dataFormat):
     datatype,complexFlag=dataFormat2dataType(dataFormat);
-    data.astype(np.dtype(datatype)).tofile(fname)
+    if complexFlag:
+        bipData=np.empty([data.shape[0], data.shape[1]*2]);
+        bipData[:,0::2]=data.real;
+        bipData[:,1::2]=data.imag;
+        bipData.astype(np.dtype(datatype)).tofile(fname) 
+    else:
+        data.astype(np.dtype(datatype)).tofile(fname)
     
 def isint(x):
     #http://drj11.wordpress.com/2009/02/27/python-integer-int-float/
@@ -174,16 +218,20 @@ def main(argv):
     cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
     cfg.setdefault("-f", "cr4")
     cfg.setdefault("-e", "")
-    cfg.setdefault("-o", "1")
     cfg["-w"]=int(cfg["-w"])
-    cfg["-o"]=int(cfg["-o"]) 
     
     data=getdata(inputfile,cfg["-w"],cfg["-f"])
     if cfg["-e"]:
         eData=getdata(cfg["-e"],cfg["-w"],cfg["-f"])
     else:
         eData=None;
-    outData=deramp(data, eData, order=cfg["-o"]);
+    if len(cfg["-f"])==3: #complex
+        cfg.setdefault("-o", None)
+        outData=derampcpx(data,eData, order=cfg["-o"]);
+    else:
+        cfg.setdefault("-o", "1")
+        cfg["-o"]=int(cfg["-o"]) 
+        outData=deramp(data, eData, order=cfg["-o"]);
     print "Writing output to:", inputfile+'deramp'
     writedata(inputfile+'deramp',outData,cfg["-f"]);
     

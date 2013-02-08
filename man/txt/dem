@@ -5,9 +5,10 @@ USAGE:
 	dem load [path/to/demfile.dem]
 	dem unload
 	dem check 
-        dem convert path/to/demfile.dem "gdalOptions"
+        dem import path/to/demfile.dem "gdalOptions"
         dem extent
         dem expand path/to/big.dem [merged.bil]
+        dem export format 
         dem view
 
 DESCRIPTION:
@@ -15,40 +16,34 @@ DESCRIPTION:
  It can generate and load DEM settings to the environment.   
 
 INPUT:
- `dem`: 
-	defaults to "dem check"
-
- `dem make SRTM1/SRTM3 extraBufferPercentage name`
-	Calculates the master scene coverage and issues a call to `construct_dem.sh` 
-	Area if padded (enlarged) in all directions with the extraBufferPercentage.
-	You can call this function with no/some arguments. Defaults are: `SRTM3 20 dem`
-
- `dem load path/to/demfile.dem`
-	Load's the specified dem file. 
+ * `dem`: 
+   * defaults to "dem check"
+ * `dem make SRTM1/SRTM3 extraBufferPercentage name`
+   * Calculates the master scene coverage and issues a call to     
+ * `construct_dem.sh` 
+   * Area if padded (enlarged) in all directions with the extraBufferPercentage. You can call this function with no/some arguments. Defaults are: `SRTM3 20 dem`
+ * `dem load path/to/demfile.dem`
+   * Load's the specified dem file. 
 	Currently supported DEM formats:
 	  * output of "dem make"
 	  * construct_dem.sh (from TU-DELFT).
 	  * ArcGIS .flt files (with .flt and .hdr files should be in the same folder and have the same name.)
 	  * ESRI .bil files (with .hdr files)
 	  * GMT .grd files. (Creates .dem and input_doris files in the current directory.)
-
- `dem unload`:
-	Clears sam_in_dem, dac_in_dem and crd_in_dem. If you want to re-run dem make this can be used.
-
- `dem check`:
-	Checks the environment DEM settings and suggests fixes to problems.
-
- `dem convert path/to/demfile.dem [gdalOptions]`:
-	Convert given DEM file using GDAL to ESRI BIL format (GDAL EHDR format). Converted DEM then can loaded using dem load.
-  
-  `dem extent`:
-	Calculates and displays the corner coordinates of the DEM based on input values.
-
-  `dem expand path/to/big.dem [merged.bil]`:
-	Merge a small dem with a big dem. The small dem overwrites the big one. 
-
-  `dem view`:
-	Display DEM using `cpxview` and the input values. Additional options can be passed. See `? view`
+ * `dem unload`:
+   * Clears sam_in_dem, dac_in_dem and crd_in_dem. If you want to re-run dem make this can be used.
+ * `dem check`:
+   * Checks the environment DEM settings and suggests fixes to problems.
+ * `dem import path/to/demfile.dem [gdalOptions]`:
+   * Converts and loads given DEM file using GDAL to ESRI BIL format (GDAL EHDR format). This function was used to be called `dem convert`. 
+ * `dem extent`:
+   * Calculates and displays the corner coordinates of the DEM based on input values.
+ * `dem expand path/to/big.dem [merged.bil]`:
+   * Merge a small dem with a big dem. The small dem overwrites the big one. 
+ * `dem export format`:
+   * Export the current DEM in a different format. Currently only the following format is available: `roipac`
+ * `dem view`:
+   * Display DEM using `cpxview` and the input values. Additional options can be passed. See `? view`
 
 
 OUTPUT:

@@ -170,6 +170,32 @@ local DATADIR="${1}"
   fi  
   [ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
   [ -z "${slave}"        	] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
+  #### set slc_az_res and slc_rg_res
+  setSlcRes 
+}
+
+function setSlcRes(){
+  if [ "${m_in_method}" == "ERS"]; then
+    slc_az_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_rg_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
+  elif [ "${m_in_method}" == "ASAR"]; then
+    slc_az_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_rg_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
+  elif [ "${m_in_method}" == "GAMMA"]; then
+    slc_az_res=`grep "^azimuth_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
+    slc_rg_res=`grep "^range_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
+    slc_az_res=`echo "${slc_az_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`    
+    slc_rg_res=`echo "${slc_rg_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`
+  else 
+    echo "I am unable to detect the imaging mode for ${m_in_method}."
+    echo "I have the following information in my database which may help you [mode,az,rg]:"
+    grep "^${m_in_method}" "${ADOREFOLDER}/set/resolution.csv"
+    echo "Please enter azimuth resolution in meters:"
+    read slc_az_res
+    echo "Please enter range resolution in meters:"
+    read slc_rg_res
+  fi
+  echo "SLC resolution set to [az,rg]: ${slc_az_res} ${slc_rg_res}"
 }
 
 function getInfoFromUser(){

@@ -16,3 +16,4 @@ INPUT:
 OUTPUT
   Modifies the result file by moving the resampling step to crop. 
   Also generates an output file with ".addrefpha" extension.
+
