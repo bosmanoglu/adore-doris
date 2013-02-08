@@ -5,7 +5,7 @@
 #	dem load path/to/demfile.dem
 #	dem unload
 #	dem check
-#       dem convert path/to/demfile.dem "gdalOptions"
+#       dem import path/to/demfile.dem "gdalOptions"
 #	dem extent 
 #       dem expand path/to/big.dem [merged.bil]
 #	dem view
@@ -425,7 +425,6 @@ function demExpand(){
   #check to see if gdal can read the dem files.
   #if it is a doris dem, create an hdr file.
   #then run gdal_merge  
-  set -x
   [ ! -f "${sam_in_dem}" ] && echo "Please load the dem to expand first." && return 
   local smallDem=${sam_in_dem} #already loaded
   local bigDem=${1}
@@ -436,7 +435,6 @@ function demExpand(){
   gdalinfo ${bigDem} &> /dev/null
   [ $? -ne 0 ] && createHeader ${bigDem}
   gdal_merge.py -init 0 -o ${mergedDem} -of EHdr -ps ${sam_in_delta} ${bigDem} ${smallDem} 
-  set +x
 }
 
 function createHeader(){
@@ -466,6 +464,105 @@ function createHeader(){
   fi
 }
 
+function createGiantRSC(){
+  local demname="${crd_out_dem_lp}"
+  local fldr=`dirname ${demname}`
+  local hdrname=`basename ${demname}`
+  hdrname="${fldr}/${hdrname%%.*}.rsc"  
+  # the coordinate calculations are based on an euclidian geometry and might not be very accurate
+  # see http://stackoverflow.com/questions/1624574/calculate-lat-lng-of-corners-of-ground-overlay-from-kml-file
+  local kmlfile A north south east west x y 
+  if [ -f "$i12sFolder/resample.kml" ]; then
+    kmlfile="$i12sFolder/resample.kml"
+  elif [ -f $resampleFolder/*_${master}/resample.kml ]; then
+    kmlfile="$resampleFolder/*_${master}/resample.kml"
+  else
+    error "Can not find resample.kml file."
+    return 
+  fi
+  A=`grep rotation ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+  north=`grep north ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+  south=`grep south ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+  east=`grep east ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+  west=`grep west ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+  cy=`echo ${north} ${south} | awk '{print ($1+$2)/2}'` # center lat
+  cx=`echo ${east} ${west} | awk '{print ($1+$2)/2}'`   # center lon 
+  x=`echo ${east} ${west} | awk '{print ($1-$2)/2}'`    # width lon
+  y=`echo ${north} ${south} | awk '{print ($1-$2)/2}'`  # width lat
+  A=`echo ${A} | awk '{print $1*3.14159265/180}'`
+  nex=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 + $3*cos($5) - $4*sin($5)}'` # north east x lon
+  ney=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 + $3*sin($5) + $4*cos($5)}'`
+  nwx=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 - $3*cos($5) - $4*sin($5)}'`
+  nwy=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 - $3*sin($5) + $4*cos($5)}'`
+  sex=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 + $3*cos($5) + $4*sin($5)}'`
+  sey=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 + $3*sin($5) - $4*cos($5)}'`
+  swx=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 - $3*cos($5) + $4*sin($5)}'`
+  swy=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 - $3*sin($5) - $4*cos($5)}'` # south west y lat
+  # dem resolution
+  local dem_az_res dem_rg_res
+  dem_az_res=`echo ${slc_az_res} ${coh_multilook%% *} | awk '{print $1 * $2}'`
+  dem_rg_res=`echo ${slc_rg_res} ${coh_multilook##* } | awk '{print $1 * $2}'`
+  # create the rsc file
+  echo "WIDTH               `readRes.sh ${i_resfile} "comp_refdem" "Number of pixels (multilooked)"`" >> ${hdrname}
+  echo "FILE_LENGTH         `readRes.sh ${i_resfile} "comp_refdem" "Number of lines (multilooked)"`" >> ${hdrname}
+  echo "LAT_REF1            ${nwy}" >> ${hdrname}
+  echo "LON_REF1            ${nwx}" >> ${hdrname}
+  echo "LAT_REF2            ${swy}" >> ${hdrname}
+  echo "LON_REF2            ${swx}" >> ${hdrname}
+  echo "LAT_REF3            ${sey}" >> ${hdrname}
+  echo "LON_REF3            ${sex}" >> ${hdrname}
+  echo "LAT_REF4            ${ney}" >> ${hdrname}
+  echo "LON_REF4            ${nex}" >> ${hdrname}
+  echo "AZIMUTH_PIXEL_SIZE  ${dem_az_res}" >> ${hdrname}
+  echo "RANGE_PIXEL_SIZE    ${dem_rg_res}" >> ${hdrname}
+}
+
+function createRoipacRSC(){
+  local demname="${1}"
+  [ -z "${demname}" ] && demname="${sam_in_dem}"
+  local curDem="${sam_in_dem}"
+  if [ "${curDem}" != "${demname}" ]; then
+    demLoad ${demname}
+  fi
+  local fldr=`dirname ${demname}`
+  local hdrname=`basename ${demname}`
+  hdrname="${fldr}/${hdrname%%.*}.rsc"  
+  echo "WIDTH          ${sam_in_size%% *}" >> ${hdrname}
+  echo "FILE LENGTH    ${sam_in_size##* }" >> ${hdrname}
+  echo "XMIN           0" >> ${hdrname}
+  echo "XMAX           $((${sam_in_size%% *}-1))" >> ${hdrname}
+  echo "YMIN           0" >> ${hdrname}
+  echo "YMAX           $((${sam_in_size##* }-1))" >> ${hdrname}
+  echo "X_FIRST        ${sam_in_ul##* }" >> ${hdrname}
+  echo "Y_FIRST        ${sam_in_ul%% *}" >> ${hdrname}
+  echo "X_STEP         ${sam_in_delta##* }" >> ${hdrname}
+  echo "Y_STEP         ${sam_in_delta%% *}" >> ${hdrname}
+  echo "X_UNIT         degrees" >> ${hdrname}
+  echo "Y_UNIT         degrees" >> ${hdrname}
+  echo "Z_OFFSET       0" >> ${hdrname}
+  echo "Z_SCALE        1" >> ${hdrname}
+  echo "PROJECTION     LATLON" >> ${hdrname}
+  if [ "${curDem}" != "${demname}" ]; then
+    demLoad ${curDem}
+  fi  
+}
+
+function demExport(){
+  case ${1} in
+    roipac)
+      shift
+      createRoipacRSC ${@}  
+    ;;
+    giant)
+      shift
+      createGiantRSC ${@}  
+    ;;
+    *)
+      error "Currently dem export only supports: roipac, giant"
+    ;;    
+  esac    
+}
+
 function main(){
   local srtm buffer name demFile demPath demBasename settings_file
   case ${1} in
@@ -487,6 +584,12 @@ function main(){
     ;;
     convert)
       shift
+      error "DEM CONVERT is deprecated."
+      error "Please use DEM IMPORT instead."
+      convertGdalDem "${@}"
+    ;;
+    import)
+      shift
       convertGdalDem "${@}"
     ;;
     unload)
@@ -502,6 +605,10 @@ function main(){
     expand)
       shift
       demExpand "${@}"      
+    ;;
+    export)
+      shift
+      demExport "${@}"      
     ;;
     *)
       #check to see if dem exists and it is loaded.

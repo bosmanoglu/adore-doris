@@ -24,9 +24,9 @@ function processInterferoSteps(){
    if [ "${master}"!="${slave}" ]; then
      settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
      mkdir -p "${outputFolder}"
-     cd "${outputFolder}"    
-     cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
-     cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+     cd "${outputFolder}"
+     [ -e ${resampleFolder}/*_${master}/${master}.res ] && cp ${resampleFolder}/*_${master}/${master}.res ${outputFolder}/${master}.res || cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+     [ -e ${resampleFolder}/*_${slave}/${slave}.res ] && cp ${resampleFolder}/*_${slave}/${slave}.res ${outputFolder}/${slave}.res || cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
      if [ "${parallel}" == "on" ]; then
        jobId=`quejob "${interferoSteps}" "${outputFolder}"`
        jobIds=( ${jobIds[@]} ${jobId} )
@@ -40,7 +40,7 @@ function processInterferoSteps(){
 }
 function processInterfero(){
   local interferoSteps="${@}"
-  if [ -z ${interferoSteps} ]; then
+  if [ -z "${interferoSteps}" ]; then
     error "Please specify processing steps to execute."
     error "See usage: ? i12s"
     return 
@@ -211,6 +211,11 @@ function i12s_clear(){
   pairs=();
 }
 
+function i12s_plot(){
+  cmd="import insar;insar.time_series.plot_bperp_btemp('${baselinesFolder}/baselines', '${runFolder}/${runName}_pairs.csv');ginput(n=1, timeout=0)"
+  openInIpython "$cmd" 2> /dev/null &
+}
+
 #######################################################
 ####  MAIN ####
 #######################################################
@@ -235,6 +240,10 @@ case "${1}" in
 "load")
  shift   
  i12s_load "$@"
+ ;;
+"plot")
+ shift   
+ i12s_plot "$@"
  ;;
 "save")
  shift   

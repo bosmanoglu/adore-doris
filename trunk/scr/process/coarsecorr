@@ -24,8 +24,8 @@ function coarsecorr_manual(){
   sfrmt=`rs2pn ${sfrmt}`
   #mfmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
   
-  echo ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop}  
-  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 ${@} ${mcrop} ${scrop} | tee ${outputFolder}/manual_offsets_cc.txt
+  echo ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 -r auto ${@} ${mcrop} ${scrop}  
+  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${mwidth}/${swidth} -f ${mfrmt}/${sfrmt} -q mag/mag -e0.3/0.3 -r auto ${@} ${mcrop} ${scrop} | tee ${outputFolder}/manual_offsets_cc.txt
   openInIpython ${ADOREFOLDER}/lib/python/fun/manual_offsets_coarsecorr.py 
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
   unset mwidth

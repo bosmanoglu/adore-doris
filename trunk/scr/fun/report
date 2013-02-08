@@ -49,7 +49,8 @@ do
   cd ${iFolder}/${folder}
   settings load
   raster_format=png
-  echo "<H1>${folder}</H1>" >> ${rFile}
+  echo "<H1><a href=\"javascript:toggle('${folder}');\">${folder}</a></H1>" >> ${rFile}
+  echo "<div id=\"${folder}\" style=\"display: block\">" >> ${rFile}
   echo " <table><tr>" >> ${rFile}
   c=0
   for step in `echo ${rSteps} | tr ';' '\n'`
@@ -63,6 +64,7 @@ do
     c=$(( c + 1 ))
   done
   echo "</tr></table>" >> ${rFile}
+  echo "</div>" >> ${rFile}
 done
 writeHTMLFooter >> ${rFile}
 cd ${curFolder}
@@ -82,22 +84,22 @@ function handleStep(){
  *porbits)
    reportText ${step}
  ;;
- m_simamp)
+ m_simamp*)
    reportPicture ${step}
  ;;
  m_timing)
    reportText ${step}
  ;;
- *ovs)
+ *ovs*)
    reportPicture ${step}
  ;;
- *crop)
+ *crop*)
    reportPicture ${step}
  ;;
  coarseorb)
    reportText ${step}
  ;;    
- *filtazi)
+ *filtazi*)
    reportPicture ${step}
  ;;
  fine)
@@ -112,43 +114,43 @@ function handleStep(){
  coregpm)
    reportText ${step}
  ;;
- resample)
+ resample*)
    reportPicture ${step}
  ;;
- filtrange)
+ filtrange*)
    reportPicture ${step}
  ;;
- interfero)
+ interfero*)
    reportPicture ${step}
  ;;
- comprefpha)
+ comprefpha*)
    reportPicture ${step}
  ;;
- subtrrefpha)
+ subtrrefpha*)
    reportPicture ${step}
  ;;
- comprefdem)
+ comprefdem*)
    reportPicture ${step}
  ;;
- subtrrefdem)
+ subtrrefdem*)
    reportPicture ${step}
  ;;
- coherence)
+ coherence*)
    reportPicture ${step}
  ;;
- filtphase)
+ filtphase*)
    reportPicture ${step}
  ;;
- unwrap)
+ unwrap*)
    reportPicture ${step}
  ;;
- dinsar)
+ dinsar*)
    reportPicture ${step}
  ;;
- slant2h)
+ slant2h*)
    reportPicture ${step}
  ;;
- geocode)
+ geocode*)
    reportPicture ${step}
  ;;
  *)
@@ -200,6 +202,17 @@ cat <<_EOF
 <HTML>
  <HEAD>
   <TITLE>ADORE REPORT</TITLE>
+  <script language="javascript"> 
+  function toggle( id ) {
+          var ele = document.getElementById(id);
+          if(ele.style.display == "block") {
+                  ele.style.display = "none";
+          }
+          else {
+                  ele.style.display = "block";
+          }
+  } 
+  </script>
  </HEAD>
  <BODY>
 _EOF

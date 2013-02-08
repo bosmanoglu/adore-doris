@@ -52,7 +52,12 @@ function processResampleSteps(){
    settings save
 }
 function processResample(){
-  local resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
+  local resampleSteps
+  if [ -f "${sam_in_dem}" ]; then 
+    resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" crd_include_fe=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefdem;addrefpha2s_crop'
+  else
+    resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
+  fi
   # we will be changing directories
   # save the current dir.
   local CALLDIR="$PWD";
@@ -68,6 +73,12 @@ function processResample(){
   do
     processResampleSteps "${scene}"
   done
+  
+  #return back
+  cd ${CALLDIR}
+  settings load ${originalSettingsFile}
+  #cleanup
+  rm -rf ${originalSettingsFile}
 }
 
 ##MAIN

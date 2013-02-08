@@ -148,8 +148,8 @@ def main(argv):
         cfg["Mp"]=int(cfg["-M"].split("/")[0])    
         #cfg["-s"]=float(cfg["-s"]) 
         #cfg["-e"]=float(cfg["-e"]) 
-        cfg["rmin"]=int(cfg["-r"].split("/")[0])
-        cfg["rmax"]=int(cfg["-r"].split("/")[1])    
+        #cfg["rmin"]=int(cfg["-r"].split("/")[0])
+        #cfg["rmax"]=int(cfg["-r"].split("/")[1])    
         if "/" in cfg["-f"]:
             cfgf=cfg["-f"].split("/")[counter]
         if "/" in cfg["-q"]:
@@ -213,6 +213,15 @@ def main(argv):
         # set colormap
         mp.set_cmap(cfg["-c"])        
         #rescale?
+        if "/" in cfg["-r"]:
+            cfg["rmin"]=int(cfg["-r"].split("/")[0])
+            cfg["rmax"]=int(cfg["-r"].split("/")[1])
+        elif cfg["-r"] == "auto":
+            cfg["rmin"]=data.mean()-3.*data.std()    
+            cfg["rmax"]=data.mean()+3.*data.std()    
+        else:
+            print "Bad rescaling option."
+            return
         if cfg["-r"]!="0/0":
             mp.clim([ cfg["rmin"], cfg["rmax"] ]);
         #Place colorbar

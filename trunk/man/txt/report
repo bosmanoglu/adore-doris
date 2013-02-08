@@ -7,7 +7,7 @@ DESCRIPTION:
  It generates an HTML report for the given doris steps. For steps providing an output data file, it displays an image, for others, it displays the relevant section from the result file in a text box. 
 
 INPUT:
- * `"dorisSteps"`: These are the steps that you would like to see the results reported. For DORIS steps see [lsprocess]. These have to be in quotes and separated by semi-colons. 
+ * `"dorisSteps"`: These are the steps that you would like to see the results reported. For DORIS steps see [lsprocess]. These have to be in quotes and separated by semicolons. Alternate filenames can be provided with the semicolon format. See [raster] for details on this feature.
   
 OPTIONAL:
    * `i12sFolder`: Allows the user to specify a different i12sFolder. 
@@ -23,5 +23,5 @@ FILES and REFERENCES:
 Example:
 
  report "interfero;coherence"
- report "coarseorb;filtphase;unwrap"
+ report "coarseorb;filtphase:*.pfderamp;unwrap"
 }}}
