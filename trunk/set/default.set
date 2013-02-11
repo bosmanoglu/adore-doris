@@ -24,6 +24,8 @@
 [ -z "${_rel_i12sFolder}"	] && _rel_i12sFolder='echo ${runFolder}/i12s'
 [ -z "${baselinesFolder}"	] && baselinesFolder=${runFolder}/baselines
 [ -z "${_rel_baselinesFolder}"	] && _rel_baselinesFolder='echo ${runFolder}/baselines'
+[ -z "${resampleFolder}"	] && resampleFolder=${runFolder}/resample
+[ -z "${_rel_resampleFolder}"	] && _rel_resampleFolder='echo ${runFolder}/resample'
 [ -z "${adoreHistoryFile}"	] && adoreHistoryFile=${projectFolder}/.history
 [ -z "${_rel_adoreHistoryFile}"	] && _rel_adoreHistoryFile='echo ${projectFolder}/.history'
 [ -z "${dorisVersion}"          ] && dorisVersion=`doris -v 2>&1 |grep version | cut -f5 -d" "| cut -d"-" -f1`
