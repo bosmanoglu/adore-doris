@@ -21,12 +21,19 @@ function processInterferoSteps(){
    bold "Processing ${scenes}"
    master=${scenes%%,*}
    slave=${scenes#*,}
+   outputFolder="${i12sFolder}/${master}_${slave}"   
+   mkdir -p "${outputFolder}"
    if [ "${master}"!="${slave}" ]; then
-     settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
-     mkdir -p "${outputFolder}"
-     cd "${outputFolder}"
-     [ -e ${resampleFolder}/*_${master}/${master}.res ] && cp ${resampleFolder}/*_${master}/${master}.res ${outputFolder}/${master}.res || cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
-     [ -e ${resampleFolder}/*_${slave}/${slave}.res ] && cp ${resampleFolder}/*_${slave}/${slave}.res ${outputFolder}/${slave}.res || cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+     if ([ -f "${outputFolder}/${master}.res" ] && [ -f "${outputFolder}/${slave}.res" ]); then 
+       #if folder already exists check for m_res and s_res. If exists do not copy anything
+       cd "${outputFolder}"
+       settings load     
+     else     
+       settings apply -r -q master=${master} slave=${slave} outputFolder="${i12sFolder}/${master}_${slave}"
+       cd "${outputFolder}"
+       [ -e ${resampleFolder}/*_${master}/${master}.res ] && cp ${resampleFolder}/*_${master}/${master}.res ${outputFolder}/${master}.res || cp ${cropsFolder}/${master}/${master}.res ${outputFolder}/${master}.res
+       [ -e ${resampleFolder}/*_${slave}/${slave}.res ] && cp ${resampleFolder}/*_${slave}/${slave}.res ${outputFolder}/${slave}.res || cp ${cropsFolder}/${slave}/${slave}.res ${outputFolder}/${slave}.res
+     fi
      if [ "${parallel}" == "on" ]; then
        jobId=`quejob "${interferoSteps}" "${outputFolder}"`
        jobIds=( ${jobIds[@]} ${jobId} )
