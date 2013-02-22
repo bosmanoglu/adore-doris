@@ -2,9 +2,9 @@
 #labels Phase-Support,Help
 =USAGE:=
 {{{
-        mask generate [coh_threshold]
-        mask generate [inputfile threshold]
 	mask processName [maskFile]
+    UPCOMING mask generate [coh_threshold]
+    UPCOMING mask generate [inputfile threshold] 
 }}}
 =DESCRIPTION:=
  MASK is an internal ADORE command.  
