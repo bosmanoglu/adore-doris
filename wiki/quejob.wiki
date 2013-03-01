@@ -23,6 +23,7 @@
 	outputFolder: specify output folder for the ADORE command. Default is current folder ("$PWD").
 =OUTPUT=
  Creates ${tmpFolder}/{randomFile}.set and  ${tmpFolder}/{randomFile}.sh 
+ The PBS job id is displayed upon successful submission.
 =EXAMPLE=
 {{{ 
  quejob comprefdem 
