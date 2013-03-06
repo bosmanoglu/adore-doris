@@ -1,0 +1,19 @@
+To compile:
+ python setup.py build_ext -i
+
+To debug the code
+ In setup.py add: '-ggdb' to extra_compile_args
+ Recompile and...
+ gdb --args python -c 'import snaphu; A=snaphu.Snaphu(); A.unwrap()'
+
+ then type: run
+ after it fails type: bt 20
+ to see the last 20 lines of the trace
+ You can move up and down the trace using up/down commands
+
+PITFALLS:
+ If a function is defined as:
+ void foo(void):
+
+ in cython you declare it as:
+ cdef void foo()
