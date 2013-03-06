@@ -2,8 +2,10 @@
 
 wikif=${1}
 txtf=${2}
-#clear old txtf 
-rm -rf ${txtf}
+# clear old txtf 
+# Remove everything except the .svn folders. #rm -rf ${txtf}
+# http://serverfault.com/questions/195005/linux-svn-how-to-remove-all-versioned-files-but-keep-directory-structure-ign
+find ${txtf} -not -path "*/.svn/*" -and -type f -and -exec /bin/rm '{}' \;
 mkdir -p ${txtf}
 
 for file in `ls ${1} | grep -v "~"`;
