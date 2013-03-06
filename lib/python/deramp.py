@@ -34,7 +34,7 @@ import getopt
 #import pylab as mp; #mp=matplotlib.
 import numpy as np;
 import scipy
-scipy.pkgload('optimize')
+import scipy.optimize
 
 def usage():
     print __doc__
@@ -124,7 +124,7 @@ def derampcpx(inData, estData=None, order=None):
     subi2=np.unravel_index(indx2, inData.shape)
     dist1=np.sqrt( (subi[0]-fymax)**2. + (subi[1]-fxmax)**2.)
     dist2=np.sqrt( (subi2[0]-fymax)**2. + (subi2[1]-fxmax)**2.)
-    print [dist1, dist2]
+    #print [dist1, dist2]
     if dist1<dist2:
         #we got the direction wrong
         outData=inData*np.exp(1.j*surface)
@@ -132,6 +132,36 @@ def derampcpx(inData, estData=None, order=None):
     if estData is not None:
         outData=outData*estData.conj() #re-add the estimated Data.
     return outData
+
+def estrampcpx(inData, estData=None):
+    if estData is not None:
+        if np.any(np.iscomplex(estData)):
+            estData=estData.conj()        
+            inData=inData*estData
+        else:
+            estData=np.exp(-1.j*estData)
+            inData=inData*estData
+    indx=np.log10(abs(np.fft.fftshift(np.fft.fft2(np.angle(inData))))).argmax() #to display fft you may want to take log10 of the value here
+    subi=np.unravel_index(indx, inData.shape)
+    X,Y=np.meshgrid(np.r_[0:inData.shape[1]], np.r_[0:inData.shape[0]])
+    fxmax=inData.shape[1]/2.
+    fymax=inData.shape[0]/2.
+    surface=np.pi*( (subi[0]-fymax)*Y/fymax + (subi[1]-fxmax)*X/fxmax )
+    #print [ subi, fxmax, fymax ]
+    outData=inData*np.exp(-1.j*surface)
+    outVal=[(subi[0]-fymax)/fymax , (subi[1]-fxmax)/fxmax]
+    #test if we get the direction right.
+    indx2=np.log10(abs(np.fft.fftshift(np.fft.fft2(np.angle(outData))))).argmax() 
+    subi2=np.unravel_index(indx2, inData.shape)
+    dist1=np.sqrt( (subi[0]-fymax)**2. + (subi[1]-fxmax)**2.)
+    dist2=np.sqrt( (subi2[0]-fymax)**2. + (subi2[1]-fxmax)**2.)
+    #print [dist1, dist2]
+    if dist1<dist2:
+        #we got the direction wrong
+        outVal=[-(subi[0]-fymax)/fymax , -(subi[1]-fxmax)/fxmax]
+    #outData=np.exp(-1.j*surface)
+    return outVal
+
 
 def dataFormat2dataType(dataFormat):
     complexFlag=False;

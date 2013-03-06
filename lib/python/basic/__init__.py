@@ -25,6 +25,10 @@ validIndex(arrSize, arrIdx)
 wrapToPi(x)
 wrapToInt(x, period)
 colorbarFigure(cmap,norm,label="")
+fillNan
+cdiff
+div
+
 """
 
 import operator
@@ -54,7 +58,15 @@ class DictObj(object):
         setattr(self.__class__, name, property(func))        
     def __missing__(self, key):
         return None
-            
+
+#def list_methods():
+#    import basic
+#    for m in dir(basic):
+#        try:
+#            if "basic" in basic.__dict__[m]:
+#                print m    
+#        except:
+#            pass    
 def confirm(prompt=None, resp=False):
     """prompts for yes or no response from the user. Returns True for yes and
     False for no.

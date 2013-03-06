@@ -38,7 +38,7 @@ endline=`grep -n End_${section} ${inputFile} | cut -f1 -d":"`
 #echo $endline
 
 length=`echo ${endline} - ${startline} |bc`
-resultPos=`grep -n -A ${length} "_Start_${section}" ${inputFile} | grep "${parameter}" | cut -f1 -d"-"`
+resultPos=`grep -n -A ${length} "_Start_${section}" ${inputFile} | grep "${parameter}" |head -n1| cut -f1 -d"-"`
 sed -i ${resultPos}c\ "${parameter}: ${newValue}" ${inputFile}
 ##echo $resultPos
 #count=1 #counting lines from 1

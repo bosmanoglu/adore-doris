@@ -21,30 +21,34 @@ function applyMask(){
 local dorisStep threshold mask_file coherence_file doris_output resFile format width numlines
 #read input
 dorisStep=`pn2rs ${1}`
-
-# get coherence filename
-unwrap_file=`readRes.sh ${i_resfile} unwrap Data_output_file`
-# get floatmask filename
-mask_file=${unwrap_file}.mask
-[ ! -e ${mask_file} ] && echo "Mask file does not exist: ${mask_file}" && return
-
-# generate float mask
-bkconvert ${mask_file} ${mask_file}.float 1 4 &> /dev/null
-[ ! -e ${mask_file}.float ] && echo "Float mask file could not be created.: ${mask_file}.float" && echo "I was trying to run: bkconvert ${mask_file} ${mask_file}.float 1 4" && return
+if [ -z "${2}" ]; then
+  mask_file=`readRes.sh ${i_resfile} unwrap Data_output_file`
+  mask_file="${mask_file}.mask"
+  [ ! -e ${mask_file} ] && echo "Mask file does not exist: ${mask_file}" && return
+  # generate float mask
+  bkconvert ${mask_file} ${mask_file}.float 1 4 &> /dev/null
+  [ ! -e ${mask_file}.float ] && echo "Float mask file could not be created.: ${mask_file}.float" && echo "I was trying to run: bkconvert ${mask_file} ${mask_file}.float 1 4" && return
+  mask_file=${mask_file}.float
+else
+  mask_file="${2}"
+fi
+[ ! -e ${mask_file} ] && echo "Mask file does not exist: ${mask_file}" && echo "Please create a mask file first." && return
 
 # get the name of the output file for doris step.
 call "(doris_output resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
 echo "Backing-up ${doris_output} to ${doris_output}.notmasked"
 mv ${doris_output} ${doris_output}.notmasked
 if [ "${format}" == "r4" ]; then
-  gmtmath -bis1 -bos1 ${mask_file}.float ${doris_output}.notmasked MUL = ${doris_output} &> /dev/null
+  gmtmath -bis1 -bos1 ${mask_file} ${doris_output}.notmasked MUL = ${doris_output} &> /dev/null
 elif [ "$format" == "cr4" ]; then
   #generate complex mask
-  echo "Complex masking operation adds a constant phase value of PI/4 to the whole image. Should not effect results/modeling etc."
-  gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx
-  [ ! -e ${mask_file}.cpx ] && echo "Complex mask file could not be created.: ${mask_file}.cpx" && echo "I was trying to run: gmtconvert ${mask_file}.float ${mask_file}.float -bis1 -A -bos2 > ${mask_file}.cpx" && return
+  if [ ! -e ${mask_file}.cpx ]; then   
+    echo "Complex masking operation adds a constant phase value of PI/4 to the whole image. Should not effect results/modeling etc."
+    gmtconvert ${mask_file} ${mask_file} -bis1 -A -bos2 > ${mask_file}.cpx
+    [ ! -e ${mask_file}.cpx ] && echo "Complex mask file could not be created.: ${mask_file}.cpx" && echo "I was trying to run: gmtconvert ${mask_file} ${mask_file} -bis1 -A -bos2 > ${mask_file}.cpx" && return
+  fi
   #cpxmult ${doris_output}.notmasked ${mask_file}.cpx ${doris_output} add=1
-  gmtmath -bis2 -bos2 ${mask_file}.cpx ${doris_output}.notmasked MUL = ${doris_output}
+  gmtmath -bis1 -bos1 ${mask_file}.cpx ${doris_output}.notmasked MUL = ${doris_output}
 else
   echo "Output format of the file you requested is ${format}. I can only mask real4 (r4) or complex_real4 (cr4) files."
   return
@@ -65,34 +69,40 @@ echo "SUCCESS: mask"
 
 
 function generateMask(){
-local dorisStep threshold mask_file coherence_file doris_output resFile format width numlines
+local dorisStep threshold mask_file input_file doris_output resFile format width numlines
+local operation
 #read input
-dorisStep=`pn2rs ${1}`
-threshold=${2:-0.4};
+if [ -z "${2}" ]; then
+  input_file=`readRes.sh ${i_resfile} coherence Data_output_file`
+  threshold=${1:-0.4}
+else
+  input_file="${1}"
+  operation="${2}"
+  threshold=${3}
+fi
 
-# get coherence filename
-coherence_file=`readRes.sh ${i_resfile} coherence Data_output_file`
 #generate mask
-floatmask ${coherence_file} ${threshold}
-if [ "$?" -ne 0]; then
- echo "floatmask command failed. I can not continue without the mask file."
- return
+floatmask ${input_file} ${operation} ${threshold}
+if [ $? -ne 0]; then
+  echo "floatmask command failed. I can not continue without the mask file."
+  return
 fi
 # get floatmask filename
-mask_file=${coherence_file}.mask${threshold}
+mask_file=${input_file}.${operation}${threshold}
 [ ! -e ${mask_file} ] && echo "Mask file does not exist: ${mask_file}" && return
 
-# generate complex mask
-gmtconvert ${mask_file} ${mask_file} -bis1 -A -bos2 > ${mask_file}.cpx
-[ ! -e ${mask_file}.cpx ] && echo "Complex Mask file could not be created.: ${mask_file}" && echo "Could be a GMT problem." && return
-
-# get the name of the output file for doris step.
-call "(doris_output resFile format width numlines)=dorisProcess2OutputFile ${dorisStep}"
-mv ${doris_output} ${doris_output}.notmasked
-cpxmult ${doris_output}.notmasked ${mask_file}.cpx ${doris_output} add=1
-
-echo "SUCCESS: mask"
+echo "Mask is ready: ${mask_file}"
 }
 
+case ${1} in 
+  generate)
+    shift
+    generateMask ${@}
+  ;;
+  *)
+    applyMask ${@}
+  ;;
+esac
+
 #generateMask $@
-applyMask $@
+#applyMask $@

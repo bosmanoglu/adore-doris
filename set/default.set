@@ -26,6 +26,7 @@
 [ -z "${_rel_baselinesFolder}"	] && _rel_baselinesFolder='echo ${runFolder}/baselines'
 [ -z "${resampleFolder}"	] && resampleFolder=${runFolder}/resample
 [ -z "${_rel_resampleFolder}"	] && _rel_resampleFolder='echo ${runFolder}/resample'
+[ -z "${resampleMaster}"        ] && resampleMaster=""
 [ -z "${adoreHistoryFile}"	] && adoreHistoryFile=${projectFolder}/.history
 [ -z "${_rel_adoreHistoryFile}"	] && _rel_adoreHistoryFile='echo ${projectFolder}/.history'
 [ -z "${dorisVersion}"          ] && dorisVersion=`doris -v 2>&1 |grep version | cut -f5 -d" "| cut -d"-" -f1`
@@ -57,6 +58,13 @@
 [ -z "${raster_format}"		] && raster_format="ras" #default is not set
 ####### for tandemx-bistatic
 [ -z "${bistatic}"		] && bistatic="off" #default is off
+####### for torque-pbs parallel
+[ -z "${parallel}"		] && parallel="off" #default is off
+[ -z "${parallel_options}"      ] && parallel_options="" #default is empty
+####### for i12s pairs
+[ -z "${pairsFile}"      	] && pairsFile=${runFolder}/${runName}_pairs.csv 
+[ -z "${_rel_pairsFile}"	] && _rel_pairsFile='echo ${runFolder}/${runName}_pairs.csv'
+[ -z "${pairs}"      	        ] && pairs=() #default is empty array
 #######################################
 ###     Default Doris Settings      ###
 #######################################
@@ -375,10 +383,11 @@
 [ -z "${uw_snaphu_dumponlyconf}" ] && uw_snaphu_dumponlyconf="off"
 ################### estorbits
 ### SECTION=estorbits
-
 [ -z "${eo_method}"             ] && eo_method="lsq"
 [ -z "${eo_in_dem_lp}"          ] && eo_in_dem_lp="${outputFolder}/${master}_${slave}.crddemlp"
+[ -z "${_rel_eo_in_dem_lp}"     ] && _rel_eo_in_dem_lp='echo ${outputFolder}/${master}_${slave}.crddemlp'
 [ -z "${eo_out_res}"            ] && eo_out_res="${outputFolder}/${master}_${slave}.eores"
+[ -z "${_rel_eo_out_res}"       ] && _rel_eo_out_res='echo ${outputFolder}/${master}_${slave}.eores'
 [ -z "${eo_weighting}"          ] && eo_weighting="none"
 [ -z "${eo_npoints}"            ] && eo_npoints="1000"
 [ -z "${eo_in_pos}"             ] && eo_in_pos="${unspecified}"
@@ -387,12 +396,12 @@
 [ -z "${eo_k_alpha}"            ] && eo_k_alpha="3.29"
 [ -z "${eo_searchspace}"        ] && eo_searchspace="15 15"
 [ -z "${eo_reforbit}"           ] && eo_reforbit="${outputFolder}/${master}.res"
+[ -z "${_rel_eo_reforbit}"      ] && _rel_eo_reforbit='echo ${outputFolder}/${master}.res'
 [ -z "${eo_out_data}"           ] && eo_out_data="${outputFolder}/${master}_${slave}.eodata"
+[ -z "${_rel_eo_out_data}"      ] && _rel_eo_out_data='echo ${outputFolder}/${master}_${slave}.eodata'
 [ -z "${eo_degree}"             ] && eo_degree="1"
 [ -z "${eo_constrain}"          ] && eo_constrain="0"
 [ -z "${eo_nobs}"               ] && eo_nobs="1000"
-
-
 ################### dinsar
 ### SECTION=dinsar
 [ -z "${di_out_file}" 		] && di_out_file="${outputFolder}/${master}_${slave}.di"

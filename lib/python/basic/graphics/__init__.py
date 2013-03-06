@@ -47,6 +47,8 @@ def imshowsc(A,n=2):
 def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
     """
     figureHandles=clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
+    xScat: x-axis variables for Scatter Plot. Has to be the same length as last dimension of array3d.shape[2]
+    
     """
     dateaxis=False;
     if xScat is None:

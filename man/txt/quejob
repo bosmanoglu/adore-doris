@@ -24,8 +24,9 @@ OPTIONAL:
 
 OUTPUT
  Creates ${tmpFolder}/{randomFile}.set and  ${tmpFolder}/{randomFile}.sh 
+ The PBS job id is displayed upon successful submission.
 =EXAMPLE=
  
  quejob comprefdem 
  quejob "snaphu  -f snaphu.conf ./BRX_BTX.pf 2912" -- -l walltime=72:00:00
-}}}
+

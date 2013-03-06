@@ -37,6 +37,9 @@ else
   echo "Wrong parameter. Please check usage with: ? quejob" >&2 && return 110
 fi
 
+#if options are not specified using commandline check any environment options. 
+[ -z ${qsubOpts} ] && qsubOpts="${parallel_options}"
+
 generateRandomString 
 local queJobRandStr=${randomString}
 mkdir -p ${tmpFolder} 

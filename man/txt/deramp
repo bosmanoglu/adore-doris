@@ -2,7 +2,7 @@
 USAGE:
  
 	deramp dorisStep  
-        deramp dorisStep:filename [-o ORDER -e ESTIMATEFILE]
+        deramp dorisStep:filename [-o ORDER -e ESTIMATEFILE -m network]
 
 DESCRIPTION:
  DERAMP is an internal ADORE command.  
@@ -20,6 +20,7 @@ INPUT:
 OPTIONAL:
    * -o ORDER: The order of the polynomial defining the plane. Can be 1 or 2. Default is 1. For complex files this parameter is ignored (i.e. order=1).
    * -e ESTIMATEFILE: When specified this file is subtracted before calculating the best fitting plane. It has to be the same format as the input.
+  * -m network: For SBAS style connected networks, a common solution is found after inverting the individually estimated phase ramps. If the ramps are not affecting the phase unwrapping, network deramping in [giant] should be used. 
 
 
 OUTPUT
@@ -35,4 +36,5 @@ Example:
   deramp unwrap -o 2 
   deramp unwrap -e ${master}_${slave}.crd
   deramp filtphase 
+  deramp filtphase -m network
 

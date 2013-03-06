@@ -115,7 +115,7 @@ function i12s_init(){
     fi
   fi
     
-  if [ "${method}"=="sbas" ]; then  
+  if [ "${method}"=="all" ]; then
     parseargs "t:p:" ${@}
     #echo "t: ${t}"
     #echo "p: ${p}"
@@ -123,6 +123,23 @@ function i12s_init(){
     [ -z ${p} ] && p=400
     _ipy_t=${t}
     _ipy_p=${p}    
+    _ipy_method=${method}    
+    _ipy_f="${pairsFile}"
+    if [ ! -e "${baselinesFolder}/baselines" ]; then
+      error "Baselines file is not generated."
+      bold "Running baselines..."
+      baselines
+    fi
+    openInIpython "${ADOREFOLDER}/lib/python/fun/select_pairs_from_baselines.py"
+  elif [ "${method}"=="delaunay" ]; then
+    parseargs "t:p:" ${@}
+    #echo "t: ${t}"
+    #echo "p: ${p}"
+    [ -z ${t} ] && t=400
+    [ -z ${p} ] && p=400
+    _ipy_t=${t}
+    _ipy_p=${p}
+    _ipy_method=${method}    
     _ipy_f="${pairsFile}"
     if [ ! -e "${baselinesFolder}/baselines" ]; then
       error "Baselines file is not generated."
@@ -147,6 +164,9 @@ function i12s_init(){
         echo "${m},${scene}" >> ${pairsFile}
       fi
     done 
+  else
+    error "Wrong method. Please see: ? i12s"
+    return -1
   fi
   echo "Pairs file: ${pairsFile}"
   i12s_load ${pairsFile}

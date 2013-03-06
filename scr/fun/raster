@@ -59,15 +59,45 @@
 #   raster_format
 #
 
+function set_output(){
+  # this function defines the output parameter.
+  # It allows for providing a filename with format extension.
+  [ -z "${o}" ] && o="sunraster"
+  local oUP=`echo ${o} |tr '[:lower:]' '[:upper:]'`  
+  case ${oUP} in
+    UCHAR|SUNRASTER|FLOAT|SHORT|ASCII)
+      parO="${o}"
+      [[ "${generate}" == *a* ]] && output_filename="A_${outName}.ras"
+      [[ "${generate}" == *p* ]] && output_filename="P_${outName}.ras"
+      [[ "${generate}" == *m* ]] && output_filename="M_${outName}.ras"
+    ;;
+    *.*)
+      parO='sunraster'
+      output_basename="${o%%.*}"
+      output_filename="${output_basename}.ras" # The real output filename is after raster conversion. So we need to set raster_format
+      output_extension="${o##*.}"
+      if [ "${output_extension}" != "${raster_format}" ]; then
+        print "Temporarily overwriting raster_format."
+        raster_format="${output_extension}"
+        default_raster_format="${raster_format}"
+      fi  
+    ;;
+    *)  
+      error "I did not understand the output format: ${o}"
+      return -1
+    ;;
+  esac
+  
+}
+
 function convert_raster(){
-  local filename
-  filename=${1}  
   if [[ "${raster_format:-undefined}" != "undefined" ]]; then
     if [[ "${raster_format}" != "ras" ]]; then
       echo "Converting ${1}.ras to format: ${raster_format}..."
       convert ${1}.ras ${1}.${raster_format}
       [ $? -ne 0 ] && { echo "There was a problem with imagemagick (convert) when I ran: convert ${1}.ras ${1}.${raster_format}"; return 1; }
       rm ${1}.ras
+      output_filename="${1}.${raster_format}"
     fi
   fi
 }
@@ -301,56 +331,61 @@ if [[ "${generate}" == "auto" ]]; then
   esac
 fi
 #####
+set_output #sets parO, outputfilename and if necessary raster_format
+
 if [[ "${generate}" == *a* ]]; then
   if [[ ${#format} -eq 2 ]];then
     #No log scaling if not complex. 
     [ -z "${q}" ] && parQ="normal"    || parQ=${q}
-    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    #[ -z "${o}" ] && parO="sunraster" || parO=`set_output` # parO=${o}
     [ -z "${c}" ] && parC="gray"      || parC=${c}
-    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > "${output_filename}" # A_${outName}.ras
     convert_raster A_${outName}
   else
     [ -z "${q}" ] && parQ="mag"       || parQ=${q}
-    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    #[ -z "${o}" ] && parO="sunraster" || parO=`set_output`
     [ -z "${c}" ] && parC="gray"      || parC=${c}
     [ -z "${e}" ] && parE="0.5"       || parE=${e}
-    cpxfiddle -w ${width} -f ${format} -e ${parE} -q ${parQ}  -o ${parO} -c ${parC} ${remainder} ${fileName} > A_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -e ${parE} -q ${parQ}  -o ${parO} -c ${parC} ${remainder} ${fileName} > "${output_filename}" # A_${outName}.ras
     convert_raster A_${outName}
   fi
-  echo "Name of rasterfile: A_${outName}.${raster_format}"
+  echo "Name of rasterfile: ${output_filename}"
 fi
 if [[ "${generate}" == *p* ]]; then
   if [[ ${#format} -eq 2 ]];then
     [ -z "${q}" ] && parQ="normal"    || parQ=${q}
-    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    #[ -z "${o}" ] && parO="sunraster" || parO=`set_output` # parO=${o}
     [ -z "${c}" ] && parC="jet"       || parC=${c}
-    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > P_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > "${output_filename}" # P_${outName}.ras
     convert_raster P_${outName}
   else
     [ -z "${q}" ] && parQ="phase"     || parQ=${q}
-    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    #[ -z "${o}" ] && parO="sunraster" || parO=`set_output` # parO=${o}
     [ -z "${c}" ] && parC="jet"       || parC=${c}  
-    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > P_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -o ${parO} -c ${parC} ${remainder} ${fileName} > "${output_filename}" # P_${outName}.ras
     convert_raster P_${outName}
   fi
-  echo "Name of rasterfile: P_${outName}.${raster_format}"    
+  echo "Name of rasterfile: ${output_filename}"
 fi
 if [[ "${generate}" == *m* ]]; then
   if [[ ${#format} -eq 2 ]];then
     echo "Mixed (Amp/Phase) output can not be generated using a real file. Image format: ${format}"
   else
     [ -z "${q}" ] && parQ="mixed"     || parQ=${q}
-    [ -z "${o}" ] && parO="sunraster" || parO=${o}
+    #[ -z "${o}" ] && parO="sunraster" || parO=`set_output` # parO=${o}
     [ -z "${c}" ] && parC="gray"      || parC=${c}
     [ -z "${e}" ] && parE="0.5"       || parE=${e}
     [ -z "${s}" ] && parS="1.2"       || parS=${s}
-    cpxfiddle -w ${width} -f ${format} -q ${parQ} -e ${parE} -s ${parS} -o ${parO} -c ${parC} ${remainder} ${fileName} > M_${outName}.ras
+    cpxfiddle -w ${width} -f ${format} -q ${parQ} -e ${parE} -s ${parS} -o ${parO} -c ${parC} ${remainder} ${fileName} > "${output_filename}" # M_${outName}.ras
     convert_raster M_${outName}
   fi
-  echo "Name of rasterfile: M_${outName}.${raster_format}"    
+  echo "Name of rasterfile: ${output_filename}"
   #cpxfiddle -w ${width} -f ${frmt} -e 0.5 -s 1.2 -q mixed -o sunraster -c cool -M${ratio} ${fname} > ${bname}_mixed.ras
 fi
 
+[ "${default_raster_format:-Undefined}" != "Undefined" ] && raster_format="${default_raster_format}" && unset default_raster_format
+unset width format parQ parE parS parO parC remainder fileName output_filename outName output_extension
+unset set_output
 #go back to adore
 return 0;
 
