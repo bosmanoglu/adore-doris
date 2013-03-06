@@ -73,7 +73,7 @@
 /* parser for getting  DIMACS format input and transforming the
    data to the internal representation */
 
-#include "snaphu_cs2parse.c"
+#include "snaphu_cs2parse.h"
 
 
 #define N_NODE( i ) ( ( (i) == NULL ) ? -1 : ( (i) - ndp + nmin ) )
