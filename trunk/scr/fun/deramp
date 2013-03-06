@@ -37,14 +37,14 @@
 local generate dorisStep remainder #format grepM grepS grepI
 local generateCheck #resultFile firstPixel lastPixel width
 local fileName resFile format width numlines inputFileName
-local w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
+local m w f e q o c s inArg parE parQ parO parC parS flag OPTIND OPTARG
 local cmd passOn lenRemainder
 ###### GET INPUT OPTIONS
 if [ $# -gt 0 ];then
   dorisStep=${1};shift
   remainder=$@
 else
-  error "Please check usage by: ? raster"
+  error "Please check usage by: ? deramp"
   return
 fi
 passOn=()
@@ -60,10 +60,10 @@ do
   lenRemainder=$(( ${#remainder} - ${#inArg} ))
   remainder="${remainder:0:${lenRemainder}}"
   unset OPTIND
-  while getopts ":w:f:" flag ${inArg};
+  while getopts ":w:f:m:" flag ${inArg};
   do
     case $flag in
-      w|f)
+      w|f|m)
         eval ${flag}=${OPTARG};;
       *)
         passOn+=($inArg)
@@ -72,16 +72,22 @@ do
     esac
   done
 done
+
+if [ "${m}" == "network" ]; then 
+  _ipy_p="${dorisStep}"
+  openInIpython "${ADOREFOLDER}/lib/python/fun/network_deramp_complex.py"  
+  return $?
+fi
 # make generate lowercase to accommadate user entries in caps from APM
 remainder="${passOn[@]}" #set remainder to passed on variables for cpxfiddle
 if [ "${remainder:-undef}" != "undef" ]; then
-  error "I'll pass these options to cpxview: ..${remainder}.."
+  error "I'll pass these options to deramp: ..${remainder}.."
 fi
 
 #check if filename is specified with dorisStep
 if [[ "${dorisStep}" == *:* ]]; then
+  dorisStep="${dorisStep%:*}"
   inputFileName=`eval echo ${dorisStep#*:}`
-  dorisStep=${dorisStep%:*}
   [ ! -e "${inputFileName}" ] && { error "Can not find specified file: ${inputFileName}"; return 1; }
 fi
 
@@ -111,6 +117,8 @@ outName=`basename ${fileName}| tr '.' '_'`
 cmd=`echo "${ADOREFOLDER}/lib/python/deramp.py -w ${width} -f ${format} ${remainder} ${fileName}"`
 eval "${cmd}"
 
-#go back to adore
+# Rename the output to the deramped file in the result file. Only if the user did not specify a different file. 
+[ "${inputFileName:-undefined}" == "undefined" ] && modifyRes.sh "${resfile}" "${dorisStep}" "Data_output_file" "${fileName}deramp"
+# go back to adore
 return 0;
 

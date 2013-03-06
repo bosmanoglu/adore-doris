@@ -277,7 +277,7 @@ function report(){
 function s()
 {
 #SHOW
-  local newline line dorisProcess var variableNames
+  local newline line dorisProcess var variableNames varArr
   dorisProcess=${1}
   if [ -e "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" ]; then
     cat "${ADOREFOLDER}/drs/${dorisVersion}/${dorisProcess}.drs" | while read -r line; do
@@ -294,7 +294,8 @@ function s()
     if [ -n "${variableNames}" ]; then
       for var in ${variableNames}
       do
-	echo "${var}=${!var}"
+        varArr="${var}[*]"
+	echo "${var}=${!varArr}"
       done
     else
       echo "Unknown process or variable: ${dorisProcess}"

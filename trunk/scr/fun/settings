@@ -458,7 +458,7 @@ function settings_list(){
     #  echo ..${leftSide}..=..${leftSideEval}..
     #done
 
-
+    local line varName varValue varNameArray
     #default: show settings
     cat "${ADOREFOLDER}/set/default.set" |while read -r line; do
       if [[ "${line}" == *SECTION* ]];then #check if section line 
@@ -472,7 +472,8 @@ function settings_list(){
           #echo ${line%%=*}=${line##*=}
           varName=${line%%=*};
           varName=${varName// /};#remove spaces
-          varValue=${!varName};
+          varNameArray="${varName}[*]" #Works for normal variables and ARRAYS.
+          varValue=${!varNameArray};
           #indirect referencing in the line below {!
           if [[ ${varName} == *_rel_* ]]; then
             echo "${varName}='${varValue}'"

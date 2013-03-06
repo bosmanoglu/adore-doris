@@ -16,6 +16,7 @@ mres2dicts(resfiles)
 import os, re
 import numpy as np
 import basic 
+import string
 
 class Object:
     """ADORE Object
@@ -31,7 +32,7 @@ class Object:
             try:
                 settings=parseSettings(self.settingsFile);
                 self.settings=settings
-                self.setobj=dict2obj(settings._sections);
+                self.setobj=dict2obj(settings._sections, lambda x: string.strip(x, '"'));
             except:
                 self.settings=None
                 self.setobj=None                        
@@ -230,7 +231,10 @@ class Object:
 #    do = DictObj(d)
 #    return do
 
-def dict2obj(d):
+def dict2obj(d, fun=None):
+    """dict2obj(d, fun=None)
+    dict2obj(d, fun=string.strip())
+    """
     #Modified from
     #Ygor Lemos: parand.com/say/index.php/2008/10/13/access-python-dictionary-keys-as-properties/
     class DictObj:
@@ -242,7 +246,10 @@ def dict2obj(d):
                 if isinstance(d[e], dict):
                     self.__dict__[et]=dict2obj(d[e])
                 else:
-                    self.__dict__[et]=d[e]                
+                    if fun is not None:
+                      self.__dict__[et]=fun(d[e])
+                    else:
+                      self.__dict__[et]=d[e]                
     return DictObj(**d)
   
 def res2dict(resfile):
@@ -902,8 +909,10 @@ def getProduct(rdict, process=None, filename=None, width=None, dataFormat=None):
         if width is None:
             if hasattr(rdict,'Number of pixels'):
                 width=int(rdict.Number_of_pixels)
-            else:
+            elif hasattr(rdict,'Multilookfactor_range_direction'):
                 width=int( (int(rdict.Last_pixel)-int(rdict.First_pixel)+1)/rdict.Multilookfactor_range_direction )
+            else:
+                width=int( (int(rdict.Last_pixel)-int(rdict.First_pixel)+1) )
         if dataFormat is None:
             dataFormat=rdict.Data_output_format       
     else:

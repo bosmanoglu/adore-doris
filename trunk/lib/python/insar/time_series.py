@@ -5,36 +5,67 @@ import pylab as P
 import insar
 import scipy
 import scipy.integrate
+import os
 from dateutil import parser
 ###############################################################
 ###############################################################
 ###############################################################
-def select_pairs(scene, btemp, bperp, bdopp=None, btemp_limits=[0,400],bperp_limits=[0,300],bdopp_limits=[0,500]):
+def select_pairs(scene, btemp, bperp, bdopp=None, btemp_limits=[0,400],bperp_limits=[0,300],bdopp_limits=[0,500], method='all', exclude=''):
     """select_pairs(scene, btemp, bperp, bdopp, btemp_limits=[0,400],bperp_limits=[0,300],bdopp_limits=[0,500])
     master scene should have btemp=bperp=bdopp=0.
     """
     pairs=[]
-    for m in N.r_[0:len(scene)]:
-        for s in N.r_[0:len(scene)]:
+    if method=='all':
+        for m in N.r_[0:len(scene)]:
+            for s in N.r_[0:len(scene)]:
+                #skip (continue) if pair is excluded   
+                if ( scene[m] in exclude ) or ( scene[s] in exclude):
+                    continue
+                #if already included or master=slave skip
+                if (m == s) | ((scene[s], scene[m]) in pairs ):
+                    continue
+            # if btemp is out of range skip
+                if ( abs(btemp[m]-btemp[s])> btemp_limits[1] ) | ( abs(btemp[m]-btemp[s]) < btemp_limits[0] ):
+                    continue
+            # if bperp is out of range skip
+                if ( abs(bperp[m]-bperp[s])> bperp_limits[1] ) | ( abs(bperp[m]-bperp[s]) < bperp_limits[0] ):
+                    continue
+                if bdopp is not None:
+            # if bdopp is out of range skip
+                    if ( abs(bdopp[m]-bdopp[s])> bdopp_limits[1] ) | ( abs(bdopp[m]-bdopp[s]) < bdopp_limits[0] ):
+                        continue
+                pairs.append((scene[m], scene[s]));
+    elif method=='delaunay':
+        # get delaunay triangulation
+        cens, edges, tri, neig = P.matplotlib.delaunay.delaunay(btemp, bperp)        
+        # remove long pairs
+        for e in edges:
+            m=e[0]
+            s=e[1]
+            #skip (continue) if pair is excluded
+            if (( scene[m] in exclude ) or ( scene[s] in exclude)):
+                continue
+            #Skip (continue) if pair is out of range
             #if already included or master=slave skip
             if (m == s) | ((scene[s], scene[m]) in pairs ):
-		continue
-	    # if btemp is out of range skip
+                continue
+            # if btemp is out of range skip
             if ( abs(btemp[m]-btemp[s])> btemp_limits[1] ) | ( abs(btemp[m]-btemp[s]) < btemp_limits[0] ):
                 continue
-	    # if bperp is out of range skip
+            # if bperp is out of range skip
             if ( abs(bperp[m]-bperp[s])> bperp_limits[1] ) | ( abs(bperp[m]-bperp[s]) < bperp_limits[0] ):
                 continue
             if bdopp is not None:
-		# if bdopp is out of range skip
+            # if bdopp is out of range skip
                 if ( abs(bdopp[m]-bdopp[s])> bdopp_limits[1] ) | ( abs(bdopp[m]-bdopp[s]) < bdopp_limits[0] ):
                     continue
-            pairs.append((scene[m], scene[s]));
+            #otherwise add
+            pairs.append((scene[m], scene[s])) 
     return pairs
 ###############################################################
 ###############################################################
 ###############################################################
-def select_pairs_from_baselines(baselines_file,btemp_limits=[0,400],bperp_limits=[0,300],bdopp_limits=[0,500]):
+def select_pairs_from_baselines(baselines_file,btemp_limits=[0,400],bperp_limits=[0,300],bdopp_limits=[0,500], method="all", exclude=''):
     """select_pairs_from_baselines(baselines_file)
     """
     baseline_dtype=N.dtype([
@@ -46,7 +77,8 @@ def select_pairs_from_baselines(baselines_file,btemp_limits=[0,400],bperp_limits
     scene=[x[2] for x in A];
     bperp=[x[1] for x in A];
     btemp=[x[0] for x in A];
-    return select_pairs(scene, btemp, bperp, None, btemp_limits, bperp_limits, bdopp_limits)
+    return select_pairs(scene, btemp, bperp, None, btemp_limits, bperp_limits, bdopp_limits, method, exclude=exclude)
+        
 ###############################################################
 ###############################################################
 ###############################################################        
@@ -75,7 +107,7 @@ def bperp_btemp(drsFiles):
 ###############################################################
 ###############################################################
 ###############################################################        
-def bperp_btemp_master_slave(drsFiles):
+def bperp_btemp_master_slave(drsFiles=None):
     from dateutil import parser
     
     mresfiles=[]
@@ -233,4 +265,88 @@ def select_single_master_from_baselines(baselines_file):
     scene=[x[2] for x in A];
     bperp=[x[1] for x in A];
     return select_single_master(bperp,scene)
+###############################################################
+###############################################################
+###############################################################        
+def estimate_overlap(baselinesFolder,buffers=[200,200], masterRes=None):
+    """estimate_overlap(baselinesFolder, buffers[az_buf, rg_buf])
+       az_buf=200
+       rg_buf=200
+       ex:
+       baselinesFolder=setobj.adore.baselinesfolder.strip('"')
+       estimate_overlap(baselinesFolder, [400,400])
+    """
+    import glob
+    if masterRes is not None:
+        mobj=adore.dict2obj(adore.res2dict( masterRes ))
     
+    ifiles=glob.glob(baselinesFolder+'/*_*.res')
+    i12s=[]    #interferogram objects list
+    master=[]  #master names list
+    slave=[]   #slave names list
+    lines=[]   #list of translation lines (az)
+    pixels=[]  #list of translation pixels (rg)
+    for f in ifiles:
+        d=adore.res2dict(f) #dictionary
+        #i12s.append(adore.dict2obj(d))
+        iobj=adore.dict2obj(d)
+        master.append(os.path.splitext(os.path.basename(f))[0].split('_')[0])
+        slave.append(os.path.splitext(os.path.basename(f))[0].split('_')[1])
+        lines.append(iobj.coarse_orbits.Coarse_orbits_translation_lines)
+        pixels.append(iobj.coarse_orbits.Coarse_orbits_translation_pixels)
+        
+    K=len(ifiles)            #number of interferograms
+    allDates=master + slave  #merge master and slave lists
+    allDates=N.sort(list(set(allDates)));
+    I=len(allDates); #Number of images (dates)
+    A=N.zeros([K+1,I]);
+    
+    if masterRes is None:
+        masterScene=0
+    else:
+        masterScene=os.path.splitext(os.path.basename(masterRes))[0]
+        masterScene=(allDates==masterScene)    
+
+    for k in xrange(K):
+        A[k,:]=(allDates==master[k])*-1+(allDates==slave[k])*1; 
+    A[-1,masterScene]=1
+    l=N.dot(N.linalg.pinv(A),lines+[0]) #merge zero to the end of list
+    p=N.dot(N.linalg.pinv(A),pixels+[0]) #merge zero to the end of list
+
+    neg_line_off=min(l[l<0])             #negative line offset
+    pos_line_off=max(l[l>0])             #positive line offset
+    neg_pix_off=min(p[p<0])             #negative px offset
+    pos_pix_off=max(p[p>0])             #positive px offset
+
+    if masterRes is not None:
+        return -1
+#        if lo > 0:
+#            lmin=0
+#            if mobj.process_control.oversample == 1:
+#                lmax=mobj.oversample.Last_line-lo/mobj.oversample.Multilookfactor_azimuth_direction            
+#            else:
+#                lmax=mobj.crop.Last_line-lo                        
+#        else:
+#            if mobj.process_control.oversample == 1:
+#                lmin=mobj.oversample.First_line-l0/mobj.oversample.Multilookfactor_azimuth_direction
+#                lmax=mobj.oversample.Last_line
+#            else:
+#                lmin=mobj.crop.First_line-l0
+#                lmax=mobj.crop.Last_line
+#        if po > 0:
+#            pmin=0
+#            if mobj.process_control.oversample == 1:
+#                pmax=mobj.oversample.Last_pixel-po/mobj.oversample.Multilookfactor_range_direction            
+#            else:
+#                pmax=mobj.crop.Last_line-po                        
+#        else:
+#            if mobj.process_control.oversample == 1:
+#                pmin=mobj.oversample.First_pixel-p0/mobj.oversample.Multilookfactor_range_direction
+#                pmax=mobj.oversample.Last_pixel
+#            else:
+#                lmin=mobj.crop.First_pixel-p0
+#                lmax=mobj.crop.Last_pixel
+#        return [mobj.crop.First_line+lo, po]              
+    else:
+        return [neg_line_off, pos_line_off, neg_pix_off, pos_pix_off]    
+

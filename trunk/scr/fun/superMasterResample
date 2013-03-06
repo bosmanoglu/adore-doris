@@ -54,9 +54,9 @@ function processResampleSteps(){
 function processResample(){
   local resampleSteps
   if [ -f "${sam_in_dem}" ]; then 
-    resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" crd_include_fe=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefdem;addrefpha2s_crop'
+    resampleSteps='settings apply -r -q int_multilook=\"1 1\" srp_multilook=\"1 1\" crd_include_fe=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefdem;addrefpha2s_crop'
   else
-    resampleSteps='settings apply -r -q int_multilook="1 1" srp_multilook="1 1" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
+    resampleSteps='settings apply -r -q int_multilook=\"1 1\" srp_multilook=\"1 1\" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero;comprefpha;subtrrefpha;addrefpha2s_crop'
   fi
   # we will be changing directories
   # save the current dir.
@@ -83,7 +83,8 @@ function processResample(){
 
 ##MAIN
 resampleFolder="${runFolder}/resample"
-resampleMaster="${1}"
+[ -n "${1}" ] && resampleMaster="${1}"
+[ -z "${resampleMaster}" ] && error "Please specify the super resampling master. See usage: ? superMasterResample" && return
 [ ! -d "${cropsFolder}/${resampleMaster}" ] && error "Bad super master." && return 
 [ "${rs_dbow}" == "0 0 0 0" ] && [ "${rs_dbow_geo}" == "0 0 0 0" ] && error "Please specify rs_dbow or rs_dbow_geo." && return
 processResample
