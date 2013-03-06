@@ -97,7 +97,7 @@ void SetDefaults(infileT *infiles, outfileT *outfiles, paramT *params){
   params->da=DEF_DA;               
   params->rangeres=DEF_RANGERES;         
   params->azres=DEF_AZRES;            
-  params->lambda=DEF_LAMBDA;           
+  params->wavelength=DEF_LAMBDA;           
 
   /* scattering model parameters */
   params->kds=DEF_KDS;
@@ -573,8 +573,8 @@ void CheckParams(infileT *infiles, outfileT *outfiles,
     exit(ABNORMAL_EXIT);
   }
   */
-  if(params->lambda<=0){
-    fprintf(sp0,"wavelength lambda  must be positive (meters)\n");
+  if(params->wavelength<=0){
+    fprintf(sp0,"wavelength wavelength  must be positive (meters)\n");
     exit(ABNORMAL_EXIT);
   }
 
@@ -630,6 +630,7 @@ void CheckParams(infileT *infiles, outfileT *outfiles,
      || params->nlooksaz<1 || params->nlooksrange<1
      || params->nlooksother<1){
     fprintf(sp0,"numbers of looks must be positive integer\n");
+    fprintf(sp0,"bad values az:%ld range:%ld other:%ld\n", params->ncorrlooksaz, params->ncorrlooksrange, params->nlooksother);
     exit(ABNORMAL_EXIT);
   }
   if(!strlen(infiles->corrfile)){
@@ -1153,7 +1154,7 @@ void ReadConfigFile(char *conffile, infileT *infiles, outfileT *outfiles,
       }else if(!strcmp(str1,"AZRES")){
 	badparam=StringToDouble(str2,&(params->azres));
       }else if(!strcmp(str1,"LAMBDA")){
-	badparam=StringToDouble(str2,&(params->lambda));
+	badparam=StringToDouble(str2,&(params->wavelength));
       }else if(!strcmp(str1,"KDS") || !strcmp(str1,"KSD")){
 	if(!strcmp(str1,"KSD")){
 	  fprintf(sp0,"WARNING: parameter KSD interpreted as KDS (%s:%ld)\n",
@@ -1564,7 +1565,7 @@ void WriteConfigLogFile(int argc, char *argv[], infileT *infiles,
     fprintf(fp,"DA  %.8f\n",params->da);
     fprintf(fp,"RANGERES  %.8f\n",params->rangeres);
     fprintf(fp,"AZRES  %.8f\n",params->azres);
-    fprintf(fp,"LAMBDA  %.8f\n",params->lambda);
+    fprintf(fp,"LAMBDA  %.8f\n",params->wavelength);
     fprintf(fp,"NLOOKSRANGE  %ld\n",params->nlooksrange);
     fprintf(fp,"NLOOKSAZ  %ld\n",params->nlooksaz);
     fprintf(fp,"NLOOKSOTHER  %ld\n",params->nlooksother);
@@ -2523,6 +2524,7 @@ void ReadComplexFile(float ***mag, float ***phase, char *rifile,
   for(row=0; row<nrow; row++){
     if(fread(inpline,sizeof(float),2*ncol,fp)!=2*ncol){
       fprintf(sp0,"Error while reading from file %s\nAbort\n",rifile);
+      fprintf(sp0,"Tried to read %d, got %d at line %d \n", 2*ncol, fread(inpline,sizeof(float),2*ncol,fp), row); // batu
       exit(ABNORMAL_EXIT);
     }
     for(col=0; col<ncol; col++){

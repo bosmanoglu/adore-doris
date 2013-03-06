@@ -276,7 +276,7 @@ void **BuildStatCostsTopo(float **wrappedphase, float **mag,
   long kperpdpsi, kpardpsi, sigsqshortmin;
   double a, re, dr, slantrange, nearrange, nominc0, dnominc;
   double nomincangle, nomincind, sinnomincangle, cosnomincangle, bperp;
-  double baseline, baselineangle, lambda, lookangle;
+  double baseline, baselineangle, wavelength, lookangle;
   double dzlay, dzei, dzr0, dzrcrit, dzeimin, dphilaypeak, dzrhomax;
   double azdzfactor, dzeifactor, dzeiweight, dzlayfactor;
   double avgei, eicrit, layminei, laywidth, slope1, const1, slope2, const2;
@@ -315,7 +315,7 @@ void **BuildStatCostsTopo(float **wrappedphase, float **mag,
   dzeimin=params->dzeimin;
   dzlayfactor=params->dzlayfactor;
   sigsqei=params->sigsqei;
-  lambda=params->lambda;
+  wavelength=params->wavelength;
   noshadow=!(params->shadow);
   a=params->orbitradius;
   re=params->earthradius;
@@ -368,7 +368,7 @@ void **BuildStatCostsTopo(float **wrappedphase, float **mag,
   
   /* set cost autoscale factor based on midswath parameters */
   bperp=baseline*cos(lookangle-baselineangle);
-  midrangeambight=fabs(lambda*slantrange*sinnomincangle/(2*bperp));
+  midrangeambight=fabs(wavelength*slantrange*sinnomincangle/(2*bperp));
   costscale=params->costscale*fabs(params->costscaleambight/midrangeambight);
   glay=-costscale*log(params->layconst);
 
@@ -395,7 +395,7 @@ void **BuildStatCostsTopo(float **wrappedphase, float **mag,
     lookangle=asin(re/a*sinnomincangle);
     dzr0=-dr*cosnomincangle;
     bperp=baseline*cos(lookangle-baselineangle);
-    ambiguityheight=-(lambda*slantrange*sinnomincangle)/(2*bperp);
+    ambiguityheight=-(wavelength*slantrange*sinnomincangle)/(2*bperp);
     sigsqrhoconst=2.0*ambiguityheight*ambiguityheight/12.0;  
     ztoshort=nshortcycle/ambiguityheight;
     ztoshortsq=ztoshort*ztoshort;
@@ -545,7 +545,7 @@ void **BuildStatCostsTopo(float **wrappedphase, float **mag,
     lookangle=asin(re/a*sinnomincangle);
     dzr0=-dr*cosnomincangle;
     bperp=baseline*cos(lookangle-baselineangle);
-    ambiguityheight=-lambda*slantrange*sinnomincangle/(2*bperp);
+    ambiguityheight=-wavelength*slantrange*sinnomincangle/(2*bperp);
     sigsqrhoconst=2.0*ambiguityheight*ambiguityheight/12.0;  
     ztoshort=nshortcycle/ambiguityheight;
     ztoshortsq=ztoshort*ztoshort;
@@ -1504,7 +1504,7 @@ double CalcDZRhoMax(double rho, double nominc, paramT *params,
   lookangle=asin(re/a*sintheta);
   bperp=params->baseline*cos(lookangle-params->baselineangle);
   slantrange=sqrt(a*a+re*re-2*a*re*cos(nominc-lookangle));
-  rhosfactor=2.0*fabs(bperp)*(params->rangeres)/((params->lambda)*slantrange);
+  rhosfactor=2.0*fabs(bperp)*(params->rangeres)/((params->wavelength)*slantrange);
 
   /* take care of the extremes */
   if(rho>=1.0){
