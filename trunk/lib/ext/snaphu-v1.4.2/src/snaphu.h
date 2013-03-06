@@ -490,7 +490,7 @@ typedef struct paramST{
   double da;              /* azimuth bin spacing (meters) */
   double rangeres;        /* range resolution (meters) */
   double azres;           /* azimuth resolution (meters) */
-  double lambda;          /* wavelength (meters) */
+  double wavelength;          /* wavelength (meters) */
 
   /* scattering model parameters */
   double kds;             /* ratio of diffuse to specular scattering */
