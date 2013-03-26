@@ -48,7 +48,8 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
     """
     figureHandles=clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
     xScat: x-axis variables for Scatter Plot. Has to be the same length as last dimension of array3d.shape[2]
-    
+    xerror3d: errorbars for x-axis. two sided. 
+    fn:'annual'
     """
     dateaxis=False;
     if xScat is None:
@@ -95,9 +96,34 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
             else:
                 yerr=yerror3d2[x, y,:]
             P.errorbar(xScat,array3d2[x, y,:], xerr=xerr, yerr=yerr, marker='*', fmt='o');
-        #Plot function result as scatter data.            
-        if fn is not None:            
-            P.scatter(xScat, fn(xScat), marker='^');       
+        #Plot function result as scatter data.
+        p=None            
+        if fn is not None:
+            if fn=='annual':
+                import scipy
+                dataMask=~np.isnan(array3d[x, y,:])
+                p0=np.array([1,1,basic.nonan(array3d[x, y,:]).mean() ])
+                fitfun=lambda p: p[0]* np.cos(2*np.pi*xScat[dataMask]/365.+p[1]) + p[2]
+                xScat2=np.linspace(xScat.min(),xScat.max())
+                fitfun2=lambda p: p[0]* np.cos(2*np.pi*xScat2/365.+p[1]) + p[2]
+                #errfun=lambda p: sum(abs(basic.nonan(array3d[x, y,:])-fitfun(p)));
+                if yerror3d is None:
+                    w=np.ones(array3d[x, y,:].shape);
+                else:
+                    w=basic.rescale(1./yerror3d[x,y,:], [1,2])
+                errfun=lambda p: basic.nonan(w*array3d[x, y,:])-w[dataMask]*fitfun(p);
+                #p=scipy.optimize.fmin_powell(errfun, p0)
+                p=scipy.optimize.leastsq(errfun, p0);
+                p=p[0];
+                P.scatter(xScat[dataMask], fitfun(p), marker='^');                
+                sortedxy=  np.squeeze(np.dstack([xScat2, fitfun2(p)]));
+                sortedxy=sortedxy[sortedxy[:,0].argsort(),:]
+                P.plot(sortedxy[:,0], sortedxy[:,1]);
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
+                P.annotate(str("amp:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
+            else:      
+                p=None             
+                P.scatter(xScat, fn(xScat), marker='^');       
         #convert axis to date...             
         if dateaxis:
             try:
@@ -115,6 +141,9 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
         else:
             yM=y;
         #x and y are flipped in the try/except block above. So Flip again.
+        #if p is not None:
+        #    P.title("x,y,[]: " + str(yM) + ", " + str(xM) + ', ' + str(p) )
+        #else:
         P.title("x,y,z,z.std: " + str(yM) + ", " + str(xM) + ', ' + str(array2d[x,y]) +', ' + str(np.std(basic.nonan(array3d[x, y,:]))) )
         
         # rotate and align the tick labels so they look better
@@ -264,6 +293,13 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
     if (histogramArr is None) and (zpdf is None):
         print('Error: histogramArr or zpdf has to be specified')
         return 
+    if (bins<=1) and (zbins is None):
+        print('Skipping histogram matching: bins<=1')
+        return inputArr
+    if len(zbins)<=1:
+        print('Skipping histogram matching: len(zbins)<=1')
+        return inputArr
+        
     dS=inputArr.shape
     lenS=inputArr.size
     s=basic.nonan(inputArr.ravel())
@@ -325,9 +361,10 @@ def sensitivity_plot(lvar, lnames):
     #nvel, nf, nalpha, A, B, E, and result(H)
     nvar=len(lvar)
     #now put all variables in a list
-    lvar=[nvel,nf,nalpha,nA,nB,nE,nH]
+    #lvar=[nvel,nf,nalpha,nA,nB,nE,nH]
     #list of names
-    lnvar=['vel','f','slope','A','B','E','H']
+    #lnvar=['vel','f','slope','A','B','E','H']
+    lnvar=lnames
     #now we create subplot (nvar-1 x nvar-1)    
 #    for k in xrange(nvar-1):
 #        for l in xrange(nvar-1-k):

@@ -181,7 +181,7 @@ def div(U,V,spacing=[1.,1.]):
     """    
     return cdiff(U,0)/spacing[0]+cdiff(V,1)/spacing[1];
 
-def fillNan(arr, copy=True):
+def fillNan(arr, copy=True, method='quick', maxiter=None):
     """ outData=basic.fillNan(data, copy=True) 
     
     Fills nan's of an ND-array with a nearest neighbor like algorithm. 
@@ -192,41 +192,54 @@ def fillNan(arr, copy=True):
     For algorithm details see the authors explanation on the following page.
     Source: http://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
     """
-    # -- setup --
-    if copy:
-        data=arr.copy()
-    else:
-        data=arr
-    shape = data.shape
-    dim = len(shape)
-    #data = np.random.random(shape)
-    flag = ~isnan(data);#zeros(shape, dtype=bool)
-    t_ct = int(data.size/5)
-    #flag.flat[random.randint(0, flag.size, t_ct)] = True
-    # True flags the data
-    # -- end setup --
-    
-    slcs = [slice(None)]*dim
-    
-    while any(~flag): # as long as there are any False's in flag
-        for i in range(dim): # do each axis
-            # make slices to shift view one element along the axis
-            slcs1 = slcs[:]
-            slcs2 = slcs[:]
-            slcs1[i] = slice(0, -1)
-            slcs2[i] = slice(1, None)
-    
-            # replace from the right
-            repmask = logical_and(~flag[slcs1], flag[slcs2])
-            data[slcs1][repmask] = data[slcs2][repmask]
-            flag[slcs1][repmask] = True
-    
-            # replace from the left
-            repmask = logical_and(~flag[slcs2], flag[slcs1])
-            data[slcs2][repmask] = data[slcs1][repmask]
-            flag[slcs2][repmask] = True
+    if method=='quick':
+        # -- setup --    
+        if copy:
+            data=arr.copy()
+        else:
+            data=arr
+        shape = data.shape
+        dim = len(shape)
+        #data = np.random.random(shape)
+        flag = ~isnan(data);#zeros(shape, dtype=bool)
+        t_ct = int(data.size/5)
+        #flag.flat[random.randint(0, flag.size, t_ct)] = True
+        # True flags the data
+        # -- end setup --
+        
+        slcs = [slice(None)]*dim
+        k=0
+        while any(~flag): # as long as there are any False's in flag
+            if maxiter is not None:
+                k=k+1
+                if k>= maxiter:
+                    break
+            for i in range(dim): # do each axis
+                # make slices to shift view one element along the axis
+                slcs1 = slcs[:]
+                slcs2 = slcs[:]
+                slcs1[i] = slice(0, -1)
+                slcs2[i] = slice(1, None)
+        
+                # replace from the right
+                repmask = logical_and(~flag[slcs1], flag[slcs2])
+                data[slcs1][repmask] = data[slcs2][repmask]
+                flag[slcs1][repmask] = True
+        
+                # replace from the left
+                repmask = logical_and(~flag[slcs2], flag[slcs1])
+                data[slcs2][repmask] = data[slcs1][repmask]
+                flag[slcs2][repmask] = True
 
-    return data
+        return data
+    else:
+        import scipy
+        X, Y= meshgrid(r_[0:arr.shape[1]], r_[0:arr.shape[0]])
+        m=~isnan(arr)
+        z=arr[m]
+        x=X[m]
+        y=Y[m]
+        return scipy.interpolate.griddata((x,y), z, (X,Y), method=method);
 
 def ind2sub(shp, idx):
     """ind2sub(shp, idx)
@@ -624,4 +637,9 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
                 s[k]=1
     return [x0,y0,x,y,z]
     
-             
+def moving_window(arr, window_size=[3,3], func=mean):
+    """moving_window(array, window_size, func=mean)
+    """
+    import scipy
+    return scipy.ndimage.filters.generic_filter(arr, func, size=window_size)
+
