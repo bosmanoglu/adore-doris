@@ -73,6 +73,12 @@ _EOF
 ## MAIN ##
 #####################
 case ${1} in
+  "*;*")
+    for gp in `echo ${1}|tr ";" " "`
+    do
+      giant "${gp}"
+    done
+  ;;
   "prepxml_SBAS")
     shift
     prepxml_SBAS

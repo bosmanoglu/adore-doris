@@ -587,6 +587,102 @@ function saveas_gdal(){
   fi
 }
 
+function saveas_giant(){
+  dorisStep=${1}
+  local geocodeStatus phi_filename lam_filename phi_l0p0 lam_l0p0 phi_lNpN lam_lNpN phi_step lam_step
+  local filename resfile format numpixels numlines hei_filename hei_resfile hei_format hei_numpixels hei_numlines
+  local bands endian
+  local hdrname
+  local kmlfile A north south east west x y 
+
+  call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
+  hdrname="${filename%%.*}.rsc"  
+  geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
+  if [ ${geocodeStatus} -eq "1" ]; then
+    call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
+    # get the name of phi(lat) and lambda (lon) files
+    phi_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_phi`
+    lam_filename=`readRes.sh ${i_resfile} geocoding Data_output_file_lamda`
+    #get the coordinates for 1st px
+    phi_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_l0p0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`
+    #get the coordinates for last px on 1st line
+    phi_l0pN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p${hei_numpixels} -P${hei_numpixels} ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_l0pN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l1 -L1 -p${hei_numpixels} -P${hei_numpixels} ${lam_filename} 2>/dev/null | tr -d "\n"`
+    phi_step=`echo "${phi_l0pN} ${phi_l0p0} ${numpixels}" | awk '{printf "%.8f", ($1-$2)/$3};'`
+    #get the coordinates for last line on 1st col.(pixel)
+    phi_lNp0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p1 -P1 ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_lNp0=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p1 -P1 ${lam_filename} 2>/dev/null | tr -d "\n"`        
+    lam_step=`echo "${lam_lNp0} ${lam_l0p0} ${numlines}"  | awk '{printf "%.8f", ($1-$2)/$3};'`
+    #get the coordinates for last line on last col.(pixel)
+    phi_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${phi_filename} 2>/dev/null | tr -d "\n"`
+    lam_lNpN=`cpxfiddle -w ${hei_numpixels} -f ${hei_format} -qnormal -l${hei_numlines} -L${hei_numlines} -p${hei_numpixels} -P${hei_numpixels} ${lam_filename} 2>/dev/null | tr -d "\n"`        
+    # create the rsc file
+    echo "WIDTH               ${numpixels}"> ${hdrname}
+    echo "FILE_LENGTH         ${numlines}" >> ${hdrname}
+    echo "LAT_REF1            ${lam_l0p0}" >> ${hdrname}
+    echo "LON_REF1            ${phi_l0p0}" >> ${hdrname}
+    echo "LAT_REF2            ${lam_l0pN}" >> ${hdrname}
+    echo "LON_REF2            ${phi_l0pN}" >> ${hdrname}
+    echo "LAT_REF3            ${lam_lNp0}" >> ${hdrname}
+    echo "LON_REF3            ${phi_lNp0}" >> ${hdrname}
+    echo "LAT_REF4            ${lam_lNpN}" >> ${hdrname}
+    echo "LON_REF4            ${phi_lNpN}" >> ${hdrname}
+    echo "AZIMUTH_PIXEL_SIZE  ${lam_step}" >> ${hdrname}
+    echo "RANGE_PIXEL_SIZE    ${phi_step}" >> ${hdrname}
+  else
+    echo "Using approximate lat/lon coordinates from KML. Should be OK for Giant".
+    # the coordinate calculations are based on an euclidian geometry and might not be very accurate
+    # see http://stackoverflow.com/questions/1624574/calculate-lat-lng-of-corners-of-ground-overlay-from-kml-file
+    if [ -f "${i12sFolder}/resample.kml" ]; then
+      kmlfile="${i12sFolder}/resample.kml"
+    elif [ -f ${resampleFolder}/*_${master}/resample.kml ]; then
+      kmlfile="${resampleFolder}/*_${master}/resample.kml"
+    else
+      error "Can not find resample.kml file."
+      return 
+    fi
+    A=`grep rotation ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+    north=`grep north ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+    south=`grep south ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+    east=`grep east ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+    west=`grep west ${kmlfile} |tr "<" ">"| cut -d">" -f3`
+    cy=`echo ${north} ${south} | awk '{print ($1+$2)/2}'` # center lat
+    cx=`echo ${east} ${west} | awk '{print ($1+$2)/2}'`   # center lon 
+    x=`echo ${east} ${west} | awk '{print ($1-$2)/2}'`    # width lon
+    y=`echo ${north} ${south} | awk '{print ($1-$2)/2}'`  # width lat
+    A=`echo ${A} | awk '{print $1*3.14159265/180}'`
+    nex=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 + $3*cos($5) - $4*sin($5)}'` # north east x lon
+    ney=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 + $3*sin($5) + $4*cos($5)}'`
+    nwx=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 - $3*cos($5) - $4*sin($5)}'`
+    nwy=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 - $3*sin($5) + $4*cos($5)}'`
+    sex=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 + $3*cos($5) + $4*sin($5)}'`
+    sey=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 + $3*sin($5) - $4*cos($5)}'`
+    swx=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $1 - $3*cos($5) + $4*sin($5)}'`
+    swy=`echo ${cx} ${cy} ${x} ${y} ${A} | awk '{print $2 - $3*sin($5) - $4*cos($5)}'` # south west y lat
+    # resolution
+    phi_step=`echo "${nex} ${nwy} ${numpixels}"  | awk 'function abs(x){return ((x <0.0 )? -x : x)} {printf "%.8f", abs($1-$2)/$3};'`
+    lam_step=`echo "${ney} ${sey} ${numlines}"   | awk 'function abs(x){return ((x <0.0 )? -x : x)} {printf "%.8f", abs($1-$2)/$3};'`
+    # create the rsc file
+    echo "WIDTH               ${numpixels}" > ${hdrname}
+    echo "FILE_LENGTH         ${numlines}"  >> ${hdrname}
+    echo "LAT_REF1            ${nwy}" >> ${hdrname}
+    echo "LON_REF1            ${nwx}" >> ${hdrname}
+    echo "LAT_REF2            ${swy}" >> ${hdrname}
+    echo "LON_REF2            ${swx}" >> ${hdrname}
+    echo "LAT_REF3            ${sey}" >> ${hdrname}
+    echo "LON_REF3            ${sex}" >> ${hdrname}
+    echo "LAT_REF4            ${ney}" >> ${hdrname}
+    echo "LON_REF4            ${nex}" >> ${hdrname}
+    echo "AZIMUTH_PIXEL_SIZE  ${lam_step}" >> ${hdrname}
+    echo "RANGE_PIXEL_SIZE    ${phi_step}" >> ${hdrname}   
+  fi
+  echo "GIANT header file: ${hdrname}"
+  echo "SUCCESS: saveas_giant"
+}
+
+
+
 case ${1} in 
   envi)
     [ $# -gt 2 ] && "Please check usage: ? saveas"      
@@ -606,5 +702,9 @@ case ${1} in
   ascii)
     shift
     saveas_ascii ${@}
+  ;;
+  giant)
+    shift
+    saveas_giant ${@}
   ;;
 esac

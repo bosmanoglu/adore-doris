@@ -83,7 +83,7 @@ fi
 
 #generate mask
 floatmask ${input_file} ${operation} ${threshold}
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
   echo "floatmask command failed. I can not continue without the mask file."
   return
 fi
