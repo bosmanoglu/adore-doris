@@ -21,11 +21,38 @@ function runSnaphu(){
   doris ${outputFolder}/${dorisProcess}.drs
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
 }
+
+function runSnaphuMultiGrid(){
+  local snaphuCmd uw_snaphu_dumponlyconf_orig _py_f
+  # run doris to generate the snaphu.conf  
+  uw_snaphu_dumponlyconf_orig="${uw_snaphu_dumponlyconf}"
+  uw_snaphu_dumponlyconf=on
+  uw_method="snaphu"
+  runSnaphu
+  uw_snaphu_dumponlyconf="${uw_snaphu_dumponlyconf_orig}"
+  uw_method="snaphu_multigrid"
+  # read the command from the config file
+  snaphuCmd=`grep "\-f snaphu.conf" snaphu.conf |tr -d "#" | tr -s " "`
+  _ipy_c=`echo ${snaphuCmd} | cut -d" " -f3`
+  _ipy_f=`echo ${snaphuCmd} | cut -d" " -f4`
+  _ipy_w=`echo ${snaphuCmd} | cut -d" " -f5`
+  # now add the options and run
+  #echo ${snaphuCmd} ${@}
+  #eval "${snaphuCmd} ${@}"
+  openInIpython "${ADOREFOLDER}/lib/python/fun/snaphu_multigrid.py"
+  return $?
+}
+
 ##################################
 ## MAIN
 ##################################
-if [[ $# -eq 0 ]]; then
-  runSnaphu
+if [ ${uw_method} == "snaphu_multigrid" ]; then 
+  echo runSnaphuMultiGrid
 else
-  runSnaphuWithOptions $@
+  if [[ $# -eq 0 ]]; then
+    runSnaphu
+  else
+    runSnaphuWithOptions $@
+  fi
 fi
+unset runSnaphuWithOptions runSnaphu runSnaphuMultiGrid
