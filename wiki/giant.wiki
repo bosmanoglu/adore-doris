@@ -39,6 +39,7 @@
 =EXAMPLE:=
 {{{
  ADORE: giant prepxml_SBAS
+ ADORE: giant "PrepIgramStack;ProcessStack;SBASInvert"
  ADORE: giant list
 Available GIAnT commands:
 
