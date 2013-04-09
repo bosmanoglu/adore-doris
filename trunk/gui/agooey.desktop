@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=AGOOEY
+Type=Application
+GenericName[en_US.UTF-8]=AGOOEY
+Exec=/usr/share/adore-doris/gui/agooey
+Comment=Click to start an interactive ADORE-DORIS session.
+Comment[en_US.UTF-8]=Click to start an interactive ADORE-DORIS session.
+Icon=/usr/share/adore-doris/gui/adore-doris-gui-icon-256px.png
+Name[en_US]=AGOOEY

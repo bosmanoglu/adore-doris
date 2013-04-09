@@ -15,7 +15,7 @@ INPUT:
   newValue: modified setting for the field
 
 OUTPUT: 
-  Dumps the new resultfile to stdout. Replacement might not match the original line in terms of whitespace. This is not a problem for doris.
+  Edits the original file. Replacement might not match the original line in terms of whitespace. This is not a problem for doris.
 
 LIMITATIONS:
 

@@ -78,6 +78,44 @@ function processCrops(){
   waitjob ${jobIds[@]}
 }
 
+function crops_c(){
+  local f=${1}  
+  if [ "${f}" == "first" ]; then
+    f=`ls ${i12sFolder}| head -n 1`
+  elif [ "${f}" == "last" ]; then
+    f=`ls ${i12sFolder}| tail -n 1`
+  elif [ "${f}" == "missing" ]; then
+    f=`diff ${cropsFolder} ${dataFolder} | grep "Only in ${dataFolder}" |cut -d":" -f2 | tr -d "[:blank:]"`
+  fi
+  shift
+  local cropSteps="${@}"
+
+  # we will be changing directories
+  # save the current dir.
+  local CALLDIR="$PWD";
+
+  generateRandomString
+  local originalSettingsFile="${CALLDIR}/${randomString}.set"
+  #save current settings so that we can recall them at the end.
+  settings save ${originalSettingsFile}
+
+
+  for scene in `echo ${f}`
+  do
+    processCropSteps ${scene} 
+  done
+  cd ${CALLDIR} #if pairs file is given by relative path we want to be in CALLDIR.
+
+  #go back to where we started
+  cd ${CALLDIR}
+  echo "Replacing user settings"
+  echo "You can cancel the wait loop by CTRL+C."
+  bold "However, processes may still be running. Please check with: qstat"
+  settings load ${originalSettingsFile}
+  rm ${originalSettingsFile}
+  waitjob ${jobIds[@]}
+}
+
 ###############
 ### MAIN
 ###############
@@ -89,6 +127,10 @@ case "${1}" in
 "include")
  shift
  scenes include "$@"
+ ;;
+"-c")
+ shift
+ crops_c "${@}"
  ;;
 *)
  processCrops "${@}"

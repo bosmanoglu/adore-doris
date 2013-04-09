@@ -33,7 +33,7 @@
 #       $dataFolder variable. Keep in mind that the dataFolder will be set
 #       to the newly created output data folder.  
 #
-# scenes rename [date,datetime,orbit,trackframe]:
+# scenes rename [date,datetime,orbit,trackframe,bistatic]:
 #	rename scenes in the data folder given the naming convention.
 #
 # scenes rescan: 
@@ -459,6 +459,18 @@ function scenes_rename(){
        if [ "${newname}" != "${f}" ]; then 
          echo "Renaming: ${f}  as ${newname}"
          mv ${dataFolder}/${f} ${dataFolder}/${newname}
+       fi
+     fi
+   ;;
+   bistatic)
+     if [ "${m_in_method}" == "TSX" ]; then
+       bname=$( basename ${dataFolder}/${f}/${leaderFile} )
+       newname="${bname:28:8}${bname:15:2}"
+       if [ "${newname}" != "${f}" ]; then
+         echo "Renaming: ${f}  as ${newname}"
+         mv ${dataFolder}/${f} ${dataFolder}/${newname}
+       else
+         error "Can not rename ${f}. ${newname} exists."
        fi
      fi
    ;;

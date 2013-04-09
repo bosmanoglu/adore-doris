@@ -239,8 +239,24 @@ function i12s_clear(){
 }
 
 function i12s_plot(){
-  cmd="import insar;insar.time_series.plot_bperp_btemp('${baselinesFolder}/baselines', '${runFolder}/${runName}_pairs.csv');ginput(n=1, timeout=0)"
+  bold "Press enter to quit."
+  cmd="import insar;insar.time_series.plot_bperp_btemp('${baselinesFolder}/baselines', '${runFolder}/${runName}_pairs.csv');ginput(n=10000, timeout=0, mouse_add=3, mouse_pop=1)"
   openInIpython "$cmd" 2> /dev/null &
+}
+
+function i12s_i(){
+  local f=${1}  
+  if [ "${f}" == "first" ]; then
+    f=`ls ${i12sFolder}| head -n 1`
+  elif [ "${f}" == "last" ]; then
+    f=`ls ${i12sFolder}| tail -n 1`
+  fi
+  shift
+  local setorj=${u}
+  
+  settings load ${i12sFolder}/${f}/settings.set
+  eval "${@}"
+  settings load ${setorj}  
 }
 
 #######################################################
@@ -275,6 +291,10 @@ case "${1}" in
 "save")
  shift   
  i12s_save "$@"
+ ;;
+"-i")
+ shift
+ i12s_i "${@}"
  ;;
 *)
  processInterfero "${@}"
