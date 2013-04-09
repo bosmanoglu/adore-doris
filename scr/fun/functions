@@ -435,6 +435,10 @@ function view(){
 	. ${ADORESCR}/fun/view "$@"
 }
 
+function visualize(){
+ 	. ${ADORESCR}/fun/visualize "$@"
+}
+
 function waitjob(){
 	. ${ADORESCR}/fun/waitjob "$@"
 }

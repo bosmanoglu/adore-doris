@@ -46,6 +46,7 @@ rFile=`canonicalPath ${rFolder}/index.html`
 writeHTMLHeader > ${rFile}
 for folder in `ls ${iFolder}`
 do
+  [ -f "${iFolder}/${folder}/settings.set" ] || continue
   cd ${iFolder}/${folder}
   settings load
   raster_format=png
@@ -171,9 +172,9 @@ function reportPicture(){
  step="${1}"
  #echo ${coh_multilook}
  m1=$(( 20 / ${coh_multilook% *} ))
- m2=$(( ${m1} * ${coh_multilook#* } ))
+ #m2=$(( ${m1} * ${coh_multilook#* } ))
  [ "${m1}" == "" ] && m1="20" && m2="20"
- imgFile=`raster auto ${step} -M${m1}/${m2} | tail -n1| cut -d":" -f2 | tr -d " "`
+ imgFile=`raster auto ${step} -M${m1}/${m1} | tail -n1| cut -d":" -f2 | tr -d " "`
  if [ ! -f "${imgFile}" ]; then
    error "Can not find result for step ${step}."
    [ ! -e "${rFolder}/report_result_not_found.png" ] && cp ${ADOREFOLDER}/gui/graphics/report_result_not_found.png "${rFolder}"

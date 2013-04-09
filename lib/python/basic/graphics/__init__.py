@@ -99,7 +99,53 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
         #Plot function result as scatter data.
         p=None            
         if fn is not None:
-            if fn=='annual':
+            if fn=='linear_amplitude_annual':
+                import scipy
+                dataMask=~np.isnan(array3d[x, y,:])
+                p0=np.array([1,0,0,basic.nonan(array3d[x, y,:]).mean() ])
+                fitfun=lambda p: (p[0]+p[1]*xScat[dataMask]/365. )* np.cos(2*np.pi*xScat[dataMask]/365.+p[2]) + p[3]
+                xScat2=np.linspace(xScat.min(),xScat.max())
+                fitfun2=lambda p: (p[0]+p[1]*xScat2/365.) * np.cos(2*np.pi*xScat2/365.+p[2]) + p[3]
+                #errfun=lambda p: sum(abs(basic.nonan(array3d[x, y,:])-fitfun(p)));
+                if yerror3d is None:
+                    w=np.ones(array3d[x, y,:].shape);
+                else:
+                    w=basic.rescale(1./yerror3d[x,y,:], [1,2])
+                errfun=lambda p: basic.nonan(w*array3d[x, y,:])-w[dataMask]*fitfun(p);
+                #p=scipy.optimize.fmin_powell(errfun, p0)
+                p=scipy.optimize.leastsq(errfun, p0);
+                p=p[0];
+                P.scatter(xScat[dataMask], fitfun(p), marker='^');                
+                sortedxy=  np.squeeze(np.dstack([xScat2, fitfun2(p)]));
+                sortedxy=sortedxy[sortedxy[:,0].argsort(),:]
+                P.plot(sortedxy[:,0], sortedxy[:,1]);
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
+                P.annotate(str("a0:%0.2f\na1:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], p[3], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
+            elif fn=='quadratic_amplitude_annual':
+                import scipy
+                dataMask=~np.isnan(array3d[x, y,:])
+                p0=np.array([1,0,0,0,basic.nonan(array3d[x, y,:]).mean() ])
+                fitfun=lambda p: (p[0]+p[1]*xScat[dataMask]/365.+p[2]*(xScat[dataMask]/365.)**2. )* np.cos(2*np.pi*xScat[dataMask]/365.+p[3]) + p[4]
+                xScat2=np.linspace(xScat.min(),xScat.max())
+                fitfun2=lambda p: (p[0]+p[1]*xScat2/365.+p[2]*(xScat2/365.)**2.) * np.cos(2*np.pi*xScat2/365.+p[3]) + p[4]
+                #errfun=lambda p: sum(abs(basic.nonan(array3d[x, y,:])-fitfun(p)));
+                if yerror3d is None:
+                    w=np.ones(array3d[x, y,:].shape);
+                else:
+                    w=basic.rescale(1./yerror3d[x,y,:], [1,2])
+                errfun=lambda p: basic.nonan(w*array3d[x, y,:])-w[dataMask]*fitfun(p);
+                #p=scipy.optimize.fmin_powell(errfun, p0)
+                p=scipy.optimize.leastsq(errfun, p0);
+                p=p[0];
+                P.scatter(xScat[dataMask], fitfun(p), marker='^');                
+                sortedxy=  np.squeeze(np.dstack([xScat2, fitfun2(p)]));
+                sortedxy=sortedxy[sortedxy[:,0].argsort(),:]
+                P.plot(sortedxy[:,0], sortedxy[:,1]);
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
+                P.annotate(str("a0:%0.2f\na1:%0.2f\na2:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], p[3], p[4], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
+
+
+            elif fn=='annual':
                 import scipy
                 dataMask=~np.isnan(array3d[x, y,:])
                 p0=np.array([1,1,basic.nonan(array3d[x, y,:]).mean() ])

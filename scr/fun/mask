@@ -73,7 +73,8 @@ local dorisStep threshold mask_file input_file doris_output resFile format width
 local operation
 #read input
 if [ -z "${2}" ]; then
-  input_file=`readRes.sh ${i_resfile} coherence Data_output_file`
+  input_file="${coh_out_coh}" # `readRes.sh ${i_resfile} coherence Data_output_file`
+  operation='lt'
   threshold=${1:-0.4}
 else
   input_file="${1}"
