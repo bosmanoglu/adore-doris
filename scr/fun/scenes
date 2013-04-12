@@ -175,13 +175,13 @@ local DATADIR="${1}"
 }
 
 function setSlcRes(){
-  if [ "${m_in_method}" == "ERS"]; then
+  if [ "${m_in_method}" == "ERS" ]; then
     slc_az_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
     slc_rg_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
-  elif [ "${m_in_method}" == "ASAR"]; then
+  elif [ "${m_in_method}" == "ASAR" ]; then
     slc_az_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
     slc_rg_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
-  elif [ "${m_in_method}" == "GAMMA"]; then
+  elif [ "${m_in_method}" == "GAMMA" ]; then
     slc_az_res=`grep "^azimuth_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
     slc_rg_res=`grep "^range_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
     slc_az_res=`echo "${slc_az_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`    
@@ -242,12 +242,13 @@ local date
   for f in $(find -L "${DATADIR}" -name "${dataFile}"); do
     #echo info: $f
     #date=$( awk '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
-    date=`awk '/ORBIT/{print substr($5,1,8)}' ${f}/${leaderFile}`
+    dname=$( dirname ${f} )
+    date=`awk '/ORBIT/{print substr($5,1,8)}' ${dname}/${leaderFile}`
     mkdir -p ${dataFolder}/${date}
-    ln -s ${f}/${leaderFile} ${dataFolder}/${date}/
-    ln -s ${f}/${dataFile} ${dataFolder}/${date}/
-    ln -s ${f}/${volumeFile} ${dataFolder}/${date}/
-    ln -s ${f}/${nullFile} ${dataFolder}/${date}/
+    ln -s ${dname}/${leaderFile} ${dataFolder}/${date}/
+    ln -s ${dname}/${dataFile} ${dataFolder}/${date}/
+    ln -s ${dname}/${volumeFile} ${dataFolder}/${date}/
+    ln -s ${dname}/${nullFile} ${dataFolder}/${date}/
   done
 }
 
