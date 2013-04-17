@@ -1,0 +1,21 @@
+#summary superMasterResample
+#labels Phase-Support,Help
+=USAGE:=
+{{{
+    superMasterResample superMaster
+}}}
+=DESCRIPTION:=
+  superMasterResample is an internal ADORE command. <br>
+  It resamples all crops to a single master image, so that the resulting files can be used to combine interferograms among any pair without resampling. <br>
+
+ If a DEM is available it is equivalent to running:<br>
+  `settings apply -r -q int_multilook=\"1 1\" srp_multilook=\"1 1\" crd_include_fe=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero; comprefdem;addrefpha2s_crop`<br>
+  
+ If a DEM is not available it is equivalent to running:<br>
+  `settings apply -r -q int_multilook=\"1 1\" srp_multilook=\"1 1\" srp_dumprefpha=on;coarseorb;coarsecorr;fine;coregpm;resample;interfero; comprefpha;subtrrefpha;addrefpha2s_crop`<br>
+    
+=INPUT:=
+ superMaster: the name of the folder in the data file to be used as the resampling master.
+
+=OUTPUT=
+ Creates the `resample` folder inside the `${runFolder}` and resamples all crops listed in `scenes include`
