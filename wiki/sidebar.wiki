@@ -66,6 +66,7 @@
     * [settings settings]
     * [slant2htrick slant2htrick]
     * [s s]
+    * [superMasterResample superMasterResample]
     * [undo undo]
     * [view view]
     * [waitjob waitjob]
