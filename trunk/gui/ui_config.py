@@ -4,11 +4,13 @@ import settingsEditor
 import processSelector
 import snaphuConfigEditor
 import dialogs
+import os
 
 def menuActions(self):
   return [
     ('About', None, '_About'),
     ('File', None, '_File'),
+    ('Open', None, '_Open', '<ALT>o', 'Open an ADORE project.', lambda w: menuAction(self,w)),
     ('Quit', None, '_Quit', '<ALT>q', 'Quit ADORE.', lambda w: gtk.main_quit()),
     ('Edit', None, '_Edit'),
     ('Copy', None, '_Copy', '<CTRL><SHIFT>c', 'Copy selected text.', lambda w: self.v.copy_clipboard()),
@@ -238,7 +240,20 @@ def runMenuName(self, w):
 
 def menuAction(self, w):
   m=w.get_name()
-  if m == "demLoad":
+  if m == "Open":
+    chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                                    buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+    response = chooser.run()
+    if response == gtk.RESPONSE_OK:
+      filename=chooser.get_filename();
+      if os.path.splitext(filename)[-1]==".set":
+        self.runcmd("cd " + os.path.dirname(filename));
+        self.runcmd("settings load " + filename);
+      else:
+        dialogs.error(str('%s does not appear to be an ADORE settings file.' %filename))
+    chooser.destroy()  
+    return
+  elif m == "demLoad":
     chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                     buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
     response = chooser.run()

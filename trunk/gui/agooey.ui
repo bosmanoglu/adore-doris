@@ -1,6 +1,7 @@
 <ui>
 <menubar name="MenuBar">
   <menu action="File">
+    <menuitem action="Open"/>
     <menuitem action="Quit"/>
   </menu>
   <menu action="Edit">

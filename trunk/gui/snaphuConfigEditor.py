@@ -6,6 +6,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import os
+import dialogs
 
 class SnaphuConfigEditor:
     def snaphuParser(self, set=None, setFile=None):
@@ -37,18 +38,19 @@ class SnaphuConfigEditor:
         #        if "_rel_" in option and not self.advancedChkBtn.get_active():
         #            continue;
         #        self.liststore.append(sectionId, (False,option,value))
-        self.set={}
-        f=open(self.setFile, 'r')
-        for l in f:
-            wl=l.split('#')[0].strip()      #remove comments
-            if wl!='':                      #skip empty lines
-                key=wl.split()[0].strip()   #get the keyword
-                val=''.join(wl.split()[1:]) #get value
-                #print [key, val]
-                self.set[key]=val
-                self.liststore.append((False, key, val))
-        f.close()            
-        self.window.set_title(str('SNAPHU Settings Read: %d' % len(self.set.keys()) ))
+        k=0;
+        if os.path.exists(self.setFile):
+            f=open(self.setFile, 'r')
+            for l in f:
+                wl=l.split('#')[0].strip()      #remove comments
+                if wl!='':                      #skip empty lines
+                    k=k+1;
+                    key=wl.split()[0].strip()   #get the keyword
+                    val=''.join(wl.split()[1:]) #get value
+                    #print [key, val]
+                    self.liststore.append((False, key, val))
+            f.close()
+            self.window.set_title(str('%d settings: %s' % (k, self.setFile)  ))
                         
     def chkbx_toggled_cb(self, cell, path, liststore):
         liststore[path][0]=not liststore[path][0]
@@ -61,14 +63,15 @@ class SnaphuConfigEditor:
         #print liststore        
         liststore[path][2] = new_text
         liststore[path][0] = True
+        self.window.set_title(str('! %s' % ( self.setFile)  ))
         return
-    def edited_cb(self, cell, path, new_text, liststore):
-        #print path
-        #print new_text
-        #print liststore        
-        liststore[path][1] = new_text
-        liststore[path][0] = True
-        return
+
+#    def row_inserted(self, widget, path, iter):
+#        print widget
+#        print path
+#        print iter
+#
+#        self.treeview.set_cursor(path, focus_column=self.tvcolumn2, start_editing=True)
         
     # close the window and quit
     def delete_event(self, widget, event, data=None):
@@ -90,26 +93,37 @@ class SnaphuConfigEditor:
         for row in liststore:
             f.write(str('%s\t%s\n' %(row[1], row[2])))
         f.close()            
+        self.window.set_title(str('%s' % ( self.setFile)  ))
 
     def saveButtonClicked(self, widget, liststore):
         f=open(self.setFile, 'w')
         for row in liststore:
             f.write(str('%s\t%s\n' %(row[1], row[2])))
         f.close()            
+        self.window.set_title(str('%s' % ( self.setFile)  ))
         #Let's see if this will stop the constant crashing
         #self.window.destroy();  
 
-    def refreshButtonClicked(self, widget, liststore):
-        liststore.clear()
-        self.displayOptions(self.setFile, liststore);
-
     def addButtonClicked(self, widget, liststore):
-        liststore.append((True, '', ''))
+        dropdownlist=self.set.keys();
+        for row in liststore:
+            if row[1] in dropdownlist:
+                dropdownlist.remove(row[1]);
+        if len(dropdownlist)>0:
+            response,param=dialogs.dropdown(dropdownlist, '<b>Add</b>');
+            if response == gtk.RESPONSE_OK:
+              liststore.prepend((False, param, self.set[param]))
+              self.window.set_title(str('! %s' % ( self.setFile)  ))
+            return
+        else:
+            dialogs.error('No more keywords to add.')
+            return
 
     def removeButtonClicked(self, widget, liststore):
         for row in liststore:
             if row[0] == True:
                 liststore.remove(row.iter)
+                self.window.set_title(str('! %s' % (self.setFile)  ))
                 
     def openButtonClicked(self, widget, liststore):
         liststore.clear()
@@ -129,10 +143,10 @@ class SnaphuConfigEditor:
         #Make settings case sensitive
         #self.set.optionxform = str
         #
-        #self.setfile=mainWindow.set.get('adore','outputFolder')+'snaphu.conf'
         mainWindow.readSet();
-        self.setFile=os.path.join(mainWindow.set.get('adore','ADOREFOLDER').strip('"'),'set/snaphu.conf.full')
-        self.snaphuParser(); #Initialize the set object.
+        self.confFull=os.path.join(mainWindow.set.get('adore','ADOREFOLDER').strip('"'),'set/snaphu.conf.full')
+        self.snaphuParser(setFile=self.confFull); #Initialize the set object.
+        self.setFile=os.path.join(mainWindow.set.get('adore','outputFolder').strip('"'),'snaphu.conf')
         self.runcmd=mainWindow.runcmd;
 #        self.set=ConfigParser.ConfigParser()
 #        self.set.read(setFile)
@@ -163,10 +177,10 @@ class SnaphuConfigEditor:
         self.saveAsButton.set_flags(gtk.CAN_DEFAULT);
         self.saveAsButton.show();
 
-        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
-        self.refreshButton.connect("clicked", self.refreshButtonClicked, self.liststore)
-        self.refreshButton.set_flags(gtk.CAN_DEFAULT);
-        self.refreshButton.show();
+#        self.refreshButton=gtk.Button(label='Refresh', stock=None, use_underline=True);        
+#        self.refreshButton.connect("clicked", self.refreshButtonClicked, self.liststore)
+#        self.refreshButton.set_flags(gtk.CAN_DEFAULT);
+#        self.refreshButton.show();
 
         self.openButton=gtk.Button(label='Open', stock=None, use_underline=True);        
         self.openButton.connect("clicked", self.openButtonClicked, self.liststore)
@@ -192,7 +206,7 @@ class SnaphuConfigEditor:
         self.hbox.pack_start(self.saveAsButton, expand = False, fill = False, padding = 5);
         self.hbox.pack_start(self.addButton, expand = False, fill = False, padding = 5);
         self.hbox.pack_start(self.removeButton, expand = False, fill = False, padding = 5);
-        self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 5);
+#        self.hbox.pack_start(self.refreshButton, expand = False, fill = False, padding = 5);
 #        self.hbox.pack_start(self.advancedChkBtn, expand = False, fill = False, padding = 20);
 
         ##### SET THE VBOX #####
@@ -215,15 +229,14 @@ class SnaphuConfigEditor:
         #Make chkbox col activatable
         self.chkbx.set_property('activatable', True)
         #Make col1 editable
-        self.cell.set_property('editable', True)
         self.cell2.set_property('editable', True)
         # connect the edit handling function
-        self.cell.connect('edited', self.edited_cb, self.liststore)
         self.cell2.connect('edited', self.edited_cb2, self.liststore)
         self.chkbx.connect('toggled', self.chkbx_toggled_cb, self.liststore)
+        #self.liststore.connect('row_inserted', self.row_inserted)
 
         # create the TreeViewColumn to display the data
-        self.tvcolumn0 = gtk.TreeViewColumn('Apply', self.chkbx)
+        self.tvcolumn0 = gtk.TreeViewColumn('Remove', self.chkbx)
         self.tvcolumn1 = gtk.TreeViewColumn('Settings', self.cell, text=1)
         self.tvcolumn2 = gtk.TreeViewColumn('Values', self.cell2, text=2)
 
