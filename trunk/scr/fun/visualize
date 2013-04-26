@@ -1,0 +1,33 @@
+#!/bin/bash
+
+function visualize_fine(){
+  ${ADOREFOLDER}/lib/python/plot_fine.py ${i_resfile}
+}
+
+function visualize_coarsecorr(){
+  ${ADOREFOLDER}/lib/python/plot_coarsecorr.py ${i_resfile}
+}
+
+function visualize_geocode(){
+  ${ADOREFOLDER}/lib/python/matshowclick_geocode.py ${i_resfile} ${@}
+}
+
+#################
+## MAIN
+#################
+
+case ${1} in 
+  coarsecorr)
+    visualize_coarsecorr 
+  ;;
+  fine)
+    visualize_fine
+  ;;
+  geocode)
+    shift
+    visualize_geocode ${@}
+  ;;
+  *)
+    h visualize
+  ;;
+esac

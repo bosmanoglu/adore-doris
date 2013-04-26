@@ -11,6 +11,13 @@ if [ "${ADORESCR:-isEmpty}" = "isEmpty" ]; then
     export ADORESCR
   fi
 fi
+# also agooey does not source ~/.bashrc when launched from unity
+# let's check for GMT in ubuntu.
+if [ ! `which psxy` ]; then
+  if [ -f /usr/lib/gmt/bin/psxy ]; then
+    export PATH=${PATH}:/usr/lib/gmt/bin
+  fi
+fi
 
 # THE BELOW LINES BREAK ${i} variable
 #if [ "${g-notGui}" != "notGui" ]; then
