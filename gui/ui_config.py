@@ -2,6 +2,7 @@
 import gtk
 import settingsEditor
 import processSelector
+import snaphuConfigEditor
 import dialogs
 
 def menuActions(self):
@@ -64,6 +65,9 @@ def menuActions(self):
     ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', lambda x: self.runcmd('settings load')),
     ('settingsSave', None, '_Save', None, 'Save settings to current folder.', lambda x: self.runcmd('settings save')),
     ('settingsReset',  None, '_Reset',  None, 'Reset settings to defaults', lambda x: self.runcmd('settings reset')),
+    ('Tools', None, '_Tools'),
+    ('toolsSnaphu', None, '_Snaphu Configuration', None, 'Snaphu Configuration Editor', lambda x: snaphuConfigEditor.SnaphuConfigEditor(self)),
+    ('toolsPythonCmd', None, '_Python Command', None, 'Evaluate python commands within agooey.', lambda x: menuAction(self, x)),
     ('Help', None, '_Help'),
     ('helpCommandReference', None, 'Offline _Command Reference'),
     ('hcr_?', None, '?', None, 'Help on ?', lambda w: runMenuCmd(self, w)),
@@ -265,4 +269,10 @@ def menuAction(self, w):
     about.set_logo(gtk.gdk.pixbuf_new_from_file(self.set.get('adore','ADOREFOLDER').strip('\'"') +"/gui/adore-doris-gui-icon-256px.png"))
     about.run()
     about.destroy()
-
+    return
+  elif m =="toolsPythonCmd":
+    response,param=dialogs.parameter("<b>Python Command</b>", "Please enter your command", "", "");
+    if response == gtk.RESPONSE_OK:
+      self.v.feed(str(eval(param)));
+      self.v.feed('\n');
+    return

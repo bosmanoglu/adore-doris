@@ -69,6 +69,10 @@
     <separator/>
     <menuitem action="settingsReset"/>
   </menu>  
+  <menu action="Tools">
+    <menuitem action="toolsSnaphu"/>
+    <menuitem action="toolsPythonCmd"/>
+  </menu>
   <menu action="Help">
     <menu action="helpCommandReference">
       <menuitem action="hcr_?"/>
