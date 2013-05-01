@@ -1,5 +1,18 @@
 #summary How to install ADORE on Ubuntu.
 #labels Phase-Deploy,Featured
+= Live DVD = 
+You can download ADORE Live DVD which comes with:
+  * Ubuntu 12.04 LTS
+  * ADORE-DORIS (0.1.416)
+  * DORIS (4.04.4)
+  * SNAPHU
+  * GMT, GDAL, IMAGEMAGICK from Ubuntu Repositories.
+
+The DVD is available here:
+
+[http://www.osmanoglu.org/sar/98-live-dvd-for-adore-doris]
+
+Simply download and burn the `iso` image on a DVD as a DVD image (NOT as a file/data dvd) and start your computer from the DVD drive. 
 
 = From EO-Tools Repository =
 You can add the EO-Tools repository to your apt-sources and get the following packages: `adore-doris, doris, getorb, snaphu`<br>
