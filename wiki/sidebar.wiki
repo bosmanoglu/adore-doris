@@ -1,6 +1,7 @@
 #labels Phase-Support
 #sidebar TableOfContents
-  * [Installation HOWTO Install]
+  * [Installation How to Install]
+  * [Update How to Update]
   * [Roadmap List of upcoming features]
   * [FAQ Frequently Asked Questions]
   * [MailingList Users Mailing List]
