@@ -596,7 +596,7 @@ function saveas_giant(){
   local kmlfile A north south east west x y 
 
   call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${dorisStep}"
-  hdrname="${filename%%.*}.rsc"  
+  hdrname="${filename}.rsc"  
   geocodeStatus=`check ${i_resfile} | grep -i -w "geocoding"| cut -f2 -d:`
   if [ ${geocodeStatus} -eq "1" ]; then
     call "(hei_filename hei_resfile hei_format hei_numpixels hei_numlines)=dorisProcess2OutputFile geocode Data_output_file_hei"
