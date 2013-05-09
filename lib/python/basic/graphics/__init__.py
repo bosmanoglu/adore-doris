@@ -1,6 +1,9 @@
 import numpy as np
 import pylab as P
 import basic
+import scipy
+import scipy.optimize
+import scipy.stats
 
 def matshowClick(A, value=True, vmin=None, vmax=None):
     def onclick(event):
@@ -100,7 +103,6 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
         p=None            
         if fn is not None:
             if fn=='linear_amplitude_annual':
-                import scipy
                 dataMask=~np.isnan(array3d[x, y,:])
                 p0=np.array([1,0,0,basic.nonan(array3d[x, y,:]).mean() ])
                 fitfun=lambda p: (p[0]+p[1]*xScat[dataMask]/365. )* np.cos(2*np.pi*xScat[dataMask]/365.+p[2]) + p[3]
@@ -122,7 +124,6 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
                 slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
                 P.annotate(str("a0:%0.2f\na1:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], p[3], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
             elif fn=='quadratic_amplitude_annual':
-                import scipy
                 dataMask=~np.isnan(array3d[x, y,:])
                 p0=np.array([1,0,0,0,basic.nonan(array3d[x, y,:]).mean() ])
                 fitfun=lambda p: (p[0]+p[1]*xScat[dataMask]/365.+p[2]*(xScat[dataMask]/365.)**2. )* np.cos(2*np.pi*xScat[dataMask]/365.+p[3]) + p[4]
@@ -143,10 +144,7 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
                 P.plot(sortedxy[:,0], sortedxy[:,1]);
                 slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
                 P.annotate(str("a0:%0.2f\na1:%0.2f\na2:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], p[3], p[4], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
-
-
             elif fn=='annual':
-                import scipy
                 dataMask=~np.isnan(array3d[x, y,:])
                 p0=np.array([1,1,basic.nonan(array3d[x, y,:]).mean() ])
                 fitfun=lambda p: p[0]* np.cos(2*np.pi*xScat[dataMask]/365.+p[1]) + p[2]
@@ -272,7 +270,6 @@ def matscale(array, m=None, s=None, **kwargs):
 def frankotchellappaiter(dzdx,dzdy,weight=None, threshold=0.1, maxiter=10):
     '''frankotchellappaiter(dzdx,dzdy):
     '''
-    import scipy
     scipy.pkgload('ndimage');
     
     dS=dzdx.shape;
