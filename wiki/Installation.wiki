@@ -54,6 +54,8 @@ ADORE requires the following packages to be installed on your system:
     TU-DELFT DORIS is used for all interferometric processing.
   * *GMT* http://gmt.soest.hawaii.edu/ {{{sudo apt-get install gmt}}}
     GMT is required for TU-DELFT DORIS and ADORE-DORIS uses it in MASK and SAVEAS commands.
+  * *ipython* http://ipython.org {{{sudo apt-get install ipython}}}
+    ipython is required to provide ADORE specific improvements to DORIS (e.g. TanDEM-X bistatic processing, manual coarse offset calculation, network deramping of wrapped data, selecting interferometric pairs and etc.) Furthermore ipython allows ADORE to open the current interferogram in python for interactive calculations and data visualization. 
   * _GNUPLOT_ http://www.gnuplot.info/ {{{sudo apt-get install gnuplot}}}
     GNUPLOT is used after the BASELINES command to create a post-script (PS) image of the temporal and perpendicular baselines.
   * _Image-Magick_ http://www.imagemagick.org/ {{{sudo apt-get install imagemagick }}}
@@ -61,6 +63,14 @@ ADORE requires the following packages to be installed on your system:
   * _GDAL_ http://www.gdal.org/ {{{sudo apt-get install gdal-bin}}}
     GDAL is optional, it allows ADORE-DORIS outputs to be exported to ArcGIS via SAVEAS command.
 
+
+The packages below are requirements for Agooey (ADORE-GUI):
+  * *pygtk* {{{sudo apt-get install python-gtk2}}}
+  Required to display Agooey window. 
+  * *vte* {{{sudo apt-get install python-vte}}}
+  Virtual Terminal Emulator is used to display the ADORE prompt.
+  * _ipython-qtconsole_ {{{sudo apt-get install ipython-qtconsole}}}
+  In Agooey, ipython can be opened in a separate window, releasing ADORE prompt for processing. If qtconsole is not available ipython opens inside vte.
 
 == Setup ==
 ADORE-DORIS scripts folder needs to be in your environment PATH. You can do this in ubuntu systems by adding the following lines to the end of your ~/.bashrc file. 
