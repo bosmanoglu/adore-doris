@@ -19,8 +19,13 @@ else
 fi
 
 if [ -z "${cmd}" ]; then 
-  [ "${ipv}" == "0.10" ] && ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"
-  [ "${ipv}" != "0.10" ] && ipython --pylab -i -c "\"%run $ADOREFOLDER/lib/python/ipython.rc "${tmpFolder}/settings.set" \""  
+  if [ "${g-notGui}" != "notGui" ]; then
+    [ "${ipv}" == "0.10" ] && ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"
+    [ "${ipv}" != "0.10" ] && ipython qtconsole --pylab -c "\"%run $ADOREFOLDER/lib/python/ipython.rc "${tmpFolder}/settings.set" \""  &
+  else
+    [ "${ipv}" == "0.10" ] && ipython -pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'"
+    [ "${ipv}" != "0.10" ] && ipython --pylab -i -c "%run $ADOREFOLDER/lib/python/ipython.rc ${tmpFolder}/settings.set"   
+  fi
 elif [ -f "${cmd}" ]; then
   #echo "%run $ADOREFOLDER/lib/python/ipython.rc '${tmpFolder}/settings.set'" > tmpfile.tmp
   #cat "${cmd}" >> tmpfile.tmp

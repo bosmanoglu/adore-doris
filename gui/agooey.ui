@@ -2,6 +2,7 @@
 <menubar name="MenuBar">
   <menu action="File">
     <menuitem action="Open"/>
+    <menuitem action="Connect"/>
     <menuitem action="Quit"/>
   </menu>
   <menu action="Edit">

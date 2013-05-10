@@ -71,7 +71,6 @@ if [ "${i-notInteractive}" != "notInteractive" ]; then
                            #unset _ADOREPATH
   unset i #If this line is omitted, all spawned ADORE jobs
           # will run in interactive mode.
-
   if [ "${g-notGui}" == "notGui" ]; then 
     declare -r PROMPT_COMMAND="setPS1" 
         			#setPS1 function will check the 
@@ -88,7 +87,9 @@ fi
 
 #Only if gui mode
 if [ "${g-notGui}" != "notGui" ]; then
-  #Gui on
-  declare -r PROMPT_COMMAND="setPS1 && settings list &> /tmp/adore${PPID}.set"
+  #Gui on  
+  #declare -r PROMPT_COMMAND="setPS1 && settings list &> /tmp/adore${PPID}.set"
+  #echo "setPS1 && settings list &> ${g}"
+  declare -r PROMPT_COMMAND="setPS1 && settings list &> ${g}"
 fi
 

@@ -57,6 +57,47 @@ def parameter(label1String, label2String=None, textString=None, titleString=None
         dialog.destroy();	  
 	return response,text
 
+def parameters(label1String, label2String=None, labels=(), parameters=(), titleString=None):
+        """parameters(label1String, label2String=None, labels=(), parameters=(), titleString=None)
+        """
+	#base this on a message dialog
+	dialog = gtk.MessageDialog(
+		None,
+		gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+		gtk.MESSAGE_QUESTION,
+		gtk.BUTTONS_OK_CANCEL,
+		None)
+	dialog.set_markup(label1String)
+	entry=[]
+	for k in xrange(len(parameters)):	
+          #create the text input field
+          entry.append(gtk.Entry())
+          if parameters is not None:
+            entry[k].set_text(parameters[k]);
+            #allow the user to press enter to do ok
+            entry[k].connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
+          #create a horizontal box to pack the entry and a label
+          hbox = gtk.HBox()
+          hbox.pack_start(gtk.Label(labels[k]), False, 5, 5)
+          hbox.pack_start(entry[k])
+          dialog.vbox.pack_end(hbox, True, True, 0)
+        #title
+        if titleString:
+          dialog.set_title(titleString);
+        #some secondary text
+        if label2String:
+          dialog.format_secondary_markup(label2String)
+        #add it and show it
+        dialog.show_all()
+        #go go go
+        response=dialog.run()
+        text=[];
+	for k in xrange(len(parameters)):	
+          text.append(entry[k].get_text())
+        dialog.destroy();	  
+	return response,text
+
+
 def dropdown(dropdownList, label1String, label2String=None, label3String='Selection:', titleString=None):
         #http://www.pygtk.org/pygtk2tutorial/examples/comboboxbasic.py
 	#base this on a message dialog
