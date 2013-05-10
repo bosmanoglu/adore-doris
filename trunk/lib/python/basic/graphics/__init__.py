@@ -2,8 +2,6 @@ import numpy as np
 import pylab as P
 import basic
 import scipy
-import scipy.optimize
-import scipy.stats
 
 def matshowClick(A, value=True, vmin=None, vmax=None):
     def onclick(event):
@@ -47,13 +45,14 @@ def imshowsc(A,n=2):
     fig.canvas.mpl_connect('button_press_event', onclick);
     return fig
 
-def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
+def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None, modelError=False):
     """
     figureHandles=clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
     xScat: x-axis variables for Scatter Plot. Has to be the same length as last dimension of array3d.shape[2]
     xerror3d: errorbars for x-axis. two sided. 
     fn:'annual'
     """
+    import insar
     dateaxis=False;
     if xScat is None:
         xScat=np.r_[0:array3d.shape[2]];
@@ -79,26 +78,34 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
             #if there are no points to plot (all nan) then return
             return
         
-        if (yerror3d is None) and (xerror3d is None):
-            P.scatter(xScat,array3d[x, y,:]);
-        elif (xerror3d is None):
-            P.errorbar(xScat,array3d[x, y,:], yerr=yerror3d[x, y,:], fmt='ro');
-        elif (yerror3d is None):
-            P.errorbar(xScat,array3d[x, y,:], xerr=xerror3d[x,y,:], fmt='ro');
-        else:
-            P.errorbar(xScat,array3d[x, y,:], xerr=xerror3d[x,y,:], yerr=yerror3d[x, y,:], fmt='ro');
         #Plot second scatter data.
-        if array3d2 is not None:
-            #P.scatter(xScat, array3d2[x, y,:], marker='*');
-            if xerror3d2 is None:
-                xerr=None;
-            else:
-                xerr=xerror3d2[x,y,:]
-            if yerror3d2 is None:
-                yerr=None;
-            else:
-                yerr=yerror3d2[x, y,:]
-            P.errorbar(xScat,array3d2[x, y,:], xerr=xerr, yerr=yerr, marker='*', fmt='o');
+        if array3d2 is not None:        
+            if isinstance(array3d2, list):
+                if yerror3d is None:
+                    w=np.ones(array3d[x, y,:].shape);
+                else:
+                    w=basic.rescale(1./yerror3d[x,y,:], [1,2])
+                markers=['*','+','s','d','x','v','<','>','^']
+                m=0;
+                for arr in array3d2:  
+                    print ("%d, %d, %d" % (x,y,m))                  
+                    P.scatter(xScat, arr[x, y,:], marker=markers[m]);
+                    idx=~( np.isnan(arr[x, y,:]) | np.isnan(array3d[x, y,:]))
+                    #c=insar.crosscorrelate(basic.nonan(w[idx]*arr[x, y,idx]),basic.nonan(w[idx]*array3d[x, y,idx]))
+                    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w[idx]*arr[x, y,idx]), basic.nonan(w[idx]*array3d[x, y,idx]))
+                    P.annotate(str("r2[%s]: %0.2f" % (markers[m],r_value)), (0,0.9-m*0.05), xycoords='axes fraction')                    
+                    m=m+1;
+            else:            
+                if xerror3d2 is None:
+                    xerr=None;
+                else:
+                    xerr=xerror3d2[x,y,:]
+                if yerror3d2 is None:
+                    yerr=None;
+                else:
+                    yerr=yerror3d2[x, y,:]
+                P.errorbar(xScat,array3d2[x, y,:], xerr=xerr, yerr=yerr, marker='*', fmt='o');
+
         #Plot function result as scatter data.
         p=None            
         if fn is not None:
@@ -144,6 +151,8 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
                 P.plot(sortedxy[:,0], sortedxy[:,1]);
                 slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(basic.nonan(w*array3d[x, y,:]),w[dataMask]*fitfun(p))
                 P.annotate(str("a0:%0.2f\na1:%0.2f\na2:%0.2f\npha:%0.2f\nbias:%0.2f\nr2:%0.2f" % (p[0], p[1], p[2], p[3], p[4], r_value**2.)), (0.8,0.8), xycoords='axes fraction')
+
+
             elif fn=='annual':
                 dataMask=~np.isnan(array3d[x, y,:])
                 p0=np.array([1,1,basic.nonan(array3d[x, y,:]).mean() ])
@@ -195,6 +204,23 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
         # use a more precise date string for the x axis locations in the
         # toolbar
         #P.gca().fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+
+        if xerror3d is None:
+            xerr=None;
+        else:
+            xerr=xerror3d[x,y,:]
+        if yerror3d is None:
+            yerr=None;
+        else:
+            yerr=yerror3d[x, y,:]        
+        if modelError:
+            yerr=yerror3d[x, y,:] 
+            yerr[dataMask]=errfun(p)
+            
+        P.errorbar(xScat,array3d[x, y,:], xerr=xerr, yerr=yerr, fmt='ro');
+        ##################################
+        ## END OF PLOTTING
+        ##################################
         
     s=array2d[~np.isnan(array2d)].std();
     m=array2d[~np.isnan(array2d)].mean();
@@ -265,13 +291,39 @@ def matscale(array, m=None, s=None, **kwargs):
         m=array.mean()
     if not s:
         s=array.std()
-    return P.matshow(array, vmin=m-s, vmax=m+s, **kwargs);        
+    return P.matshow(array, vmin=m-s, vmax=m+s, **kwargs);  
 
+def matshowN(array, axis=None, titles=None, matshow_kw=dict(), subplot_kw=dict(frame_on=False), **kwargs):
+    ''' matshowN(array, axis=None, titles=None, subplot_kw=dict(frame_on=False), **kwargs)
+        Ex: f=matshowN(angle(kum.iG.cint[:]))
+            f.tight_layout()
+            basic.graphics.matshowN((residual/stdpha)**2., matshow_kw={'vmin':0, 'vmax':1})
+            
+        axis: If not specified, uses the axis with minimum elements.
+            axis=argmin(array.shape)
+    '''          
+    if axis is None:
+      axis=np.argmin(array.shape);
+    num=array.shape[axis];
+    lw=int(np.ceil(np.sqrt(num)));
+    f,axarr=P.subplots(lw,lw,sharex='col',sharey='row', subplot_kw=subplot_kw, **kwargs)
+    array=np.rollaxis(array, axis, 0);
+    k=0;
+    for ax in axarr.ravel():
+      if k >= num:
+        ax.set_axis_off();    
+        continue
+      ax.matshow(array[k,:,:], **matshow_kw);
+      if titles is None:
+        ax.set_title(str('%d'%k));ax.set_axis_off();
+      else:
+        ax.set_title(titles[k]);ax.set_axis_off();
+      k=k+1;
+    return f;
+    
 def frankotchellappaiter(dzdx,dzdy,weight=None, threshold=0.1, maxiter=10):
     '''frankotchellappaiter(dzdx,dzdy):
-    '''
-    scipy.pkgload('ndimage');
-    
+    '''   
     dS=dzdx.shape;
     if weight is None:
        weight=np.ones(dS);
@@ -394,6 +446,22 @@ def histogram_matching(inputArr, histogramArr=None, bins=100, zpdf=None, zbins=N
     
     return z0
 
+def histogramMap(arrIn, **kwargs):
+    '''histogramMap(arr, **kwargs)
+    Returns an array where the values are replaced with
+    histogram values.
+    '''
+    arr=arrIn.copy();
+    pdf,bins=P.np.histogram(arr, **kwargs);
+    for b in xrange(len(bins)):
+        if b == 0:
+            arr[arr<bins[b]]=pdf[b];
+        elif b==len(bins)-1:
+            arr[arr>bins[b]]=pdf[b-1];
+        else:
+            arr[ (arr>bins[b])&(arr<bins[b+1]) ] = pdf[b];
+    return arr
+
 def sensitivity_plot(lvar, lnames):
     """fg=sensitivity_plot(lvar, lnames)
     Creates a plot for parameter correlation. The design of the plot is after the InSAR group at Oxford (Parsons)
@@ -436,3 +504,136 @@ def sensitivity_plot(lvar, lnames):
     P.tight_layout(pad=0.005, w_pad=0.005, h_pad=0.005)    
     return fg
     
+def manual_translation(master, slave):
+    def onrelease(event):
+        global coord
+        try:
+            x=np.round(event.xdata);
+        except:
+            return
+        y=np.round(event.ydata);
+        imshow_box(fig,master,x,y, s);
+        coord=(x,y);
+        
+    def onkeypress(event):
+        #print('you pressed', event.key, event.xdata, event.ydata)
+        global coord
+        x,y=coord
+        if event.key == "up":
+            y=y-1;
+        elif event.key == "down":
+            y=y+1;
+        elif event.key =="left":
+            x=x-1
+        elif event.key == "right":
+            x=x+1
+        coord=(x,y);
+        imshow_box(fig,master,x,y, s);
+        
+    def imshow_box(f,im, x,y,s):
+        '''imshow_box(f,im, x,y,s)
+        f: figure
+        im: image
+        x: center coordinate for box
+        y: center coord
+        s: box shape, (width, height)
+        '''
+        global coord
+        P.figure(f.number)
+        P.clf();
+        P.imshow(im);
+        P.axhline(y-s[1]/2.)
+        P.axhline(y+s[1]/2.)
+        P.axvline(x-s[0]/2.)
+        P.axvline(x+s[0]/2.)
+        xy=crop(m,s,y,x)
+        coord=(0.5*(xy[2]+xy[3]), 0.5*(xy[0]+xy[1]))
+        P.title(str('x: %d y: %d' % (x,y)));        
+        P.figure(999);
+        P.imshow(master[xy[0]:xy[1],xy[2]:xy[3]])
+        P.title('Master');
+        P.figure(998);
+        df=(master[xy[0]:xy[1],xy[2]:xy[3]]-slave)
+        P.imshow(np.abs(df))
+        P.title(str('RMS: %0.6f' % np.sqrt((df**2.).mean()) ));        
+
+    def crop(m,s,x,y):
+      xy=[round(k) for k in [x-s[0]/2. , x+s[0]/2. ,   y-s[1]/2., y+s[1]/2.]]
+      #print xy
+      if np.any(xy<0):
+        if xy[0]<0:
+          xy[1]=xy[1]-xy[0];xy[0]=0;
+        if xy[2]<0:
+          xy[3]=xy[3]-xy[2];xy[2]=0;
+      if xy[1]>m[0]:
+          xy[0]=xy[0]-(xy[1]-m[0]);xy[1]=m[0];
+      if xy[3]>m[1]:
+          xy[2]=xy[2]-(xy[3]-m[1]);xy[3]=m[1];
+      return xy
+    s=slave.shape  
+    m=master.shape                     
+    fig=P.figure();
+    imshow_box(fig,master,m[0]*0.5,m[1]*0.5,s);
+    coord=(m[0]*0.5,m[1]*0.5)
+    P.figure();
+    P.imshow(slave);P.title('Slave');
+    fig.canvas.mpl_connect('button_release_event', onrelease);
+    fig.canvas.mpl_connect('key_press_event', onkeypress);
+    return fig   
+    
+def manual_translation_scatter(master, sx,sy,sz, dotsize=1):
+    def onrelease(event):
+        if event.button !=3:
+            return
+        global coord
+        try:
+            x=np.round(event.xdata);
+        except:
+            return
+        y=np.round(event.ydata);
+        imshow_box(fig,master,x,y, s);
+        coord=(x,y);
+        
+    def onkeypress(event):
+        #print('you pressed', event.key, event.xdata, event.ydata)
+        global coord
+        x,y=coord
+        if event.key == "up":
+            y=y-1;
+        elif event.key == "down":
+            y=y+1;
+        elif event.key =="left":
+            x=x-1
+        elif event.key == "right":
+            x=x+1
+        coord=(x,y);
+        imshow_box(fig,master,x,y, s);
+        
+    def imshow_box(f,im, x,y,s):
+        '''imshow_box(f,im, x,y,s)
+        f: figure
+        im: image
+        x: center coordinate for box
+        y: center coord
+        s: box shape, (width, height)
+        '''
+        global coord
+        P.figure(f.number)
+        P.clf();
+        P.imshow(im);
+        P.axhline(y)
+        P.axhline(y+s[1])
+        P.axvline(x)
+        P.axvline(x+s[0])
+        P.scatter(sx+x,sy+y, dotsize, sz, edgecolor='none');
+        coord=(x,y);
+        P.title(str('x: %d y: %d' % (x,y)));  
+        
+    s=(sx.max()-sx.min() , sy.max()-sy.min() )
+    m=master.shape                     
+    fig=P.figure();
+    imshow_box(fig,master,m[0]*0.5,m[1]*0.5,s);
+    coord=(m[0]*0.5,m[1]*0.5)
+    fig.canvas.mpl_connect('button_release_event', onrelease);
+    fig.canvas.mpl_connect('key_press_event', onkeypress);
+    return fig       

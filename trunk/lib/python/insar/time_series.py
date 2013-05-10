@@ -136,7 +136,10 @@ def bperp_btemp_master_slave(drsFiles=None):
 ###############################################################
 ###############################################################
 ###############################################################
-def plot_bperp_btemp(drsFiles):
+def plot_bperp_btemp_from_drsFiles(drsFiles):
+    """plot_bperp_btemp_from_drsFiles(drsFiles)
+    drsFiles=glob.glob('../i12s/*/coarseorb.drs')
+    """
     fg=P.figure()
     bperp,btemp,master,slave=bperp_btemp_master_slave(drsFiles)
     
@@ -149,16 +152,19 @@ def plot_bperp_btemp(drsFiles):
     tS=temporalSampling
     for k in xrange(K):
         A[k,:]=(allDates==master[k])*-1+(allDates==slave[k])*1; 
-    A[-1,0]=1
+    A[-1,0]=1 # select master[0] time as 0.
     t=N.dot(N.linalg.pinv(A),btemp+[0]) #merge zero to the end of list
     p=N.dot(N.linalg.pinv(A),bperp+[0]) #merge zero to the end of list
     
+    t=t+P.matplotlib.dates.date2num(allDates[0])
     P.scatter(t,p)
     dateList=allDates.copy()
     for k in xrange(K):
         tk=t[allDates==master[k]]
+        #tk=P.matplotlib.dates.date2num(master[k])
         pk=p[allDates==master[k]]
         ts=t[allDates==slave[k]]
+        #ts=P.matplotlib.dates.date2num(slave[k])
         ps=p[allDates==slave[k]]
         #P.plot([tk, tk+btemp[k]], [pk, pk+bperp[k]] )
         P.plot([tk, ts], [pk, ps] )
@@ -170,7 +176,11 @@ def plot_bperp_btemp(drsFiles):
         if slave[k] in dateList:
           P.annotate(str(slave[k].date()), xy=(ts, ps), xytext=(ts, ps+10))
           dateList[N.where(allDates==slave[k])]=None          
-      
+    try:
+        P.figure(fg.number).axes[0].xaxis_date(tz=None)
+        P.figure(fg.number).autofmt_xdate()
+    except:
+        pass    
     return fg
 ###############################################################
 ###############################################################
@@ -200,7 +210,9 @@ def plot_bperp_btemp(baselines_file, pairs_file):
     K=len(btemp)
     I=len(master)
     print("Plotting %d scenes and %d interferograms." % (K, I) )
+    
     dateList=scene[:] #copy the list
+    bt=[];bp=[];   
     for k in xrange(I):
         mi=[ i for i,x in enumerate(scene) if x == master[k] ][0]
         si=[ i for i,x in enumerate(scene) if x == slave[k] ][0]
@@ -211,6 +223,7 @@ def plot_bperp_btemp(baselines_file, pairs_file):
         ps=bperp[si]
         #P.plot([tk, tk+btemp[k]], [pk, pk+bperp[k]] )
         P.plot([tm, ts], [pm, ps] )
+        bt.append(tm-ts);bp.append(pm-ps)
         if any(dateList) == False:
             continue
         if dateList[mi] is not None:
@@ -224,6 +237,8 @@ def plot_bperp_btemp(baselines_file, pairs_file):
       tm=btemp[k]
       pm=bperp[k]
       P.annotate(scene[k], xy=(tm, pm), xytext=(tm, pm+10))
+    print("abs(Bperp) max/min/mean/std: %.2f %.2f %.2f %.2f" % (max(N.abs(bp)), min(N.abs(bp)), N.mean(N.abs(bp)), N.std(N.abs(bp))))
+    print("abs(Btemp) max/min/mean/std: %.2f %.2f %.2f %.2f" % (max(N.abs(bt)), min(N.abs(bt)), N.mean(N.abs(bt)), N.std(N.abs(bt))))      
     return fg
 ###############################################################
 ###############################################################

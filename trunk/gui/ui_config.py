@@ -11,6 +11,7 @@ def menuActions(self):
     ('About', None, '_About'),
     ('File', None, '_File'),
     ('Open', None, '_Open', '<ALT>o', 'Open an ADORE project.', lambda w: menuAction(self,w)),
+    ('Connect', None, '_Connect', '<ALT>c', 'Connect to a server.', lambda w: menuAction(self,w)),
     ('Quit', None, '_Quit', '<ALT>q', 'Quit ADORE.', lambda w: gtk.main_quit()),
     ('Edit', None, '_Edit'),
     ('Copy', None, '_Copy', '<CTRL><SHIFT>c', 'Copy selected text.', lambda w: self.v.copy_clipboard()),
@@ -253,6 +254,13 @@ def menuAction(self, w):
         dialogs.error(str('%s does not appear to be an ADORE settings file.' %filename))
     chooser.destroy()  
     return
+  elif m == "Connect":
+    response,param=dialogs.parameters("<b>Connect</b>", labels=("URI", "Agooey Temporary File"), parameters=('user@sshserver.com',self.setFile), titleString="Connect to remote server");
+    if response == gtk.RESPONSE_OK:
+#      self.runcmd(str('ssh -Y %s -t "bash -c adore -g %s"' % (param[0], param[1])))
+       self.setFile=param[1]
+       self.runcmd(str('ssh -Y %s -t \'bash -i -c "adore -i -g %s"\' '% (param[0],param[1])))
+    return    
   elif m == "demLoad":
     chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                     buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))

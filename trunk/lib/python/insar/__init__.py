@@ -133,7 +133,7 @@ def coherence(m,s,w):
     Em=scipy.signal.signaltools.correlate(m*conj(m), corrFilter, mode='same')
     Es=scipy.signal.signaltools.correlate(s*conj(s), corrFilter, mode='same')
     Ems=scipy.signal.signaltools.correlate(m*conj(s), corrFilter, mode='same')
-    coh=abs(Ems / sqrt(Em**2+Es**2))
+    coh=abs(Ems / 0.5*sqrt(Em**2+Es**2)) #need to divide by two to get root mean square
 
 #    for k in r_[0:len(m)]:
 #        if k+w>=len(m):

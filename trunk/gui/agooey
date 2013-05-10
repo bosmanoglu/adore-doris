@@ -11,6 +11,7 @@ import sys
 import subprocess
 import shlex
 import ConfigParser
+import random
 
 import dialogs
 
@@ -26,7 +27,7 @@ class MyGUI:
   #ui = ui_file.read()
 
   def __init__( self, title,argv):
-    self.argv=argv or "/scr/adore -g -i"
+    self.argv=argv or "/scr/adore -i"
     self.set = ConfigParser.ConfigParser()
     self.window = gtk.Window()
     self.title = title
@@ -86,9 +87,11 @@ class MyGUI:
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i" ])
     #self.v.fork_command("sh", ["/bin/bash", "-c", "adore -i -u /home/bosmanoglu/tmp/test/settings.set"])
     #THIS WORKS but creates spawns 3 shells instead of two#self.vPid=self.v.fork_command("sh", ["/bin/bash", "-c", self.argv])
+    self.setFile="/tmp/adore"+str(random.randint(0,10000))+".set"
+    self.argv=self.argv + str('-g %s ' %self.setFile);
     cmd=self.argv.split(" ");
+    print cmd
     self.vPid=self.v.fork_command(cmd[0], cmd);#USAGE:fork_command(args[0], args, None, os.getcwd())
-    self.setFile="/tmp/adore"+str(self.vPid)+".set"
     #print self.vPid
     #self.v.fork_command("sh", shlex.split(self.argv))
     #self.mainbox.pack_start(self.v)
@@ -174,7 +177,7 @@ if __name__ == "__main__":
   ADOREGUIFOLDER=os.path.split(os.path.realpath(sys.argv[0]))[0]
   ADOREFOLDER=os.path.split(ADOREGUIFOLDER)[0]
   #print ADOREFOLDER
-  argv=ADOREFOLDER + "/scr/adore -g -i "
+  argv=ADOREFOLDER + "/scr/adore -i "
   if len(sys.argv[1:]) >0:
     argv+= " ".join(sys.argv[1:]);
   #  #print argv
