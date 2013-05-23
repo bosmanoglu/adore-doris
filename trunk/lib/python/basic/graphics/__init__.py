@@ -45,7 +45,8 @@ def imshowsc(A,n=2):
     fig.canvas.mpl_connect('button_press_event', onclick);
     return fig
 
-def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None, modelError=False):
+def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None, 
+    modelError=False, ylimScat=None):
     """
     figureHandles=clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3d2=None, xerror3d2=None, yerror3d2=None, fn=None, xMap=None, yMap=None):
     xScat: x-axis variables for Scatter Plot. Has to be the same length as last dimension of array3d.shape[2]
@@ -218,6 +219,8 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
             yerr[dataMask]=errfun(p)
             
         P.errorbar(xScat,array3d[x, y,:], xerr=xerr, yerr=yerr, fmt='ro');
+        if ylimScat is not None:
+            P.ylim(ylimScat);
         ##################################
         ## END OF PLOTTING
         ##################################
