@@ -768,21 +768,25 @@ def getval(fileDict, key, lines=None, processName=None, regexp=None):
         out=out[0]; #if singleton return value not a list.
     return out
 
-def getdata(fname, width, dataFormat, length=0, byteswap=False):  
+def getdata(fname, width, dataFormat, length=0, byteswap=False, skipbytes=0):  
     datatype, complexFlag=dataFormat2dataType(dataFormat);        
     if complexFlag==True:
         width=2*width;
 
     if length==0:
         filesize=os.path.getsize(fname)
-        length=float(filesize)/width/np.dtype(datatype).itemsize
+        length=float(filesize-skipbytes)/width/np.dtype(datatype).itemsize
         if not basic.isint(length):
             print("Error with file width, will continue but results might be bad.")
             print('Width(*2 if complex): %d, Length: %.2f, FileSize: %d' % (width,length,filesize) )
         length=int(length);
 
+    f=open(fname, "rb")
+    if skipbytes > 0:
+        f.seek(skipbytes, os.SEEK_SET)
+    
     if complexFlag:
-        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+        data=np.fromfile(f, datatype ,width*length).reshape(length, width)
         #data=np.vectorize(complex)(data[:,0:-1:2],data[:,1::2])
         if byteswap:
             data.byteswap(True);
@@ -790,9 +794,10 @@ def getdata(fname, width, dataFormat, length=0, byteswap=False):
         #data=np.zeros((length,width/2),np.complex);
         #data+=dataP;
     else:
-        data=np.fromfile(fname, datatype ,width*length).reshape(length, width)
+        data=np.fromfile(f, datatype ,width*length).reshape(length, width)
         if byteswap:
             data.byteswap(True);
+    f.close()
     return data
 
 def getProcessLines(fileDict, processName):
