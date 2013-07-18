@@ -27,6 +27,18 @@ Update the package list:<br>
 To install adore-doris (this should also install doris, getorb and snaphu)<br>
 `sudo apt-get install adore-doris`
 
+= Installing DORIS and Snaphu From Ubuntu and Debian Repositories =
+by Antonio Valentino and Francesco P. Lovergine on July 18th, 2013.
+
+We finally have doris and snaphu in debian:
+ * http://packages.debian.org/sid/doris
+ * http://packages.debian.org/sid/snaphu
+
+Currently they are only available in the unstable (sid) and testing (jessie) archives, not in stable (wheezy).
+You need to enable the `contrib` and `non-free` archives in your `/etc/apt/source.lists` in order be able to install them.
+
+Also these packages will be in Ubuntu 13.10 (saucy) in the `multiverse` archive.
+
 = Debian Package Installation =
 You can download and install the Debian packages under Debian based operating systems including Ubuntu. 
 
