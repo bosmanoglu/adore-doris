@@ -768,7 +768,7 @@ def getval(fileDict, key, lines=None, processName=None, regexp=None):
         out=out[0]; #if singleton return value not a list.
     return out
 
-def getdata(fname, width, dataFormat, length=0, byteswap=False, skipbytes=0):  
+def getdata(fname, width, dataFormat, length=0, byteswap=False, skipbytes=0, interleave='bip'):  
     datatype, complexFlag=dataFormat2dataType(dataFormat);        
     if complexFlag==True:
         width=2*width;
@@ -790,10 +790,13 @@ def getdata(fname, width, dataFormat, length=0, byteswap=False, skipbytes=0):
         #data=np.vectorize(complex)(data[:,0:-1:2],data[:,1::2])
         if byteswap:
             data.byteswap(True);
-        data=data[:,0:-1:2]+1j*data[:,1::2]
-        #data=np.zeros((length,width/2),np.complex);
-        #data+=dataP;
-    else:
+        if interleave=='bip':
+          data=data[:,0:-1:2]+1j*data[:,1::2]
+          #data=np.zeros((length,width/2),np.complex);
+          #data+=dataP;
+        elif interleave=='bil':
+          data=data[0:-1:2,:]+1j*data[1::2,:]
+    else:        
         data=np.fromfile(f, datatype ,width*length).reshape(length, width)
         if byteswap:
             data.byteswap(True);
