@@ -1,5 +1,8 @@
 #summary ADORE-DORIS Live DVD
 #labels Featured
 
+*Thanks for your interest*
+So far we ran out all free DVD's. Soon you will be able to order for the reproduction+mailing fee. I would still like to keep it free for students but that requires some additional funding. 
+
 First 10 people to fill out the following form will receive a free Ubuntu live DVD with ADORE-DORIS:
-https://docs.google.com/spreadsheet/viewform?formkey=dHlaNG4wRWhBN0gwZ1hsWHFHeXlzcHc6MQ
+~~https://docs.google.com/spreadsheet/viewform?formkey=dHlaNG4wRWhBN0gwZ1hsWHFHeXlzcHc6MQ~~
