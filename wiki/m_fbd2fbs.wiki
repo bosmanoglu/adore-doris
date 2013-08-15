@@ -6,7 +6,7 @@ M_FBD2FBS is an ADORE process and it runs the DORIS oversampling (m_ovs) step in
 
 This function only runs for ALOS imagery with a "Total_range_band_width" of 14 MHz and will do nothing for ALOS FBS imagery, which is 28 MHz. Therefore it is safe to use with the [crops] command. 
 
-This function will backup the original master result file with the `.bck` suffix. After the processing the crop step in the new output will point to the oversampled file.
+This function will backup the original master result file with the `.bck` suffix. After the processing the crop step in the new output will point to the oversampled file. The oversample step is removed from the result file with the undo command to allow further oversampling of the data is necessary. 
 
 =INPUT:=
  There are no required input parameters for this command.
