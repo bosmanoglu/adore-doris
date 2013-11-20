@@ -154,6 +154,16 @@ function calculate_rs_dbow(){
   echo "${l0} ${lN} ${p0} ${pN}"
 }
 
+function calculate_srp_multilook(){
+  if [ ${slc_az_res:-isEmpty} == "isEmpty" ]; then
+    echo "1 1" #single look is default
+  elif [ ${slc_rg_res:-isEmpty} == "isEmpty" ]; then
+    echo "1 1" #single look is default
+  else
+    echo "${slc_rg_res} ${slc_az_res}"
+  fi
+}
+
 function crops()
 {
   . ${ADORESCR}/fun/crops ${@} 

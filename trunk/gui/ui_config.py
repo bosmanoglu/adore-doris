@@ -65,6 +65,7 @@ def menuActions(self):
     ('settingsEditor', None, '_Editor...', None, 'Graphical Editor for settings.', lambda x: settingsEditor.SettingsEditor(self)),
     ('settingsCheck', None, '_Check', None, 'Check settings against default values.', lambda x: self.runcmd('settings check')),
     ('settingsFix', None, '_Fix', None, 'Fix settings using default relations.', lambda x: self.runcmd('settings check')),
+    ('settingsInit', None, '_Init', None, 'Initialize project settings.', lambda x: self.runcmd('settings init')),
     ('settingsLoad', None, '_Load', None, 'Load settings from current folder.', lambda x: self.runcmd('settings load')),
     ('settingsSave', None, '_Save', None, 'Save settings to current folder.', lambda x: self.runcmd('settings save')),
     ('settingsReset',  None, '_Reset',  None, 'Reset settings to defaults', lambda x: self.runcmd('settings reset')),

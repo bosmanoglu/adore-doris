@@ -514,6 +514,11 @@ function settings_init(){
        read -e userInput
        scenes init "${userInput}"
      fi
+   elif [ "$(ls -A ${dataFolder})" ]; then 
+     echo "Data folder exists but is empty."
+     echo "Please specify where your data is currently located:"
+     read -e userInput
+     scenes init "${userInput}"
    else
      bold "dataFolder is currently set as: $dataFolder" 
      if ask "Do you want to create a new dataFolder?"

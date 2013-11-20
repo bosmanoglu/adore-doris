@@ -19,6 +19,14 @@ if [ ! `which psxy` ]; then
   fi
 fi
 
+#check for doris in /usr/lib/doris/
+if [ ! `which envisat_dump_data` ]; then
+  if [ -f /usr/lib/doris/envisat_dump_data ]; then
+    export PATH=${PATH}:/usr/lib/doris
+  fi
+fi
+
+
 # THE BELOW LINES BREAK ${i} variable
 #if [ "${g-notGui}" != "notGui" ]; then
 #  #Gui on
