@@ -134,7 +134,7 @@ local DATADIR="${1}"
     m_in_method='CSK';
     dataFile="CSK*.h5"
   #elif $( ls -1 ${firstDATADIR}/T*.xml &>/dev/null ); then
-  elif [ $( find -L "${DATADIR}" -maxdepth 2 -name "T*.xml" 2> /dev/null | wc -l ) -gt 0 ]; then
+  elif [ $( find -L "${DATADIR}" -maxdepth 3 -name "T*.xml" 2> /dev/null | wc -l ) -gt 0 ]; then
     m_in_method='TSX'
     dataFile="*.cos"
     leaderFile="T*.xml"

@@ -296,7 +296,7 @@
 [ -z "${_rel_int_out_cint}" 	] && _rel_int_out_cint='echo ${outputFolder}/${master}_${slave}.cint'
 [ -z "${int_out_int}" 		] && int_out_int="${outputFolder}/${master}_${slave}.int"
 [ -z "${_rel_int_out_int}" 	] && _rel_int_out_int='echo ${outputFolder}/${master}_${slave}.int'
-[ -z "${int_multilook}" 	] && int_multilook="5 1"
+[ -z "${int_multilook}" 	] && int_multilook="1 1"
 ################### comprefpha
 ### SECTION=comprefpha
 [ -z "${fe_method}" 		] && fe_method="porbits"
@@ -309,7 +309,7 @@
 [ -z "${srp_method}" 		] && srp_method="polynomial"
 [ -z "${srp_out_cint}" 		] && srp_out_cint="${outputFolder}/${master}_${slave}.srp"
 [ -z "${_rel_srp_out_cint}" 	] && _rel_srp_out_cint='echo ${outputFolder}/${master}_${slave}.srp'
-[ -z "${srp_multilook}" 	] && srp_multilook="1 1"
+[ -z "${srp_multilook}" 	] && srp_multilook=`calculate_srp_multilook` #"1 1"
 [ -z "${srp_dumprefpha}" 	] && srp_dumprefpha="off"
 [ -z "${srp_out_refpha}" 	] && srp_out_refpha="${outputFolder}/${master}_${slave}.srprefpha"
 [ -z "${_rel_srp_out_refpha}" 	] && _rel_srp_out_refpha='echo ${outputFolder}/${master}_${slave}.srprefpha'

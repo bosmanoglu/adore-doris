@@ -66,6 +66,7 @@
     <menuitem action="settingsEditor"/>
     <menuitem action="settingsCheck"/>
     <menuitem action="settingsFix"/>
+    <menuitem action="settingsInit"/>
     <menuitem action="settingsLoad"/>
     <menuitem action="settingsSave"/>
     <separator/>
