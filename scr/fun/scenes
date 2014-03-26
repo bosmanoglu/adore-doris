@@ -200,7 +200,7 @@ function setSlcRes(){
 
 function getInfoFromUser(){
   local DATADIR="${1}"
-  bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
+  bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, RADARSAT-2, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
   echo "Current setting: [${m_in_method}]"
   read userInput
   [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"      
