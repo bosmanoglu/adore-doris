@@ -1,4 +1,4 @@
-data=adore.getdata(sobj.crop.Data_output_file,(sobj.crop.Last_pixel-sobj.crop.First_pixel+1), 'cr2', (sobj.crop.Last_line-sobj.crop.First_line+1));
+#data=adore.getdata(sobj.crop.Data_output_file,(sobj.crop.Last_pixel-sobj.crop.First_pixel+1), 'cr2', (sobj.crop.Last_line-sobj.crop.First_line+1));
 
 filesize=os.path.getsize(sobj.crop.Data_output_file);
 width=sobj.crop.Last_pixel-sobj.crop.First_pixel+1;
@@ -9,9 +9,12 @@ fileparts=fix(linspace(0, length, 10));
 #adore.writedata(sobj.crop.Data_output_file+'.cr4', data, 'cr4')
 fout=open(sobj.crop.Data_output_file+'.cr4', 'wb');
 for l in xrange(len(fileparts)-1):
+  data=adore.getdata(sobj.crop.Data_output_file,(sobj.crop.Last_pixel-sobj.crop.First_pixel+1), 'cr2', fileparts[l+1]-fileparts[l], skipbytes=(fileparts[l]*width*np.dtype(datatype).itemsize*2));
   bipData=np.empty([fileparts[l+1]-fileparts[l], data.shape[1]*2]);
-  bipData[:,0::2]=data[fileparts[l]:fileparts[l+1],:].real;
-  bipData[:,1::2]=data[fileparts[l]:fileparts[l+1],:].imag;
+  #bipData[:,0::2]=data[fileparts[l]:fileparts[l+1],:].real;
+  #bipData[:,1::2]=data[fileparts[l]:fileparts[l+1],:].imag;
+  bipData[:,0::2]=data.real;
+  bipData[:,1::2]=data.imag;
   fout.write( bipData.astype(np.dtype(numpy.float32)) );
 fout.close();
 
