@@ -5,7 +5,7 @@ doris ${outputFolder}/${dorisProcess}.drs
 if [ "${bistatic}" == "on" ]; then
   #openInIpython "${ADOREFOLDER}/lib/python/fun/subtrrefdem_bistatic.py"
   floatmult ${crd_out_dem} 0.5
-  mv ${crd_out_dem}.0.5 ${crd_out_dem}
+  mv ${crd_out_dem}.floatmult0.5 ${crd_out_dem}
 fi
 
 [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
