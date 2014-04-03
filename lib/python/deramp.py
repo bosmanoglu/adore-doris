@@ -3,7 +3,7 @@
 Calculates a best fitting plane to the phase of the unwrapped interferogram and removes the plane.
 
 Usage: 
- deramp.py -w WIDTH -f FORMAT [-e ESTIMATEFILE] [-o ORDER] FILE
+ deramp.py -w WIDTH -f FORMAT [-e ESTIMATEFILE] [-o ORDER] [-m MASKFILE] FILE
 
 INPUT:
  WIDTH:number of pixels (range samples) for the FILE.
@@ -12,6 +12,9 @@ INPUT:
    SNAPHU topo results it may be possible that the actual topography has a 
    plane. This file is added back to the result before the result is saved.
  ORDER: Degree of the polynomial. Can be 1 or 2. 
+ MASKFILE: This is used to weight the pixels and can take values between 0 and 1. 
+   One is the highest weight and zero is the lowest weight. It has to be the same 
+   size as the FILE. 
  FILE: The unwrapping result file. 
  
 EXAMPLES:
@@ -241,13 +244,14 @@ def main(argv):
         print "File not found:", inputfile
         sys.exit(2)
     try:
-        opts, args = getopt.getopt(argv, "w:f:e:o:")
+        opts, args = getopt.getopt(argv, "w:f:e:o:m:")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     cfg=dict(opts); #linuxtopia.org/online_books/programming_books/python_programming/python_ch35s03.html
     cfg.setdefault("-f", "cr4")
     cfg.setdefault("-e", "")
+    cfg.setdefault("-m", "")
     cfg["-w"]=int(cfg["-w"])
     
     data=getdata(inputfile,cfg["-w"],cfg["-f"])
@@ -255,13 +259,17 @@ def main(argv):
         eData=getdata(cfg["-e"],cfg["-w"],cfg["-f"])
     else:
         eData=None;
+    if cfg["-m"]:
+        mData=getdata(cfg["-m"],cfg["-w"],cfg["-f"])
+    else:
+        mData=None;
     if len(cfg["-f"])==3: #complex
         cfg.setdefault("-o", None)
         outData=derampcpx(data,eData, order=cfg["-o"]);
     else:
         cfg.setdefault("-o", "1")
         cfg["-o"]=int(cfg["-o"]) 
-        outData=deramp(data, eData, order=cfg["-o"]);
+        outData=deramp(data, eData, weight=mData, order=cfg["-o"]);
     print "Writing output to:", inputfile+'deramp'
     writedata(inputfile+'deramp',outData,cfg["-f"]);
     
