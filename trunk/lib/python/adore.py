@@ -929,8 +929,10 @@ def getProduct(rdict, process=None, filename=None, width=None, dataFormat=None):
         if width is None:
             if rdict[process].has_key('Number of pixels'):
                 width=int(rdict[process]['Number of pixels'])
+	    elif rdict[process].has_key('Multilookfactor_range_direction'):
+                width=int( (int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1) /rdict[process]['Multilookfactor_range_direction'] )
             else:
-                width=int( (int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1) /rdict.Multilookfactor_range_direction )
+		width=int(rdict[process]['Last_pixel'])-int(rdict[process]['First_pixel'])+1
         if dataFormat is None:
             dataFormat=rdict[process]['Data_output_format']        
     return getdata(filename, width, dataFormat);
