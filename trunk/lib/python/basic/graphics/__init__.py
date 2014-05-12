@@ -247,7 +247,9 @@ def clickScat(array2d, array3d, xScat=None, xerror3d=None, yerror3d=None, array3
     fig.canvas.mpl_connect('button_press_event', onclick);
     return (fig,fh)
     
-def linkedImShow(im1, im2):    
+def linkedImShow(im1, im2, **kwargs):
+    """(ax1,ax2)=linkedImShow(im1, im2, **imshow_kwargs)
+    """
     P.figure();
     ax1 = P.subplot(111)
     P.figure();
@@ -257,10 +259,10 @@ def linkedImShow(im1, im2):
     #ax2.set_adjustable("box-forced")
     
     #arr1 = np.arange(100).reshape((10, 10))
-    ax1.imshow(im1)
+    ax1.imshow(im1, **kwargs)
     
     #arr2 = np.arange(100, 0, -1).reshape((10, 10))
-    ax2.imshow(im2)
+    ax2.imshow(im2, **kwargs)
     return (ax1, ax2)
     
 def linkaxes(ax1, ax2):        
