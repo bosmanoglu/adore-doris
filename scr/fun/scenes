@@ -126,7 +126,7 @@ function detectSatellite(){
 # STAMPS3.2/link_slcs:goodSense(), Mahmut Arikan - 20091021 
 local DATADIR="${1}"
   #local firstDATADIR=`canonicalPath "${DATADIR}/*"| head -n 1`
-  echo "I can only detect ERS, ASAR, TSX, CSK, PALSAR(L1.1) and GAMMA SLC images for now."
+  echo "I can detect: ERS1/2, ASAR, TSX, TDX, CSK1-4, GAMMA, and ADORE SLC images for now."
   echo "If you are using other datasets please setup the dataFolder manually."
   m_in_method='UNKNOWN'
   #if $( ls -1 ${firstDATADIR}/CSK*.h5 &> /dev/null ); then
@@ -164,14 +164,14 @@ local DATADIR="${1}"
     leaderFile="LED*H1.1__A" 
     volumeFile="VOL*H1.1__A" 
     nullFile="TRL*H1.1__A"
+  elif [ $( find -L "${DATADIR}" -maxdepth 2 -name "*.res" 2> /dev/null | wc -l ) -gt 0 ]; then
+    m_in_method="ADORE"
+    dataFile="*.crop"
+    leaderFile="*.res"
   else 
     error "I could not define the image type."
     getInfoFromUser "${DATADIR}"    
   fi  
-  [ -z "${master}"		] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
-  [ -z "${slave}"        	] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
-  #### set slc_az_res and slc_rg_res
-  setSlcRes 
 }
 
 function setSlcRes(){
@@ -186,6 +186,12 @@ function setSlcRes(){
     slc_rg_res=`grep "^range_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
     slc_az_res=`echo "${slc_az_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`    
     slc_rg_res=`echo "${slc_rg_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`
+  elif [ "${m_in_method}" == "ADORE" ]; then
+    settings apply -r ${q} master=${master} slave=${slave}
+    local productType=`readRes.sh ${m_in_lea} readfiles "Product type specifier"`;
+    local m_in_method=`productType2m_in_method ${productType}`
+    setSlcRes
+    m_in_method="ADORE" 
   else 
     echo "I am unable to detect the imaging mode for ${m_in_method}."
     echo "I have the following information in my database which may help you [mode,az,rg]:"
@@ -231,6 +237,22 @@ function getInfoFromUser(){
     read userInput
     [ -n "${userInput}" ] && settings apply -r ${q} nullFile="${userInput}"
   fi  
+}
+
+function linkADORE(){
+local DATADIR=${1}
+  for f in $(find -L "${DATADIR}" -name "${dataFile}"); do
+    dname=$( dirname ${f} )
+    date=`grep "First_pixel_azimuth_time" ${f} |tr -s "\t" " " | cut -d " " -f 3`
+    if [ -z "${date}" ]; then
+      date=$(basename ${dname})
+    else
+      date=`date -d "${date}" +%Y%m%d`
+    fi
+    mkdir -p ${dataFolder}/${date}
+    ln -s ${dname}/${leaderFile} ${dataFolder}/${date}/
+    ln -s ${dname}/${dataFile} ${dataFolder}/${date}/
+  done
 }
 
 function linkERS(){
@@ -414,8 +436,16 @@ GAMMA)
 CSK)
   linkCSK "${rawDataFolder}";
   ;;
+ADORE)
+  linkADORE "${rawDataFolder}";
+  ;;
 esac
 
+[ -z "${master}"	] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
+[ -z "${slave}"        	] && slave=`ls -F ${dataFolder}/  2>/dev/null | grep "/" | awk 'NR==2' | tr -d "/"| tr -d [:blank:] | tr -d "\n" 2>/dev/null`
+
+#### set slc_az_res and slc_rg_res
+setSlcRes 
 batch="${batchOn}"
 }
 
@@ -443,6 +473,9 @@ do
     ;;
   CSK)    
     linkCSK "${rawDataFolder}";
+    ;;
+  ADORE)
+    linkADORE "${rawDataFolder}";
     ;;
   esac
 done
@@ -489,6 +522,27 @@ function scenes_rescan(){
   scenes_include=( $(sort_scenes ${scenes_include[@]}))
   
 }
+
+function productType2m_in_method(){
+  local productType=${1}
+  case ${productType} in 
+  TSX*)
+    echo "TSX"
+  ;;
+  TDX*)
+    echo "TSX"
+  ;;
+  *IS*)
+    echo "ASAR"
+  ;;
+  CSK*)
+    echo "CSK"
+  ;;
+  *)
+    echo "${productType}"
+  esac
+}
+
 case "${1}" in 
 "")
  all_scenes
@@ -520,3 +574,4 @@ case "${1}" in
  scenes_rescan
  ;;
 esac
+
