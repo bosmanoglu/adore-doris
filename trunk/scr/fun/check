@@ -5,6 +5,7 @@
 #	check resultFile
 # 	check -p processName [filename]
 #	check -j jobid
+#       check productSize
 #
 # DESCRIPTION:
 #  CHECK is an internal ADORE command. 
@@ -36,6 +37,8 @@
 #               Held 		6
 #
 #     setup: Check several executables and returns assistive messages if executables are missing.
+#
+#     productSize: Will check to see if the product size in the result file is matching the actual file.
 #
 # OUTPUT:
 #  Shows the process control list of given result file.
@@ -552,6 +555,21 @@ bold "Please check to see if the results match. You should see OK after the file
 md5sum -c 1393_21066.md5
 }
 
+function checkProductSize(){
+ local filename resfile format numpixels numlines 
+ local fileOnDisk unitSize calculatedSize wrongSize
+ wrongSize=false
+ call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile ${1};"
+ fileOnDisk=`fileSize ${filename}`;
+ unitSize=`formatBytes ${format}`;
+ calculatedSize=$(( ${unitSize} * ${numpixels} * ${numlines} ))
+ if [ ${fileOnDisk} -ne ${calculatedSize} ]; then
+   error "Data product for ${1} has a different size than expected."
+   error "Expected Size: ${calculatedSize}  File Size: ${fileOnDisk}"
+   wrongSize=true
+ fi
+}
+
 #MAIN FUNCTION
 if [ "${1}" == "-p" ]; then
  shift 
@@ -566,6 +584,9 @@ elif [ "${1}" == "setup" ];then
 elif [ "${1}" == "updates" ]; then
  shift 
  checkUpdates 
+elif [ "${1}" == "productSize" ]; then
+ shift
+ checkProductSize "${@}"
 else
  listProcessFlagsFromResultFiles "$@"
 fi 
