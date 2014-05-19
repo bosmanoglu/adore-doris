@@ -568,6 +568,31 @@ function checkProductSize(){
    error "Expected Size: ${calculatedSize}  File Size: ${fileOnDisk}"
    wrongSize=true
  fi
+ if [ ${wrongSize} == true ] && [ "${1}" == "unwrap" ]; then
+   #check if piece is set
+   local snaphucmd snaphufirstrow snaphufirstcol snaphunrow snaphuncol
+   snaphucmd=`history | grep snaphu | grep "piece" | tail -n 1`
+   echo "..$snaphucmd.."
+   snaphufirstrow=`echo ${snaphucmd#*piece} | cut -d" " -f1` 
+   snaphufirstcol=`echo ${snaphucmd#*piece} | cut -d" " -f2`
+   snaphunrow=`echo ${snaphucmd#*piece} | cut -d" " -f3` 
+   snaphuncol=`echo ${snaphucmd#*piece} | cut -d" " -f4`
+   echo "$snaphufirstrow $snaphufirstcol $snaphunrow $snaphuncol" 
+   resfilefirstline=`readRes.sh ${resfile} unwrap "First_line (w.r.t. original_master)"`
+   resfilelastline=`readRes.sh ${resfile} unwrap "Last_line (w.r.t. original_master)"`
+   resfilefirstpixel=`readRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)"`
+   resfilelastpixel=`readRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"`
+   echo "$resfilefirstline $resfilefirstpixel"
+   modifyRes.sh ${resfile} unwrap "First_line (w.r.t. original_master)"  $(( ${resfilefirstline}+${snaphufirstrow} ))
+   modifyRes.sh ${resfile} unwrap "Last_line (w.r.t. original_master)"   $(( ${resfilefirstline}+${snaphufirstrow}+${snaphunrow}-1 ))
+   modifyRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)" $(( ${resfilefirstpixel}+${snaphufirstcol} ))
+   modifyRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"  $(( ${resfilefirstpixel}+${snaphufirstcol}+${snaphuncol}-1 ))
+   echo "File size for unwrap adjusted based on last run snaphu --piece command."
+ elif [ ${wrongSize} == true ]; then
+   echo "Please correct filesize manually."
+ else
+   echo "File size matches the result file."
+ fi 
 }
 
 #MAIN FUNCTION
