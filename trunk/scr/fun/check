@@ -588,6 +588,22 @@ function checkProductSize(){
    modifyRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)" $(( ${resfilefirstpixel}+${snaphufirstcol} ))
    modifyRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"  $(( ${resfilefirstpixel}+${snaphufirstcol}+${snaphuncol}-1 ))
    echo "File size for unwrap adjusted based on last run snaphu --piece command."
+ elif [ ${wrongSize} == true ] && [ "${1}" == "m_crop" ]; then
+   # check m_dbow
+   if [ "${m_dbow}" == "0 0 0 0" ] && [ "${m_dbow_geo}" == "0 0 0 0" ]; then
+     #if both unset, then read m_readfiles
+     numlines=`readRes.sh ${m_resfile} readfiles "Number_of_lines_original"`
+     numpixels=`readRes.sh ${m_resfile} readfiles "Number_of_pixels_original"`
+
+     modifyRes.sh ${m_resfile} crop "First_line (w.r.t. original_image)" 1
+     modifyRes.sh ${m_resfile} crop "Last_line (w.r.t. original_image)" $numlines
+     modifyRes.sh ${m_resfile} crop "First_pixel (w.r.t. original_image)" 1
+     modifyRes.sh ${m_resfile} crop "Last_pixel (w.r.t. original_image)" $numpixels
+     modifyRes.sh ${m_resfile} crop "Number of lines (non-multilooked)" $numlines
+     modifyRes.sh ${m_resfile} crop "Number of pixels (non-multilooked)" $numpixels
+   else
+     echo "Please correct filesize manually."
+   fi
  elif [ ${wrongSize} == true ]; then
    echo "Please correct filesize manually."
  else
