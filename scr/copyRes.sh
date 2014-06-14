@@ -48,7 +48,7 @@ function funCopyRes(){
   local status
   
   status=`readRes.sh ${tResFile} "process_control" ${tSection}`
-  if [ ${status} -eq 0 ]; then
+  if [ $? -eq 0 ] && [ ${status} -eq 0 ]; then
     sed -i -e "/^${tSection}/s/0/1/g" ${tResFile}
     echo "*******************************************************************" >> ${tResFile}
     echo "*_Start_${tSection}:                   " >> ${tResFile}
