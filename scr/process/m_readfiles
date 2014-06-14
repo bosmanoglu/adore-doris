@@ -46,6 +46,23 @@ case "${slcType}" in
     [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
     unset masterDataFolder parFile sysFile
   ;;
+  adore)
+    echo "Reading ADORE SLC"
+    if [ -e "${m_in_lea}" ];then
+      #copy header
+      headerLine=`grep -n Start_process_control ${m_in_lea} | cut -d":" -f1`
+      headerLine=$(( ${headerLine} - 1 ))
+      head -n ${headerLine} ${m_in_lea} > ${m_resfile}
+      tailLine=`grep -n End_process_control ${m_in_lea} | cut -d":" -f1`
+      grep -A $(( $tailLine - $headerLine )) Start_process_control  ${m_in_lea} | tr "1" "0" >> ${m_resfile}
+      # copy readfiles 
+      copyRes.sh ${m_in_lea} readfiles ${m_resfile}  
+      modifyRes.sh ${m_resfile} readfiles "Datafile" ${m_in_dat}
+    else
+      error "ADORE SLC files also require a leader file set."
+      return -1;
+    fi
+  ;;
   *)
     #if [ "${slcType-undefined}" == "undefined" ]; then
     #standard processing
