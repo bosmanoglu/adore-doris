@@ -41,7 +41,7 @@ startline=`grep -n Start_${section} ${inputfile} | cut -f1 -d":"`
 endline=`grep -n End_${section} ${inputfile} | cut -f1 -d":"`
 length=`echo ${endline} - ${startline} |bc`
 
-[ -z "${length}" ] && echo -e "ERROR: Can not find section." >&2 && return; #If can not determine section, no need to run further.
+[ -z "${length}" ] && echo -e "ERROR: Can not find section." >&2 && exit 1; #If can not determine section, no need to run further.
 
 if [[ "${notify}" == "notify" ]]; then
   #get number of hits
