@@ -68,6 +68,8 @@ ADORE requires the following packages to be installed on your system:
     GMT is required for TU-DELFT DORIS and ADORE-DORIS uses it in MASK and SAVEAS commands.
   * *ipython* http://ipython.org {{{sudo apt-get install ipython}}}
     ipython is required to provide ADORE specific improvements to DORIS (e.g. TanDEM-X bistatic processing, manual coarse offset calculation, network deramping of wrapped data, selecting interferometric pairs and etc.) Furthermore ipython allows ADORE to open the current interferogram in python for interactive calculations and data visualization. 
+  * *Python modules* {{{sudo apt-get install python-numpy python-scipy python-mpltoolkits.basemap}}}
+    Several python modules are used in ADORE python scripts to assist processing and visualization.
   * _GNUPLOT_ http://www.gnuplot.info/ {{{sudo apt-get install gnuplot}}}
     GNUPLOT is used after the BASELINES command to create a post-script (PS) image of the temporal and perpendicular baselines.
   * _Image-Magick_ http://www.imagemagick.org/ {{{sudo apt-get install imagemagick }}}
