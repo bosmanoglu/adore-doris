@@ -71,6 +71,7 @@
     * [superMasterResample superMasterResample]
     * [undo undo]
     * [view view]
+    * [visualize visualize]
     * [waitjob waitjob]
   * [adoreVariables ADORE Variables]
   * [Functions ADORE Functions]
