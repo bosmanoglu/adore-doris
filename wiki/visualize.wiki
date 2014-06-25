@@ -3,7 +3,7 @@
 =USAGE:=
 {{{
 	visualize coarsecorr|fine
-        visualize geocode dorisStep[:filename]
+        visualize map a|p dorisStep[:filename]
 }}}
 =DESCRIPTION:=
  VISUALIZE is an internal ADORE command.  
@@ -13,7 +13,9 @@
 `coarsecorr|fine|geocode`
   * coarsecorr: plot the coarse correlation offset vectors.
   * fine: plot the fine correlation offset vectors.
-  * geocode: display a geocoded view of the results.
+  * map: display a geocoded view of the results.
+`a|p`
+      Display amplitude or phase (if complex).
 `dorisStep`
       The step for the output. lsprocess can be used to 
       get a list of doris processes. 
