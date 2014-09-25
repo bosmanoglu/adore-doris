@@ -18,3 +18,4 @@ for l in xrange(len(fileparts)-1):
 fout.close();
 A.modifyResults('m_crop', 'Data_output_file', mobj.crop.Data_output_file+'.cr4');
 A.modifyResults('m_crop', 'Data_output_format', 'complex_real4')
+

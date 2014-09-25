@@ -425,6 +425,16 @@ def process2dict(fileDict, processName):
                   'First_pixel': None,
                   'Last_pixel': None,                 
                   }
+    elif processName == 'resample':
+        reDict = {'Shifted azimuth spectrum': None,
+		  'Data_output_file': None,
+                  'Data_output_format': None,
+		  'Interpolation kernel': None,
+                  'First_line': None,
+                  'Last_line': None,
+                  'First_pixel': None,
+                  'Last_pixel': None,                 
+                  }
     elif processName == 'sim_amplitude':
         reDict = {'DEM source file': None,
                   'Min. of input DEM': None,
