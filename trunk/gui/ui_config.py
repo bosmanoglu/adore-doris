@@ -10,12 +10,14 @@ def menuActions(self):
   return [
     ('About', None, '_About'),
     ('File', None, '_File'),
+    #('New', None, '_New', '<ALT>n', 'Open a new AGOOEY window.', lambda w: menuAction(self,w)),
     ('Open', None, '_Open', '<ALT>o', 'Open an ADORE project.', lambda w: menuAction(self,w)),
     ('Connect', None, '_Connect', '<ALT>c', 'Connect to a server.', lambda w: menuAction(self,w)),
     ('Quit', None, '_Quit', '<ALT>q', 'Quit ADORE.', lambda w: gtk.main_quit()),
     ('Edit', None, '_Edit'),
     ('Copy', None, '_Copy', '<CTRL><SHIFT>c', 'Copy selected text.', lambda w: self.v.copy_clipboard()),
     ('Paste', None, '_Paste','<CTRL><SHIFT>v', 'Paste text from clipboard.', lambda w: self.v.paste_clipboard()),
+    ('Font', None, '_Font...', '<ALT>f', 'Set terminal font.', lambda w: self.set_font()),
     ('Check', None, '_Check'),
     ('checkProcess', None, 'Process', None, '', lambda w: runMenuCmd(self, w)),
     ('checkSetup', None, 'Setup', None, '', lambda w: runMenuCmd(self, w)),
@@ -242,7 +244,10 @@ def runMenuName(self, w):
 
 def menuAction(self, w):
   m=w.get_name()
-  if m == "Open":
+  if m == "New":
+    #self.runcmd("agooey &");
+    os.system('agooey &')
+  elif m == "Open":
     chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                     buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
     response = chooser.run()

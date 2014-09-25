@@ -135,6 +135,24 @@ def dropdown(dropdownList, label1String, label2String=None, label3String='Select
 	return response,text
 
 
+def font(title='Agooey - Font selection dialog', font='Ubuntu Mono 12'):
+    dialog = gtk.FontSelectionDialog(title);
+    dialog.set_font_name(font);
+    dialog.show_all()
+    #go go go
+    response=dialog.run()
+    fontstr=dialog.get_font_name()
+    #parse fontstr
+#    splitfont=fontstr.split(" ");
+#    font={};
+#    if len(splitfont)>=2:
+#      font['name']=fontstr.split(" ")[0];
+#      font['size']=fontstr.split(" ")[-1];
+#    if len(splitfont)==3:
+#      font['style']=fontstr.split(" ")[1];
+    dialog.destroy();	  
+    return response, fontstr
+
 if __name__ == '__main__':
 	print "The name was %s" % parameter("Please enter your name:")
 	gtk.main()

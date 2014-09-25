@@ -796,6 +796,9 @@ def getdata(fname, width, dataFormat, length=0, byteswap=False, skipbytes=0, int
           #data+=dataP;
         elif interleave=='bil':
           data=data[0:-1:2,:]+1j*data[1::2,:]
+	elif interleave=='bsq':
+	  data=data[:,0:width/2]+1j*data[:,width/2:];
+	  #data=data[:,0:6144]+1j*data[:,6144:];
     else:        
         data=np.fromfile(f, datatype ,width*length).reshape(length, width)
         if byteswap:
@@ -873,6 +876,10 @@ def dataFormat2dataType(dataFormat):
         complexFlag=True;                
     elif dataFormat=="u1":
         datatype="u1"
+    elif  dataFormat=="u2":
+        datatype="u2"
+    elif  dataFormat=="cu2":
+        datatype="cu2"
     #else: dtype is already set to dataFormat
     return (datatype, complexFlag);    
     

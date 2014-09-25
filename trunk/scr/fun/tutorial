@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# USAGE:
+# 	tutorial start [tutorialName]
+#	tutorial list
+#       tutorial ?|h [tutorialName]
+#
+# DESCRIPTION:
+#  TUTORIAL is an ADORE function which starts a pre-recorded tutorial.
+#
+# INPUT:
+#  start: Start a given tutorial
+#  list: List available tutorials.
+# OUTPUT:
+#  interactive.
+# EXAMPLES:
+#  
+
+#######################################################
+
+function tutorial_start(){
+  #We start a special session, where the screen is split to 3. 
+  tutorialFile="${ADOREFOLDER}/tutorials/${1}"
+  shift #to pass the next parameter...
+  rm -f ${tutorial_help_file}
+  if [ "${g-notGui}" != "notGui" ]; then
+    echo "<meta http-equiv=refresh content=3; URL=${tutorialFile}>" > ${tutorial_help_file}
+    echo "<pre>" >> ${tutorial_help_file}
+    xdg-open ${tutorial_help_file} &> /dev/null & #show help; has to be .htm or .html
+  fi
+  h ${tutorialFile} >> ${tutorial_help_file}
+  if [ "${g-notGui}" == "notGui" ]; then
+    cat ${ADOREFOLDER}/tutorials/introduction.hlp >> ${tutorial_help_file}
+    sed "s@TUTORIALFILE@${tutorialFile} ${@}@g;s@TUTORIALHELPFILE@${tutorial_help_file}@g" ${ADOREFOLDER}/tutorials/.screenrc > /tmp/.screenrc
+    screen -c /tmp/.screenrc   
+  else
+    cat ${ADOREFOLDER}/tutorials/introduction_gui.hlp >> ${tutorial_help_file}
+    echo "source ${tutorialFile} ${1}"
+    source ${tutorialFile} ${1} #run tutorial
+  fi
+}
+
+function tutorial_list(){
+  ls ${ADOREFOLDER}/tutorials/*.tut | sed "s@${ADOREFOLDER}/tutorials/@@g"
+}
+
+#####################
+## MAIN ##
+#####################
+tutorial_help_file="/tmp/adore_tutorial_help.html"
+case ${1} in
+  "start")
+    shift
+    tutorial_start ${@}
+  ;;
+  "list")
+    shift
+    tutorial_list
+  ;;
+  ?|h)
+    shift
+    ? ${ADOREFOLDER}/tutorials/${1}
+  ;;
+  *)
+    error "Unknown option ${1} for tutorial."
+    error "Please see: ? tutorial"
+  ;;
+esac
+

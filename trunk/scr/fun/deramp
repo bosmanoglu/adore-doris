@@ -118,7 +118,7 @@ cmd=`echo "${ADOREFOLDER}/lib/python/deramp.py -w ${width} -f ${format} ${remain
 eval "${cmd}"
 
 # Rename the output to the deramped file in the result file. Only if the user did not specify a different file. 
-[ "${inputFileName:-undefined}" == "undefined" ] && modifyRes.sh "${resfile}" "${dorisStep}" "Data_output_file" "${fileName}deramp"
+[ "${inputFileName:-undefined}" == "undefined" ] && modifyRes.sh "${resFile}" "${dorisStep}" "Data_output_file" "${fileName}deramp"
 # go back to adore
 return 0;
 
