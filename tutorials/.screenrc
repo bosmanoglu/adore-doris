@@ -1,0 +1,13 @@
+hardstatus on
+hardstatus alwayslastline 
+startup_message off
+termcapinfo xterm ti@:te@
+hardstatus string "%{= kG}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %m/%d %C%a "
+scrollback 3000
+split
+screen -t tutorial 1 adore -i -d "tutorial_help_file=TUTORIALHELPFILE" ". TUTORIALFILE "
+focus
+screen -t help 2 tail -f /tmp/adore_tutorial.help
+split
+focus
+screen -t interactive 3 adore -i 

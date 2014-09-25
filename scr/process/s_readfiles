@@ -61,6 +61,17 @@ case "${slcType}" in
       return -1;
     fi
   ;;
+  gmtsar)
+    echo "Reading GMTSAR SLC"
+    if [ -e "${s_in_lea}" ] && [ -e "${s_in_dat}" ] && [ -e "${s_in_vol}" ]; then
+      #run the m_readfiles script
+      gmtsarReadfiles.py ${s_in_dat} ${s_in_lea} ${s_in_vol} > ${s_resfile}
+      [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
+    else
+      error "GMTSAR SLC files require the *.PRM, *.SLC and *.LEA files in m_in_lea, m_in_dat and m_in_vol."
+      return -1;
+    fi
+  ;;
   *)
     #if [ "${slcType-undefined}" == "undefined" ]; then
     #standard processing

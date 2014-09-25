@@ -14,10 +14,12 @@ def main(argv=None):
   if argv is None:
     argv=sys.argv
   iresfile=argv[1];
-  try:    
-    product=argv[2];
+  try:
+    mode=argv[2];
+    product=argv[3];
   except:
     product='geocoding'
+    mode='p';
   ires=adore.res2dict(iresfile);
   iobj=adore.dict2obj(ires);  
   lat=adore.getProduct(iobj.geocoding, filename=iobj.geocoding.Data_output_file_lamda)
@@ -47,7 +49,14 @@ def main(argv=None):
   print ('Please wait... Generating map\n')
   m = Basemap(llcrnrlon=d0.min(), llcrnrlat=d1.min(), urcrnrlon=d0.max(), urcrnrlat=d1.max(), 
     resolution='f', area_thresh=1., projection='cyl')
-  m.imshow(hei_gridded, interpolation='nearest', origin='upper')
+  if 'complex' in ires[product]['Data_output_format']:#any(numpy.iscomplex(hei_gridded)):
+    if mode=='p':
+      m.imshow(numpy.angle(hei_gridded), interpolation='nearest', origin='upper')
+    else:
+      m.imshow(10*numpy.log10(abs(hei_gridded)), interpolation='nearest', origin='upper')
+      pl.gray();
+  else:
+    m.imshow(hei_gridded, interpolation='nearest', origin='upper')
   m.drawcoastlines(color='w',linewidth=0.8)
   m.drawmapboundary() # draw a line around the map region
   m.drawrivers() 

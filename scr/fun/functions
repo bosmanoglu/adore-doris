@@ -450,6 +450,10 @@ function superMasterResample(){
         . ${ADORESCR}/fun/superMasterResample "${@}"
 }
 
+function tutorial(){
+	. ${ADORESCR}/fun/tutorial "${@}"
+}
+
 function undo(){
 	. ${ADORESCR}/fun/undo "$@"
 }

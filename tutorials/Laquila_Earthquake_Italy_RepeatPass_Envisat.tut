@@ -1,0 +1,144 @@
+# USAGE: tutorials Laquila_Earthquake_Italy_RepeatPass_Envisat.tut
+#
+# ADORE TUTORIAL: L'Aquila Earthquake, Italy, April 2009
+# DATA: ENVISAT ASAR SLC, 1 February 2009
+#       ENVISAT ASAR SLC, 12 April 2009
+# ANALYSIS: Repeat-pass interferogram generation for deformation.
+#
+
+function step01(){
+  echo "We will first start with creating a new folder and generating the necessary folder structure inside."
+  if ask "Can I create the following folder? ${PWD}/ASAR_Laquila"
+  then 
+    projectFolder="${PWD}/ASAR_Laquila";
+  else
+    echo "You can TAB complete the folders in this prompt." >> ${tutorial_help_file}
+    echo "Please type the parent folder under which you would like me to create the ASAR_Laquila folder:"
+    read -e userInput
+    [ -n "${userInput}" ] && projectFolder="${userInput}/ASAR_Laquila"
+  fi
+  mkdir -p ${projectFolder}; 
+  settings apply -r -q projectFolder=${projectFolder}
+  cd $projectFolder
+  settings save
+  echo "Downloading files for tutorial."
+  echo "These data are provided by courtesy of ESA." >> ${tutorial_help_file}
+  echo "See for details: https://earth.esa.int/web/guest/-/l-rsquo-aquila-earthquake-italy-6349" >> ${tutorial_help_file}
+  mkdir ${projectFolder}/download
+  cd ${projectFolder}/download
+  if [ -e "~/Downloads/ASA_IMS_Date20090412_Time092427_00079_Orbit37207_1530.zip" ]; then
+    echo "Found first SAR data: ASAR 12 April 2009." 
+    cp ~/Downloads/ASA_IMS_Date20090412_Time092427_00079_Orbit37207_1530.zip ${projectFolder}/download/
+  elif  [ -e "ASA_IMS_Date20090412_Time092427_00079_Orbit37207_1530.zip" ]; then 
+    echo "Found first SAR data: ASAR 12 April 2009." 
+  else
+    echo "Downloading first SAR data: ASAR 12 April 2009." >> ${tutorial_help_file}
+    wget ftp://earthquake:earthquake@us-ext-nas.eo.esa.int/Abruzzo_09/ENVISAT/ASA_IMS_Date20090412_Time092427_00079_Orbit37207_1530.zip 
+  fi 
+  if [ -e "~/Downloads/ASA_IMS_1P_Date20090201_Time092428_00079_Orbit36205_2699.zip" ]; then
+    echo "Found second SAR data: ASAR 01 February 2009." 
+    cp ~/Downloads/ASA_IMS_1P_Date20090201_Time092428_00079_Orbit36205_2699.zip ${projectFolder}/download/
+  elif  [ -e "ASA_IMS_1P_Date20090201_Time092428_00079_Orbit36205_2699.zip" ]; then 
+    echo "Found second SAR data: ASAR 01 February 2009." 
+  else
+    echo "Downloading second SAR data: ASAR 01 February 2009."  >> ${tutorial_help_file} 
+    wget ftp://earthquake:earthquake@us-ext-nas.eo.esa.int/Abruzzo_09/ENVISAT/ASA_IMS_1P_Date20090201_Time092428_00079_Orbit36205_2699.zip
+  fi
+  echo "Unzipping files. IMPORTANT: Each image should have its own folder."  >> ${tutorial_help_file}
+  unzip ASA_IMS_Date20090412_Time092427_00079_Orbit37207_1530.zip -d 20090412 
+  unzip ASA_IMS_1P_Date20090201_Time092428_00079_Orbit36205_2699.zip -d 20090201
+  cd ${projectFolder}
+  bold "Follow instructions on the HELP screen."
+  bold "Do not continue, without entering manual commands."
+  ##
+  echo "" >> ${tutorial_help_file}
+  echo "- Go into ${projectFolder}: cd ${projectFolder}" >> ${tutorial_help_file}
+  echo "- Load the settings file: settings load" >> ${tutorial_help_file}
+  echo "- Load the data files with: scenes init downloads" >> ${tutorial_help_file}
+  echo "- Save the updated settings: settings save" >> ${tutorial_help_file}
+  ##
+  if ask "Are you ready to continue?"; then 
+    echo "Step01 is complete."
+    step02
+  fi 
+}  
+
+function step02(){
+  #settings load 
+  echo "" >> ${tutorial_help_file}
+  echo "In STEP02, we will read both images with DORIS." >> ${tutorial_help_file}
+  echo "You can see all DORIS steps with: lsprocess" >> ${tutorial_help_file}
+  echo "You can combine multiple steps by separating them with semi-colon(;)" >> ${tutorial_help_file}
+  echo "- Read master file: m_readfiles" >> ${tutorial_help_file}
+  echo "- Generate DORIS readable data file: m_crop" >> ${tutorial_help_file}
+  echo "- Same steps for slave: s_readfiles;s_crop" >> ${tutorial_help_file}
+  echo "" >> ${tutorial_help_file}
+  if ask "Are you ready to continue?"; then 
+    echo "Step02 is complete."
+    step03
+  fi 
+}
+
+function step03(){
+  echo "" >> ${tutorial_help_file}
+  echo "In STEP03, we will resample the slave image." >> ${tutorial_help_file}
+  echo "- Coarse orbits to estimate image offsets from orbits: coarseorb" >> ${tutorial_help_file}
+  echo "- Improve coarse coregistration with image correlation: coarsecorr" >> ${tutorial_help_file}
+  echo "- Fine coregistration (might take some time): fine" >> ${tutorial_help_file}
+  echo "- Calculate coregistration parameters: coregpm" >> ${tutorial_help_file}
+  echo "- Resample slave to master (might take some time): resample" >> ${tutorial_help_file}
+  echo "" >> ${tutorial_help_file}
+  if ask "Are you ready to continue?"; then 
+    echo "Step03 is complete."
+    step04
+  fi 
+}
+
+function step04(){
+  echo "" >> ${tutorial_help_file}
+  echo "In STEP04, we will generate the flat earth removed interferogram." >> ${tutorial_help_file}
+  echo "- Generate interferogram: interfero" >> ${tutorial_help_file}
+  echo "- Estimate flat earth phase: comprefpha" >> ${tutorial_help_file}
+  echo "- Remove flat earth phase: subtrrefpha" >> ${tutorial_help_file}
+  echo "" >> ${tutorial_help_file}
+  if ask "Are you ready to continue?"; then 
+    echo "Step04 is complete."
+    step05
+  fi 
+}
+
+function step05(){
+  echo "" >> ${tutorial_help_file}
+  echo "In STEP05, we will remove the topography from the interferogram." >> ${tutorial_help_file}
+  echo "- Generate DEM: dem make srtm3 50" >> ${tutorial_help_file}
+  echo "- Load the DEM: dem load " >> ${tutorial_help_file}
+  echo "- Estimate topographic phase: comprefdem" >> ${tutorial_help_file}
+  echo "- Remove topographic phase: subtrrefdem" >> ${tutorial_help_file}
+  echo "" >> ${tutorial_help_file}
+  if ask "Are you ready to continue?"; then 
+    echo "Step05 is complete."
+    step06
+  fi 
+}
+
+case "${1}" in
+step01)
+  step01
+;;
+step02)
+  step02
+;;
+step03)
+  step03
+;;
+step04)
+  step04
+;;
+step05)
+  step05
+;;
+*)
+  step01
+;;
+esac
+

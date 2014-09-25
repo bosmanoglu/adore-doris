@@ -8,6 +8,8 @@
   <menu action="Edit">
     <menuitem action="Copy"/>
     <menuitem action="Paste"/>
+    <separator />
+    <menuitem action="Font" />
   </menu>
   <menu action="Check">
     <menuitem action="checkProcess"/>

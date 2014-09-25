@@ -1,6 +1,6 @@
 import insar
 cint=adore.getProduct(ires, 'interfero');
-srp_mutlilook=[0,0];
+srp_multilook=[0,0];
 srp_multilook[0]=int(setobj.subtrrefpha.srp_multilook.strip('"').split(" ")[0]);
 srp_multilook[1]=int(setobj.subtrrefpha.srp_multilook.strip('"').split(" ")[1]);
 if srp_multilook!=[1,1]:

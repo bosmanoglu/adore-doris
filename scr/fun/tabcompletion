@@ -13,6 +13,7 @@ complete -F "_settings" -o "default" "settings"
 complete -F "_undo" -o "default" "undo"
 complete -F "_giant" -o "default" "giant"
 complete -F "_i12s" -o "default" "i12s"
+complete -F "_view" -o "default" "view"
 
 function _archive(){
 	COMPREPLY=()
@@ -282,6 +283,28 @@ function _undo(){
         COMPREPLY=($(compgen -W "only ${opts}" -- ${cur}))
 }
 
-
+function _view(){
+	COMPREPLY=()
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local opts="a p"
+	optsX="m_crop m_simamp m_ovs s_crop s_ovs m_filtazi s_filtazi resample filtrange interfero comprefpha subtrrefpha comprefdem subtrrefdem coherence filtphase unwrap dinsar slant2h"
+	local prev
+        cur=${cur##* }; #delete everything before if there is space.
+                        #if previous parameter has quotes this variable
+                        #shows parts of the previous parameter and adore
+                        #setting. removing everything before the last space
+                        #only leaves the latest adore setting.
+        local prev=${COMP_WORDS[1]}      
+        
+        case "${prev}" in
+                a|p) 
+                        COMPREPLY=( $(compgen -W "${optsX}" -- ${cur}) )
+                        return 0
+                        ;;
+		*)
+		;;
+	esac
+	COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
 
 #Have a newline at the end
