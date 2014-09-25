@@ -11,3 +11,4 @@ Y,X=meshgrid(y,x);
 refpha=adore.polyval(X,Y, ires['comp_refphase']['Estimated_coefficients_flatearth']);
 srp=cint*exp(-1j*refpha/2);
 adore.writedata(ires['subtr_refphase']['Data_output_file'], srp, 'cr4');
+

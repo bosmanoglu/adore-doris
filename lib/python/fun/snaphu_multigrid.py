@@ -11,3 +11,4 @@ sn.width=int(setobj._ipy_.w)
 #Assuming cr4. This needs to be checked. 
 sn.lines=int(os.path.getsize(sn.infile)/sn.width/8)
 sn.unwrap_multigrid()
+

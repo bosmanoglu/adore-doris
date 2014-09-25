@@ -20,3 +20,4 @@ fout.close();
 
 A.modifyResults('s_crop', 'Data_output_file', sobj.crop.Data_output_file+'.cr4');
 A.modifyResults('s_crop', 'Data_output_format', 'complex_real4')
+
