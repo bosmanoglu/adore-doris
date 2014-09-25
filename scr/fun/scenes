@@ -166,6 +166,7 @@ local DATADIR="${1}"
     nullFile="TRL*H1.1__A"
   elif [ $( find -L "${DATADIR}" -maxdepth 2 -name "*.res" 2> /dev/null | wc -l ) -gt 0 ]; then
     m_in_method="ADORE"
+    slcType="ADORE"
     dataFile="*.crop"
     leaderFile="*.res"
   else 
@@ -187,9 +188,10 @@ function setSlcRes(){
     slc_az_res=`echo "${slc_az_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`    
     slc_rg_res=`echo "${slc_rg_res}" | awk '{printf("%d\n",$0+=$0<0?-0.5:0.5)}'`
   elif [ "${m_in_method}" == "ADORE" ]; then
-    settings apply -r ${q} master=${master} slave=${slave}
-    local productType=`readRes.sh ${m_in_lea} readfiles "Product type specifier"`;
-    local m_in_method=`productType2m_in_method ${productType}`
+    #settings apply -r ${q} master=${master} slave=${slave}
+    local masterLeaderFile="${dataFolder}/${master}/${leaderFile}"
+    local productType=`readRes.sh ${masterLeaderFile} readfiles "Product type specifier"`;
+    m_in_method=`productType2m_in_method ${productType}`
     setSlcRes
     m_in_method="ADORE" 
   else 
