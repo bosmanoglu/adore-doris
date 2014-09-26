@@ -23,10 +23,25 @@ function tutorial_start(){
   tutorialFile="${ADOREFOLDER}/tutorials/${1}"
   shift #to pass the next parameter...
   rm -f ${tutorial_help_file}
+  #check if firefox is installed
+  firefox=`which firefox`
+  #check fi firefox add on auto-reload is installed
+  addon=`grep -i autoreload ~/.mozilla/firefox/*.default/extensions.ini`
+  if [[ "${firefox:-notEmpty}" != "notEmpty"  &&  "${addon:-notEmpty}" != "notEmpty" ]]; then
+    autorefresh=0;
+  else
+    autorefresh=1;
+  fi
   if [ "${g-notGui}" != "notGui" ]; then
-    echo "<meta http-equiv=refresh content=3; URL=${tutorialFile}>" > ${tutorial_help_file}
+    if [ ${autorefresh} -eq 1 ]; then 
+      echo "<meta http-equiv=refresh content=3; URL=${tutorialFile}>" > ${tutorial_help_file}
+    fi
     echo "<pre>" >> ${tutorial_help_file}
-    xdg-open ${tutorial_help_file} &> /dev/null & #show help; has to be .htm or .html
+    if [ ${autorefresh} -eq 0 ]; then   
+      firefox ${tutorial_help_file} &> /dev/null & #show help; has to be .htm or .html
+    else 
+      xdg-open ${tutorial_help_file} &> /dev/null & #show help; has to be .htm or .html
+    fi
   fi
   h ${tutorialFile} >> ${tutorial_help_file}
   if [ "${g-notGui}" == "notGui" ]; then
