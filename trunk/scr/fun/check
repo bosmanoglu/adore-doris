@@ -582,11 +582,19 @@ function checkProductSize(){
    resfilelastline=`readRes.sh ${resfile} unwrap "Last_line (w.r.t. original_master)"`
    resfilefirstpixel=`readRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)"`
    resfilelastpixel=`readRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"`
+   azMultilook=`readRes.sh ${resfile} unwrap "Multilookfactor_azimuth_direction"`
+   rgMultilook=`readRes.sh ${resfile} unwrap "Multilookfactor_azimuth_direction"`
    echo "$resfilefirstline $resfilefirstpixel"
-   modifyRes.sh ${resfile} unwrap "First_line (w.r.t. original_master)"  $(( ${resfilefirstline}+${snaphufirstrow} ))
-   modifyRes.sh ${resfile} unwrap "Last_line (w.r.t. original_master)"   $(( ${resfilefirstline}+${snaphufirstrow}+${snaphunrow}-1 ))
-   modifyRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)" $(( ${resfilefirstpixel}+${snaphufirstcol} ))
-   modifyRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"  $(( ${resfilefirstpixel}+${snaphufirstcol}+${snaphuncol}-1 ))
+   newfirstline=$(( ${resfilefirstline}+${snaphufirstrow}*${azMultilook} ));
+   newlastline=$(( ${resfilefirstline}+(${snaphufirstrow}+${snaphunrow}-1)*${azMultilook} ))
+   newfirstpixel=$(( ${resfilefirstpixel}+${snaphufirstcol}*${rgMultilook} ))
+   newlastpixel=$(( ${resfilefirstpixel}+(${snaphufirstcol}+${snaphuncol}-1)*${rgMultilook} ))
+   modifyRes.sh ${resfile} unwrap "First_line (w.r.t. original_master)"  ${newfirstline}
+   modifyRes.sh ${resfile} unwrap "Last_line (w.r.t. original_master)"   ${newlastline}
+   modifyRes.sh ${resfile} unwrap "First_pixel (w.r.t. original_master)" ${newfirstpixel}
+   modifyRes.sh ${resfile} unwrap "Last_pixel (w.r.t. original_master)"  ${newlastpixel}
+   modifyRes.sh ${resfile} unwrap "Number of lines (multilooked)"        $(( ${newlastline}-${newfirstline}+1 ))
+   modifyRes.sh ${resfile} unwrap "Number of pixels (multilooked)"       $(( ${newlastpixel}-${newfirstpixel}+1 ))
    echo "File size for unwrap adjusted based on last run snaphu --piece command."
  elif [ ${wrongSize} == true ] && [ "${1}" == "m_crop" ]; then
    # check m_dbow
