@@ -2,7 +2,7 @@
 #labels Phase-Support,Help
 =USAGE:=
 {{{
-    superMasterResample superMaster
+    superMasterResample superMaster [scene]
 }}}
 =DESCRIPTION:=
   superMasterResample is an internal ADORE command. <br>
@@ -16,6 +16,10 @@
     
 =INPUT:=
  superMaster: the name of the folder in the data file to be used as the resampling master.
+
+ ==OPTIONAL:==
+  `[scene]`: Specify a single scene to be resampled, instead of using all the `scenes include`d in the project. 
+
 
 =OUTPUT=
  Creates the `resample` folder inside the `${runFolder}` and resamples all crops listed in `scenes include`
