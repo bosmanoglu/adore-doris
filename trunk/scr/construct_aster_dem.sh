@@ -135,10 +135,10 @@ getTile(){
   tileStr=`echo ${1} ${2} | awk '{printf "%0.2d_%0.3d", $2+25,-$1+82}'`
   echo "Downloading Tile: ${tileStr}"
   timeNow=`date +%s%N | cut -c 1-13`
-  wget -nv --load-cookies ${cookieFile} -O ${selectFile} --header "content-type:application/x-www-form-urlencoded" --post-data "_gd_tiles=${tileStr}," "http://www.gdem.aster.ersdac.or.jp/gdServletAsyn/SetTileList?time=${timeNow}"
-  wget -nv --load-cookies ${cookieFile} -O ${listFile} --header "content-type:application/x-www-form-urlencoded" --post-data "_gd_tiles=${tileStr}," "http://www.gdem.aster.ersdac.or.jp/gdServlet/SelectTile"
-  wget -nv --load-cookies ${cookieFile} -O ${categoryFile} --post-data "_gd_tiles=${tileStr}," "http://www.gdem.aster.ersdac.or.jp/gdServlet/StartLogin"
-  wget -nv --load-cookies ${cookieFile} -O ${downloadsFile}  "http://www.gdem.aster.ersdac.or.jp/gdServlet/StartDownload?_gd_purpose_category=${c}"
+  wget -nv --load-cookies ${cookieFile} -O ${selectFile} --header "content-type:application/x-www-form-urlencoded" --post-data "_gd_tiles=${tileStr}," "http://gdem.ersdac.jspacesystems.or.jp/gdServletAsyn/SetTileList?time=${timeNow}"
+  wget -nv --load-cookies ${cookieFile} -O ${listFile} --header "content-type:application/x-www-form-urlencoded" --post-data "_gd_tiles=${tileStr}," "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/SelectTile"
+  wget -nv --load-cookies ${cookieFile} -O ${categoryFile} --post-data "_gd_tiles=${tileStr}," "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/StartLogin"
+  wget -nv --load-cookies ${cookieFile} -O ${downloadsFile}  "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/StartDownload?_gd_purpose_category=${c}"
   downloadSite=`grep download_immediate_site ${downloadsFile} | cut -d">" -f2 |cut -d"<" -f1`
   fileName=`grep _gd_download_file_name ${downloadsFile} | cut -d'"' -f6`
   echo ${downloadSite}${fileName}
@@ -162,7 +162,7 @@ logMeIn(){
     return 126 #126-can not login    
   else
     echo "Logging in user: ${u}"  
-    wget -nv --save-cookies ${cookieFile} --keep-session-cookies --post-data "_gd_register_user_name=${u}&_gd_register_password=${p}" -O ${loginFile} "http://www.gdem.aster.ersdac.or.jp/gdServlet/Login"
+    wget -nv --save-cookies ${cookieFile} --keep-session-cookies --post-data "_gd_register_user_name=${u}&_gd_register_password=${p}" -O ${loginFile} "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/Login"
     userName=`grep loggedin_info_value ${loginFile} | cut -d">" -f2 | cut -d"<" -f1`
     if [ $? -ne 0 ] || [ "${userName}" != "${u}" ]; then
       echo "Login Error!"
@@ -177,7 +177,7 @@ logMeIn(){
 
 logMeOut(){
   echo "Logging out user: ${u}"
-  wget -nv --load-cookies ${cookieFile} -O ${logoutFile} "http://www.gdem.aster.ersdac.or.jp/gdServlet/Logout"
+  wget -nv --load-cookies ${cookieFile} -O ${logoutFile} "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/Logout"
   return $?
 }
 
@@ -261,14 +261,14 @@ do
     fi
     lonA=`abs "${lon}"` #lonA= lon Absolute
     lonF=`printf "%0.3d" ${lonA}` #lonF = lon Formatted
-    tileFileName="ASTGTM_${latL}${latA}${lonL}${lonF}_dem.tif"
+    tileFileName="ASTGTM2_${latL}${latA}${lonL}${lonF}_dem.tif"
     echo ${tileFileName}
     filePath=`checkLocalFolder "${f}/${tileFileName}"`
     if [ "${filePath:-isEmpty}" == "isEmpty" ]; then       
-      echo "Downloading ASTGTM_${latL}${lat}${lonL}${lonF}.zip"
+      echo "Downloading ASTGTM2_${latL}${lat}${lonL}${lonF}.zip"
       getTile ${lat} ${lon}
       if [[ $? -ne 0 ]]; then
-        echo "Skipping ASTGTM_${latL}${lat}${lonL}${lonF}"
+        echo "Skipping ASTGTM2_${latL}${lat}${lonL}${lonF}"
       else
         echo "${f}/${tileFileName}" >> ${demListFile}
       fi

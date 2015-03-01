@@ -1,11 +1,12 @@
 #!/bin/bash
 if [ ${mte_method} == "manual" ]; then
   #get width of simamp  
-  width=`readRes.sh $m_resfile $(pn2rs m_simamp) "Number of pixels (multilooked)"`
-  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${width} -f r4/cr4 -q normal/mag -e1/0.3 ${@} ${master}.sam ${master}.crop | tee ${outputFolder}/manual_offsets.txt
+  call "(fileName resFile format width numlines)=dorisProcess2OutputFile m_crop"
+  #width=`readRes.sh $m_resfile $(pn2rs m_simamp) "Number of pixels (multilooked)"`
+  ${ADOREFOLDER}/lib/python/cpxoffset.py -w ${width} -f r4/${format} -q normal/mag -e1/0.3 ${@} ${master}.sam ${fileName} | tee ${outputFolder}/manual_offsets.txt
   openInIpython ${ADOREFOLDER}/lib/python/fun/manual_offsets_timing_error.py 
   [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"
-  unset width
+  unset fileName resFile format width numlines
 else
   #preprocess the drs file
   pp ${dorisProcess}

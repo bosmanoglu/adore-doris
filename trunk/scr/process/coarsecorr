@@ -3,20 +3,20 @@ function coarsecorr_manual(){
   #get width of m_crop
   ##check if reading ovs or crop
   if [ `readRes.sh $m_resfile process "oversample"` == "1" ]; then 
-    mwidth=`readRes.sh $m_resfile $(pn2rs m_ovs) "Number of pixels (oversampled)"`
+    mwidth=`readRes.sh $m_resfile $(pn2rs m_ovs) "Number of pixels"`
     mcrop=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_file"`
     mfrmt=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_format"`
   else
-    mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels (non-multilooked)"`
+    mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels"`
     mcrop=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_file"`
     mfrmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
   fi
   if [ `readRes.sh $s_resfile process "oversample"` == "1" ]; then 
-    swidth=`readRes.sh $s_resfile $(pn2rs s_ovs) "Number of pixels (oversampled)"`
+    swidth=`readRes.sh $s_resfile $(pn2rs s_ovs) "Number of pixels"`
     scrop=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_file"`
     sfrmt=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_format"`
   else
-    swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels (non-multilooked)"`
+    swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels"`
     scrop=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_file"`
     sfrmt=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_format"`
   fi

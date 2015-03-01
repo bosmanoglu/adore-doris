@@ -173,29 +173,39 @@ def main(argv):
             byteSwapFlag=True;
         data=getdata(inputfile,cfgw,cfgf.lower(),0,byteSwapFlag)
         data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
-        #multilook
-        data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
         # mirror ?
         if "x" in cfg["-m"]:
             data=fliplr(data);
         if "y" in cfg["-m"]:
             data=flipud(data);
-        if "norm" in cfgq.lower(): #cfg["-q"].lower():
+        if "norm" in cfgq.lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfgs*data**cfge);
-        elif "mag" in cfgq.lower(): #cfg["-q"].lower():
+        elif "mag" in cfgq.lower():
             data=(cfgs*abs(data)**cfge)
-        elif "pha" in cfgq.lower(): #cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
+        elif "pha" in cfgq.lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfgs*np.angle(data)**cfge)
-        elif "wrap" in cfgq.lower(): #cfg["-q"].lower():
+        elif "wrap" in cfgq.lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfgs*wrapToPi(data)**cfge)
-        elif "real" in cfgq.lower(): #cfg["-q"].lower():
+        elif "real" in cfgq.lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfgs*data.real**cfge)
-        elif "imag" in cfgq.lower(): #cfg["-q"].lower():
+        elif "imag" in cfgq.lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfgs*data.imag**cfge)
-            
         else:
             print "Unknown output type."
             return
+
         if counter==0: #not data1:
             #data1=np.hypot(sc.ndimage.sobel(data,0), sc.ndimage.sobel(data,1))#rescale(data, [0,1]);
             data1=data #rescale(data, [0,1]);

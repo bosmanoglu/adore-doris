@@ -88,6 +88,10 @@ function testFunction(){
 #echo "$a $b $c"
 #unset a b c
 
+function cds(){
+  cd ${1}; settings load
+}
+
 function parseargs(){
   local options
   options="${1}"

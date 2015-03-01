@@ -1,3 +1,16 @@
+= Live DVD = 
+You can download ADORE Live DVD which comes with:
+  * Ubuntu 12.04 LTS
+  * ADORE-DORIS (0.1.416)
+  * DORIS (4.04.4)
+  * SNAPHU
+  * GMT, GDAL, IMAGEMAGICK from Ubuntu Repositories.
+
+The DVD is available here:
+
+[http://www.osmanoglu.org/sar/98-live-dvd-for-adore-doris]
+
+Simply download and burn the `iso` image on a DVD as a DVD image (NOT as a file/data dvd) and start your computer from the DVD drive. 
 
 = From EO-Tools Repository =
 You can add the EO-Tools repository to your apt-sources and get the following packages: `adore-doris, doris, getorb, snaphu`
@@ -11,6 +24,18 @@ Update the package list:
 
 To install adore-doris (this should also install doris, getorb and snaphu)
 `sudo apt-get install adore-doris`
+
+= Installing DORIS and Snaphu From Ubuntu and Debian Repositories =
+by Antonio Valentino and Francesco P. Lovergine on July 18th, 2013.
+
+We finally have doris and snaphu in debian:
+ * http://packages.debian.org/sid/doris
+ * http://packages.debian.org/sid/snaphu
+
+Currently they are only available in the unstable (sid) and testing (jessie) archives, not in stable (wheezy).
+You need to enable the `contrib` and `non-free` archives in your `/etc/apt/source.lists` in order be able to install them.
+
+Also these packages will be in Ubuntu 13.10 (saucy) in the `multiverse` archive.
 
 = Debian Package Installation =
 You can download and install the Debian packages under Debian based operating systems including Ubuntu. 
@@ -40,6 +65,10 @@ ADORE requires the following packages to be installed on your system:
     TU-DELFT DORIS is used for all interferometric processing.
   * *GMT* http://gmt.soest.hawaii.edu/ sudo apt-get install gmt
     GMT is required for TU-DELFT DORIS and ADORE-DORIS uses it in MASK and SAVEAS commands.
+  * *ipython* http://ipython.org sudo apt-get install ipython
+    ipython is required to provide ADORE specific improvements to DORIS (e.g. TanDEM-X bistatic processing, manual coarse offset calculation, network deramping of wrapped data, selecting interferometric pairs and etc.) Furthermore ipython allows ADORE to open the current interferogram in python for interactive calculations and data visualization. 
+  * *Python modules* sudo apt-get install python-numpy python-scipy python-mpltoolkits.basemap
+    Several python modules are used in ADORE python scripts to assist processing and visualization.
   * _GNUPLOT_ http://www.gnuplot.info/ sudo apt-get install gnuplot
     GNUPLOT is used after the BASELINES command to create a post-script (PS) image of the temporal and perpendicular baselines.
   * _Image-Magick_ http://www.imagemagick.org/ sudo apt-get install imagemagick 
@@ -47,6 +76,14 @@ ADORE requires the following packages to be installed on your system:
   * _GDAL_ http://www.gdal.org/ sudo apt-get install gdal-bin
     GDAL is optional, it allows ADORE-DORIS outputs to be exported to ArcGIS via SAVEAS command.
 
+
+The packages below are requirements for Agooey (ADORE-GUI):
+  * *pygtk* sudo apt-get install python-gtk2
+  Required to display Agooey window. 
+  * *vte* sudo apt-get install python-vte
+  Virtual Terminal Emulator is used to display the ADORE prompt.
+  * _ipython-qtconsole_ sudo apt-get install ipython-qtconsole
+  In Agooey, ipython can be opened in a separate window, releasing ADORE prompt for processing. If qtconsole is not available ipython opens inside vte.
 
 
  Setup 

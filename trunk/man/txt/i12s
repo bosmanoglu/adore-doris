@@ -6,6 +6,7 @@ USAGE:
 	i12s include [master,slave]
         i12s exclude master,slave
         i12s load [filename]
+        i12s plot
         i12s save [filename]
 
 DESCRIPTION:
@@ -18,6 +19,7 @@ INPUT:
  * `include [master,slave]`: Without the optional argument displays the included interferograms. If a `master,slave` pair is given, it is added to the list. 
  * `exclude master,slave`: Can be used to remove a `master,slave` pair from the list. 
  * `load filename`: Loads the list of pairs from the given filename. Default filename: `$runFolder/$runName_pairs.csv`
+ * `plot`: Will plot the interferograms in a temporal-perpendicular baseline figure. Press Enter to close the window. Will also display statistical information about the baselines. 
  * `save filename`: Saves the list of pairs to the given filename. Default filename: `$runFolder/$runName_pairs.csv`
 
 
@@ -34,4 +36,9 @@ ADORE: i12s include
 ADORE: i12s "filtphase;unwrap"
 ADORE: i12s include 20120114,20120125
 ADORE: i12s "settings apply -r int_multilook='20 4'; interfero; settings save"
-}}}
+ADORE: i12s plot
+Plotting 13 scenes and 24 interferograms.
+abs(Bperp) max/min/mean/std: 1423.90 32.80 582.87 371.10
+abs(Btemp) max/min/mean/std: 736.00 46.00 291.33 254.27
+
+[https://dl.dropboxusercontent.com/u/18918772/adore-wiki/im/wiki/i12s_plot.png]
