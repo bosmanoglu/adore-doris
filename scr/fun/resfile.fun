@@ -53,20 +53,26 @@ function dorisProcess2OutputFile(){
 
   error "Reading ${dorisStep} information from: ${resfile}"
   # get nr of lines
-  firstPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_pixel`
-  lastPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_pixel`  
-  numpixels=$((${lastPixel}-${firstPixel}+1));
-  multilookfactorPixels=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_range_direction`
-  if [ -n "${multilookfactorPixels}" ]; then
-    [ "${multilookfactorPixels}" != 1 ] && numpixels=`echo ${numpixels} ${multilookfactorPixels} | awk '{printf "%d", $1/$2};'`
+  numpixels=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} 'Number of pixels'`
+  if [ -z "${numpixels}" ]; then 
+    firstPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_pixel`
+    lastPixel=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_pixel`  
+    numpixels=$((${lastPixel}-${firstPixel}+1));
+    multilookfactorPixels=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_range_direction`
+    if [ -n "${multilookfactorPixels}" ]; then
+      [ "${multilookfactorPixels}" != 1 ] && numpixels=`echo ${numpixels} ${multilookfactorPixels} | awk '{printf "%d", $1/$2};'`
+    fi
   fi
   # get nr of lines
-  firstLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_line`
-  lastLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_line`
-  numlines=$((${lastLine}-${firstLine}+1)); 
-  multilookfactorLines=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_azimuth_direction`
-  if [ -n "${multilookfactorLines}" ]; then
-    [ "${multilookfactorLines}" != 1 ] && numlines=`echo ${numlines} ${multilookfactorLines} | awk '{printf "%d", $1/$2};'`
+  numlines=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} 'Number of lines'`
+  if [ -z "${numpixels}" ]; then 
+    firstLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} First_line`
+    lastLine=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Last_line`
+    numlines=$((${lastLine}-${firstLine}+1)); 
+    multilookfactorLines=`${ADORESCR}/readRes.sh ${resfile} ${dorisStep} Multilookfactor_azimuth_direction`
+    if [ -n "${multilookfactorLines}" ]; then
+      [ "${multilookfactorLines}" != 1 ] && numlines=`echo ${numlines} ${multilookfactorLines} | awk '{printf "%d", $1/$2};'`
+    fi
   fi
   #readRes.sh ${resfile} ${dorisStep} Data_output_file notify
   ##########################TO DO - REFER TO READRES INSTEAD OF COPY PASTING IT HERE#########

@@ -5,6 +5,10 @@ function previousMasterSteps(){
   do
     check -p ${p} ${1} &>> /dev/null
     [ $? -eq 1 ] && steps="${steps};${p}"
+    if [ ${p} == "m_crop" ]; then
+      local outputFile=`readRes.sh ${1} $(pn2rs m_crop) "Data_output_file"`
+      [ ${outputFile:(-4)} == ".ovs" ] && steps="${steps};m_fbd2fbs" 
+    fi
   done
   echo "${steps/;/}"
 }
@@ -14,6 +18,10 @@ function previousSlaveSteps(){
   do
     check -p ${p} ${1} &>> /dev/null
     [ $? -eq 1 ] && steps="${steps};${p}"
+    if [ ${p} == "s_crop" ]; then
+      local outputFile=`readRes.sh ${1} $(pn2rs s_crop) "Data_output_file"`
+      [ ${outputFile:(-4)} == ".ovs" ] && steps="${steps};s_fbd2fbs" 
+    fi
   done
   echo "${steps/;/}"
 }

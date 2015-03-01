@@ -45,7 +45,7 @@ length=`echo ${endline} - ${startline} |bc`
 
 if [[ "${notify}" == "notify" ]]; then
   #get number of hits
-  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep "${parameter}"|wc -l`
+  numHits=`grep -A ${length} Start_${section} ${inputfile} | grep "${parameter}" |grep -v '^#' | wc -l`
   if [[ ${numHits} -gt 1 ]]; then
     echo " "
     echo "I found more than 1 match for your selection."    
@@ -64,7 +64,7 @@ if [[ "${notify}" == "notify" ]]; then
     fi
   fi
 else
-  result=`grep -A ${length} Start_${section} ${inputfile} | grep "${parameter}"`
+  result=`grep -A ${length} Start_${section} ${inputfile} | grep "${parameter}" |grep -v '^#' `
 fi
 
 if [[ ${parameter} == *:* ]]; then
