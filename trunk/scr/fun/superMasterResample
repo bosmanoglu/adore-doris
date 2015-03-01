@@ -27,12 +27,31 @@ function processResampleSteps(){
      bold "Processing resample/${master}_${scene}"
      settings apply -r -q master=${master} slave=dummy outputFolder="${resampleFolder}/${master}_${scene}" m_dbow="${rs_dbow}" m_dbow_geo="${rs_dbow_geo}"
      mkdir -p "${outputFolder}"
+     cd "${outputFolder}"
      local cropSteps=`previousSteps ${cropsFolder}/${master}/${master}.res`
-     if [ "${parallel}" == "on" ]; then
-       jobId=`quejob "${cropSteps}" "${outputFolder}"`
-       jobIds=( ${jobIds[@]} ${jobId} )
-     else
-       eval "${cropSteps}"
+     if [[ "${cropSteps}" == *m_fbd2fbs* ]]; then
+       [ "${m_dbow}" == "0 0 0 0" ] && echo "Can't use rs_dbow_geo for Master with m_fbd2fbs" > README.txt && continue
+       #copy the master.res and manually crop the file.
+       cp ${cropsFolder}/${master}/${master}.res ${outputFolder}
+       call "(filename resfile format numpixels numlines)=dorisProcess2OutputFile m_crop"
+       local dbow_arr=( ${m_dbow} )
+       local cropFile=`basename ${filename}.crop` 
+       echo "cpxfiddle -f ${format} -w ${numpixels} -q normal -o float -l ${dbow_arr[0]} -L ${dbow_arr[1]} -p ${dbow_arr[2]} -P ${dbow_arr[3]} ${filename} > ${outputFolder}/${cropFile}"
+       cpxfiddle -f ${format} -w ${numpixels} -q normal -o float -l ${dbow_arr[0]} -L ${dbow_arr[1]} -p ${dbow_arr[2]} -P ${dbow_arr[3]} ${filename} > ${outputFolder}/${cropFile}
+       modifyRes.sh ${outputFolder}/${master}.res crop "Data_output_file" ${outputFolder}/${cropFile}
+       modifyRes.sh ${outputFolder}/${master}.res crop "First_line (w.r.t. ovs_image)" ${dbow_arr[0]}
+       modifyRes.sh ${outputFolder}/${master}.res crop "Last_line (w.r.t. ovs_image)" ${dbow_arr[1]}
+       modifyRes.sh ${outputFolder}/${master}.res crop "First_pixel (w.r.t. ovs_image)" ${dbow_arr[2]}
+       modifyRes.sh ${outputFolder}/${master}.res crop "Last_pixel (w.r.t. ovs_image)" ${dbow_arr[3]}
+       modifyRes.sh ${outputFolder}/${master}.res crop "Number of lines (oversampled)" $(( ${dbow_arr[1]} - ${dbow_arr[0]} + 1 ))
+       modifyRes.sh ${outputFolder}/${master}.res crop "Number of pixels (oversampled)" $(( ${dbow_arr[3]} - ${dbow_arr[2]} + 1 ))
+     else     
+         if [ "${parallel}" == "on" ]; then
+           jobId=`quejob "${cropSteps}" "${outputFolder}"`
+           jobIds=( ${jobIds[@]} ${jobId} )
+         else
+           eval "${cropSteps}"
+         fi
      fi
    else
      bold "Processing resample/${master}_${scene}"
