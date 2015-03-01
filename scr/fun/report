@@ -170,11 +170,20 @@ echo '</textarea>' >>${rFile}
 function reportPicture(){
  local step m1 m2
  step="${1}"
- #echo ${coh_multilook}
- m1=$(( 20 / ${coh_multilook% *} ))
+ #Are pixels already square?
+ if [ -n "${slc_az_res}" ]; then 
+   if [ $(( $slc_az_res * ${coh_multilook% *} )) -eq $(( $slc_rg_res * ${coh_multilook#* } )) ]; then 
+     #echo ${coh_multilook}
+     m1=$(( 20 / ${coh_multilook% *} ))
+   else
+     m1=${slc_az_res}; m2=${slc_rg_res};
+   fi
+ else
+   m1=$(( 20 / ${coh_multilook% *} ))
+ fi 
  #m2=$(( ${m1} * ${coh_multilook#* } ))
  [ "${m1}" == "" ] && m1="20" && m2="20"
- imgFile=`raster auto ${step} -M${m1}/${m1} | tail -n1| cut -d":" -f2 | tr -d " "`
+ imgFile=`raster auto ${step} -M${m1}/${m2} | tail -n1| cut -d":" -f2 | tr -d " "`
  if [ ! -f "${imgFile}" ]; then
    error "Can not find result for step ${step}."
    [ ! -e "${rFolder}/report_result_not_found.png" ] && cp ${ADOREFOLDER}/gui/graphics/report_result_not_found.png "${rFolder}"

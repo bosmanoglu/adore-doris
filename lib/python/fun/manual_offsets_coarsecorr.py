@@ -4,8 +4,8 @@ if isvector(off):
 else:  
 #  iobj.coarse_correl.Coarse_correlation_translation_lines=(off[:,0]-off[:,2]).mean()-mobj.crop.First_line;   #Average offset in azimuth
 #  iobj.coarse_correl.Coarse_correlation_translation_pixels=(off[:,1]-off[:,3]).mean()-mobj.crop.First_pixel; #Average offset in range
-  iobj.coarse_correl.Coarse_correlation_translation_lines=int(round( ((off[:,0]-off[:,2])*off[:,4]).sum()/sum(off[:,4])))-mobj.crop.First_line;   #Average offset in azimuth
-  iobj.coarse_correl.Coarse_correlation_translation_pixels=int(round( ((off[:,1]-off[:,3])*off[:,4]).sum()/sum(off[:,4])))-mobj.crop.First_pixel; #Average offset in range
+  iobj.coarse_correl.Coarse_correlation_translation_pixels=int(round( ((off[:,0]-off[:,2])*off[:,4]).sum()/sum(off[:,4])))-mobj.crop.First_pixel;   #Average offset in azimuth
+  iobj.coarse_correl.Coarse_correlation_translation_lines=int(round( ((off[:,1]-off[:,3])*off[:,4]).sum()/sum(off[:,4])))-mobj.crop.First_line; #Average offset in range
   iobj.coarse_correl.Number_of_correlation_windows='%d of %d' % (off.shape[0],off.shape[0])
   iobj.coarse_correl.results=np.zeros([off.shape[0],6])
   iobj.coarse_correl.results[:,0]=np.r_[1:off.shape[0]+1]

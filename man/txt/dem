@@ -41,7 +41,7 @@ INPUT:
  * `dem expand path/to/big.dem [merged.bil]`:
    * Merge a small dem with a big dem. The small dem overwrites the big one. 
  * `dem export format`:
-   * Export the current DEM in a different format. Currently only the following format is available: `roipac`
+   * Export the current DEM in a different format. Currently only the following formats are available: `roipac, giant`.
  * `dem view`:
    * Display DEM using `cpxview` and the input values. Additional options can be passed. See `? view`
 

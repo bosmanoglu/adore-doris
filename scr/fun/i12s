@@ -240,8 +240,32 @@ function i12s_clear(){
 
 function i12s_plot(){
   bold "Press enter to quit."
-  cmd="import insar;insar.time_series.plot_bperp_btemp('${baselinesFolder}/baselines', '${runFolder}/${runName}_pairs.csv');ginput(n=10000, timeout=0, mouse_add=3, mouse_pop=1)"
-  openInIpython "$cmd" 2> /dev/null &
+  i12s include | tr " " "\n" > ${tmpFolder}/${runName}_pairs.csv
+  cmd="import insar;insar.time_series.plot_bperp_btemp('${baselinesFolder}/baselines', '${tmpFolder}/${runName}_pairs.csv');ginput(n=10000, timeout=0, mouse_add=3, mouse_pop=1)"
+  openInIpython "$cmd" 2> /dev/null &  
+}
+
+function i12s_remove(){
+  bold "Removing i12s folders..."
+  if [ "${1:-undefined}" == "undefined" ]; then
+    if [ ${#pairs[@]} -gt 0 ]; then
+      for pair in ${pairs[@]}
+      do 
+        pair=`echo ${pair} | tr ",'" "_"`
+        bold "Removing: ${i12sFolder}/${pair}"
+        rm -rf ${i12sFolder}/${pair}
+      done
+    else
+      error "No pairs are defined. Nothing to remove."
+    fi
+  else
+    local pair
+    for pair in "$@"
+    do
+        bold "Removing: ${i12sFolder}/${pair}"
+        rm -rf ${i12sFolder}/${pair}
+    done
+  fi
 }
 
 function i12s_i(){
@@ -287,6 +311,10 @@ case "${1}" in
 "plot")
  shift   
  i12s_plot "$@"
+ ;;
+"remove")
+ shift
+ i12s_remove "$@"
  ;;
 "save")
  shift   

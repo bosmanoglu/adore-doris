@@ -88,10 +88,11 @@ do
   lenRemainder=$(( ${#remainder} - ${#inArg} ))
   remainder="${remainder:0:${lenRemainder}}"
   unset OPTIND
-  while getopts ":w:f:e:q:o:c:s:" flag ${inArg};
+  #while getopts ":w:f:e:q:o:c:s:" flag ${inArg};
+  while getopts ":w:f:e:q:c:" flag ${inArg};
   do
     case $flag in
-      w|f|e|q|o|c|s)
+      w|f|e|q|c)
         eval ${flag}=${OPTARG};;
       *)
         passOn+=($inArg)

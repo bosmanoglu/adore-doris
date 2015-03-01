@@ -107,7 +107,7 @@ def main(argv):
     except:
         print "Input file not specified."
         sys.exit(2)
-
+    
     for inputfile in args:        
         if not os.path.exists(inputfile):
             print "File not found:", inputfile
@@ -148,30 +148,41 @@ def main(argv):
             byteSwapFlag=True;
         data=getdata(inputfile,cfg["-w"],cfg["-f"].lower(),0,byteSwapFlag)
         data=data[cfg["-l"]:cfg["-L"]:cfg["Sl"], cfg["-p"]:cfg["-P"]:cfg["Sp"]];
-        #multilook
-        data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
         # mirror ?
         if "x" in cfg["-m"]:
             data=fliplr(data);
         if "y" in cfg["-m"]:
             data=flipud(data);
         if "norm" in cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfg["-s"]*data**cfg["-e"]);
         elif "mag" in cfg["-q"].lower():
             data=(cfg["-s"]*abs(data)**cfg["-e"])
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
         elif "pha" in cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfg["-s"]*np.angle(data)**cfg["-e"])
         elif "wrap" in cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfg["-s"]*wrapToPi(data)**cfg["-e"])
         elif "real" in cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfg["-s"]*data.real**cfg["-e"])
         elif "imag" in cfg["-q"].lower():
+            #multilook
+            data=multilook(data, [cfg["Ml"],cfg["Mp"]]);
             data=(cfg["-s"]*data.imag**cfg["-e"])
             
         else:
             print "Unknown output type."
             return
-        fg=mp.matshow(data, picker=5);
+        
+	fg=mp.matshow(data, picker=5);
         # set colormap
         mp.set_cmap(cfg["-c"])        
         #rescale?
