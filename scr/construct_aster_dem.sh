@@ -18,6 +18,7 @@
 #		stitchMethod 1 : Using buildvrt and gdal_translate Doris readable (ENVI) output (Mahmut Arikan)
 #		stitchMethod 2 : Using gdal_merge Doris readable (mff2) output(Petar Marinkovic)
 #		stitchMethod 3 : Using gdal_merge Gtiff output (Petar Marinkovic)
+#               stitchMethod 4 : Using gdal_merge EHDR output (ADORE compatible)
 #	W E S N: The corner coordinates of the study area. Enter West and South as - (negative)
 #		values. Decimals are ignored maximizing the area (i.e. floor(west), ceil(east)) 
 #
@@ -140,7 +141,7 @@ getTile(){
   wget -nv --load-cookies ${cookieFile} -O ${categoryFile} --post-data "_gd_tiles=${tileStr}," "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/StartLogin"
   wget -nv --load-cookies ${cookieFile} -O ${downloadsFile}  "http://gdem.ersdac.jspacesystems.or.jp/gdServlet/StartDownload?_gd_purpose_category=${c}"
   downloadSite=`grep download_immediate_site ${downloadsFile} | cut -d">" -f2 |cut -d"<" -f1`
-  fileName=`grep _gd_download_file_name ${downloadsFile} | cut -d'"' -f6`
+  fileName=`grep _gd_download_file_name ${downloadsFile} | cut -d'"' -f6 | tail -n1`
   echo ${downloadSite}${fileName}
   wget --tries=2 --load-cookies ${cookieFile} -O${tmpFolder}/${fileName} --post-data "_gd_download_file_name=${fileName}" "${downloadSite}gdServlet/Download"
   unzip -j -d ${f} ${tmpFolder}/${fileName}
@@ -298,9 +299,13 @@ case ${s} in
     #method3: Thanks to Petar Marinkovich 
     gdal_merge.py -n -32768 -of GTiff -co "TFW=YES" -v -o ${n}.tif --optfile ${demListFile}  
   ;;
+  4)
+    #method4: For ADORE
+    gdal_merge.py -n -32768 -of EHDR  -v -ot Float32 -o ${n}.bil --optfile ${demListFile} #will also create .hdr 
+  ;;
   *)
     #no stitching.
-    echo "Stitching method was given as ${s}. Stitching is only done for methods 1 and 2."
+    echo "Stitching method was given as ${s}. Stitching is only done for methods 1, 2, 3 and 4."
   ;;
 esac
 #cleanup temporary files
