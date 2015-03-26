@@ -1,0 +1,27 @@
+# USAGE: #
+```
+ m_timing
+```
+# DESCRIPTION: #
+> M\_TIMING is an ADORE process and runs the DORIS step with the same name.
+> The absolute timing error between DEM and the master is computed using the simulated amplitude and the result of the coarse coregistration. Therefore, this step can only be run after the steps M\_CROP and M\_SIMAMP. The timing error in azimuth as well as in range direction is estimated.
+
+> ADORE provides a manual offset calculation routine for this step. Manual method, displays the simulated amplitude and master amplitude images in two separate figures, on which the user can choose corresponding points using the left-click. User can zoom in and out as needed. When correct points are selected a right-click confirms the selection. To use manual method, simply set the `mte_method` parameter to `manual`. If the images are too big to display options from `raster` command (e.g. `-M4/4`) can be used.
+# INPUT: #
+> There are no required input parameters for this command.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> Azimuth and range timing errors are written under the master\_timing step in the result file.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/drs/${dorisVersion}/m_timing.drs
+ http://doris.tudelft.nl/usermanual/node29.html
+```
+# EXAMPLE: #
+```
+ m_timing
+```
+# KNOWN BUGS: #
+> None.

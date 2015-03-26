@@ -1,0 +1,15 @@
+# USAGE: #
+```
+	pn2rs processName 
+	pnr2rs -f processName
+```
+# DESCRIPTION: #
+> PN2RS is an internal ADORE function.
+> It outputs the resultfile section name or the
+> result file name for the given processName.
+# INPUT: #
+> -f: Flag for filename. If present corresponding filename
+> is returned.
+> processName: Doris step to lookup.
+# OUTPUT #
+> Name of the section in doris result file.

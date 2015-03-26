@@ -1,0 +1,24 @@
+# USAGE: #
+```
+	p dorisProcess
+	p adoreScript.adr
+```
+# DESCRIPTION: #
+> p is a builtin ADORE command. It runs the given DORIS processing step or the ADORE script.
+# INPUT: #
+  * dorisProcess: Name of the DORIS processing step to run. List of available processes can be found at the end of this help message.
+  * adoreScript: Full path to ADORE script.
+# OUTPUT #
+dorisProcess: SUCCESS is output if DORIS finishes successfully.
+
+Available DORIS processes:
+```
+
+
+m_readfiles  s_readfiles  coarseorb   demassist	  subtrrefpha  dinsar
+m_porbits    s_porbits	  coarsecorr  coregpm	  comprefdem   slant2h
+m_crop	     s_crop	  m_filtazi   resample	  subtrrefdem  geocode
+m_simamp		  s_filtazi   filtrange	  coherence
+m_timing		  fine	      interfero	  filtphase
+m_ovs	     s_ovs	  reltiming   comprefpha  unwrap
+```

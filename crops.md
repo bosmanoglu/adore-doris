@@ -1,0 +1,33 @@
+# USAGE: #
+```
+	crops dorisProcess(es) 
+	crops exclude [orbitFolder1 orbitFolder2 ...]
+	crops include [orbitFolder1 orbitFolder2 ...]
+```
+# DESCRIPTION: #
+> CROPS is an internal ADORE command.
+
+> CROPS provides an interface to run the same DORIS processes on multiple crops. `include` and `exclude` functions are simple links to the same name functions for the `scenes` command.
+# INPUTS: #
+`dorisProcess(es)`:
+> > A single or multiple doris processes (see [lsprocess](lsprocess.md)) can be run on all the interferograms. If multiple processes are given, they must be in quotes and separated with semi-colon.
+`exclude`:
+
+> With no inputs this command lists currently excluded scenes.
+`exclude orbitFolder1 orbitFolder2 ...`:
+> > listed orbit folders (folders inside data folder) are excluded from
+> > batch processing.
+`include`:
+> > With no inputs this command lists currently included scenes.
+`include orbitFolder1 orbitFolder2 ...`:
+> > given orbit folders will be removed from the exclude list.
+# FILES and REFERENCES: #
+```
+None.
+```
+# EXAMPLE: #ADORE: crops "m_readfiles;m_orbits;m_crop;"
+ADORE: crops include
+050820 050122 050507
+ADORE: crops include 030503
+ADORE: crops include
+050820 050122 050507 030503```

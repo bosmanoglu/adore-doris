@@ -1,0 +1,32 @@
+# USAGE: #
+```
+ s_filtazi
+```
+# DESCRIPTION: #
+> S\_FILTAZI is an ADORE process runs the DORIS step with the same name.
+> Normally the step S\_FILTAZI is performed at the same time as M\_FILTAZI.
+> (PROCESS M\_FILTAZI card in input file.) However, we kept this two seperate
+> steps to be able to only filter the slave images in a large stack (all
+> slaves coregistered on the same master image). This has the advantage that
+> for each interferogram of the stack not a large file is created for the
+> master. The disadvantage of not filtering the master of course is that a
+> small part of the spectrum of the master is not shared with the slave
+> spectrum, yielding coherence loss of the interferogram.
+# INPUT: #
+> There are no required input parameters for this command.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> ${slave}.af file is created.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/drs/${dorisVersion}/s_filtazi.drs
+ http://doris.tudelft.nl/usermanual/node59.html
+```
+# EXAMPLE: #
+```
+ s_filtazi
+```
+# KNOWN BUGS: #
+> None.

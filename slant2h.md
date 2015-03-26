@@ -1,0 +1,18 @@
+# USAGE: #
+```
+ slant2h
+```
+# DESCRIPTION: #
+SLANT2H is an ADORE process and it runs the DORIS step with the same name.
+
+In this step in principle the heights in the radar coded system are computed. However with the ambiguity method, the geocoding can be done in the same step.
+
+ADORE also supports a "trick" method for geocoding using the DEM. The `crd_out_dem_lp` is linked to `s2h_out_hei` and related lines are added to the interferogram result file. This method can also be executed with the [slant2htrick](slant2htrick.md) command.
+
+# INPUT: #
+> There are no required input parameters for this command.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> ${master}

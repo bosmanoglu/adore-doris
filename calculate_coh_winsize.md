@@ -1,0 +1,23 @@
+# USAGE: #
+```
+ calculate_coh_winsize
+```
+# DESCRIPTION: #
+> CALCULATE\_COH\_WINSIZE is an ADORE function to calculate the coherence window
+> size based on doubling the multiplication of subtrrefpha and interfero
+> multilooking parameters.
+# INPUT: #
+> There are no required input parameters for this command.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> Prints out two times the multiplication of srp\_multilook and int\_multilook
+> parameters.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/scr/fun/functions
+```
+# EXAMPLE: # ADORE: calculate_coh_winsize 
+ 10 2
+```

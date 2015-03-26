@@ -1,0 +1,36 @@
+# USAGE: #
+```
+	deramp dorisStep  
+        deramp dorisStep:filename [-o ORDER -e ESTIMATEFILE -m network]
+```
+# DESCRIPTION: #
+> DERAMP is an internal ADORE command.
+> It removes a first or second order plane from DORIS results using python, numpy, scipy.
+
+> The deramp module is located in $ADOREFOLDER/lib/python and has more
+> adjustable parameters compared to this ADORE function.
+
+# INPUT: #
+  * dorisStep[:filename]
+> > The step for the output file. Optionally a different file can be specified separated by a colon (:). It can also be used for complex files where a best fitting plane is calculated in frequency domain for the phase.
+
+
+> ## OPTIONAL: ##
+    * -o ORDER: The order of the polynomial defining the plane. Can be 1 or 2. Default is 1. For complex files this parameter is ignored (i.e. order=1).
+    * -e ESTIMATEFILE: When specified this file is subtracted before calculating the best fitting plane. It has to be the same format as the input.
+  * -m network: For SBAS style connected networks, a common solution is found after inverting the individually estimated phase ramps. If the ramps are not affecting the phase unwrapping, network deramping in [giant](giant.md) should be used.
+
+# OUTPUT #
+> Writes the plane removed result with a `deramp` suffix.
+# FILES and REFERENCES: #
+```
+ None.
+```
+
+Example:
+```
+  deramp unwrap -o 2 
+  deramp unwrap -e ${master}_${slave}.crd
+  deramp filtphase 
+  deramp filtphase -m network
+```

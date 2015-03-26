@@ -1,0 +1,24 @@
+# USAGE: #
+```
+  error "error message" 
+```
+# DESCRIPTION: #
+> ERROR is an internal ADORE function. It echoes the displayed error message
+to the stderr.
+# INPUT: #
+> "error message": Error message to be displayed.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> Error message echoed to stderr.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/scr/fun/functions
+```
+# EXAMPLE: #
+```
+ error "There is a problem."
+```
+# KNOWN BUGS: #
+> None.

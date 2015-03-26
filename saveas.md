@@ -1,0 +1,40 @@
+# USAGE: #
+```
+	saveas exportFormat [optionalParameters] processName
+```
+# DESCRIPTION: #
+> SAVEAS is an internal ADORE command.
+> It prepares DORIS results so that they can be opened by other programs.
+# INPUT: #
+> exportFormat: arcgis, ascii, envi, gdal, giant, grd.
+
+> processName: Doris step to be exported.
+> ## OPTIONAL: ##
+> > `[a|p|m]`
+> > > For single-channel outputs, the output can be specified as (a)mplitude, (p)hase or (m)ixed. If not specified phase is assumed. Phase output can be used to export raw amplitude data, if no rescaling is intended for amplitude values. Amplitude values are rescaled by means of taking their square-root. Mixed output combines amplitude and phase information for display purposes.
+
+> > `saveas arcgis [a|p|m] processName`
+> > > arcgis export files (HFA, img files) can only have single channel (amplitude, phase or mixed). Results of geocoding step are required.
+
+> > `saveas ascii [a|p|m] processName`
+> > > Generates an ascii file, outputting each pixel in lon,lat,data format. Results of geocoding step are required.
+
+> > `saveas envi processName`
+> > > Generates an ENVI header (`*.hdr`) file for the given input file. If file is complex, both real and imaginary channels can be opened in ENVI. Only corner coordinates are used for geocoding. ArcGIS (`*.img`) files can also be opened in ENVI, if geocoding of the entire image is required.
+
+> > `saveas gdal a|p|m processName [options for gdal] outputFileName`
+> > > Generates an interim file and passes it to gdal\_translate. The output filename and all other parameters have to be input by the user. Results of geocoding step are required.
+
+> > `saveas giant [a|p|m] processName`
+> > > Generates an RSC file for GIAnT processing. Geocoding information is taken from the automatically generated resample.kml file.
+
+> > `saveas grd [a|p|m] processName`
+> > > Generates a GMT grid file in Golden Software Surfer format 6 (float) format. Results of geocoding step are required.
+# OUTPUT #
+Generates an output file for the corresponding format.
+
+# EXAMPLE: #
+```
+ saveas gdal p unwrap -of GTiff 200405_200703_uw.tiff   
+ saveas grd p unwrap
+```

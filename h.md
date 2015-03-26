@@ -1,0 +1,14 @@
+# USAGE: #
+```
+	? commandName
+        h commandName
+```
+# DESCRIPTION: #
+? an h are builtin ADORE commands. They displays the help for given adore command.
+
+The help files are also available online at: https://code.google.com/p/adore-doris/wiki
+# INPUT: #
+> commandName: ADORE command name to get help. A list of commands
+> can be found at the end of this help message.
+# OUTPUT #
+> Help message for the specified command, or the help message for this command if no parameter is given.

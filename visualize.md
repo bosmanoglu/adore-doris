@@ -1,0 +1,29 @@
+# USAGE: #
+```
+	visualize coarsecorr|fine
+        visualize map a|p dorisStep[:filename]
+```
+# DESCRIPTION: #
+> VISUALIZE is an internal ADORE command.
+> It generates plots and specific raster data which can not be displayed with [view](view.md).
+> It displays plots and raster images using python-matplotlib, and for geocode python-mpltoolkits.basemap.
+> # INPUT: #
+`coarsecorr|fine|geocode`
+    * coarsecorr: plot the coarse correlation offset vectors.
+    * fine: plot the fine correlation offset vectors.
+    * map: display a geocoded view of the results.
+`a|p`
+> > > Display amplitude or phase (if complex).
+`dorisStep`
+> > > The step for the output. lsprocess can be used to
+> > > get a list of doris processes.
+> > > The step can be in the master, slave or interferogram result file.
+`dorisStep:filename`
+
+> Can be used to specify a filename that is not in the resultfile.
+> This is useful for generating rasters for `*.demlp, *.notmasked` files.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> Displays specific visualizations of generated results on screen.

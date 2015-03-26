@@ -1,0 +1,22 @@
+# USAGE: #
+```
+        lsprocess
+```
+# DESCRIPTION: #
+> lsprocess is an internal/external ADORE command. It shows the
+> list of doris steps to run. List is in column order (read down then right).
+# INPUT: #
+> No input option.
+# OUTPUT #
+> List of doris steps as recognized by adore.
+# EXAMPLE: #
+```
+ADORE: lsprocess
+Available doris processes:
+m_readfiles  s_readfiles  coarseorb   demassist   subtrrefpha  dinsar
+m_porbits    s_porbits    coarsecorr  coregpm     comprefdem   slant2h
+m_crop       s_crop       m_filtazi   resample    subtrrefdem  geocode
+m_simamp                  s_filtazi   filtrange   coherence
+m_timing                  fine        interfero   filtphase
+m_ovs        s_ovs        reltiming   comprefpha  unwrap
+```

@@ -1,0 +1,22 @@
+# USAGE: #
+```
+ calculate_coh_multilook
+```
+# DESCRIPTION: #
+> CALCULATE\_COH\_MULTILOOK is an ADORE function to calculate the coherence
+> multilooking factors based on the multiplication of subtrrefpha and interfero
+> multilooking parameters.
+# INPUT: #
+> There are no required input parameters for this command.
+> ## OPTIONAL: ##
+> > There are no optional input parameters for this command.
+# OUTPUT #
+
+> Prints out the multiplication of srp\_multilook and int\_multilook parameters.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/scr/fun/functions
+```
+# EXAMPLE: # ADORE: calculate_coh_multilook 
+ 5 1
+```

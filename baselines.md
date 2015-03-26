@@ -1,0 +1,30 @@
+# USAGE: #
+```
+ baselines
+```
+# DESCRIPTION: #
+> baselines is an ADORE function to provide a shorthand to run baselines.adr
+> located in ${ADOREFOLDER}/templates/baselines.adr. It generates a single
+> master stack baseline table and plot using the active ADORE settings. This
+> command is equivalent to run: "p ${ADOREFOLDER}/templates/baselines.adr".
+# INPUT: #
+> There are no input parameters.
+# OUTPUT #
+> Creates ${projectFolder}/process/${runName}/baselines
+> It runs the following DORIS steps:
+> > m\_readfiles, m\_porbits, coarseorb
+
+> If GNUPLOT is installed it creates a baseline plot (eps).
+> If IMAGEMAGICK is installed it converts the plot (eps) to a raster image
+> format specified by "raster\_format" ADORE variable.
+# FILES and REFERENCES: #
+```
+ ${ADOREFOLDER}/scr/fun/functions
+ ${ADOREFOLDER}/templates/baselines.adr
+```
+# EXAMPLE: #
+```
+ baselines
+```
+# KNOWN BUGS: #
+> None.
