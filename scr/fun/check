@@ -525,18 +525,23 @@ fi
 function checkUpdates(){ 
 #Download current version
 mkdir -p ${tmpFolder}
-wget http://adore-doris.googlecode.com/svn/trunk/version -O ${tmpFolder}/version
+# wget http://adore-doris.googlecode.com/svn/trunk/version -O ${tmpFolder}/version
+wget https://raw.githubusercontent.com/bosmanoglu/adore-doris/master/version -O ${tmpFolder}/version
 svn_version=`cat ${tmpFolder}/version | tr -d ".r"`  
 cur_version=`cat ${ADOREFOLDER}/version | tr -d ".r"`
 #compare versions
 if [ ${svn_version} -gt ${cur_version} ]; then
  echo "A new version is available."
  if ask "Would you like to upgrade?"; then
+  wget https://github.com/bosmanoglu/adore-doris/archive/master.zip -O /${tmpFolder}/master.zip
+  unzip ${tmpFolder}/master.zip -d ${tmpFolder}
   touch ${ADOREFOLDER}/version
   if [ $? -eq 0 ]; then
-    svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+    # svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+    mv ${tmpFolder}/adore-doris-master ${ADOREFOLDER}
   else
-    sudo svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+    # sudo svn export --force http://adore-doris.googlecode.com/svn/trunk/ ${ADOREFOLDER}
+    sudo mv ${tmpFolder}/adore-doris-master ${ADOREFOLDER}
   fi
   echo "Please restart ADORE to make sure all changes are in effect."
  fi 
