@@ -21,6 +21,7 @@
 #               stitchMethod 4 : Using gdal_merge EHDR output (ADORE compatible)
 #	W E S N: The corner coordinates of the study area. Enter West and South as - (negative)
 #		values. Decimals are ignored maximizing the area (i.e. floor(west), ceil(east)) 
+#               Use -- before entering coordinates if any of the coordinates are negative. (e.g. -- -100 -98 18 20)
 #
 # NOTES: 
 #	It is advised that all username, password, category and localFolder options are given.
