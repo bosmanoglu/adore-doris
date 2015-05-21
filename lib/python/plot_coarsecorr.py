@@ -16,8 +16,8 @@ def main(argv=None):
   pylab.figure()
   pylab.title('Coarse Correlation Results')
   Q=pylab.quiver(A[:,2], A[:,1], A[:,5], A[:,4], A[:,3]);
-  azAvg=round(pylab.np.mean(A[:,3]));
-  rgAvg=round(pylab.np.mean(A[:,4]));
+  azAvg=round(pylab.np.mean(A[:,4]));
+  rgAvg=round(pylab.np.mean(A[:,3]));
   qk = pylab.quiverkey(Q, 0.33, 0.92, azAvg, ('%d [px az]' % (azAvg)), labelpos='W', fontproperties={'weight': 'bold'})
   qk = pylab.quiverkey(Q, 0.66, 0.92, rgAvg, ('%d [px rg]' % (rgAvg)), labelpos='W', fontproperties={'weight': 'bold'})
   pylab.colorbar()
@@ -26,8 +26,8 @@ def main(argv=None):
   pylab.figure()
   pylab.title('Coarse Correlation Deviations')
   Q=pylab.quiver(A[:,2], A[:,1], A[:,5]-rg, A[:,4]-az, A[:,3]);
-  azStd=round(pylab.np.std(A[:,3]-az));
-  rgStd=round(pylab.np.std(A[:,4]-rg));
+  azStd=round(pylab.np.std(A[:,4]-az));
+  rgStd=round(pylab.np.std(A[:,3]-rg));
   qk = pylab.quiverkey(Q, 0.33, 0.92, azStd, ('%d [px az]' % (azStd)), labelpos='W', fontproperties={'weight': 'bold'})
   qk = pylab.quiverkey(Q, 0.66, 0.92, rgStd, ('%d [px rg]' % (rgStd)), labelpos='W', fontproperties={'weight': 'bold'})
 
