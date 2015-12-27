@@ -421,6 +421,14 @@ function openInIpython(){
 	. ${ADORESCR}/fun/openInIpython
 }
 
+function openInMatlab(){
+	. ${ADORESCR}/fun/openInMatlab
+}
+
+function openInOctave(){
+	. ${ADORESCR}/fun/openInOctave
+}
+
 function quejob(){
 	. ${ADORESCR}/fun/quejob "$@"
 }

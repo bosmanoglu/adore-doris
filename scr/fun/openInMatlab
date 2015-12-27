@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+function runMatlab(){
+export tmpFolder
+local cmd="${@}"
+mkdir -p ${tmpFolder}
+settings list &> ${tmpFolder}/settings.set
+echo "[_mat_]" &>> ${tmpFolder}/settings.set
+s _mat_ |sed 's/_mat_//g' &>> ${tmpFolder}/settings.set
+
+if [ -z "${cmd}" ]; then 
+  if [ "${g-notGui}" != "notGui" ]; then
+     matlab -r "addpath('/d0/bosmanoglu/projectLocker/adore-doris/trunk/lib/matlab');startup"
+  else
+     matlab -nodesktop -r "addpath('/d0/bosmanoglu/projectLocker/adore-doris/trunk/lib/matlab');startup"
+  fi
+elif [ -f "${cmd}" ]; then
+  cat "${cmd}" | matlab -nodesktop -r "addpath('/d0/bosmanoglu/projectLocker/adore-doris/trunk/lib/matlab');startup" 
+else
+  (echo "${cmd}" ) | matlab -nodesktop -r "addpath('/d0/bosmanoglu/projectLocker/adore-doris/trunk/lib/matlab');startup"
+fi
+}
+
+####### MAIN
+runMatlab ${@}
