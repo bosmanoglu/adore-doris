@@ -1,0 +1,34 @@
+#!/bin/bash
+# USAGE:
+#	resample2s_crop
+#
+# DESCRIPTION:
+#  RESAMPLE2S_CROP is an internal ADORE command. 
+#
+#  resample2s_crop copies the result of s_resample as m/s_ovs or m/s_crop.
+#
+#  Selection between ovs and crop is done automatically. If m/s_ovs is in the
+#  process control flag, ovs is used. Otherwise m/s_crop is used. 
+#
+# INPUT:
+#  There are no required input parameters for this command.
+#  
+# OUTPUT:
+#  Modifies the result file, makes a backup copy. 
+
+function fun_crop2resample(){
+cp ${s_resfile} ${s_resfile%%.res}_res_$( date +%Y%m%d-%H.%M.%S ).bck
+copyRes.sh ${s_resfile} resample ${s_resfile} crop
+}
+function fun_ovs2resample(){
+cp ${s_resfile} ${s_resfile%%.res}_res_$( date +%Y%m%d-%H.%M.%S ).bck
+copyRes.sh ${s_resfile} resample ${s_resfile} oversample
+}
+###MAIN
+if [ `readRes.sh ${m_resfile} process_control oversample` == "1" ]; then
+  fun_ovs2resample ${@}
+elif [ `readRes.sh ${m_resfile} process_control crop` == "1" ]; then
+  fun_crop2resample ${@}
+else
+  error "resample2s_crop: m_ovs or m_crop steps are not in m_resfile."
+fi

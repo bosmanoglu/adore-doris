@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+function runOctave(){
+export tmpFolder
+local cmd="${@}"
+mkdir -p ${tmpFolder}
+settings list &> ${tmpFolder}/settings.set
+echo "[_mat_]" &>> ${tmpFolder}/settings.set
+s _mat_ |sed 's/_mat_//g' &>> ${tmpFolder}/settings.set
+
+if [ -z "${cmd}" ]; then 
+  if [ "${g-notGui}" != "notGui" ]; then
+     octave --persist $ADOREFOLDER/lib/matlab/startup.m &
+  else
+     octave-cli --persist $ADOREFOLDER/lib/matlab/startup.m
+  fi
+elif [ -f "${cmd}" ]; then
+  cat "${cmd}" | octave-cli $ADOREFOLDER/lib/matlab/startup.m 
+else
+  (echo "${cmd}" ) | octave-cli $ADOREFOLDER/lib/matlab/startup.m
+fi
+}
+
+####### MAIN
+runOctave ${@}
