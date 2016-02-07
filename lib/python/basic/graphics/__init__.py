@@ -641,4 +641,56 @@ def manual_translation_scatter(master, sx,sy,sz, dotsize=1):
     coord=(m[0]*0.5,m[1]*0.5)
     fig.canvas.mpl_connect('button_release_event', onrelease);
     fig.canvas.mpl_connect('key_press_event', onkeypress);
-    return fig       
+    return fig      
+
+def distance_from_colorbar(im, c=P.cm.jet(np.arange(256))):
+  """ This function calculates a distance value for all pixels of an image given a colorbar. 
+      It also returns the best fitting colorbar class for each pixel.
+  e.g.: 
+    import cv2
+    im=cv2.cvtColor(cv2.imread('REsults_zonaSur_cut.tiff'), cv2.COLOR_BGR2RGB);
+    dist, classes=distance_from_colorbar(im);
+  """
+  import time
+  N=c.shape[0];
+  cmax=2**np.round(np.log2(im.max()))
+  if c.max() != cmax:
+    c256=c*cmax/c.max(); #colorbar in uint8 
+  else:
+    c256=c;
+      
+  dist=np.ones((im.shape[0], im.shape[1]))*np.inf; 
+  distOld=dist.copy();
+  classes=np.zeros((im.shape[0], im.shape[1]));
+  ccc=0; #current class counter
+  t0=0; #time.time(); #show 0.0 at the beginning of the loop. 
+  for k in c256:
+    dist   =np.dstack([dist, np.sqrt( (im[:,:,0]-k[0])**2. + (im[:,:,1]-k[1])**2. + (im[:,:,2]-k[2])**2. )]).min(2);
+    classes[dist!=distOld]=ccc;
+    ccc=ccc+1;distOld=dist;
+    if basic.progresstime(t0):
+      basic.progress(ccc,N);t0=time.time();
+  return dist, classes;
+
+def data_from_image(im, classes, mask, limits=[0.,1.]):
+  """ This function extracts the data from a image, based on the classes and a mask. 
+      Once the data is masked, a look-up-table is used to set values to the classes. 
+  """
+  import time;
+  N=int (basic.nonan(classes).max()+1) ; # zero is a class... 
+  classes[mask]=np.nan
+  classLimits=np.linspace(np.min(limits), np.max(limits), N);
+  
+  cmax=2**np.round(np.log2(im.max()));
+  imSingle=im[:,:,0]*(cmax**0)+im[:,:,1]*(cmax**1)+im[:,:,2]*(cmax**2.);
+  data=np.zeros(imSingle.shape); 
+  t0=0;
+  for k in xrange(N-1):
+    #for each class do a linear interpolation
+    if np.any(classes==k):
+      data[classes==k]=basic.rescale(imSingle[classes==k], classLimits[k:k+2], quiet=True);
+    if basic.progresstime(t0):
+      basic.progress(k,N); t0=time.time();
+  data[mask]=np.nan;
+  return data;
+

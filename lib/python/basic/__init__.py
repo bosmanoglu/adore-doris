@@ -234,6 +234,7 @@ def fillNan(arr, copy=True, method='quick', maxiter=None):
         return data
     else:
         import scipy
+        import scipy.interpolate
         X, Y= meshgrid(r_[0:arr.shape[1]], r_[0:arr.shape[0]])
         m=~isnan(arr)
         z=arr[m]
@@ -326,10 +327,26 @@ def maskshow(array, mask=None, **kwargs):
     ''' maskshow(array, mask=None)
     Ex: maskshow(kum.topoA[:,:,0], mask<0.5)
     '''
-    maskedArray=array.copy();
-    if mask != None:          
-        maskedArray[mask]=nan;
-    return plt.matshow(maskedArray, **kwargs);
+
+    if array.ndim==4: # use imshow instead of matshow...
+        maskedArray=array.copy();
+        if mask != None:
+            mask=255*abs(double(mask)-1);
+            maskedArray[:,:,3] =mask;
+        return plt.imshow(maskedArray, **kwargs);
+    elif array.ndim==3: # use imshow instead of matshow...
+        maskedArray=zeros((array.shape[0], array.shape[1], 4), dtype=array.dtype)
+        maskedArray[:,:,0:3]=array;
+        if mask != None:
+            mask=255*abs(double(mask)-1);
+            maskedArray[:,:,3] =mask;
+        plt.imshow(maskedArray, **kwargs);
+        return maskedArray
+    elif array.ndim==2:
+        maskedArray=array.copy();
+        if mask != None:          
+            maskedArray[mask]=nan;
+        return plt.matshow(maskedArray, **kwargs);
 
 def mdot(listIn):
     ''' out=mdot([A,B,C])
@@ -380,11 +397,15 @@ def progresstime(t0=0,timeSpan=30):
     else:
         return False;
         
-def rescale(arr, lim, trim=False, arrlim=None):
-    """rescale(array, limits, trim=False, arrlim=None)
+def rescale(arr, lim, trim=False, arrlim=None, quiet=False):
+    """rescale(array, limits, trim=False, arrlim=None, quiet=False)
     scale the values of the array to new limits ([min, max])
     Trim:
       With this option set to a number, the limits are stretced between [mean-TRIM*stdev:mean+TRIM*stdev]
+    arrlim: 
+      If given the limits are not calculated (useful if array has nan/inf values).
+    quiet:
+      If True, won't print the min/max values for the array. 
     """
     if arrlim is not None:
         minarr=arrlim[0];
@@ -397,7 +418,8 @@ def rescale(arr, lim, trim=False, arrlim=None):
     elif (trim==False) & (arrlim is None):
         minarr=arr.min()
         maxarr=arr.max()
-    print [minarr, maxarr]        
+    if not quiet:
+      print [minarr, maxarr]        
     newarr=(arr-minarr)/(maxarr-minarr)*(lim[1]-lim[0])+lim[0]
     newarr[newarr<lim[0]]=lim[0]
     newarr[newarr>lim[1]]=lim[1]
