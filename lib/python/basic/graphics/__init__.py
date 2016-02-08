@@ -641,4 +641,44 @@ def manual_translation_scatter(master, sx,sy,sz, dotsize=1):
     coord=(m[0]*0.5,m[1]*0.5)
     fig.canvas.mpl_connect('button_release_event', onrelease);
     fig.canvas.mpl_connect('key_press_event', onkeypress);
-    return fig       
+    return fig     
+
+def z2rgb(z):
+  z=abs(np.log10(z))*np.exp(1j*np.angle(z));
+  r = abs(z);
+  [d1,d2]=z.shape;
+  a = np.sqrt(1/6)*np.real(z);
+  b = np.sqrt(1/2)*np.imag(z);
+  d = 1./(1+r**2);
+  R = 1/2 + np.sqrt(2/3)*np.real(z)*d;
+  G = 1/2 - d*(a-b);
+  B = 1/2 - d*(a+b);
+  d = 1/2 - r*d;
+  d[r<1] = -d[r<1];
+  C=np.zeros([d1,d2,3]);
+  C[:,:,0] = R + d;
+  C[:,:,1] = G + d;
+  C[:,:,2] = B + d;
+  f=P.figure();
+  P.imshow(C);  
+  return f
+
+def z2rgba(z):
+  z=abs(np.log10(z))*np.exp(1j*np.angle(z));
+  r = abs(z);
+  [d1,d2]=z.shape;
+  a = np.sqrt(1/6)*np.real(z);
+  b = np.sqrt(1/2)*np.imag(z);
+  d = 1./(1+r**2);
+  R = 1/2 + np.sqrt(2/3)*np.real(z)*d;
+  G = 1/2 - d*(a-b);
+  B = 1/2 - d*(a+b);
+  d = 1/2 - r*d;
+  d[r<1] = -d[r<1];
+  C=np.zeros([d1,d2,3]);
+  C[:,:,0] = R + d;
+  C[:,:,1] = G + d;
+  C[:,:,2] = B + d;
+  f=P.figure();
+  P.imshow(C);  
+  return f
