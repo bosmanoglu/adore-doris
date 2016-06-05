@@ -465,6 +465,15 @@ def tic():
     return time.time()
 
 def transect(x,y,z,x0,y0,x1,y1,plots=0):
+    ''' (xi, yi, zi)=transect(x,y,z,x0,y0,x1,y1,plots=0)
+    x: 2-D array of x coordinates
+    y: 2-D array of y coordinates
+    z: 2-D array of z values
+    x0,y0,x1,y1: scalar coordinates
+    plots=0: do not show plots
+    outputs
+    xi,yi,zi: vectors of x,y coordinates and z values along transect.
+    '''
     #convert coord to pixel coord
     d0=sqrt( (x-x0)**2+ (y-y0)**2 );
     i0=d0.argmin();

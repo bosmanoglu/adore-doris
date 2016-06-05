@@ -734,3 +734,10 @@ def data_from_image(im, classes, mask, limits=[0.,1.]):
   data[mask]=np.nan;
   return data;
 
+def class2data(classes, c=P.cm.jet(np.arange(256)), limits=[0., 1.]):
+  """ Find the closest value in the colormap.
+  """
+  N=c.shape[0];
+  data=classes/N*[np.max(limits)-np.min(limits)]+np.min(limits)
+  return data;
+  

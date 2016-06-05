@@ -43,6 +43,13 @@ def usage():
     print __doc__
 
 def fitSurface(x,y,z, weight=None, order=1):
+    """planefit, fitfunc=fitSurface(x,y,z, weight=None, order=1)
+    x,y,z: vectors 
+    weight: vector same size as x
+    Known Bugs: If data contains nan values, fit might fail quietly. 
+    """
+    if any(isnan(z)):
+        print("Data contains nan values. Fit might fail.");
     if weight is not None:
         w=weight;
     else:
@@ -56,7 +63,7 @@ def fitSurface(x,y,z, weight=None, order=1):
     else:
         print "order has to be 1 or 2."
         return -1
-    errfunc = lambda p, x, y, z, w: w*(fitfunc(p,x,y) - z)
+    errfunc = lambda p, x, y, z, w: abs(w*(fitfunc(p,x,y) - z))
     planefit, success=scipy.optimize.leastsq(errfunc, p0, args=(x,y,z,w))
     return planefit, fitfunc
 
