@@ -33,7 +33,7 @@
 #       $dataFolder variable. Keep in mind that the dataFolder will be set
 #       to the newly created output data folder.  
 #
-# scenes rename [date,datetime,orbit,trackframe,bistatic]:
+# scenes rename [datetime (for CSK),bistatic (for TDX)]:
 #	rename scenes in the data folder given the naming convention.
 #
 # scenes rescan: 
@@ -126,7 +126,7 @@ function detectSatellite(){
 # STAMPS3.2/link_slcs:goodSense(), Mahmut Arikan - 20091021 
 local DATADIR="${1}"
   #local firstDATADIR=`canonicalPath "${DATADIR}/*"| head -n 1`
-  echo "I can detect: ERS1/2, ASAR, TSX, TDX, CSK1-4, GAMMA, and ADORE SLC images for now."
+  echo "I can detect: ERS1/2, ASAR, TSX, TDX, CSK1-4, GAMMA, ADORE, and GMTSAR SLC images for now."
   echo "If you are using other datasets please setup the dataFolder manually."
   m_in_method='UNKNOWN'
   #if $( ls -1 ${firstDATADIR}/CSK*.h5 &> /dev/null ); then
@@ -146,6 +146,14 @@ local DATADIR="${1}"
     volumeFile="System.par"
     echo "Please verify patterns for dataFile, leaderFile and volumeFile."
     getInfoFromUser "${DATADIR}"
+  elif [ $( find -L "${DATADIR}" -maxdepth 2 -name "*.PRM" 2> /dev/null | wc -l ) -gt 0 ]; then
+    m_in_method="GMTSAR"
+    dataFile="*.SLC"
+    leaderFile="*.PRM"
+    volumeFile="*.LED"
+    slcType="GMTSAR"
+    #echo "Please verify patterns for dataFile, leaderFile and volumeFile."
+    #getInfoFromUser "${DATADIR}"
   #elif $( ls -1 ${firstDATADIR}/ASA* &>/dev/null ); then
   elif [ $( find -L "${DATADIR}" -maxdepth 2 -name "ASA*" 2> /dev/null | wc -l ) -gt 0 ]; then
     m_in_method='ASAR'    
@@ -175,6 +183,23 @@ local DATADIR="${1}"
   fi  
 }
 
+function gmtsar2m_in_method(){
+case "$1" in
+1)
+  echo "ERS";
+  ;;
+2)
+  echo "ERS";
+  ;;
+4)
+  echo "ASAR";  
+  ;;
+5)
+  echo "ALOS";
+  ;;
+esac
+}
+
 function setSlcRes(){
   if [ "${m_in_method}" == "ERS" ]; then
     slc_az_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
@@ -194,6 +219,14 @@ function setSlcRes(){
     m_in_method=`productType2m_in_method ${productType}`
     setSlcRes
     m_in_method="ADORE" 
+  elif [ "${m_in_method}" == "GMTSAR" ]; then
+    #slc_az_res=`grep "^az_res" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f3 -d","`;
+    #slc_rg_res=
+    local satID=`grep "^SC_identity" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f3 -d","`;
+    m_in_method=`gmtsar2m_in_method ${satID}`
+    echo "Temporarily setting m_in_method as ${m_in_method}"
+    setSlcRes
+    m_in_method="GMTSAR"    
   else 
     echo "I am unable to detect the imaging mode for ${m_in_method}."
     echo "I have the following information in my database which may help you [mode,az,rg]:"
@@ -212,7 +245,7 @@ function setSlcRes(){
 
 function getInfoFromUser(){
   local DATADIR="${1}"
-  bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, RADARSAT-2, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA"
+  bold "What is the m_in_method? Available options are: ERS, ASAR, RSAT, RADARSAT-2, ATLANTIS, JERS, ALOS, TSX, CSK, GAMMA, GMTSAR, ADORE"
   echo "Current setting: [${m_in_method}]"
   read userInput
   [ -n "${userInput}" ] && settings apply -r ${q} m_in_method="${userInput}"      
@@ -372,7 +405,7 @@ local date
       ln -s ${f}/${volumeFile} ${dataFolder}/${date}/
       ln -s ${f}/${nullFile} ${dataFolder}/${date}/
     else
-      error "Can not add ${fd}. Not a GAMMA focused SLC?"
+      error "Can not add ${f}. Can not find date in ${f}/${leaderFile}. Not a GAMMA focused SLC?"
     fi
     #fi
   done
@@ -406,6 +439,38 @@ local f bname date
     ln -s "${f}" "${dataFolder}/${date}"                 # h5
   done
 }
+
+function linkGMTSAR(){
+#Modified from
+# linkGAMMA
+local DATADIR=${1}
+local date
+  #for f in $(ls -1d ${DATADIR}/*); do
+  for fl in $(find -L "${DATADIR}" -name "${dataFile}"); do
+    #echo info: $f
+    #date=$( awk '/ORBIT/{print substr($5,1,8)}' ${f}/L* )
+    local f=`dirname ${fl}`
+    local b=`basename ${fl}`
+    b=`echo ${b%%.*}`
+    #if [ -d "${f}" ]; then 
+    date=`awk '/SC_clock_start/{printf "%8d",$3}' ${f}/${b}.PRM | tr -d [:blank:] `
+    if [ $? -eq 0 ]; then 
+      if [ -d "${dataFolder}/${date}" ]; then 
+        error "Can not add already existing data: ${f}"
+        continue
+      fi
+      mkdir -p ${dataFolder}/${date}
+      ln -s ${f}/${b}.PRM ${dataFolder}/${date}/
+      ln -s ${fl} ${dataFolder}/${date}/
+      ln -s ${f}/${b}.LED ${dataFolder}/${date}/
+      #ln -s ${f}/${nullFile} ${dataFolder}/${date}/
+    else
+      error "Can not add ${fl}. Problem with the *.PRM file. Not a GMTSAR focused SLC?"
+    fi
+    #fi
+  done
+}
+
 
 function scenes_init(){
 if [ "${1:-isEmpty}" == "isEmpty" ]; then
@@ -445,6 +510,9 @@ CSK)
 ADORE)
   linkADORE "${rawDataFolder}";
   ;;
+GMTSAR)
+  linkGMTSAR "${rawDataFolder}";
+  ;;
 esac
 
 [ -z "${master}"	] && master=`ls -F ${dataFolder}/ 2>/dev/null |grep "/" | head -n 1|tr -d "/"|tr -d [:blank:] |tr -d "\n" 2>/dev/null`
@@ -483,6 +551,9 @@ do
     ;;
   ADORE)
     linkADORE "${rawDataFolder}";
+    ;;
+  GMTSAR)
+    linkGMTSAR "${rawDataFolder}";
     ;;
   esac
 done
