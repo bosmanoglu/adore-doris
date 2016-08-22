@@ -202,11 +202,11 @@ esac
 
 function setSlcRes(){
   if [ "${m_in_method}" == "ERS" ]; then
-    slc_az_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
-    slc_rg_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_az_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_rg_res=`grep "^ERS" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
   elif [ "${m_in_method}" == "ASAR" ]; then
-    slc_az_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
-    slc_rg_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_az_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f3 -d","`
+    slc_rg_res=`grep "^ASAR,Stripmap" "${ADOREFOLDER}/set/resolution.csv" | cut -f4 -d","`
   elif [ "${m_in_method}" == "GAMMA" ]; then
     slc_az_res=`grep "^azimuth_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`
     slc_rg_res=`grep "^range_resolution" "${m_in_lea}" | tr -s "[:blank:]" ","| cut -f2 -d","`

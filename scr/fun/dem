@@ -195,51 +195,73 @@ function makeSrtmDem(){
       m_readfiles
     fi
   fi
-  if [ "${slc_rg_res:-isEmpty}" == "isEmpty" ] || [ "${slc_az_res:-isEmpty}" == "isEmpty" ]; then
-    if [ ! -e ${i_resfile} ]; then
-      echo "I can not find the i_resfile. This is required to calculate pixel size."
-      echo "Please specify azimuth and range resolution manually in the following variables: slc_az_res, slc_rg_res"
-      echo "Or you can run the coarse_orbits step and re-run dem make."
-      return;
-    else
-      radar_band_width=`readRes.sh ${m_resfile} readfiles Total_range_band_width | tr -d '\n'`
-      echo "Radar Band Width=${radar_band_width}"
-      inc_angle=`readRes.sh ${i_resfile} coarse_orbits inc_angle | tr -d '\n'`
-      [ -z "${inc_angle}" ] && echo -e "Can not read incidence angle from ${i_resfile}. \n Using default:23.2" && inc_angle=23.2
-      # get range resolution
-      [ -z "${slc_rg_res}" ] && slc_rg_res=`echo "2.99e8 ${radar_band_width} ${inc_angle}" | awk '{PI=3.14159;printf "%d", $1/($2*1e6*cos($3/180*PI))};'`
-      if [ -z "${slc_az_res}" ]; then
-        [ "${m_in_method}" == "ASAR" -o  "${m_in_method}" == "ERS" ] && slc_az_res=`echo "${slc_rg_res}" | awk '{printf "%d", $1/5};'`
-        [ "${m_in_method}" == "TSX" ] && slc_az_res=2.4 #Antenna L=4.8m theoretical stripmap res=L/2
-      fi
-    fi
+#  if [ "${slc_rg_res:-isEmpty}" == "isEmpty" ] || [ "${slc_az_res:-isEmpty}" == "isEmpty" ]; then
+#    if [ ! -e ${i_resfile} ]; then
+#      echo "I can not find the i_resfile. This is required to calculate pixel size."
+#      echo "Please specify azimuth and range resolution manually in the following variables: slc_az_res, slc_rg_res"
+#      echo "Or you can run the coarse_orbits step and re-run dem make."
+#      return;
+#    else
+#      radar_band_width=`readRes.sh ${m_resfile} readfiles Total_range_band_width | tr -d '\n'`
+#      echo "Radar Band Width=${radar_band_width}"
+#      inc_angle=`readRes.sh ${i_resfile} coarse_orbits inc_angle | tr -d '\n'`
+#      [ -z "${inc_angle}" ] && echo -e "Can not read incidence angle from ${i_resfile}. \n Using default:23.2" && inc_angle=23.2
+#      # get range resolution
+#      [ -z "${slc_rg_res}" ] && slc_rg_res=`echo "2.99e8 ${radar_band_width} ${inc_angle}" | awk '{PI=3.14159;printf "%d", $1/($2*1e6*cos($3/180*PI))};'`
+#      if [ -z "${slc_az_res}" ]; then
+#        [ "${m_in_method}" == "ASAR" -o  "${m_in_method}" == "ERS" ] && slc_az_res=`echo "${slc_rg_res}" | awk '{printf "%d", $1/5};'`
+#        [ "${m_in_method}" == "TSX" ] && slc_az_res=2.4 #Antenna L=4.8m theoretical stripmap res=L/2
+#      fi
+#    fi
+#  fi
+#  echo "SLC resolution [Azimuth x Range]: ${slc_az_res} x ${slc_rg_res}"
+#  ## get center coordinates
+#  center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude  |awk '{printf "%f", $1};'`
+#  center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude |awk '{printf "%f", $1};'`
+#  ## get crop size
+#  #last_step="readfiles" #`check ${s_resfile} | grep -w "1" | cut -f2 -d:`
+#  #first_line=`readRes.sh ${m_resfile} ${last_step} First_line | tr -d '\n'`
+#  #last_line=`readRes.sh ${m_resfile} ${last_step} Last_line  | tr -d '\n'`
+#  #first_pixel=`readRes.sh ${m_resfile} ${last_step} First_pixel | tr -d '\n'`
+#  #last_pixel=`readRes.sh ${m_resfile} ${last_step} Last_pixel | tr -d '\n'`
+#  size_rg=`readRes.sh ${m_resfile} readfiles Number_of_pixels_original | tr -d '\n'` #`echo "${last_pixel} ${first_pixel}" | awk '{printf "%d", $1-$2+1};'`
+#  size_az=`readRes.sh ${m_resfile} readfiles Number_of_lines_original | tr -d '\n'`#`echo "${last_line} ${first_line}" | awk '{printf "%d", $1-$2+1};'`
+#    
+#  ## find bounding box
+#  size_rg_km=`echo "${size_rg} ${slc_rg_res} ${buffer}" | awk '{printf "%d", ($1*$2/1000)*(100+$3)/100};'`
+#  size_az_km=`echo "${size_az} ${slc_az_res} ${buffer}" | awk '{printf "%d", ($1*$2/1000)*(100+$3)/100};'`
+#  echo "DEM size in km [Azimuth x Range]: ${size_az_km} x ${size_rg_km}"
+#  dem_area=`boundingBox.sh $center_lat $center_lon $size_rg_km $size_az_km | tr -d '\n'`  
+#  echo "Calculated bounding box for input: ${dem_area}"
+  
+  ## find bounding box:
+  mkdir -p ${tmpFolder}
+  cp ${m_resfile} ${tmpFolder}/m_simamp_resfile.bck
+  undo only m_simamp
+  dem load ${ADOREFOLDER}/lib/dem/fakeDem.bil
+  m_simamp &> ${tmpFolder}/m_simamp.log
+  mv ${tmpFolder}/m_simamp_resfile.bck ${m_resfile}
+  dem_area=`grep "DEM input required" ${tmpFolder}/m_simamp.log`
+  #dem_area=`echo ${dem_area##* } | tr "/" " "`
+  dem_area=`echo ${dem_area##* } ${buffer}| tr "/" " " | awk '{A=($2-$1)*$5/100;B=($4-$3)*$5/100;printf("%f %f %f %f\n",$1-A, $2+A, $3-B, $4+B)}'`
+  ## call eio
+  #dem_area is in wesn, eio uses w s e n
+  dem_array=($dem_area)
+  dem_area="${dem_array[0]} ${dem_array[2]} ${dem_array[1]} ${dem_array[3]}"
+  if [ -e ${name}.bil ] && [[ "${overwrite^^}" == *ON* ]]; then 
+    rm -rf ${name%.*}.bil ${name%.*}.hdr
   fi
-  echo "SLC resolution [Azimuth x Range]: ${slc_az_res} x ${slc_rg_res}"
-  ## get center coordinates
-  center_lat=`readRes.sh ${m_resfile} readfiles Scene_centre_latitude  |awk '{printf "%f", $1};'`
-  center_lon=`readRes.sh ${m_resfile} readfiles Scene_centre_longitude |awk '{printf "%f", $1};'`
-  ## get crop size
-  #last_step="readfiles" #`check ${s_resfile} | grep -w "1" | cut -f2 -d:`
-  #first_line=`readRes.sh ${m_resfile} ${last_step} First_line | tr -d '\n'`
-  #last_line=`readRes.sh ${m_resfile} ${last_step} Last_line  | tr -d '\n'`
-  #first_pixel=`readRes.sh ${m_resfile} ${last_step} First_pixel | tr -d '\n'`
-  #last_pixel=`readRes.sh ${m_resfile} ${last_step} Last_pixel | tr -d '\n'`
-  size_rg=`readRes.sh ${m_resfile} readfiles Number_of_pixels_original | tr -d '\n'` #`echo "${last_pixel} ${first_pixel}" | awk '{printf "%d", $1-$2+1};'`
-  size_az=`readRes.sh ${m_resfile} readfiles Number_of_lines_original | tr -d '\n'`#`echo "${last_line} ${first_line}" | awk '{printf "%d", $1-$2+1};'`
-    
-  ## find bounding box
-  size_rg_km=`echo "${size_rg} ${slc_rg_res} ${buffer}" | awk '{printf "%d", ($1*$2/1000)*(100+$3)/100};'`
-  size_az_km=`echo "${size_az} ${slc_az_res} ${buffer}" | awk '{printf "%d", ($1*$2/1000)*(100+$3)/100};'`
-  echo "DEM size in km [Azimuth x Range]: ${size_az_km} x ${size_rg_km}"
-  dem_area=`boundingBox.sh $center_lat $center_lon $size_rg_km $size_az_km | tr -d '\n'`  
-  echo "Calculated bounding box for input: ${dem_area}"
-
+  echo "Creating DEM with: eio --product ${srtm^^} clip -o ${name}.tif --bounds ${dem_area}"
+  eio --product ${srtm^^} clip -o ${name}.tif --bounds ${dem_area}
+  convertGdalDem ${name}.tif 
+  demLoad ${name%.*}.bil
   ## call construct_dem.sh
-  echo "Creating DEM with: construct_dem.sh ${name} ${dem_area} ${srtm}"
-  construct_dem.sh ${name} ${dem_area} ${srtm}
+  #echo "Creating DEM with: construct_dem.sh ${name} ${dem_area} ${srtm}"
+  #construct_dem.sh ${name} ${dem_area} ${srtm}
   ## modify settings
-  settings_file="${name}/input.doris_${name}"  
-  updateSrtmDemsettings "${settings_file}" "${name}/final_${name}.dem"
+  #settings_file="${name}/input.doris_${name}"  
+  #updateSrtmDemsettings "${settings_file}" "${name}/final_${name}.dem"
+   
 }
 
 
