@@ -325,6 +325,7 @@ function demLoad(){
   fi
   #read input settings 	
   if [ -e "${demFile}" ]; then
+    demFile=`canonicalPath $demFile`
     if [[ "${demFile}" == *.dem* ]]; then
       echo "You are using this SRTM DEM: ${demFile}"
       #get input settings file.
@@ -354,7 +355,7 @@ function demLoad(){
       fi
     elif [[ "${demFile}" == *.grd* ]]; then
       echo "You are using a GMT grid file as DEM: ${demFile}"
-      updateGrdDemSettings `canonicalPath ${demFile}`
+      updateGrdDemSettings ${demFile} # `canonicalPath ${demFile}`
     elif [[ "${demFile}" == *.bil* ]]; then
       echo "You are using ESRI .hdr labelled *.BIL format as DEM."
       demPath=`dirname ${demFile}`

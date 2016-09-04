@@ -37,7 +37,11 @@ def select_pairs(scene, btemp, bperp, bdopp=None, btemp_limits=[0,400],bperp_lim
                 pairs.append((scene[m], scene[s]));
     elif method=='delaunay':
         # get delaunay triangulation
-        cens, edges, tri, neig = P.matplotlib.delaunay.delaunay(btemp, bperp)        
+        try:
+          cens, edges, tri, neig = P.matplotlib.delaunay.delaunay(btemp, bperp)        
+        except:
+          triang = P.matplotlib.tri.Triangulation(btemp,bperp)
+          edges=triang.edges
         # remove long pairs
         for e in edges:
             m=e[0]

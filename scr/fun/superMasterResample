@@ -112,4 +112,6 @@ resampleFolder="${runFolder}/resample"
 [ ! -d "${cropsFolder}/${resampleMaster}" ] && error "Bad super master. ${cropsFolder}/${resampleMaster} does not exist." && return 
 [ "${rs_dbow}" == "0 0 0 0" ] && [ "${rs_dbow_geo}" == "0 0 0 0" ] && error "Please specify rs_dbow or rs_dbow_geo." && return
 processResample
+#cleanup
+unset singleSlave
 

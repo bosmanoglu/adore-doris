@@ -5,6 +5,7 @@ from osgeo.gdal_array import *
 from osgeo.gdalconst import * 
 from PIL import Image
 import pylab as P
+import os
 N=P.np
 
 
@@ -14,7 +15,7 @@ def readData(filename, ndtype=N.float64):
     '''
     return LoadFile(filename).astype(ndtype);
     
-def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
+def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
     '''writeTiff(ary, geoTransform, filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64 ,lon=None, lat=None):
     ary: 2D array.
     geoTransform: [top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution]
@@ -78,7 +79,11 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, format=gdal.GDT_
     # top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution
     ds.SetGeoTransform( coord )    
     srs=osr.SpatialReference()
-    srs.ImportFromProj4(srs_proj4)
+    if os.path.isfile(srs_proj4):
+      srs.ImportFromWkt(open(srs_proj4).read());
+    else:
+      srs.ImportFromProj4(srs_proj4)
+    
     ds.SetProjection(srs.ExportToWkt() );
     if nodata is not None:
         ds.GetRasterBand(1).SetNoDataValue(0);
@@ -86,12 +91,13 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, format=gdal.GDT_
     ds = None
     print "File written to: " + filename;
 
-def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
-    '''writeAny(ary, geoTransform, format="GTiff", filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64 ,lon=None, lat=None):
+def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=None, dataformat=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
+    '''writeAny(ary, geoTransform, format="GTiff", filename='kgiAlos.tif', rescale=None, datatype=gdal.GDT_Float64 ,lon=None, lat=None):
     ary: 2D array.
     geoTransform: [top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution]
-    format: "GTiff" 
+    fileformat: "GTiff" 
     rescale: [min max]: If given rescale ary values between min and max.
+    
     
     If lon lat is specified set coord to None
     
@@ -145,7 +151,7 @@ def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=Non
     #ary = numpy.flipup(ary)
     Ny, Nx = ary.shape
     driver = gdal.GetDriverByName(fileformat)
-    ds = driver.Create(filename, Nx, Ny, 1, gdal.GDT_Float64)
+    ds = driver.Create(filename, Nx, Ny, 1, dataformat)
 
     #ds.SetGeoTransform( ... ) # define GeoTransform tuple
     # top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution
@@ -160,7 +166,7 @@ def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=Non
     print "File written to: " + filename;
 
 
-def writeCSV(ary, filename='kgiAlos.tif', rescale=None, format="%f", lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
+def writeCSV(ary, filename='kgiAlos.tif', rescale=None, dataformat="%f", lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
     '''writeAny(ary, geoTransform, format="GTiff", filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64 ,lon=None, lat=None):
     ary: 2D array.
     geoTransform: [top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution]
