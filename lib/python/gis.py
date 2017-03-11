@@ -15,12 +15,12 @@ def readData(filename, ndtype=N.float64):
     '''
     return LoadFile(filename).astype(ndtype);
     
-def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
+def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=None, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
     '''writeTiff(ary, geoTransform, filename='kgiAlos.tif', rescale=None, format=gdal.GDT_Float64 ,lon=None, lat=None):
     ary: 2D array.
     geoTransform: [top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution]
     rescale: [min max]: If given rescale ary values between min and max.
-    
+    grid: Gridding (interpolation) method None, 'nearest', 'linear', or 'cubic'. Default None.  
     If lon lat is specified set coord to None
     
     '''
@@ -56,11 +56,11 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.
         #yrot=0.
         #coord=[x,dx, xrot, y,yrot, dy]
 
-        if grid:
+        if grid is not None:
             import scipy.interpolate
             LON,LAT=N.meshgrid(N.r_[lon.min():lon.max():abs(coord[1])], N.r_[lat.max():lat.min():-abs(coord[5])])    
             #ary=P.griddata(lon.ravel(),lat.ravel(),ary.ravel(),LON,LAT);
-            ary=scipy.interpolate.griddata(N.array([lon.ravel(),lat.ravel()]).T,ary.ravel(),(LON,LAT), method='cubic');
+            ary=scipy.interpolate.griddata(N.array([lon.ravel(),lat.ravel()]).T,ary.ravel(),(LON,LAT), method=grid, fill_value=nodata);
             coord=[LON[0,0],abs(coord[1]), 0, LAT[0,0], 0,-abs(coord[5])];            
             print coord
                    
@@ -86,7 +86,7 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.
     
     ds.SetProjection(srs.ExportToWkt() );
     if nodata is not None:
-        ds.GetRasterBand(1).SetNoDataValue(0);
+        ds.GetRasterBand(1).SetNoDataValue(nodata);
     ds.GetRasterBand(1).WriteArray(ary)
     ds = None
     print "File written to: " + filename;
