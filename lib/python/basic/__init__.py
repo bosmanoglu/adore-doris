@@ -716,4 +716,25 @@ def clear_sys_module(root_module):
     # delete references to these loaded modules from sys.modules
     for key in loaded_package_modules:
         del sys.modules[key]
+
+def resize(a, new_shape, stretch=True,method='linear'):
+    """ Returns a in the new_shape.
+    stretch=True: Interpolate as necessary. If false, use numpy.resize
+    method= 'linear' ==> interp2d kind.
+    %Only supports 2D at the moment   
+    """
+    import numpy as np
+    if stretch==False:
+        return np.resize(a, new_shape)
+    import scipy
+    import scipy.interpolate
+    #import scipy.misc
+    #return scipy.misc.imresize(a,new_shape)
+    #X, Y=  meshgrid(x, y)
+    x=arange(a.shape[0])
+    y=arange(a.shape[1])
+    interpFun=scipy.interpolate.interp2d(x,y,a )   
+    X=arange(new_shape[0])*a.shape[0]/new_shape[0]
+    Y=arange(new_shape[1])*a.shape[1]/new_shape[1]
+    return interpFun(X,Y)
     
