@@ -2,7 +2,7 @@ import numpy as np
 import pylab as P
 import basic
 import scipy
-
+from arcs import arcs 
 def matshowClick(A, value=True, vmin=None, vmax=None):
     def onclick(event):
         try:
