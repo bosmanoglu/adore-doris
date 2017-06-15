@@ -882,14 +882,15 @@ def dataFormat2dataType(dataFormat):
     elif dataFormat=="c1":
         datatype="i1"
     elif dataFormat=="cu1":
-        datatype="u1"
+        datatype="I1"
         complexFlag=True;                
     elif dataFormat=="u1":
-        datatype="u1"
+        datatype="I1"
     elif  dataFormat=="u2":
-        datatype="u2"
+        datatype="I2"
     elif  dataFormat=="cu2":
-        datatype="cu2"
+        datatype="I2" #np.uint16
+        complexFlag=True;
     #else: dtype is already set to dataFormat
     return (datatype, complexFlag);    
     
