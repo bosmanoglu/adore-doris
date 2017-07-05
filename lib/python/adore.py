@@ -998,7 +998,7 @@ def initialize_result_file(resfile, type='master'):
  -------------------------------------------------------
 
 
-Start_process_control        
+Start_process_control
 readfiles:              0
 precise_orbits:         0
 modify_orbits:          0
@@ -1011,7 +1011,7 @@ filt_azi:               0
 filt_range:             0
 NOT_USED:               0
 End_process_control
-        """)
+""")
     else:
         print('Not implemented yet')
         return False
