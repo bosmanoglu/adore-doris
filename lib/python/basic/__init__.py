@@ -737,4 +737,18 @@ def resize(a, new_shape, stretch=True,method='linear'):
     X=arange(new_shape[0])*a.shape[0]/new_shape[0]
     Y=arange(new_shape[1])*a.shape[1]/new_shape[1]
     return interpFun(X,Y)
-    
+   
+def rmse(predictions, targets):
+  """rmse(predictions, targets)
+  """
+  return sqrt(mean((predictions-targets)**2.)) 
+
+def r_squared(predictions, targets):
+  """r_squared(predictions, targets)
+  """
+  import scipy
+  scipy.pkgload('stats')
+  slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions, targets)
+  return r_value**2.
+
+

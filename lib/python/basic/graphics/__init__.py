@@ -902,3 +902,26 @@ def scalogram2(data, vmin=None, vmax=None, max_level=None, scale=None, percent=F
     if scale=='power' or scale=='logpower':
         P.matshow(power);P.colorbar();P.title('Denominator');
     return arr
+
+def mapshow(lon,lat, z):
+  from mpl_toolkits.basemap import Basemap
+  if lat.ndim==1:
+    d0,d1=numpy.meshgrid(numpy.linspace(lat.min(),lat.max(), lon.shape[1]),
+    numpy.linspace(lon.min(), lon.max(), lon.shape[0]))
+    z = interpolate.griddata((lon.ravel(),lat.ravel()), z.ravel(), (d1, d0), method='linear')
+  else:
+    d0=lon;d1=lat;
+  if lat[0,0] > 0: #northern hemisphere
+    if d1[0,0]<d1[-1,0]:
+      d1=numpy.flipud(d1)
+
+  print ('Please wait... Generating map\n')
+  m = Basemap(llcrnrlon=d0.min(), llcrnrlat=d1.min(), urcrnrlon=d0.max(), urcrnrlat=d1.max(),
+    resolution='f', area_thresh=1., projection='cyl')
+  m.imshow(z, interpolation='nearest', origin='upper')
+  m.drawcoastlines(color='w',linewidth=0.8)
+  m.drawmapboundary() # draw a line around the map region
+  m.drawrivers()
+  m.drawparallels(numpy.arange(int(d1.min()), int(d1.max()), 1),linewidth=0.2,labels=[1,0,0,0])
+  m.drawmeridians(numpy.arange(int(d0.min()), int(d0.max()), 1),linewidth=0.2,labels=[0,0,0,1])    
+
