@@ -737,18 +737,18 @@ def resize(a, new_shape, stretch=True,method='linear'):
     X=arange(new_shape[0])*a.shape[0]/new_shape[0]
     Y=arange(new_shape[1])*a.shape[1]/new_shape[1]
     return interpFun(X,Y)
+   
+def rmse(predictions, targets):
+  """rmse(predictions, targets)
+  """
+  return sqrt(mean((predictions-targets)**2.)) 
 
-def rmse_r2(x,y, demean=False):
-    """ calculate rmse and r^2 for x and y. 
-    x,y: have to be the same length vectors
-    x is truth, y is pred.
-    """   
-    if demean:
-      x=x-nanmean(x)
-      y=y-nanmean(y)
-    x_mean=nanmean(x);
-    ss_tot=nansum((x-nanmean(x))**2.)
-    rmse=sqrt(nanmean( (y-x)**2.))
-    ss_res=nansum((y-x)**2.)
-    rsquared=1-ss_res/(ss_tot+sys.float_info.epsilon) #Rsquared
-    return (rmse,rsquared)
+def r_squared(predictions, targets):
+  """r_squared(predictions, targets)
+  """
+  import scipy
+  scipy.pkgload('stats')
+  slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions, targets)
+  return r_value**2.
+
+

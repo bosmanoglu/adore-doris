@@ -187,7 +187,7 @@ def coherence(m,s=None,w=(5,5)):
     Em=scipy.signal.signaltools.correlate(m*conj(m), corrFilter, mode='same')
     Es=scipy.signal.signaltools.correlate(s*conj(s), corrFilter, mode='same')
     Ems=scipy.signal.signaltools.correlate(m*conj(s), corrFilter, mode='same')
-    coh=abs(Ems / sqrt(0.5*(Em**2+Es**2)))
+    coh=abs(Ems / (sqrt(Em**2+Es**2)/sqrt(2))) #need to divide by two to get root mean square
 
 #    for k in r_[0:len(m)]:
 #        if k+w>=len(m):
@@ -612,6 +612,20 @@ def dist2rad(distance, wavelength=0.056):
        Returns radians corresponding to distance. Distance and wavelength has to be in the same units.
     '''
     return distance*4*pi/wavelength
+
+def h2ph(Bperp, wavelength=0.0566, R=830e3, theta=deg2rad(23.0), bistatic=False):
+    '''h2ph(Bperp, wavelength=0.0566, R=800e3, theta=deg2rad(23.0))
+    Height-to-phase calculation. 
+    Bperp: Perpendicular baseline [m]
+    Wavelength: Radar wavelength [m]
+    R: range to master [m]
+    theta: Look-angle [rad]
+    '''
+    if bistatic:
+        pi4divlam=(-2.*pi)/wavelength;
+    else:
+        pi4divlam=(-4.*pi)/wavelength;
+    return -pi4divlam*Bperp/(R*sin(theta))
 
 def xyz2los(inVector, projectionVector=zeros([1,3]), incidenceAngle=0, headingAngle=0 ):
     '''xyz2los(inVector, projectionVector=zeros([1,3]), incidenceAngle=0, headingAngle=0 ):

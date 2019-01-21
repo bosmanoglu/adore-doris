@@ -7,7 +7,10 @@ function coarsecorr_manual(){
     mcrop=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_file"`
     mfrmt=`readRes.sh $m_resfile $(pn2rs m_ovs) "Data_output_format"`
   else
-    mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels"`
+    mpN=`readRes.sh $m_resfile $(pn2rs m_crop) "Last_pixel"`
+    mp0=`readRes.sh $m_resfile $(pn2rs m_crop) "First_pixel"`
+    mwidth=$(( $mpN-$mp0+1 ))
+    #mwidth=`readRes.sh $m_resfile $(pn2rs m_crop) "Number of pixels"`
     mcrop=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_file"`
     mfrmt=`readRes.sh $m_resfile $(pn2rs m_crop) "Data_output_format"`
   fi
@@ -16,7 +19,9 @@ function coarsecorr_manual(){
     scrop=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_file"`
     sfrmt=`readRes.sh $s_resfile $(pn2rs s_ovs) "Data_output_format"`
   else
-    swidth=`readRes.sh $s_resfile $(pn2rs s_crop) "Number of pixels"`
+    spN=`readRes.sh $s_resfile $(pn2rs s_crop) "Last_pixel"`
+    sp0=`readRes.sh $s_resfile $(pn2rs s_crop) "First_pixel"`
+    swidth=$(( $spN-$sp0+1 ))
     scrop=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_file"`
     sfrmt=`readRes.sh $s_resfile $(pn2rs s_crop) "Data_output_format"`
   fi
