@@ -737,4 +737,18 @@ def resize(a, new_shape, stretch=True,method='linear'):
     X=arange(new_shape[0])*a.shape[0]/new_shape[0]
     Y=arange(new_shape[1])*a.shape[1]/new_shape[1]
     return interpFun(X,Y)
-    
+
+def rmse_r2(x,y, demean=False):
+    """ calculate rmse and r^2 for x and y. 
+    x,y: have to be the same length vectors
+    x is truth, y is pred.
+    """   
+    if demean:
+      x=x-nanmean(x)
+      y=y-nanmean(y)
+    x_mean=nanmean(x);
+    ss_tot=nansum((x-nanmean(x))**2.)
+    rmse=sqrt(nanmean( (y-x)**2.))
+    ss_res=nansum((y-x)**2.)
+    rsquared=1-ss_res/(ss_tot+sys.float_info.epsilon) #Rsquared
+    return (rmse,rsquared)
