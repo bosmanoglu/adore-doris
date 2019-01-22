@@ -412,7 +412,7 @@ def siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
             temporal_coh=exp(-temporal_decorrelation_factor*Btemp)
             noise=noise+random.randn(*interf.shape)*coh2stdpha(temporal_coh, 20)
         if defoRate is not None: # Deformation is always included Coherence if specified.
-            noise=noise+ (-pi4divlam*defoRate*Btemp)
+            noise=noise+ (pi4divlam*defoRate*Btemp)
         if isfloat(coh) and coh.size==1: #isfloat=basic.isfloat
             stdphase=coh2stdpha(coh, 20); # This calculation is based on simnoise.
             noise=random.randn(*interf.shape) * stdphase
