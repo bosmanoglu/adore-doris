@@ -47,7 +47,7 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.
         #if xlat[2]>0: #flip ud
         #    ary=N.flipud(ary)    
         coord=[xlon[0],xlon[2], xlon[1], xlat[0], xlat[2], xlat[1]];
-        print coord
+        print(coord)
         #x=lon[0,0]
         #y=lat[0,0]
         #dx=lon[0,1]-lon[0,0]
@@ -62,7 +62,7 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.
             #ary=P.griddata(lon.ravel(),lat.ravel(),ary.ravel(),LON,LAT);
             ary=scipy.interpolate.griddata(N.array([lon.ravel(),lat.ravel()]).T,ary.ravel(),(LON,LAT), method=grid, fill_value=nodata);
             coord=[LON[0,0],abs(coord[1]), 0, LAT[0,0], 0,-abs(coord[5])];            
-            print coord
+            print(coord)
                    
     if rescale:
         import basic
@@ -89,7 +89,7 @@ def writeTiff(ary, coord, filename='kgiAlos.tif', rescale=None, dataformat=gdal.
         ds.GetRasterBand(1).SetNoDataValue(nodata);
     ds.GetRasterBand(1).WriteArray(ary)
     ds = None
-    print "File written to: " + filename;
+    print("File written to: " + filename)
 
 def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=None, dataformat=gdal.GDT_Float64,lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
     '''writeAny(ary, geoTransform, format="GTiff", filename='kgiAlos.tif', rescale=None, datatype=gdal.GDT_Float64 ,lon=None, lat=None):
@@ -125,7 +125,7 @@ def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=Non
         #if xlat[2]>0: #flip ud
         #    ary=N.flipud(ary)    
         coord=[xlon[0],xlon[2], xlon[1], xlat[0], xlat[2], xlat[1]];
-        print coord
+        print(coord)
         #x=lon[0,0]
         #y=lat[0,0]
         #dx=lon[0,1]-lon[0,0]
@@ -140,7 +140,7 @@ def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=Non
             #ary=P.griddata(lon.ravel(),lat.ravel(),ary.ravel(),LON,LAT);
             ary=scipy.interpolate.griddata(N.array([lon.ravel(),lat.ravel()]).T,ary.ravel(),(LON,LAT), method='cubic');
             coord=[LON[0,0],abs(coord[1]), 0, LAT[0,0], 0,-abs(coord[5])];            
-            print coord
+            print(coord)
                    
     if rescale:
         import basic
@@ -163,7 +163,7 @@ def writeAny(ary, coord, fileformat="GTiff", filename='kgiAlos.tif', rescale=Non
         ds.GetRasterBand(1).SetNoDataValue(0);
     ds.GetRasterBand(1).WriteArray(ary)
     ds = None
-    print "File written to: " + filename;
+    print("File written to: " + filename)
 
 
 def writeCSV(ary, filename='kgiAlos.tif', rescale=None, dataformat="%f", lon=None, lat=None, nodata=None, grid=False, srs_proj4='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'):
@@ -199,7 +199,7 @@ def writeCSV(ary, filename='kgiAlos.tif', rescale=None, dataformat="%f", lon=Non
         #if xlat[2]>0: #flip ud
         #    ary=N.flipud(ary)    
         coord=[xlon[0],xlon[2], xlon[1], xlat[0], xlat[2], xlat[1]];
-        print coord
+        print(coord)
         #x=lon[0,0]
         #y=lat[0,0]
         #dx=lon[0,1]-lon[0,0]
@@ -214,7 +214,7 @@ def writeCSV(ary, filename='kgiAlos.tif', rescale=None, dataformat="%f", lon=Non
             #ary=P.griddata(lon.ravel(),lat.ravel(),ary.ravel(),LON,LAT);
             ary=scipy.interpolate.griddata(N.array([lon.ravel(),lat.ravel()]).T,ary.ravel(),(LON,LAT), method='cubic');
             coord=[LON[0,0],abs(coord[1]), 0, LAT[0,0], 0,-abs(coord[5])];            
-            print coord
+            print(coord)
                    
     if rescale:
         import basic
@@ -232,7 +232,7 @@ def writeCSV(ary, filename='kgiAlos.tif', rescale=None, dataformat="%f", lon=Non
         file_writer = csv.writer(test_file)
         for i in range(item_length):
             file_writer.writerow([x[i] for x in lol])
-    print "File written to: " + filename;
+    print("File written to: " + filename)
 
 
     
