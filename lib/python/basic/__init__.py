@@ -33,11 +33,12 @@ div
 
 import operator
 import sys
-import exceptions
+# import exceptions
+import builtins as exceptions
 from numpy import *
 import pylab as plt
 import time
-import graphics
+from .graphics import graphics
 
 class rkdict(dict): #return (missing) key dict
     def __missing__(self, key):
@@ -100,7 +101,7 @@ def confirm(prompt=None, resp=False):
         if not ans:
             return resp
         if ans not in ['y', 'Y', 'n', 'N']:
-            print 'please enter y or n.'
+            print('please enter y or n.')
             continue
         if ans == 'y' or ans == 'Y':
             return True
@@ -344,7 +345,7 @@ def maskshow(array, mask=None, **kwargs):
         return maskedArray
     elif array.ndim==2:
         maskedArray=array.copy();
-        if mask != None:          
+        if mask is None:          
             maskedArray[mask]=nan;
         return plt.matshow(maskedArray, **kwargs);
 
@@ -419,7 +420,7 @@ def rescale(arr, lim, trim=False, arrlim=None, quiet=False):
         minarr=arr.min()
         maxarr=arr.max()
     if not quiet:
-      print [minarr, maxarr]        
+      print([minarr, maxarr])
     newarr=(arr-minarr)/(maxarr-minarr)*(lim[1]-lim[0])+lim[0]
     newarr[newarr<lim[0]]=lim[0]
     newarr[newarr>lim[1]]=lim[1]
@@ -504,7 +505,7 @@ def transect(x,y,z,x0,y0,x1,y1,plots=0):
 def toc(t):
     ''' subtracts current time from given, and displays result
     '''
-    print time.time()-t, "sec."    
+    print(time.time()-t, "sec.")    
     return
 
 def validIndex(arrSize, arrIdx):
@@ -612,7 +613,7 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
     for k in xrange(len(s)):
         if s[k]<1:
             s[k]=1
-    print s
+    print(s)
     #create solution lists
     x=[]
     y=[]
@@ -625,12 +626,12 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
         for k in xrange(len(bounds)):
             b0.append(bounds[k][::s[k]])
         X,Y=meshgrid(b0[0], b0[1])
-        print X
-        print Y        
+        print(X)
+        print(Y)        
         for xy in zip(X.ravel(),Y.ravel()):
             #if (xy[0] in x) and (xy[1] in y):
             if any( (x==xy[0]) & (y==xy[1]) ):
-                print [xy[0], xy[1], 0]
+                print([xy[0], xy[1], 0])
                 #raise NameError("LogicError")
                 continue
             x.append(xy[0])
@@ -640,22 +641,22 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
                 fun_z=z[-1]
                 x0=x[-1];
                 y0=y[-1];
-                print [99999, x[-1], y[-1], z[-1]]
+                print([99999, x[-1], y[-1], z[-1]])
             else:
-                print [x[-1], y[-1], z[-1]]
+                print([x[-1], y[-1], z[-1]])
         #Z=griddata(x,y,z,X,Y); # The first one is actually not necessary
         #set new bounds
         #xy0=Z.argmin()
         #set new bounds
         if breakLoop:
-            print "Reached lowest grid resolution."
+            print("Reached lowest grid resolution.")
             break
         if all([sk==1 for sk in s]):
             #Do one more loop then break.
-            print "BreakLoop is ON"
+            print("BreakLoop is ON")
             breakLoop=True
         if all(bounds[0]==r_[x0-s[0]:x0+s[0]]) and all(bounds[1]==r_[y0-s[1]:y0+s[1]] ):
-            print "Breaking to avoid infinite loop."
+            print("Breaking to avoid infinite loop.")
             break#if the bounds are the same then break
         bounds[0]=r_[x0-s[0]:x0+s[0]] 
         bounds[1]=r_[y0-s[1]:y0+s[1]] 
@@ -694,7 +695,7 @@ def reload_package(root_module):
     # load each of the modules again; 
     # make old modules share state with new modules
     for key in loaded_package_modules:
-        print 'loading %s' % key
+        print('loading %s' % key)
         newmodule = __import__(key)
         oldmodule = loaded_package_modules[key]
         oldmodule.__dict__.clear()
@@ -743,12 +744,17 @@ def rmse(predictions, targets):
   """
   return sqrt(mean((predictions-targets)**2.)) 
 
-def r_squared(predictions, targets):
+def r_squared(predictions, targets, ignore_nan=True):
   """r_squared(predictions, targets)
   """
   import scipy
   scipy.pkgload('stats')
-  slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions, targets)
+  if ignore_nan:
+    m=bitwise_not(bitwise_or(isnan(predictions), isnan(targets)))
+    print("{} nan elements masked.".format(m.sum()))
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions[m], targets[m])
+  else:
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions, targets)
   return r_value**2.
 
 

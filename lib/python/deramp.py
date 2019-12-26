@@ -48,7 +48,7 @@ def fitSurface(x,y,z, weight=None, order=1):
     weight: vector same size as x
     Known Bugs: If data contains nan values, fit might fail quietly. 
     """
-    if any(isnan(z)):
+    if any(np.isnan(z)):
         print("Data contains nan values. Fit might fail.");
     if weight is not None:
         w=weight;
