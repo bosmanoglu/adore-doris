@@ -18,6 +18,18 @@ from scipy import constants #scipy.pkgload('scipy.constants')
 from scipy import optimize #scipy.pkgload('optimize')
 from scipy import stats
 import time_series
+import pdb
+try:
+  import stack
+  from cutting_edge import *
+except:
+  pass
+
+def coh2snr(coh):
+    return coh/(1.-coh);
+
+def snr2coh(snr):
+    return snr/(snr+1.);
 
 def coh2pdf(coh,n=100):
     domain=linspace(-pi,pi,n);
@@ -116,10 +128,49 @@ def coh2stdphaML(coh,L,n=100,lut=None):
             luty[k]=sqrt(trapz(domain**2*coh2pdfML(lutx[k],L,n),domain));
         lutf=scipy.interpolate.interp1d(lutx,luty, 'linear')
         stdpha=lutf(coh)
-    return stdpha 
-    
-def coherence(m,s,w):
-    '''coherence(master, slave, window):
+    return stdpha
+
+def stdpha2coh(stdpha, L=1, n=100, lut=100):
+    '''stdpha2cohML(stdpha, L=1, n=100, lut=100):
+    Creates a lookup table for coherence to stdpha and uses it to reverse the relation
+    '''
+    if isinstance(stdpha,list):
+        stdpha=array(stdpha)
+    elif isinstance(stdpha, number):
+        stdpha=array([stdpha])
+    domain=linspace(-pi,pi,n);
+    lutx=linspace(0.01, 0.99, lut); #lutx=look up table x
+    luty=zeros(lutx.shape); # luty=look up table y
+    for k in xrange(len(lutx)):
+        luty[k]=sqrt(trapz(domain**2*coh2pdfML(lutx[k],L,n),domain));
+    lutf=scipy.interpolate.interp1d(flipud(luty),flipud(lutx), 'linear', bounds_error=False)
+    coh=lutf(stdpha);
+    coh[stdpha > luty.max() ]=0.01;
+    coh[stdpha < luty.min() ]=0.99;
+    return coh
+
+def gradient_coherence(m,s=None, w=(5,5), low_pass=True):
+    if any(iscomplexobj(m)):
+      mg0,mg1=cpxgradient(m)
+    else:
+      mg0,mg1=gradient(m)
+    if s is None:
+      s=empty(m.shape, dtype=complex);
+      s[:]=1.+0.j
+    if any(iscomplexobj(s)):
+      sg0,sg1=cpxgradient(s)
+    else:
+      sg0,sg1=gradient(s)
+    if low_pass is True:
+      mg0=scipy.ndimage.generic_filter(mg0, mean, size=w)
+      mg1=scipy.ndimage.generic_filter(mg1, mean, size=w)
+      sg0=scipy.ndimage.generic_filter(sg0, mean, size=w)
+      sg1=scipy.ndimage.generic_filter(sg1, mean, size=w)
+    #pdb.set_trace()
+    return coherence(mg0+1j*mg1, sg0+1j*sg1, w=w)
+
+def coherence(m,s=None,w=(5,5)):
+    '''coherence(master, slave=None, window):
     input is master and slave complex images (tested for 1D only)
     w is the calculation window.
     '''        
@@ -130,10 +181,13 @@ def coherence(m,s,w):
 #    Em=scipy.ndimage.filters.correlate(m*conj(m),corrFilter,mode='nearest')
 #    Es=scipy.ndimage.filters.correlate(s*conj(s),corrFilter,mode='nearest')
 #    Ems=scipy.ndimage.filters.correlate(m*conj(s),corrFilter,mode='nearest')
+    if s is None:
+        s=empty(m.shape, dtype=complex)
+        s[:]=exp(1.j*0);
     Em=scipy.signal.signaltools.correlate(m*conj(m), corrFilter, mode='same')
     Es=scipy.signal.signaltools.correlate(s*conj(s), corrFilter, mode='same')
     Ems=scipy.signal.signaltools.correlate(m*conj(s), corrFilter, mode='same')
-    coh=abs(Ems / 0.5*sqrt(Em**2+Es**2)) #need to divide by two to get root mean square
+    coh=abs(Ems / (sqrt(Em**2+Es**2)/sqrt(2))) #need to divide by two to get root mean square
 
 #    for k in r_[0:len(m)]:
 #        if k+w>=len(m):
@@ -153,12 +207,12 @@ def crosscorrelate(m,s):
     #nfilt=corrFilter.size
     #corrFilter=corrFilter/nfilt    
     #m=rescale(m, [-1,1]);
-    m=m-m.mean()    
+    #m=m-m.mean()
     #s=rescale(s, [-1,1]);
-    s=s-s.mean()
-    Em=(m**2.).sum()
-    Es=(s**2.).sum()
-    Ems=(m*s).sum()
+    #s=s-s.mean()
+    Em=(m*m.conj()).mean() # Em=(m**2.).sum()
+    Es=(s*s.conj()).mean() # Es=(s**2.).sum()
+    Ems=(m*s.conj()).mean() # Ems=(m*s).sum()
     #Em=scipy.signal.signaltools.correlate(m*m, corrFilter, mode='same')
     #Es=scipy.signal.signaltools.correlate(s*s, corrFilter, mode='same')
     #Ems=scipy.signal.signaltools.correlate(m*s, corrFilter, mode='same')
@@ -219,13 +273,13 @@ def radarcode_dem(dem, alpha=0.1745, theta=0.3316, R1=830000., dx=80. ):
     rdem=zeros([numlines,numpixels]);    
     
     # Some variables for ERS1/2 and Envisat
-    alpha=deg2rad(10.);      #[rad] baseline orientation
-    wavelen = 0.05666;       #[m]   wavelength
-    theta = deg2rad(19.)     #[rad] looking angle to first pixel
-    R1 = 830000.             #[m]   range to first point
-    pi4divlam = (-4.*pi)/wavelen #lam(lambda)=wavelen, can't use lambda in python it is a registered command.
-    dx = 80                  #[m]    dem resolution    
-    
+    #alpha=deg2rad(10.);      #[rad] baseline orientation
+    #wavelen = 0.05666;       #[m]   wavelength
+    #theta = deg2rad(19.)     #[rad] looking angle to first pixel
+    #R1 = 830000.             #[m]   range to first point
+    #pi4divlam = (-4.*pi)/wavelen #lam(lambda)=wavelen, can't use lambda in python it is a registered command.
+    #dx = 80                  #[m]    dem resolution
+
     #Radarcode DEM by orbit information
     print ('Radarcoding DEM')
     numpixelsdem=dem.shape[1]
@@ -251,10 +305,19 @@ def radarcode_dem(dem, alpha=0.1745, theta=0.3316, R1=830000., dx=80. ):
         rdem[az,:]=interp(rangegrid,range2master,dem[az,:]);  
     return rdem        
 def siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
-              wavelen=0.05666, theta=0.3316, R1=830000., dx=80.):
-    '''[interf,coh,h2ph]=siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
+              wavelen=0.05666, theta=0.3316, R1=830000., dx=80., Bpar=None, defoRate=None, Btemp=None, coh='Geometric',
+              temporal_decorrelation_factor=3e-4*365.):
+    '''[interf,coh,h2ph,refpha]=siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
               wavelen=0.05666, theta=0.3316, R1=830000, dx=80):
-    doNoise can be 1 or 0. If zero gaussian noise is not added.
+    DEPRECATED:doNoise can be 1 or 0. If zero gaussian noise is not added.(USE COH=None for 0 instead).
+    if Bpar is given, alpha is calculated based on Bpar and Bperp. See Radar Interferometry pg.117, by R. Hanssen.
+    coh=[None|'Geometric'|'Geometric+Temporal'|float|array]
+        If None, no additional noise is added.
+        Geometric: Based on critical perpendicular baseline (simnoise)
+        Temporal: Based on temporal baseline (see temporal_decorrelation_factor)
+        float: Single coherence value for all interferogram
+        array: Apply given coherence.
+    temporal_decorrelation_factor=3e-4*365 for btemp in years: exp(-TDF * Btemp)  e.g. TDF=3e-4 for btemp in days (See Simulation of timeseries surface deformation by C.W. Lee et al., 2012)
     '''
     #based on SIMINTERF.m which was 
     # Created by Bert Kampes 05-Oct-2000
@@ -266,15 +329,16 @@ def siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
     interf=zeros([numlines,numpixels]);
     slope =zeros([numlines,numpixels]);
     h2ph  =ones([numlines,numpixels]);
+    refpha=ones([numlines,numpixels]);
 
     # Some variables for ERS1/2 and Envisat
-    alpha=deg2rad(10.);      #[rad] baseline orientation
-    wavelen = 0.05666;       #[m]   wavelength
-    theta = deg2rad(19.)     #[rad] looking angle to first pixel
-    R1 = 830000.             #[m]   range to first point
+    #alpha=deg2rad(10.);      #[rad] baseline orientation
+    #wavelen = 0.05666;       #[m]   wavelength
+    #theta = deg2rad(19.)     #[rad] looking angle to first pixel
+    #R1 = 830000.             #[m]   range to first point
     pi4divlam = (-4.*pi)/wavelen #lam(lambda)=wavelen, can't use lambda in python it is a registered command.
-    dx = 80                  #[m]    dem resolution    
-    
+    #dx = 80                  #[m]    dem resolution
+
     #Radarcode DEM by orbit information
     print ('Radarcoding DEM')
     numpixelsdem=dem.shape[1]
@@ -285,15 +349,26 @@ def siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
     R1extra      = R1+dem.max();
     totalrange   = maxrange-R1extra;
     rangebinsize = totalrange/numpixels;
-    rangegrid    = arange(R1extra,maxrange,rangebinsize)-rangebinsize;    
-    
+    rangegrid    = arange(R1extra,maxrange,rangebinsize)-rangebinsize;
+
     #compute range diff to slave satellite
-    B =  Bperp / cos(theta-alpha);
+    #B =  Bperp / cos(theta-alpha);
+    #batu - bpar
+    if (Bpar!=None):
+	alpha = theta - arctan2(Bpar, Bperp);
+    	B =  sqrt(Bpar**2.+Bperp**2.); #Bpar / sin(theta-alpha);
+        print 'alpha: ', alpha
+    else:
+    	B =  Bperp / cos(theta-alpha);
+	Bpar = B * sin (theta - alpha);
+        print 'Bpar: ', Bpar
+    #end bpar
+
     sat2_x = B * cos(alpha);
     sat2_y = B * sin(alpha) + sat1_y;
     x      = arange(x0,x0+dx*(numpixelsdem),dx);#	x coord. w.r.t. sat1
     x2sqr  = (x - sat2_x)**2;
-    xsqr   = x**2;    
+    xsqr   = x**2;
     #compute range for all lines of the dem
     for az in range(0,dem.shape[0]):
         y = sat1_y-dem[az,:]
@@ -309,31 +384,55 @@ def siminterf(dem,Bperp=100,doNoise=1,waterHeight=None,alpha=0.1745, \
         refpharangemaster = sqrt(sat1_y**2 + x2_0**2)
         refpharangeslave  = sqrt(sat2_y**2 + (x2_0-sat2_x)**2)
         refphase = pi4divlam * (refpharangeslave-refpharangemaster);
+        refpha[az,:]=refphase;
         phase = phase - refphase;
         ## Interpolate p to grid rangebins
         ## range is not always increasing due to foreshortning
         sortindex = argsort(range2master);
         range2master = range2master[sortindex]
-        phase        = phase[sortindex];         
-        interf[az,:]=interp(rangegrid,range2master,phase);  
-        
+        phase        = phase[sortindex];
+        interf[az,:]=interp(rangegrid,range2master,phase);
+
         ## calculate slope and simulate noise
         slopedem= arctan2(diff(dem[az,:]),dx)
         slopedem= hstack((slopedem, [0]))
         slopedem= slopedem[sortindex]
-        slope[az,:]=interp(rangegrid,range2master,slopedem);  
+        slope[az,:]=interp(rangegrid,range2master,slopedem);
         h2ph[az,:] = -pi4divlam*Bperp/(range2master*sin(theta));
-    noiseCoherence=simnoise(slope, Bperp)
-    noise = noiseCoherence[0];
-    coh = noiseCoherence[1];
-    if doNoise==1:
-        coh=coherence(exp(-1j*interf), exp(-1j*(interf+noise)), [3,3])
-        interf= interf + noise        
+    noise=zeros(interf.shape)
+    if doNoise==1 and coh is None:
+        print("DEPRECATED. Use coh instead.")
+        coh="Geometric"
+    if coh is not None:
+        if "Geometric" in coh:
+            noiseCoherence=simnoise(slope, Bperp)
+            noise = noiseCoherence[0];
+            #coh = noiseCoherence[1];
+        if "Temporal" in coh and temporal_decorrelation_factor is not None:
+            temporal_coh=exp(-temporal_decorrelation_factor*Btemp)
+            noise=noise+random.randn(*interf.shape)*coh2stdpha(temporal_coh, 20)
+        if defoRate is not None: # Deformation is always included Coherence if specified.
+            noise=noise+ (pi4divlam*defoRate*Btemp)
+        if isfloat(coh) and coh.size==1: #isfloat=basic.isfloat
+            stdphase=coh2stdpha(coh, 20); # This calculation is based on simnoise.
+            noise=random.randn(*interf.shape) * stdphase
+        if isarray(coh) and coh.shape==interf.shape:
+            stdphase=coh2stdpha(coh, 20); # This calculation is based on simnoise.
+            noise=random.randn(*coh.shape) * stdphase
+        #noiseCoherence=simnoise(slope, Bperp, Bw=15550000.,wavelen=wavelen, theta=theta, R1=R1)
+        #noise = noiseCoherence[0];
+        #coh = noiseCoherence[1];
+    #if doNoise==1:
+        #coh=coherence(exp(-1j*interf), exp(-1j*(interf+noise)), [3,3]) # This overwrites coherence based on the actual noise applied. Should be close to input coherence???
+        interf= interf + noise # This also adds the deformation signal.
+        coh = stdpha2coh(moving_window(interf, func=std))
+    #if defoRate is not None:
+    #    interf= interf+ (-pi4divlam*defoRate*Btemp)
     if waterHeight!=None:
         waterMask=(dem<waterHeight);
-        putmask(interf,waterMask,2*pi*randn(sum(waterMask)));        
-        putmask(coh,waterMask,0.05*abs(randn(sum(waterMask))))        
-    return [interf,coh,h2ph]
+        putmask(interf,waterMask,2*pi*randn(sum(waterMask)));
+        putmask(coh,waterMask,0.05*abs(randn(sum(waterMask))))
+    return [interf,coh,h2ph,refpha]
 
 def simnoise(slope,Bperp,Bw=15550000.,wavelen=0.05666, theta=0.3316, R1=830000.):
     """simnoise(slope,Bperp,Bw=15550000.,wavelen=0.05666, theta=0.3316, R1=830000.):
@@ -347,18 +446,18 @@ def simnoise(slope,Bperp,Bw=15550000.,wavelen=0.05666, theta=0.3316, R1=830000.)
                                        satellite altitude).
     """
     # Some variables for ERS1/2 and Envisat
-    Bw = 15550000;           #[Hz] range bandwidth
+    #Bw = 15550000;           #[Hz] range bandwidth
     #alpha=deg2rad(10.);      #[rad] baseline orientation
-    wavelen = 0.05666;       #[m]   wavelength
-    theta = deg2rad(19.)     #[rad] looking angle to first pixel
-    R1 = 830000.             #[m]   range to first point
+    #wavelen = 0.05666;       #[m]   wavelength
+    #theta = deg2rad(19.)     #[rad] looking angle to first pixel
+    #R1 = 830000.             #[m]   range to first point
     #pi4divlam = (-4.*pi)/wavelen #lam(lambda)=wavelen, can't use lambda in python it is a registered command.
     #dx = 80                  #[m]    dem resolution
     c = scipy.constants.c;    #[m/s] speed of light
     
     #critical baseline
     Bcritical = wavelen*(Bw/c)*R1*tan(theta-slope);
-    gammageom = abs((Bcritical-Bperp)/Bcritical);
+    gammageom = abs((Bcritical-abs(Bperp))/Bcritical); #Batu: 20181228 - Bperp<0 was causing nan otherwise.
     gammageom[isnan(gammageom)]=0
     stdphase=coh2stdpha(gammageom,20)
     #r = random.randn(*gammageom.shape)
@@ -453,17 +552,18 @@ def multilook(x,ratio):
     L=x.shape[0];
     #p=0;
     P=x.shape[1];
-    outL=floor(float(L)/ratio[0])
-    outP=floor(float(P)/ratio[1])
-    x=x[0:ratio[0]*outL,0:ratio[1]*outP]    
+    outL=np.int(floor(float(L)/ratio[0]))
+    outP=np.int(floor(float(P)/ratio[1]))
+    x=x[0:ratio[0]*outL,0:ratio[1]*outP]
     out=x.reshape(outL,ratio[0],outP,ratio[1]);
     return out.mean(axis=3).mean(axis=1);
 
 def oversample(data,ratio, method='quick', shape=None):
-    """oversample(data,ratio, method='quick')
+    """oversample(data,ratio, method='quick', shape=None)
     data: is a numpy array.
     ratio: is a list of ratios with number of elements equal to number of data dimensions.
-    CURRENTLY only 2D data is SUPPORTED.    
+    method={'quick','linear', 'nearest', 'cubic'}
+    CURRENTLY only 2D data is SUPPORTED.
     """
     includesNan=False   
     if any(np.isnan(data)):     
@@ -475,15 +575,23 @@ def oversample(data,ratio, method='quick', shape=None):
         z=data    
     x=np.r_[0:z.shape[0]];
     y=np.r_[0:z.shape[1]];
-    spl=scipy.interpolate.RectBivariateSpline(x,y,z)
+
     if shape is None:
         X=np.linspace(0.,z.shape[0]-1,z.shape[0]*ratio[0])
         Y=np.linspace(0.,z.shape[1]-1,z.shape[1]*ratio[1])
     else:
         X=np.linspace(0.,z.shape[0]-1,shape[0])
         Y=np.linspace(0.,z.shape[1]-1,shape[1])
-    zo=spl(X,Y);
-    if includesNan:
+
+    if method == "quick":
+        spl=scipy.interpolate.RectBivariateSpline(x,y,z)
+        zo=spl(X,Y);
+    else:
+        y,x=np.meshgrid(y,x)
+        Y,X=np.meshgrid(Y,X)
+        zo=scipy.interpolate.griddata((x[~m],y[~m]),z[~m], (X,Y), method=method)
+
+    if (includesNan) & (method == "quick"):
         splm=scipy.interpolate.RectBivariateSpline(x,y,m);
         mo=splm(X,Y)
         mo[mo>0.5]=True
@@ -492,7 +600,6 @@ def oversample(data,ratio, method='quick', shape=None):
         mo=scipy.ndimage.binary_dilation(mo, iterations=int( np.ceil(np.sqrt(zo.shape[0]/z.shape[0]*zo.shape[1]/z.shape[1])) +3) );
         zo[mo.astype(np.bool)]=np.nan
     return zo
-    
 
 def rad2dist(radians, wavelength=0.056):
     '''rad2dist(radians, wavelength=0.056)
@@ -506,6 +613,20 @@ def dist2rad(distance, wavelength=0.056):
     '''
     return distance*4*pi/wavelength
 
+def h2ph(Bperp, wavelength=0.0566, R=830e3, theta=deg2rad(23.0), bistatic=False):
+    '''h2ph(Bperp, wavelength=0.0566, R=800e3, theta=deg2rad(23.0))
+    Height-to-phase calculation. 
+    Bperp: Perpendicular baseline [m]
+    Wavelength: Radar wavelength [m]
+    R: range to master [m]
+    theta: Look-angle [rad]
+    '''
+    if bistatic:
+        pi4divlam=(-2.*pi)/wavelength;
+    else:
+        pi4divlam=(-4.*pi)/wavelength;
+    return -pi4divlam*Bperp/(R*sin(theta))
+
 def xyz2los(inVector, projectionVector=zeros([1,3]), incidenceAngle=0, headingAngle=0 ):
     '''xyz2los(inVector, projectionVector=zeros([1,3]), incidenceAngle=0, headingAngle=0 ):
     '''
@@ -515,3 +636,12 @@ def xyz2los(inVector, projectionVector=zeros([1,3]), incidenceAngle=0, headingAn
     projectionVector=atleast_2d(projectionVector);
     los=dot(inVector, projectionVector.T) / sqrt(nansum((projectionVector)**2));
     return los
+
+def los2up(los, incidenceAngle=0):
+    '''los2up(los, incidenceAngle )
+    los: Line of sight deformation
+    incidenceAngle: radar incidence angle in radians
+    Returns vertical translation of LOS assuming horizontal displacement is zero.
+    '''
+    return los / cos(incidenceAngle)
+

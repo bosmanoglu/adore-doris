@@ -1,5 +1,9 @@
 #!/bin/bash
 
+function visualize_baselines(){
+  ${ADOREFOLDER}/lib/python/plot_baselines.py ${baselinesFolder}/baselines
+}
+
 function visualize_fine(){
   ${ADOREFOLDER}/lib/python/plot_fine.py ${i_resfile}
 }
@@ -16,7 +20,10 @@ function visualize_map(){
 ## MAIN
 #################
 
-case ${1} in 
+case ${1} in
+  baselines)
+    visualize_baselines
+  ;; 
   coarsecorr)
     visualize_coarsecorr 
   ;;

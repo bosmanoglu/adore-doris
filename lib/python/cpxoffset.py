@@ -408,9 +408,9 @@ def multilook(x,ratio):
     L=x.shape[0];
     #p=0;
     P=x.shape[1];
-    outL=np.floor((L)/ratio[0])
-    outP=np.floor((P)/ratio[1])
-    x=x[0:ratio[0]*outL,0:ratio[1]*outP]    
+    outL=np.int(np.floor((L)/ratio[0]))
+    outP=np.int(np.floor((P)/ratio[1]))
+    x=x[0:np.int(ratio[0]*outL),0:np.int(ratio[1]*outP)]    
     out=x.reshape(outL,ratio[0],outP,ratio[1]);
     return out.mean(axis=3).mean(axis=1);
 

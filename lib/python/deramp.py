@@ -40,9 +40,16 @@ import scipy
 import scipy.optimize
 
 def usage():
-    print __doc__
+    print(__doc__)
 
 def fitSurface(x,y,z, weight=None, order=1):
+    """planefit, fitfunc=fitSurface(x,y,z, weight=None, order=1)
+    x,y,z: vectors 
+    weight: vector same size as x
+    Known Bugs: If data contains nan values, fit might fail quietly. 
+    """
+    if any(np.isnan(z)):
+        print("Data contains nan values. Fit might fail.");
     if weight is not None:
         w=weight;
     else:
@@ -54,9 +61,9 @@ def fitSurface(x,y,z, weight=None, order=1):
         p0=[0,0.1,0.1,0.1,0.1,0.1] 
         fitfunc = lambda p, x, y: p[0]+p[1]*x+p[2]*y+p[3]*x**2+p[4]*y**2+p[5]*x*y
     else:
-        print "order has to be 1 or 2."
+        print("order has to be 1 or 2.")
         return -1
-    errfunc = lambda p, x, y, z, w: w*(fitfunc(p,x,y) - z)
+    errfunc = lambda p, x, y, z, w: abs(w*(fitfunc(p,x,y) - z))
     planefit, success=scipy.optimize.leastsq(errfunc, p0, args=(x,y,z,w))
     return planefit, fitfunc
 
@@ -79,7 +86,7 @@ def deramp(inData, estData=None, multilook=[1000,1000], weight=None, order=1):
     #remove nan values
     ma=np.isnan(fitData)
     if all(ma):
-        print "Too many nans. Reduce multilook or remove nans."
+        print("Too many nans. Reduce multilook or remove nans.")
         return -1
     if any(ma):
         notNan=~ma
@@ -118,7 +125,7 @@ def derampcpx(inData, estData=None, order=None):
     elif order=="r":
       surface=np.pi*( (subi[1]-fxmax)*X/fxmax )
     else:
-      print "Order for complex files can only be a or r."
+      print("Order for complex files can only be a or r.")
       return -1
     #print [ subi, fxmax, fymax ]
     outData=inData*np.exp(-1.j*surface)
@@ -241,7 +248,7 @@ def main(argv):
         
     argv=argv[0:-1];
     if not os.path.exists(inputfile):
-        print "File not found:", inputfile
+        print("File not found:", inputfile)
         sys.exit(2)
     try:
         opts, args = getopt.getopt(argv, "w:f:e:o:m:")
@@ -270,7 +277,7 @@ def main(argv):
         cfg.setdefault("-o", "1")
         cfg["-o"]=int(cfg["-o"]) 
         outData=deramp(data, eData, weight=mData, order=cfg["-o"]);
-    print "Writing output to:", inputfile+'deramp'
+    print("Writing output to:", inputfile+'deramp')
     writedata(inputfile+'deramp',outData,cfg["-f"]);
     
 if __name__ == "__main__":

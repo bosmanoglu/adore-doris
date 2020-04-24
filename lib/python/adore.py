@@ -92,23 +92,94 @@ class Object:
           'i2'           :'short'         , 
           'r4'           :'real4'})          
 
-    def addResults(self,process,d):
+    def addResults(self,process,d, filename=''):
         """addResults(process, data_object)
           Add process results to the end of result file. 
           data_object is the subsection of mobj, sobj or iobj.
         """
         stars="*******************************************************************"
-        if "m_" in process:
-            filename=self.setobj.general.m_resfile.strip('"')
-        elif "s_" in process:
-            filename=self.setobj.general.s_resfile.strip('"')
-        else:
-            filename=self.setobj.general.i_resfile.strip('"')
+        if not filename:          
+            if "m_" in process:
+                filename=self.setobj.general.m_resfile.strip('"')
+            elif "s_" in process:
+                filename=self.setobj.general.s_resfile.strip('"')
+            else:
+                filename=self.setobj.general.i_resfile.strip('"')
 
         resname=self.pn2rs[process];
         f=open(filename, 'a');
         fwrite=lambda x: f.write(x+'\n');
-        if resname == "master_timing":
+        if resname == "readfiles":
+            fwrite(stars)
+            fwrite("*_Start_readfiles:")
+            fwrite(stars)
+            fwrite("Volume file: %s " % d.Volume_file)
+            fwrite("Volume_ID:                                      dummy")
+            fwrite("Volume_identifier:                              dummy")
+            fwrite("Volume_set_identifier:                          %s" % d.Volume_set_identifier)
+            fwrite("(Check)Number of records in ref. file:          %d" % d.Number_of_records_in_ref_file)
+            fwrite("Product type specifier:			    %s" % d.Product_type_specifier)
+            fwrite("SAR_PROCESSOR:				    %s" % d.SAR_Processor)
+            fwrite("SWATH:                                          %s" % d.Swath)
+            fwrite("PASS:                                           %s" % d.Pass)
+            fwrite("SPH_DESCRIPTOR:                                 Image Mode SLC Image")
+            fwrite("IMAGING_MODE:                                   %s" % d.Imaging_Mode)
+            fwrite("RADAR_FREQUENCY (HZ):                           %f" % d.Radar_frequency)
+            fwrite("")
+            fwrite("Logical volume generating facility:             %s" % d.Logical_volume_generating_facility)
+            fwrite("Logical volume creation date:                   dummy")
+            fwrite('Location and date/time of product creation:     %s' % d.Location_and_date_time_of_product_creation)
+            fwrite("Scene identification:                           %s" % d.Scene_identification)
+            fwrite("Scene location:                                 %s" % d.Scene_location)
+            fwrite("Leader file:  %s" % d.Leader_file)
+            fwrite("Sensor platform mission identifer:              %s" % d.Sensor_platform_mission_identifier)
+            fwrite("Scene_centre_latitude:                          %.6f" % d.Scene_centre_latitude)
+            fwrite("Scene_centre_longitude:                         %.6f" % d.Scene_centre_longitude)
+            fwrite("Scene_centre_heading:                           %.6f" % d.Scene_centre_heading)
+            fwrite("Radar_wavelength (m):                           %f"   % d.Radar_wavelength)
+            fwrite("First_pixel_azimuth_time (UTC):                 %s"   % d.First_pixel_azimuth_time)
+            fwrite("TIME TO LAST LINE: compute prf:                 %s"   % d.Time_to_last_line)
+            fwrite("Pulse_Repetition_Frequency (computed, Hz):      %.6f" % d.Pulse_Repetition_Frequency)
+            fwrite("Total_azimuth_band_width (Hz):                  %.6f" % d.Total_azimuth_band_width)
+            fwrite("Weighting_azimuth:                              HAMMING")
+            fwrite("Xtrack_f_DC_constant (Hz, early edge):          %.6f" % d.Xtrack_f_DC_constant)
+            fwrite("Xtrack_f_DC_linear (Hz/s, early edge):          %.6f" % d.Xtrack_f_DC_linear)
+            fwrite("Xtrack_f_DC_quadratic (Hz/s/s, early edge):     %.6f" % d.Xtrack_f_DC_quadratic)
+            fwrite("Range_time_to_first_pixel (2way) (ms):          %.6f" % d.Range_time_to_first_pixel)
+            fwrite("Range_sampling_rate (computed, MHz):            %.6f" % d.Range_sampling_rate)
+            fwrite("Total_range_band_width (MHz):                   %.6f" % d.Total_range_band_width)
+            fwrite("Weighting_range:                                HAMMING")
+            fwrite(stars)
+            fwrite("*_Start_leader_datapoints")
+            fwrite(stars)
+            fwrite("t(s)            X(m)            Y(m)            Z(m)")
+            fwrite("NUMBER_OF_DATAPOINTS:\t%d"                          % d.NUMBER_OF_DATAPOINTS)
+            for k in xrange(d.NUMBER_OF_DATAPOINTS):
+                fwrite("%.2f\t%.2f\t%.2f\t%.2f" % (d.leader_datapoints[k,0], d.leader_datapoints[k,1], d.leader_datapoints[k,2], d.leader_datapoints[k,3] ))  
+            fwrite(stars)
+            fwrite("* End_leader_datapoints:_NORMAL")
+            fwrite(stars)
+            fwrite("Datafile:                                       %s" % d.Datafile)
+            fwrite("Dataformat:                                     %s" % d.Dataformat)
+            fwrite("Number_of_lines_original:                       %d" % d.Number_of_lines_original)
+            fwrite("Number_of_pixels_original:                      %d" % d.Number_of_pixels_original)
+            fwrite(stars)
+            fwrite("* End_readfiles:_NORMAL")
+            fwrite(stars)
+        elif resname == "crop":
+            fwrite(stars)
+            fwrite("*_Start_crop:                        master")
+            fwrite(stars)
+            fwrite("Data_output_file:                               %s" % d.Data_output_file)
+            fwrite("Data_output_format:                             %s" % d.Data_output_format)
+            fwrite("First_line (w.r.t. original_master):            %d" % d.First_line)
+            fwrite("Last_line (w.r.t. original_master):             %d" % d.Last_line)
+            fwrite("First_pixel (w.r.t. original_master):           %d" % d.First_pixel)
+            fwrite("Last_pixel (w.r.t. original_master):            %d" % d.Last_pixel)
+            fwrite(stars)
+            fwrite("* End_crop:_NORMAL")
+            fwrite(stars)
+        elif resname == "master_timing":
             fwrite(stars)
             fwrite('*_Start_master_timing: ')
             fwrite(stars)
@@ -167,27 +238,29 @@ class Object:
         call(['adore', '-u', self.settingsFile, c]) 
         self.__init__(self.settingsFile)    
     
-    def modifyResults(self, process, parameter, value):
+    def modifyResults(self, process, parameter, value, filename=''):
         from subprocess import call
-        if "m_" in process:
-            filename=self.setobj.general.m_resfile.strip('"')
-        elif "s_" in process:
-            filename=self.setobj.general.s_resfile.strip('"')
-        else:
-            filename=self.setobj.general.i_resfile.strip('"')
+        if not filename:
+            if "m_" in process:
+                filename=self.setobj.general.m_resfile.strip('"')
+            elif "s_" in process:
+                filename=self.setobj.general.s_resfile.strip('"')
+            else:
+                filename=self.setobj.general.i_resfile.strip('"')
 
         resname=self.pn2rs[process];
         call(['modifyRes.sh',filename, resname, parameter, value]) 
 
-    def modifyResultRe(self, process, searchPattern, replacePattern):
+    def modifyResultRe(self, process, searchPattern, replacePattern, filename=''):
         import fileinput
         import re
-        if "m_" in process:
-            filename=self.setobj.general.m_resfile.strip('"')
-        elif "s_" in process:
-            filename=self.setobj.general.s_resfile.strip('"')
-        else:
-            filename=self.setobj.general.i_resfile.strip('"')
+        if not filename:
+            if "m_" in process:
+                filename=self.setobj.general.m_resfile.strip('"')
+            elif "s_" in process:
+                filename=self.setobj.general.s_resfile.strip('"')
+            else:
+                filename=self.setobj.general.i_resfile.strip('"')
 
         resname=self.pn2rs[process];
         
@@ -201,14 +274,15 @@ class Object:
                 line=re.sub(searchPattern, replacePattern, line);
             sys.stdout.write(line)
 
-    def modifyResult(self, process, parameter, value):
+    def modifyResult(self, process, parameter, value, filename=''):
         import fileinput
-        if "m_" in process:
-            filename=self.setobj.general.m_resfile.strip('"')
-        elif "s_" in process:
-            filename=self.setobj.general.s_resfile.strip('"')
-        else:
-            filename=self.setobj.general.i_resfile.strip('"')
+        if not filename:
+            if "m_" in process:
+                filename=self.setobj.general.m_resfile.strip('"')
+            elif "s_" in process:
+                filename=self.setobj.general.s_resfile.strip('"')
+            else:
+                filename=self.setobj.general.i_resfile.strip('"')
 
         resname=self.pn2rs[process];
         
@@ -402,7 +476,6 @@ def process2dict(fileDict, processName):
     if processName == 'readfiles':
         reDict = {'Volume file': None,
                   'Volume_ID': None,
-                  'Xtrack_f_DC_constant': None,
                   'Scene_centre_latitude': None,
                   'Scene_centre_longitude': None,
                   'Radar_wavelength': "Radar_wavelength.*:[\s]+(.*)",
@@ -882,16 +955,67 @@ def dataFormat2dataType(dataFormat):
     elif dataFormat=="c1":
         datatype="i1"
     elif dataFormat=="cu1":
-        datatype="u1"
+        datatype="I1"
         complexFlag=True;                
     elif dataFormat=="u1":
-        datatype="u1"
+        datatype="I1"
     elif  dataFormat=="u2":
-        datatype="u2"
+        datatype="I2"
     elif  dataFormat=="cu2":
-        datatype="cu2"
+        datatype="I2" #np.uint16
+        complexFlag=True;
     #else: dtype is already set to dataFormat
     return (datatype, complexFlag);    
+
+def initialize_result_file(resfile, type='master'):
+    """initialize_result_file('/path/to/output/file.res', type='master')
+    Generates file and returns true if successful. 
+    """
+    fid=open(resfile, 'w')
+    fidwrite= lambda x : fid.write(x+'\n')
+    if type=='master':
+        fidwrite("=====================================================")
+        fidwrite(" MASTER RESULTFILE: {}".format(resfile))
+        fidwrite("")
+        fidwrite("Created by:")
+        fidwrite("InSAR Processor:        Doris (Delft o-o Radar Interferometric Software)")
+        fidwrite("Version:                version  4.06-beta2 (28-12-2011)")
+        fidwrite("                     build      Fri Apr 11 04:19:23 2014 (optimal)")
+        fidwrite("FFTW library:           unknown")
+        fidwrite("VECLIB library:         unknown")
+        fidwrite("LAPACK library:         unknown")
+        fidwrite("Compiled at:            Apr 11 2014 04:19:47")
+        fidwrite("By GNU gcc:             4.8.4")
+        fidwrite("File creation at:       Tue Aug 23 14:01:59 2016")
+        fidwrite("""
+
+ -------------------------------------------------------
+| Delft Institute of Earth Observation & Space Systems  |
+|          Delft University of Technology               |
+|              http://doris.tudelft.nl                  |
+|                                                       |
+| Author: (c) TUDelft - DEOS Radar Group                |
+ -------------------------------------------------------
+
+
+Start_process_control
+readfiles:              0
+precise_orbits:         0
+modify_orbits:          0
+crop:                   0
+sim_amplitude:          0
+master_timing:          0
+oversample:             0
+resample:               0
+filt_azi:               0
+filt_range:             0
+NOT_USED:               0
+End_process_control
+""")
+    else:
+        print('Not implemented yet')
+        return False
+    return True
     
 def isresfile(resfile,lines=30):  
     '''

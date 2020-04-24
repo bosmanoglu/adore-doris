@@ -33,11 +33,12 @@ div
 
 import operator
 import sys
-import exceptions
+# import exceptions
+import builtins as exceptions
 from numpy import *
 import pylab as plt
 import time
-import graphics
+from .graphics import graphics
 
 class rkdict(dict): #return (missing) key dict
     def __missing__(self, key):
@@ -100,7 +101,7 @@ def confirm(prompt=None, resp=False):
         if not ans:
             return resp
         if ans not in ['y', 'Y', 'n', 'N']:
-            print 'please enter y or n.'
+            print('please enter y or n.')
             continue
         if ans == 'y' or ans == 'Y':
             return True
@@ -234,6 +235,7 @@ def fillNan(arr, copy=True, method='quick', maxiter=None):
         return data
     else:
         import scipy
+        import scipy.interpolate
         X, Y= meshgrid(r_[0:arr.shape[1]], r_[0:arr.shape[0]])
         m=~isnan(arr)
         z=arr[m]
@@ -326,10 +328,26 @@ def maskshow(array, mask=None, **kwargs):
     ''' maskshow(array, mask=None)
     Ex: maskshow(kum.topoA[:,:,0], mask<0.5)
     '''
-    maskedArray=array.copy();
-    if mask != None:          
-        maskedArray[mask]=nan;
-    return plt.matshow(maskedArray, **kwargs);
+
+    if array.ndim==4: # use imshow instead of matshow...
+        maskedArray=array.copy();
+        if mask != None:
+            mask=255*abs(double(mask)-1);
+            maskedArray[:,:,3] =mask;
+        return plt.imshow(maskedArray, **kwargs);
+    elif array.ndim==3: # use imshow instead of matshow...
+        maskedArray=zeros((array.shape[0], array.shape[1], 4), dtype=array.dtype)
+        maskedArray[:,:,0:3]=array;
+        if mask != None:
+            mask=255*abs(double(mask)-1);
+            maskedArray[:,:,3] =mask;
+        plt.imshow(maskedArray, **kwargs);
+        return maskedArray
+    elif array.ndim==2:
+        maskedArray=array.copy();
+        if mask is None:          
+            maskedArray[mask]=nan;
+        return plt.matshow(maskedArray, **kwargs);
 
 def mdot(listIn):
     ''' out=mdot([A,B,C])
@@ -380,11 +398,15 @@ def progresstime(t0=0,timeSpan=30):
     else:
         return False;
         
-def rescale(arr, lim, trim=False, arrlim=None):
-    """rescale(array, limits, trim=False, arrlim=None)
+def rescale(arr, lim, trim=False, arrlim=None, quiet=False):
+    """rescale(array, limits, trim=False, arrlim=None, quiet=False)
     scale the values of the array to new limits ([min, max])
     Trim:
       With this option set to a number, the limits are stretced between [mean-TRIM*stdev:mean+TRIM*stdev]
+    arrlim: 
+      If given the limits are not calculated (useful if array has nan/inf values).
+    quiet:
+      If True, won't print the min/max values for the array. 
     """
     if arrlim is not None:
         minarr=arrlim[0];
@@ -397,7 +419,8 @@ def rescale(arr, lim, trim=False, arrlim=None):
     elif (trim==False) & (arrlim is None):
         minarr=arr.min()
         maxarr=arr.max()
-    print [minarr, maxarr]        
+    if not quiet:
+      print([minarr, maxarr])
     newarr=(arr-minarr)/(maxarr-minarr)*(lim[1]-lim[0])+lim[0]
     newarr[newarr<lim[0]]=lim[0]
     newarr[newarr>lim[1]]=lim[1]
@@ -443,6 +466,15 @@ def tic():
     return time.time()
 
 def transect(x,y,z,x0,y0,x1,y1,plots=0):
+    ''' (xi, yi, zi)=transect(x,y,z,x0,y0,x1,y1,plots=0)
+    x: 2-D array of x coordinates
+    y: 2-D array of y coordinates
+    z: 2-D array of z values
+    x0,y0,x1,y1: scalar coordinates
+    plots=0: do not show plots
+    outputs
+    xi,yi,zi: vectors of x,y coordinates and z values along transect.
+    '''
     #convert coord to pixel coord
     d0=sqrt( (x-x0)**2+ (y-y0)**2 );
     i0=d0.argmin();
@@ -473,7 +505,7 @@ def transect(x,y,z,x0,y0,x1,y1,plots=0):
 def toc(t):
     ''' subtracts current time from given, and displays result
     '''
-    print time.time()-t, "sec."    
+    print(time.time()-t, "sec.")    
     return
 
 def validIndex(arrSize, arrIdx):
@@ -581,7 +613,7 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
     for k in xrange(len(s)):
         if s[k]<1:
             s[k]=1
-    print s
+    print(s)
     #create solution lists
     x=[]
     y=[]
@@ -594,12 +626,12 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
         for k in xrange(len(bounds)):
             b0.append(bounds[k][::s[k]])
         X,Y=meshgrid(b0[0], b0[1])
-        print X
-        print Y        
+        print(X)
+        print(Y)        
         for xy in zip(X.ravel(),Y.ravel()):
             #if (xy[0] in x) and (xy[1] in y):
             if any( (x==xy[0]) & (y==xy[1]) ):
-                print [xy[0], xy[1], 0]
+                print([xy[0], xy[1], 0])
                 #raise NameError("LogicError")
                 continue
             x.append(xy[0])
@@ -609,22 +641,22 @@ def gridSearch2(fun, bounds,tol=1., goal='min'):
                 fun_z=z[-1]
                 x0=x[-1];
                 y0=y[-1];
-                print [99999, x[-1], y[-1], z[-1]]
+                print([99999, x[-1], y[-1], z[-1]])
             else:
-                print [x[-1], y[-1], z[-1]]
+                print([x[-1], y[-1], z[-1]])
         #Z=griddata(x,y,z,X,Y); # The first one is actually not necessary
         #set new bounds
         #xy0=Z.argmin()
         #set new bounds
         if breakLoop:
-            print "Reached lowest grid resolution."
+            print("Reached lowest grid resolution.")
             break
         if all([sk==1 for sk in s]):
             #Do one more loop then break.
-            print "BreakLoop is ON"
+            print("BreakLoop is ON")
             breakLoop=True
         if all(bounds[0]==r_[x0-s[0]:x0+s[0]]) and all(bounds[1]==r_[y0-s[1]:y0+s[1]] ):
-            print "Breaking to avoid infinite loop."
+            print("Breaking to avoid infinite loop.")
             break#if the bounds are the same then break
         bounds[0]=r_[x0-s[0]:x0+s[0]] 
         bounds[1]=r_[y0-s[1]:y0+s[1]] 
@@ -642,4 +674,87 @@ def moving_window(arr, window_size=[3,3], func=mean):
     """
     import scipy
     return scipy.ndimage.filters.generic_filter(arr, func, size=window_size)
+
+def reload_package(root_module):
+    """reload_package(module)
+    Reloads module and loaded sub-modules. It clears sys.modules for the given module.
+    http://stackoverflow.com/questions/2918898/prevent-python-from-caching-the-imported-modules
+    """
+    import types
+    package_name = root_module.__name__
+
+    # get a reference to each loaded module
+    loaded_package_modules = dict([
+        (key, value) for key, value in sys.modules.items() 
+        if key.startswith(package_name) and isinstance(value, types.ModuleType)])
+
+    # delete references to these loaded modules from sys.modules
+    for key in loaded_package_modules:
+        del sys.modules[key]
+
+    # load each of the modules again; 
+    # make old modules share state with new modules
+    for key in loaded_package_modules:
+        print('loading %s' % key)
+        newmodule = __import__(key)
+        oldmodule = loaded_package_modules[key]
+        oldmodule.__dict__.clear()
+        oldmodule.__dict__.update(newmodule.__dict__) 
+    
+def clear_sys_module(root_module):
+    """clear_sys_module(module)
+    Deletes module and loaded sub-modules from sys.modules for the given module.
+    http://stackoverflow.com/questions/2918898/prevent-python-from-caching-the-imported-modules
+    """
+    import types
+    package_name = root_module.__name__
+
+    # get a reference to each loaded module
+    loaded_package_modules = dict([
+        (key, value) for key, value in sys.modules.items() 
+        if key.startswith(package_name) and isinstance(value, types.ModuleType)])
+
+    # delete references to these loaded modules from sys.modules
+    for key in loaded_package_modules:
+        del sys.modules[key]
+
+def resize(a, new_shape, stretch=True,method='linear'):
+    """ Returns a in the new_shape.
+    stretch=True: Interpolate as necessary. If false, use numpy.resize
+    method= 'linear' ==> interp2d kind.
+    %Only supports 2D at the moment   
+    """
+    import numpy as np
+    if stretch==False:
+        return np.resize(a, new_shape)
+    import scipy
+    import scipy.interpolate
+    #import scipy.misc
+    #return scipy.misc.imresize(a,new_shape)
+    #X, Y=  meshgrid(x, y)
+    x=arange(a.shape[0])
+    y=arange(a.shape[1])
+    interpFun=scipy.interpolate.interp2d(x,y,a )   
+    X=arange(new_shape[0])*a.shape[0]/new_shape[0]
+    Y=arange(new_shape[1])*a.shape[1]/new_shape[1]
+    return interpFun(X,Y)
+   
+def rmse(predictions, targets):
+  """rmse(predictions, targets)
+  """
+  return sqrt(mean((predictions-targets)**2.)) 
+
+def r_squared(predictions, targets, ignore_nan=True):
+  """r_squared(predictions, targets)
+  """
+  import scipy
+  scipy.pkgload('stats')
+  if ignore_nan:
+    m=bitwise_not(bitwise_or(isnan(predictions), isnan(targets)))
+    print("{} nan elements masked.".format(m.sum()))
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions[m], targets[m])
+  else:
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(predictions, targets)
+  return r_value**2.
+
 

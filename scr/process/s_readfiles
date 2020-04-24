@@ -64,6 +64,8 @@ case "${slcType}" in
   gmtsar)
     echo "Reading GMTSAR SLC"
     if [ -e "${s_in_lea}" ] && [ -e "${s_in_dat}" ] && [ -e "${s_in_vol}" ]; then
+      #modify s_crop_in
+      #settings apply -r -q _rel_s_crop_in='echo ${s_in_dat}.ci2'
       #run the m_readfiles script
       gmtsarReadfiles.py ${s_in_dat} ${s_in_lea} ${s_in_vol} > ${s_resfile}
       [ $? -eq 0 ] && echo "${dorisProcess}: SUCCESS"

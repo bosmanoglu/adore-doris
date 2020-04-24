@@ -527,10 +527,12 @@ function checkUpdates(){
 mkdir -p ${tmpFolder}
 # wget http://adore-doris.googlecode.com/svn/trunk/version -O ${tmpFolder}/version
 wget https://raw.githubusercontent.com/bosmanoglu/adore-doris/master/version -O ${tmpFolder}/version
-svn_version=`cat ${tmpFolder}/version | tr -d ".r"`  
-cur_version=`cat ${ADOREFOLDER}/version | tr -d ".r"`
+#svn_version=`cat ${tmpFolder}/version | tr -d ".r"`  
+#cur_version=`cat ${ADOREFOLDER}/version | tr -d ".r"`
+svn_version=`cat ${tmpFolder}/version |sed 's/\./*1000+/g'`
+cur_version=`cat ${ADOREFOLDER}/version | sed 's/\./*1000+/g'`
 #compare versions
-if [ ${svn_version} -gt ${cur_version} ]; then
+if [ $(( ${svn_version} )) -gt $(( ${cur_version} )) ]; then
  echo "A new version is available."
  if ask "Would you like to upgrade?"; then
   wget https://github.com/bosmanoglu/adore-doris/archive/master.zip -O /${tmpFolder}/master.zip

@@ -681,11 +681,15 @@ function saveas_giant(){
   echo "SUCCESS: saveas_giant"
 }
 
-
+function saveas_matlab(){
+  _ipy_process="${1}"
+  openInIpython "${ADOREFOLDER}/lib/python/fun/saveas_matlab.py"
+  return $?
+}
 
 case ${1} in 
   envi)
-    [ $# -gt 2 ] && "Please check usage: ? saveas"      
+    [ $# -gt 2 ] && error "Please check usage: ? saveas"      
     saveas_envi ${2}    
   ;;
   arcgis)
@@ -706,5 +710,12 @@ case ${1} in
   giant)
     shift
     saveas_giant ${@}
+  ;;
+  matlab)
+    shift
+    saveas_matlab ${@}
+  ;;
+  *)
+    error "Please check usage: ? saveas"
   ;;
 esac

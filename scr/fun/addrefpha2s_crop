@@ -24,7 +24,7 @@ function funResample2Tmpfile(){
   #[ ! -e "${srp_out_refpha}" ] && error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on" && return 
   if [ ! -e "${srp_out_refpha}" ] && [ ! -e "${crd_out_file}" ] ; then
     error "Reference phase file not found. Please run subtrrefpha with dumprefpha=on or comprefdem with crd_include_fe=on"
-    return 
+    return 1 
   fi
   
   if [ -e "${crd_out_file}" ]; then 
@@ -115,11 +115,21 @@ function funResample2Ovs(){
   rm -rf ${tmpFile}
 }
 
-
+function funBackup(){
+if [ -e ${s_resfile}.bck ]; then
+  if [ ${overwrite^^} == "ON" ]; then 
+    cp ${s_resfile} ${s_resfile}.bck
+  else
+    error "Can not overwrite ${s_resfile}.bck"
+  fi
+fi
+}
 ###MAIN
 if [ `readRes.sh ${s_resfile} process_control oversample` == "1" ]; then
+  funBackup
   funResample2Ovs ${@}
 elif [ `readRes.sh ${s_resfile} process_control crop` == "1" ]; then
+  funBackup
   funResample2Crop ${@}
 else
   error "addrefpha2s_crop: s_ovs or s_crop steps are not in s_resfile."
