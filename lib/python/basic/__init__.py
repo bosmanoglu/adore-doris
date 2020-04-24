@@ -718,6 +718,22 @@ def clear_sys_module(root_module):
     for key in loaded_package_modules:
         del sys.modules[key]
 
+def numel(x):
+    import numpy as np
+    if isinstance(x, np.int):
+      return 1
+    elif isinstance(x, np.double):
+      return 1
+    elif isinstance(x, np.float):
+      return 1
+    elif isinstance(x, list) or isinstance(x, tuple):
+      return len(x)
+    elif isinstance(x, np.ndarray):
+      return x.size
+    else:
+      print('Unknown type {}.'.format(type(x)))
+    return None
+
 def resize(a, new_shape, stretch=True,method='linear'):
     """ Returns a in the new_shape.
     stretch=True: Interpolate as necessary. If false, use numpy.resize
